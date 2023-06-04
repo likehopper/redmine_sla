@@ -2,15 +2,21 @@
 
 ## Overview
 
+- Website:	https://github.com/likehopper/redmine_sla
+- Code repository:	git@github.com:likehopper/redmine_sla.git
+
+
 ### Digest
+
 Redmine SLA plugin gives the possibility of managing service levels. 
 It provides flexible configuration of calendars, times and terms.
 It calculates types of response times for project trackers.
 
 
 ### Features
+
 These are the features of this plugin :
-- Defintion at plugin level
+- Definition at plugin level
   - SLA update step
   - SLA calculation time zone
   - SLA log level (but no log currently)
@@ -44,11 +50,13 @@ These are the features of this plugin :
   - Update SLA manualy or by crontab
 
 ### Localisations
+
 - English
 - French
 
 
 ### Todo
+
 Here is a list of possible evolutions without prioritization :
 - Time zone by projets 
 - Ability to sort lists
