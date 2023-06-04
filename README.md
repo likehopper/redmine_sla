@@ -82,10 +82,10 @@ Here is a list of possible evolutions without prioritization :
 
 | Name               | requirement                      |
 | -------------------|----------------------------------|
-| `Redmine` version  | >= 4.0                           |
-| `Ruby` version     | >= 2.7                           |
-| `Ruby` version     | >= 5.2                           |
-| `Database` version | PostgreSQL >= 10                 |
+| `Redmine`          | >= 4.0                           |
+| `Ruby`             | >= 2.7                           |
+| `Ruby`             | >= 5.2                           |
+| `Database`         | PostgreSQL >= 10                 |
 
 > **_NOTE:_** It is important to note that, to calculate the SLAs, the plugin uses the features of Posgtres, including the Pl/Pgsql procedures.
 
