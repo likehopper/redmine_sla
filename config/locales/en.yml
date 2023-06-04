@@ -1,0 +1,267 @@
+# head config/locales/en.yml
+en:
+  permission_view_sla: View SLA
+  permission_manage_sla: Manage SLA
+
+  msgerror: Error message
+
+  sla_log_level_none: None
+  sla_log_level_error: Errors
+  sla_log_level_info: Informations
+  sla_log_level_debug: Debug
+
+  sla_dictionary:
+    sla: &sla Service Level Agreement
+    name: &name Name
+    start_date: &start_date Start date
+    end_date: &end_date End date
+    dow: &dow Dow
+    start_time: &start_time Start time
+    end_time: &end_time End time
+    date: &date Date
+    priority: &priority Priority
+    match: &match Match
+    term: &term Term
+    status: &status Status
+    sla_holiday: &sla_holiday SLA Holiday
+    sla_calendar: &sla_calendar SLA Calendar
+    sla_schedule: &sla_schedule SLA Schedule
+    sla_type: &sla_type SLA Type
+    sla_level: &sla_level SLA Level
+
+  field_sla: *sla
+  field_name: *name
+  field_start_date: *start_date
+  field_end_date: *end_date
+  field_dow: *dow
+  field_start_time: *start_time
+  field_end_time: *end_time
+  field_date: *date
+  field_priority: *priority
+  field_match: *match
+  field_term: *term
+  field_status: *status
+  field_sla_holiday: *sla_holiday
+  field_sla_calendar: *sla_calendar
+  field_sla_schedule: *sla_schedule
+  field_sla_type: *sla_type
+  field_sla_level: *sla_level
+    
+  activerecord:
+    models:
+      sla_holiday: *sla_holiday
+      sla_calendar: *sla_calendar
+      sla_schedule: *sla_schedule
+      sla_type: *sla_type
+      sla_level: *sla_level
+    attributes:
+      sla:
+        sla: *sla
+        name: *name
+      sla_type:
+        sla_type: *sla_type
+        name: *name
+      sla_level:
+        sla_level: *sla_level
+        name: *name
+        sla: *sla
+        sla_id: *sla
+        sla_type: *sla_level
+        sla_type_id: *sla_level
+        sla_calendar: *sla_calendar
+        sla_calendar_id: *sla_calendar
+      sla_status:
+        sla_type: *sla_type
+        sla_type_id: *sla_type
+      sla_holiday:
+        sla_holiday: *sla_holiday
+        name: *name
+      sla_calendar:
+        sla_calendar: *sla_calendar
+        sla_calendar_id: *sla_calendar
+        name: *name
+        date: *date
+      sla_schedules:
+        sla_calendar_id: *sla_calendar
+      sla_schedule:
+        sla_shedule: *sla_schedule
+        sla_shedule_id: *sla_schedule
+        sla_calendar: *sla_calendar
+        sla_calendar_id: *sla_calendar
+        dow: *dow
+        start_date: *start_date
+        end_date: *end_date
+        match: *match
+      sla_calendar_holiday:
+        sla_calendar: *sla_calendar
+        sla_calendar_id: *sla_calendar
+        sla_holiday: *sla_holiday
+        sla_holiday_id: *sla_holiday
+        match: *match
+      sla_level_term:
+        sla_level: *sla_level
+        sla_level_id: *sla_level
+        sla_type: *sla_type
+        sla_type_id: *sla_type
+        priority: *priority
+        term: *term
+        
+  sla_label_abbreviation: SLA
+  sla_label_global_settings: SLA Global settings
+  sla_label_plugin_settings: SLA Plugin settings
+  sla_label_project_settings: SLA Project settings
+
+  sla_label:
+  
+    # SlaCache
+    sla_cache:
+      manage: SLA Cache management
+      ttl: SLA Cache Lifetime (in minutes)
+
+    # SlaLog
+    sla_log:
+      error_logs: SLA Error logs
+      error_level: SLA Error level
+
+    # Sla
+    sla:
+      singular: *sla
+      plural: Service Levels Agreement
+      count:
+        zero: None SLA
+        one: One SLA
+        other: "%{count} SLA"
+      new: New SLA
+      edit: Edit SLA
+      delete: Delete SLA
+      miss: Miss SLA
+
+    # SlaType
+    sla_type:
+      singular: *sla_type
+      plural: SLA Types
+      count:
+        zero: None SLA Type
+        one: One SLA Types
+        other: "%{count} SLA Types"
+      new: New SLA Type
+      edit: Edit SLA Type
+      delete: Delete SLA Type
+      miss: Miss SLA Type
+
+    # SlaStatus
+    sla_status:
+      singular: SLA Status
+      plural: SLA Statuses
+      count:
+        zero: None SLA Status
+        one: One SLA Status
+        other: "%{count} SLA Statuses"
+      new: New SLA Status
+      edit: Edit SLA Status
+      delete: Delete SLA Statuses
+      miss: Miss SLA Statuses
+
+    # SlaHoliday
+    sla_holiday:
+      singular: *sla_holiday
+      plural: SLA Holidays
+      count:
+        zero: None SLA Holiday
+        one: One SLA Holiday
+        other: "%{count} SLA Holidays"
+      new: New SLA Holiday
+      edit: Edit SLA Holiday
+      delete: Delete SLA Holiday
+      miss: Miss SLA Holiday
+
+    # SlaCalendar
+    sla_calendar:
+      singular: *sla_calendar
+      plural: SLA Calendars
+      count:
+        zero: None SLA Calendar
+        one: One SLA Calendar
+        other: "%{count} SLA Calendars"
+      new: New SLA Calendar
+      edit: Edit SLA Calendar
+      delete: Delete SLA Calendar
+      miss: Miss SLA Calendar
+
+    # SlaScheduler
+    sla_schedule:
+      singular: *sla_schedule
+      plural:  SLA Schedules
+      count:
+        zero: None SLA Schedule
+        one: One SLA Schedule
+        other: "%{count} SLA Schedules"
+      new: New SLA Schedule
+      edit: Edit SLA Schedule
+      delete: Del SLA Schedule
+      miss: Miss SLA Schedule
+      exists: This slot alredy exists
+
+    # SlaCalendarHoliday
+    sla_calendar_holiday:
+      singular: SLA Calendar's Holidays
+      plural: SLA Calendars' Holidays
+      count:
+        zero: None SLA Calendar's Holiday
+        one: One SLA Calendar's Holidays
+        other: "%{count} SLA Calendars' Holidays"
+      new: New SLA Calendar's Holidays
+      edit: Edit SLA Calendar's Holidays
+      delete: Delete SLA Calendar's Holidays
+
+    # SlaLevel
+    sla_level:
+      singular: SLA Level
+      plural: SLA Levels
+      count:
+        zero: None SLA Level
+        one: One SLA Level
+        other: "%{count} SLA Levels"
+      new: Add SLA Level
+      edit: Edit SLA Level
+      delete: Delete SLA Level
+      miss: Miss SLA Level
+
+    # SlaLevelTerm
+    sla_level_term:
+      singular: SLA Term
+      plural: SLA Terms
+      count:
+        zero: None SLA Term
+        one: One SLA Term
+        other: "%{count} SLA Terms"
+      new: Add SLA Term
+      edit: Edit SLA Term
+      delete: Delete SLA Term
+      miss: Miss SLA Term
+      exists: This term alredy exists
+
+    # SlaProjectTracker
+    sla_project_tracker:
+      plural: SLA projects' trackers
+      singular: SLA project's trackers
+      new: New SLA project's trackers
+      edit: Edit SLA project's trackers
+      delete: Delete SLA project's trackers
+      exists: This tracker alredy exists
+
+  # Others  
+  label_sla_title_horaire_am: Schedule AM
+  label_sla_title_horaire_pm: Schedule PM
+  label_sla_gti: GTI
+  label_sla_gtr: GTR
+  label_sla_respect: respect
+  label_sla_gti_respect: GTI respect
+  label_sla_gtr_respect: GTR respect
+  label_sla_am_from: From
+  label_sla_am_to: to
+  label_sla_pm_from: From
+  label_sla_pm_to: to
+  label_sla_for: for
+  label_sla_msgerror: KO
+  label_sla_msgsuccess: OK

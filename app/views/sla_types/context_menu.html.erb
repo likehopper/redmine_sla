@@ -1,0 +1,12 @@
+<ul>
+  <% if @sla_type %>
+    <li><%= context_menu_link l(:button_show), sla_type_path(@sla_type), class: 'icon icon-magnifier', disabled: !@can[:edit] %></li>
+    <li><%= context_menu_link l(:button_edit), edit_sla_type_path(@sla_type), class: 'icon icon-edit', disabled: !@can[:edit] %></li>
+  <% end %>
+  <li><%= context_menu_link l(:button_delete),
+            sla_types_path(ids: @sla_type_ids, back_url: @back),
+            method: :delete, class: 'icon icon-del', disabled: !@can[:delete],
+            data: { confirm: l('sla_label.sla_type.count',count: @sla_type_ids.count)+"\n"+l(:text_are_you_sure) }
+  %></li>
+  <%= call_hook(:view_sla_types_context_menu_end, { sla_type: @sla_type, sla_types: @sla_types, can: @can, back: @back }) %>
+</ul>

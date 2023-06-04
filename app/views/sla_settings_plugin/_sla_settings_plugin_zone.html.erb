@@ -1,0 +1,8 @@
+<p>
+  <label for="settings_sla_time_zone"><%= l(:field_time_zone) %></label>
+  <%
+    # select_tag 'settings[sla_time_zone]', options_for_select(ActiveSupport::TimeZone::MAPPING.map {|k,v| [k,v]},
+  %>
+  <%= select_tag 'settings[sla_time_zone]', options_for_select(ActiveSupport::TimeZone::MAPPING.map {|k,v| [v,v]},
+    @settings["sla_time_zone"]) %>
+</p>

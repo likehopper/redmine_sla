@@ -1,0 +1,13 @@
+<% html_title(l(:sla_label_global_settings)) %>
+<div class="content"> 
+  <div class="contextual">
+    <%= link_to l('sla_label.sla_calendar_holiday.plural'), sla_calendar_holidays_path, class: 'icon icon-cancel' %>
+  </div>
+  <div class="title-sla-settings title-sla_calendar_holiday">
+    <%= title l('sla_label.sla_calendar_holiday.edit') %>
+  </div>  
+  <%= render partial: 'form', locals: { sla_calendar_holiday: @sla_calendar_holiday } %>
+</div>
+<% content_for :sidebar do %>
+  <%= render partial: 'slas/sidebar' %>
+<% end %>

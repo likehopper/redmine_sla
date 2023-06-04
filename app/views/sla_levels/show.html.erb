@@ -1,0 +1,66 @@
+<% html_title(l(:sla_label_global_settings)) -%>
+<div class="content"> 
+  <div class="contextual">
+    <% if User.current.admin? -%>
+      <%= link_to l('sla_label.sla_level.plural'), sla_levels_path, class: 'icon icon-cancel' -%>
+    <% else -%>
+    <%= link_to l(:button_back), :back, :class => 'button', :title => l(:button_back) -%>
+    <% end -%>
+  </div>
+  <div class="title-sla-settings title-sla_level">
+    <%= title l('sla_label.sla_level.plural') -%>
+  </div>  
+
+  <h3><%= @sla_level.name -%></h3>
+  <p>
+    <b><%= l('sla_label.sla_calendar.singular') -%> : </b><%=  -%>
+    <%= link_to @sla_level.sla_calendar.name, sla_calendar_path(@sla_level.sla_calendar), title: l(:button_show) -%> 
+  </p>
+  <table style="border: none:" margin="8px">
+  <tr>
+    <th width="240px" colspan="2" style="border-top: solid darkgrey; border-left: solid darkgrey; border-right: solid darkgrey; text-align: right;"><%= l("sla_label.sla_level.plural") -%>&nbsp;<%= image_tag("arrow_right.png") -%></th>
+    <% @sla_types= @sla_level
+          .sla_level_term
+          #.unscoped # To view all sla_types
+          .select("sla_level_terms.sla_type_id AS id, sla_types.name AS name")
+          .joins(:sla_type)
+          .order(:sla_type_id)
+          .uniq.each do |sla_type|
+    -%>
+      <th width="120px" rowspan="2" style="border: solid darkgrey;"><%= sla_type[:name] -%></th>
+    <% end -%>
+  </tr>
+  <tr>
+    <th width="240px" colspan="2" style="border-bottom: solid darkgrey; border-left: solid darkgrey; border-right: solid darkgrey; text-align: left;"><%= image_tag("arrow_down.png") -%>&nbsp;<%= l(:enumeration_issue_priorities) -%></th>
+  </tr>
+  <%  @sla_level
+        .sla_level_term
+        #.unscoped # To view all priorites
+        .select("sla_level_terms.priority_id AS id, enumerations.name AS name, enumerations.position AS position")
+        .joins(:priority)
+        .order("enumerations.position ASC") # TODO: order(:priority) possible ?
+        .uniq.each do |priority|
+  -%>
+  <tr>
+    <th colspan="2" style="border: solid darkgrey;"><%= priority.name -%></th>
+      <% @sla_types.each do |sla_type| -%>
+        <td style="border: solid darkgrey; text-align: right;"><%
+          sla_level_term = SlaLevelTerm.find_by_level_type(@sla_level.id,sla_type[:id],priority.id)
+          if ( sla_level_term.nil? )
+        -%>
+          &nbsp
+        <% else
+            sla_term = sla_level_term[:term]
+            sla_term_txt = ChronicDuration.output(sla_term*60, :format => :short, :limit_to_hours => true, :units => 2, :joiner => '')
+        -%>
+          <%= sla_term_txt -%>
+        <% end -%>
+        </td>
+    <% end -%>
+  </tr>
+<% end -%>
+</table>
+</div>
+<% content_for :sidebar do -%>
+  <% render partial: 'slas/sidebar' -%>
+<% end -%>

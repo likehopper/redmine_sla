@@ -1,0 +1,56 @@
+---
+# TMA HO GTI/GTR on tracker_bug_request
+sla_tma_level_01:
+  id: 1
+  sla_id: 1
+  sla_calendar_id: 1
+  name: TMA - Bug HO
+
+# TMA HO GTI only on tracker_support_request
+sla_tma_level_02:
+  id: 2
+  sla_id: 2
+  sla_calendar_id: 1
+  name: TMA - Support HO
+
+# Managed Services STD HO only on tracker_change_request
+sla_info_level_03:
+  id: 3
+  sla_id: 3
+  sla_calendar_id: 2
+  name: Managed Services STD - Change - HO
+
+# Managed Services STD HO continued on tracker_production_incident
+sla_info_level_04:
+  id: 4
+  sla_id: 4
+  sla_calendar_id: 3
+  name: Managed Services STD - Incident HO
+
+# Managed Services STD HNO continued on tracker_production_incident
+sla_info_level_05:
+  id: 5
+  sla_id: 4
+  sla_calendar_id: 4
+  name: Managed Services STD - Incident HNO
+
+# Managed Services SPE HO only on tracker_change_request
+sla_info_level_06:
+  id: 6
+  sla_id: 5
+  sla_calendar_id: 5
+  name: Managed Services SPE - Change - HO
+
+# Managed Services SPE HO continued on tracker_production_incident
+sla_info_level_07:
+  id: 7
+  sla_id: 6
+  sla_calendar_id: 6
+  name: Managed Services SPE - Incident HO
+
+# Managed Services SPE HNO continued on tracker_production_incident
+sla_info_level_08:
+  id: 8
+  sla_id: 6
+  sla_calendar_id: 7
+  name: Managed Services SPE - Incident HNO

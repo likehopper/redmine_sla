@@ -1,0 +1,13 @@
+<% html_title(l(:sla_label_global_settings)) %>
+<div class="content"> 
+  <div class="contextual">
+    <%= link_to l('sla_label.sla_level_term.plural'), sla_level_terms_path, class: 'icon icon-cancel' %>
+  </div>
+  <div class="title-sla-settings title-sla_level_term">
+    <%= title l('sla_label.sla_level_term.new') %>
+  </div>  
+  <%= render partial: 'form', locals: { sla_level_term: @sla_level_term } %>
+</div>  
+<% content_for :sidebar do %>
+  <%= render partial: 'slas/sidebar' %>
+<% end %>

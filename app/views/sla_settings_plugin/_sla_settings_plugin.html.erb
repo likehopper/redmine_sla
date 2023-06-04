@@ -1,0 +1,20 @@
+<% html_title(l(:sla_label_plugin_settings)) %>
+<h2><%= l(:sla_label_plugin_settings) %></h2>
+<% 
+  sla_tabs = [
+    {
+    :name => 'general',
+    :partial => 'sla_settings_plugin/sla_settings_plugin_logs', 
+    :label => 'sla_label.sla_log.error_logs'
+    },{
+    :name => 'sla_zone',
+    :partial => 'sla_settings_plugin/sla_settings_plugin_zone',
+    :label => :field_time_zone
+    },{
+    :name => 'sla_cache',
+    :partial => 'sla_settings_plugin/sla_settings_plugin_cache',
+    :label => 'sla_label.sla_cache.manage'
+    }
+]
+ %>
+<%= render_tabs sla_tabs %>

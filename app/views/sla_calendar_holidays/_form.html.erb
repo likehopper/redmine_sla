@@ -1,0 +1,29 @@
+<%= labelled_form_for([@sla_calendar_holiday], html: { multipart: false, id: 'sla_calendar_holiday_form', class: 'tabular', remote: request.xhr? }) do |f| %>
+  <%= error_messages_for f.object %>
+  <div class="box">
+    <% if sla_calendar_holiday.safe_attribute?('sla_calendar_id') %>
+    <p>
+      <%= f.select :sla_calendar_id, SlaCalendar.all.collect { |p| [ p.name, p.id ] }, :required => true, :include_blank => (@sla_calendar_holiday.new_record??true:false) %>
+    </p>
+    <% end %>
+    <% if sla_calendar_holiday.safe_attribute?('sla_holiday_id') %>
+    <p>
+      <%= f.select :sla_holiday_id, SlaHoliday.all.collect { |p| [ p.name, p.id ] }, :required => true, :include_blank => (@sla_calendar_holiday.new_record??true:false) %>
+    </p>
+    <% end %>
+    <% if sla_calendar_holiday.safe_attribute?('match') %>
+      <p>
+        <%= f.check_box :match, :required => true %>
+      </p>
+      <% end %>
+  </div>
+  <% if !request.xhr? %>
+    <p>
+      <% if f.object.new_record? %>
+        <%= submit_tag l('sla_label.sla_calendar_holiday.new'), title: l(:button_create), class: "button-positive" %>
+      <% else %>
+        <%= submit_tag l('sla_label.sla_calendar_holiday.edit'), title: l(:button_update), class: "button-positive" %>
+      <% end %>
+    </p>
+  <% end %>
+<% end %>

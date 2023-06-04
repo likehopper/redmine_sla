@@ -1,0 +1,12 @@
+<ul>
+  <% if @sla_calendar_holiday %>
+    <li><%= context_menu_link l(:button_show), sla_calendar_holiday_path(@sla_calendar_holiday), class: 'icon icon-magnifier', disabled: !@can[:edit] %></li>
+    <li><%= context_menu_link l(:button_edit), edit_sla_calendar_holiday_path(@sla_calendar_holiday), class: 'icon icon-edit', disabled: !@can[:edit] %></li>
+  <% end %>
+  <li><%= context_menu_link l(:button_delete),
+            sla_calendar_holidays_path(id: @sla_calendar_holiday_ids, back_url: @back),
+            method: :delete, class: 'icon icon-del', disabled: !@can[:delete],
+            data: { confirm: l('sla_label.sla_calendar_holiday.count',count: @sla_calendar_holiday_ids.count)+"\n"+l(:text_are_you_sure) }
+  %></li>
+  <%= call_hook(:view_sla_calendar_holidays_context_menu_end, { sla_calendar_holiday: @sla_calendar_holiday, sla_calendar_holidays: @sla_calendar_holidays, can: @can, back: @back, project: @project }) %>
+</ul>

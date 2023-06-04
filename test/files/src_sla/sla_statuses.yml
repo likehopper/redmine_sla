@@ -1,0 +1,19 @@
+---
+#
+# GTI only on New
+#
+one:
+  id: 1
+  sla_type_id: 1
+  status_id: 1
+#
+# GTR on New and Assigned
+#
+two:
+  id: 2
+  sla_type_id: 2
+  status_id: 1
+three:
+  id: 3
+  sla_type_id: 2
+  status_id: 2

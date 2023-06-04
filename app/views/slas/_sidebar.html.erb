@@ -1,0 +1,47 @@
+<% if User.current.admin? %>
+  <h3><%= l(:sla_label_global_settings) %></h3>
+  <ul>
+    <%= 
+    content_tag(:li, link_to(l('sla_label.sla.plural'), slas_path,
+      title: l(:sla_label_global_settings)+" : "+l('sla_label.sla.plural'),
+      class: 'icon icon-sla sla'))
+  %>
+  <%= 
+    content_tag(:li, link_to(l('sla_label.sla_type.plural'), sla_types_path,
+      title: l(:sla_label_global_settings)+" : "+l('sla_label.sla_type.plural'),
+      class: 'icon icon-sla_type'))
+  %>  
+  <%= 
+    content_tag(:li, link_to(l('sla_label.sla_status.plural'), sla_statuses_path,
+      title: l(:sla_label_global_settings)+" : "+l('sla_label.sla_status.plural'),
+      class: 'icon icon-sla_status'))
+  %>
+  <%= 
+    content_tag(:li, link_to(l('sla_label.sla_holiday.plural'), sla_holidays_path,
+      title: l(:sla_label_global_settings)+" : "+l('sla_label.sla_holiday.plural'),
+      class: 'icon icon-sla_holiday'))
+  %>
+  <%= 
+    content_tag(:li, link_to(l('sla_label.sla_calendar.plural'), sla_calendars_path,
+      title: l(:sla_label_global_settings)+" : "+l('sla_label.sla_calendar.plural'),
+      class: 'icon icon-sla_calendar'))
+  %>
+  <%= 
+    content_tag(:li, link_to(l('sla_label.sla_calendar_holiday.plural'), sla_calendar_holidays_path,
+      title: l(:sla_label_global_settings)+" : "+l('sla_label.sla_calendar_holiday.plural'),
+      class: 'icon icon-sla_calendar_holiday'))
+  %>
+  <%= 
+    content_tag(:li, link_to(l('sla_label.sla_level.plural'), sla_levels_path,
+      title: l(:sla_label_global_settings)+" : "+l('sla_label.sla_level.plural'),
+      class: 'icon icon-sla_level'))
+  %>
+  <%= 
+    content_tag(:li, link_to(l('sla_label.sla_level_term.plural'), sla_level_terms_path,
+      title: l(:sla_label_global_settings)+" : "+l('sla_label.sla_level_term.plural'),
+      class: 'icon icon-sla_level_term'))
+  %>
+  </ul>
+  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+  <span class="redmine_sla_footer"><a href="https://www.flaticon.com/authors/freepik" title="icons">Icons created by Freepik - Flaticon</a></span>
+<% end %>

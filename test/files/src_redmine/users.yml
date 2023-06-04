@@ -1,0 +1,69 @@
+---
+user_admin:
+  id: 1
+  status: 1
+  login: admin
+  type: User
+  created_on: 2021-11-11 11:11:11 +02:00
+  last_login_on: 
+  language: fr
+  # password = admin
+  salt: 82090c953c4a0000a7db253b0691a6b4
+  hashed_password: b5b6ff9543bf1387374cdfa27a54c96d236a7150
+  updated_on: 2021-11-11 11:11:11 +02:00
+  admin: true
+  lastname: Admin
+  firstname: Redmine
+  auth_source_id:
+  mail_notification: all
+user_manager:
+  id: 2
+  status: 1
+  login: manager
+  type: User
+  created_on: 2021-11-11 11:11:11 +02:00
+  last_login_on: 
+  language: fr
+  # password = manager
+  salt: 2068d8ac80583f2c3167c54baa35ee76
+  hashed_password: 1859e7cfc7276cc02bb0dc8caed97d44a92af449
+  updated_on: 2021-11-11 11:11:11 +02:00
+  admin: false
+  lastname: Manager
+  firstname: Redmine
+  auth_source_id:
+  mail_notification: all
+user_developer:
+  id: 3
+  status: 1
+  login: developer
+  type: User
+  created_on: 2021-11-11 11:11:11 +02:00
+  last_login_on: 
+  language: fr
+  # password = developer
+  salt: ff92d6dd4507e3c9d0ab3664b4cef0f3
+  hashed_password: 93973931580b120e8a46a83a14267f31b41aa1df
+  updated_on: 2021-11-11 11:11:11 +02:00
+  admin: false
+  lastname: Developer
+  firstname: Redmine
+  auth_source_id:
+  mail_notification: all
+user_reporter:
+  id: 4
+  status: 1
+  login: reporter
+  type: User
+  created_on: 2021-11-11 11:11:11 +02:00
+  last_login_on: 
+  language: fr
+  # password = reporter
+  salt: 34d25a04c2ffbc014d2b237461a329e2
+  hashed_password: cc4992fc5ed69211203117618211a68a434d5e74
+  updated_on: 2021-11-11 11:11:11 +02:00
+  admin: false
+  lastname: Reporter
+  firstname: Redmine
+  auth_source_id:
+  mail_notification: all  
