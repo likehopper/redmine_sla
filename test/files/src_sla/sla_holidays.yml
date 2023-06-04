@@ -1,0 +1,45 @@
+one:
+  id: 1
+  date: 2021-01-01
+  name: Jour de l'an
+two:
+  id: 2
+  date: 2021-04-05
+  name: Jour de Pâques
+three:
+  id: 3
+  date: 2021-05-01
+  name: Fête du travail
+four:
+  id: 4
+  date: 2021-05-08
+  name: Victoire 1945
+five:
+  id: 5
+  date: 2021-05-13
+  name: Ascension
+six:  
+  id: 6
+  date: 2021-05-24
+  name: Pentecôte
+seven:  
+  id: 7
+  date: 2021-07-14
+  name: Fête nationale
+eight:
+  id: 8
+  date: 2021-08-15
+  name: Assomption
+nine:  
+  id: 9
+  date: 2021-11-01
+  name: Toussaint
+ten:  
+  id: 10
+  date: 2021-11-11
+  name: Armistice
+eleven:  
+  id: 11
+  date: 2021-12-25
+  name: Jour de Noël
+

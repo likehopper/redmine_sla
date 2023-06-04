@@ -1,0 +1,24 @@
+<%= labelled_form_for([@sla_holiday], html: { multipart: false, id: 'sla_holiday_form', class: 'tabular', remote: request.xhr? }) do |f| %>
+  <%= error_messages_for f.object %>
+  <div class="box">
+      <% if sla_holiday.safe_attribute?('name') %>
+      <p>
+        <%= f.text_field :name, :required => true %>
+      </p>
+      <% end %>
+      <% if sla_holiday.safe_attribute?('date') %>
+      <p>
+        <%= f.date_field :date, :required => true %>
+      </p>
+      <% end %>
+  </div>
+  <% if !request.xhr? %>
+    <p>
+      <% if f.object.new_record? %>
+        <%= submit_tag l('sla_label.sla_holiday.new'), title: l(:button_create), class: "button-positive" %>
+      <% else %>
+        <%= submit_tag l('sla_label.sla_holiday.edit'), title: l(:button_update), class: "button-positive" %>
+      <% end %>
+    </p>
+  <% end %>
+<% end %>

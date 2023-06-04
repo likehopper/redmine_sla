@@ -1,0 +1,34 @@
+<%= labelled_form_for([@sla_level_term], html: { multipart: false, id: 'sla_level_term_form', class: 'tabular', remote: request.xhr? }) do |f| %>
+  <%= error_messages_for f.object %>
+  <div class="box">
+      <% if sla_level_term.safe_attribute?('sla_level_id') %>
+      <p>
+        <%= f.select :sla_level_id, SlaLevel.all.collect { |p| [ p.name, p.id ] }, :include_blank => (f.object.new_record??true:false), :required => true %>
+      </p>
+      <% end %>
+      <% if sla_level_term.safe_attribute?('sla_type_id') %>
+      <p>
+        <%= f.select :sla_type_id, SlaType.all.collect { |p| [ p.name, p.id ] }, :include_blank => (f.object.new_record??true:false), :required => true %>
+      </p>
+      <% end %>
+      <% if sla_level_term.safe_attribute?('priority_id') %>
+      <p>
+        <%= f.select :priority_id, IssuePriority.all.collect { |p| [ p.name, p.id ] }, :include_blank => (f.object.new_record??true:false), :required => true %>
+      </p>
+      <% end %>
+      <% if sla_level_term.safe_attribute?('term') %>
+      <p>
+        <%= f.text_field :term, :required => true %>
+      </p>
+      <% end %>
+  </div>
+  <% if !request.xhr? %>
+    <p>
+      <% if f.object.new_record? %>
+        <%= submit_tag l('sla_label.sla_level_term.new'), title: l(:button_create), class: "button-positive" %>
+      <% else %>
+        <%= submit_tag l('sla_label.sla_level_term.edit'), title: l(:button_update), class: "button-positive" %>
+      <% end %>
+    </p>
+  <% end %>
+<% end %>

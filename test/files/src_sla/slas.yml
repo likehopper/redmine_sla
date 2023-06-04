@@ -1,0 +1,19 @@
+---
+sla_tma_bug:
+  id: 1
+  name: SLA TMA tracker_bug_request
+sla_tma_ask:
+  id: 2
+  name: SLA TMA tracker_support_request
+sla_info_std_ask:
+  id: 3
+  name: SLA Managed Services Standard tracker_change_request
+sla_info_std_bug:
+  id: 4
+  name: SLA Managed Services Standard tracker_production_incident
+sla_info_spe_ask:
+  id: 5
+  name: SLA Managed Services Spécific tracker_change_request
+sla_info_spe_bug:
+  id: 6
+  name: SLA Managed Services Spécific tracker_production_incident

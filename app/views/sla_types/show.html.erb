@@ -1,0 +1,15 @@
+<% html_title(l(:sla_label_global_settings)) %>
+<div class="content"> 
+  <div class="contextual">
+    <%= link_to l('sla_label.sla_type.plural'), sla_types_path, class: 'icon icon-cancel' %>
+  </div>
+  <div class="title-sla-settings title-sla_type">
+    <%= title l('sla_label.sla_type.plural') %>
+  </div>  
+
+  <h3>n°<%= @sla_type.id %>&nbsp;:&nbsp;<%= @sla_type.name %></h3>
+
+</div>
+<% content_for :sidebar do %>
+  <% render partial: 'slas/sidebar' %>
+<% end %>

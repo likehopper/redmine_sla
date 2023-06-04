@@ -1,0 +1,25 @@
+  <%= error_messages_for f.object %>
+  <div class="box tabular">
+  <p>
+    <% if Tracker.all.nil? then %>
+      <label><%= l(:label_tracker) %></label><%= l(:error_no_tracker_in_project) %>
+    <% else %>
+    <% # TODO: except tracker already selected ? %>
+    <%= f.select :tracker_id, options_from_collection_for_select(Tracker.all, :id, :name, f.object.tracker.blank? ? 0 : f.object.tracker.id), :required => true, :include_blank => (f.object.new_record??true:false) %>
+    <% end %>
+  </p>
+  <p>
+    <% if Sla.all.blank? then %>
+      <label><%= l(:field_sla) %></label><%= l('sla_label.sla.miss') %>
+    <% else %>
+      <%= f.select :sla_id, options_from_collection_for_select(Sla.all, :id, :name, f.object.sla.blank? ? 0 : f.object.sla.id), :required => true, :include_blank => (f.object.new_record??true:false) %>
+    <% end %>
+  </div>    
+  </p>
+    <p>
+      <% if f.object.new_record? %>
+        <%= submit_tag l('sla_label.sla_project_tracker.new'), title: l(:button_create), class: "button-positive" %>
+      <% else %>
+        <%= submit_tag l('sla_label.sla_project_tracker.edit'), title: l(:button_update), class: "button-positive" %>
+      <% end %>
+    </p>  

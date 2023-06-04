@@ -1,0 +1,267 @@
+# head config/locales/fr.yml
+fr:
+  permission_view_sla: Voir les SLA
+  permission_manage_sla: Configurer les SLA
+
+  msgerror: Message d'erreur
+
+  sla_log_level_none: Aucun
+  sla_log_level_error: Erreurs
+  sla_log_level_info: Informations
+  sla_log_level_debug: Deboguage  
+
+  sla_dictionary:
+    sla: &sla Niveau de service
+    name: &name Nom
+    start_date: &start_date Date de début
+    end_date: &end_date Date de fin
+    dow: &dow Jour
+    start_time: &start_time Heure de début
+    end_time: &end_time Heure de fin
+    date: &date Date
+    priority: &priority Priorité
+    match: &match Correspondance
+    term: &term Engagement
+    status: &status Statut
+    sla_holiday: &sla_holiday Jour férié de SLA
+    sla_calendar: &sla_calendar Calendrier de SLA
+    sla_schedule: &sla_schedule Horaire de SLA
+    sla_type: &sla_type Type de SLA
+    sla_level: &sla_level Niveau de SLA
+
+  field_sla: *sla
+  field_name: *name
+  field_start_date: *start_date
+  field_end_time: *end_time
+  field_dow: *dow
+  field_start_time: *start_time
+  field_end_date: *end_date
+  field_date: *date
+  field_priority: *priority
+  field_match: *match
+  field_term: *term
+  field_status: *status
+  field_sla_holiday: *sla_holiday
+  field_sla_calendar: *sla_calendar
+  field_sla_schedule: *sla_schedule
+  field_sla_type: *sla_type
+  field_sla_level: *sla_level
+
+  activerecord:
+    models:
+      sla_holiday: *sla_holiday
+      sla_calendar: *sla_calendar
+      sla_schedule: *sla_schedule
+      sla_type: *sla_type
+      sla_level: *sla_level
+    attributes:
+      sla:
+        sla: *sla
+        name: *name
+      sla_type:
+        sla_type: *sla_type
+        name: *name
+      sla_level:
+        sla_level: *sla_level
+        name: *name
+        sla: *sla
+        sla_id: *sla
+        sla_type: *sla_level
+        sla_type_id: *sla_level
+        sla_calendar: *sla_calendar
+        sla_calendar_id: *sla_calendar
+      sla_status:
+        sla_type: *sla_type
+        sla_type_id: *sla_type
+      sla_holiday:
+        sla_holiday: *sla_holiday
+        name: *name
+      sla_calendar:
+        sla_calendar: *sla_calendar
+        sla_calendar_id: *sla_calendar
+        name: *name
+        date: *date
+      sla_schedules:
+        sla_calendar_id: *sla_calendar
+      sla_schedule:
+        sla_shedule: *sla_schedule
+        sla_shedule_id: *sla_schedule
+        sla_calendar: *sla_calendar
+        sla_calendar_id: *sla_calendar
+        dow: *dow
+        start_date: *start_date
+        end_date: *end_date
+        match: *match
+      sla_calendar_holiday:
+        sla_calendar: *sla_calendar
+        sla_calendar_id: *sla_calendar
+        sla_holiday: *sla_holiday
+        sla_holiday_id: *sla_holiday
+        match: *match
+      sla_level_term:
+        sla_level: *sla_level
+        sla_level_id: *sla_level
+        sla_type: *sla_type
+        sla_type_id: *sla_type
+        priority: *priority
+        term: *term
+
+  sla_label_abbreviation: SLA
+  sla_label_global_settings: Configuration globale des SLA
+  sla_label_plugin_settings: Configuration du plugin des SLA
+  sla_label_project_settings: Configuration des SLA du projet
+
+  sla_label:
+
+    # SlaCache
+    sla_cache:
+      manage: Gestion du cache des SLA
+      ttl: Durée de vie du cache des SLA (en minutes)
+      
+    # SlaLog
+    sla_log:
+      error_logs: Journaux d'erreurs des SLA
+      error_level: Niveau d'erreur des SLA
+
+    # Sla
+    sla:
+      singular: *sla
+      plural: Niveaux de service
+      count:
+        zero: Aucun SLA
+        one: Un SLA
+        other: "%{count} SLA"
+      new: Ajouter un SLA
+      edit: Editer un SLA
+      delete: Supprimer un SLA
+      miss: SLA absent
+
+    # SlaType
+    sla_type:
+      singular: *sla_type
+      plural: Types de SLA
+      count:
+        zero: Aucun Type de SLA
+        one: Un Type de SLA
+        other: "%{count} Types de SLA"
+      new: Ajouter un Type de SLA
+      edit: Editer un Type de SLA
+      delete: Supprimer un Type de SLA
+      miss: Absence du Type de SLA
+
+    # SlaStatus
+    sla_status:
+      plural: Statuts de SLA
+      singular: Statut de SLA
+      count:
+        zero: Aucun Statut de SLA
+        one: Un Statut de SLA
+        other: "%{count} Statuts de SLA"
+      new: Ajouter un Statut de SLA
+      edit: Editer un Statut de SLA
+      delete: Supprimer un Statut de SLA
+      miss: Statut de SLA absent
+
+    # SlaHoliday
+    sla_holiday:
+      singular: *sla_holiday
+      plural:  Jours fériés de SLA
+      count:
+        zero: Aucun Jour férié de SLA
+        one: Un Jour férié de SLA
+        other: "%{count} Jours fériés de SLA"
+      new: Ajouter un Jour férié de SLA
+      edit: Editer un Jour férié de SLA
+      delete: Supprimer un Jour férié de SLA
+      miss: Jour férié de SLA absent
+
+    # SlaCalendar
+    sla_calendar:
+      singular: *sla_calendar
+      plural: Calendriers de SLA
+      count:
+        zero: Aucun Calendrier de SLA
+        one: Un Calendrier de SLA
+        other: "%{count} Calendriers de SLA"
+      new: Ajouter un Calendrier de SLA
+      edit: Editer un Calendrier de SLA
+      delete: Supprimer un Calendrier de SLA
+      miss: Calendrier de SLA absent
+
+    # SlaSchedule
+    sla_schedule:
+      singular: *sla_schedule
+      plural: Horaires de SLA
+      count:
+        zero: Aucun Horaire de SLA
+        one: Un Horaire de SLA
+        other: "%{count} Horaires de SLA"
+      new: Ajouter un Horaire de SLA
+      edit: Editer un Horaire de SLA
+      delete: Supprimer un Horaire de SLA
+      miss: Horaire de SLA absent
+      exists: Ce crénau existe déjà
+
+    # SlaCalendarHoliday
+    sla_calendar_holiday:
+      plural: Jours fériés des calendriers de SLA
+      singular: Jour férié d'un calendrier de SLA
+      count:
+        zero: Aucun Jour férié d'un calendrier de SLA
+        one: Un Jour férié d'un calendrier de SLA
+        other: "%{count} Jours fériés des calendriers de SLA"      
+      new: Ajouter des Jours fériés d'un calendrier de SLA
+      edit: Editer des Jours fériés d'un calendrier de SLA
+      delete: Supprimer des Jours fériés d'un calendrier de SLA
+
+    # SlaLevel
+    sla_level:
+      singular: Niveau de SLA
+      plural: Niveaux de SLA
+      count:
+        zero: Aucun Niveau de SLA
+        one: Un Niveau de SLA
+        other: "%{count} Niveaux de SLA"      
+      new: Ajouter un Niveau de SLA
+      edit: Editer un Niveau de SLA
+      delete: Supprimer un Niveau de SLA
+      miss: Niveau de SLA absent
+
+    # SlaLevelTerm
+    sla_level_term:
+      singular: Engagement de SLA
+      plural: Engagements de SLA
+      count:
+        zero: Aucun Engagement de SLA
+        one: Un Engagement de SLA
+        other: "%{count} Engagements de SLA"      
+      new: Ajouter un Engagement de SLA
+      edit: Editer un Engagement de SLA
+      delete: Supprimer un Engagement de SLA
+      miss: Engagement de SLA absent
+      exists: Cet engagement existe déjà
+
+    # SlaProjectTracker
+    sla_project_tracker:
+      singular: Tracker de projet de SLA
+      plural: Trackers de projet de SLA
+      new: Ajouter un Tracker de projet de SLA
+      edit: Editer un Tracker de projet de SLA
+      delete: Supprimer un Tracker de projet de SLA
+      exists: Ce tracker existe déjà
+
+  # Autres
+  label_sla_title_horaire_am: Horaires AM
+  label_sla_title_horaire_pm: Horaires PM
+  label_sla_gti: GTI
+  label_sla_gtr: GTR
+  label_sla_respect: Respect
+  label_sla_gti_respect: Respect des GTI
+  label_sla_gtr_respect: Respect des GTR
+  label_sla_am_from: De
+  label_sla_am_to: à
+  label_sla_pm_from: De
+  label_sla_pm_to: à
+  label_sla_for: pour
+  label_sla_msgerror: KO
+  label_sla_msgsuccess: OK

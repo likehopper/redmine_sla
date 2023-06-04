@@ -1,0 +1,47 @@
+/***** Progress bar *****/
+table.sla {
+    border-collapse: collapse;
+    border-spacing: 0pt;
+    empty-cells: show;
+    text-align: center;
+    float:left;
+    margin: 1px 6px 1px 0px;
+}
+
+table.sla td { height: 1em; }
+table.sla td.inprogress { background: #a2dda2 none repeat scroll 0%; }
+table.sla td.doneok { background: #c9dfc9 none repeat scroll 0%; }
+table.sla td.doneko { background: #dfc9c9 none repeat scroll 0%; }
+table.sla td.fail { background: #ff6868 none repeat scroll 0%; }
+table.sla td.warn { background: #ff9955 none repeat scroll 0%; }
+table.sla td.todo { background: #cccccc none repeat scroll 0%; }
+
+#admin-menu a.redmine-sla { background-image:url('../images/sla_16.png'); }
+
+.title-sla-settings h2 {
+  background-position: 0% 0%;
+  background-repeat: no-repeat;
+  padding-left: 36px;
+  height: 32px;
+}
+
+.icon-sla { background-image:url('../images/sla_16.png'); }
+.title-sla h2 { background-image:url('../images/sla_32.png'); }
+.icon-sla_type { background-image:url('../images/sla_type_16.png'); }
+.title-sla_type h2 { background-image:url('../images/sla_type_32.png'); }
+.icon-sla_status { background-image:url('../images/sla_status_16.png'); }
+.title-sla_status h2 { background-image:url('../images/sla_status_32.png'); }
+.icon-sla_holiday { background-image:url('../images/sla_holiday_16.png'); }
+.title-sla_holiday h2 { background-image:url('../images/sla_holiday_32.png'); }
+.icon-sla_calendar { background-image:url('../images/sla_calendar_16.png'); }
+.title-sla_calendar h2 { background-image:url('../images/sla_calendar_32.png'); }
+.icon-sla_calendar_holiday { background-image:url('../images/sla_calendar_holiday_16.png'); }
+.title-sla_calendar_holiday h2 { background-image:url('../images/sla_calendar_holiday_32.png'); }
+.icon-sla_schedule { background-image:url('../images/sla_schedule_16.png'); }
+.title-sla_schedule h2 { background-image:url('../images/sla_schedule_32.png'); }
+.icon-sla_level { background-image:url('../images/sla_level_16.png'); }
+.title-sla_level h2 { background-image:url('../images/sla_level_32.png'); }
+.icon-sla_level_term { background-image:url('../images/sla_level_term_16.png'); }
+.title-sla_level_term h2 { background-image:url('../images/sla_level_term_32.png'); }
+
+.redmine_sla_footer { border-top: 1px solid#bbb; font-size: 0.9em; color: #aaa; padding: 5px; text-align:center;}

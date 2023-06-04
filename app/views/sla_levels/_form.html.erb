@@ -1,0 +1,31 @@
+<%= labelled_form_for([@sla_level], html: { multipart: false, id: 'sla_level_form', class: 'tabular', remote: request.xhr? }) do |f| %>
+  <%= error_messages_for f.object %>
+  <div class="box">
+    <% if sla_level.safe_attribute?('name') %>
+    <p>
+      <%= f.text_field :name, :required => true %>
+    </p>
+    <% end %>    
+      <% if sla_level.safe_attribute?('sla_id') %>
+      <p>
+        <%= f.select :sla_id, Sla.all.collect { |p| [ p.name, p.id ] }, :include_blank => (f.object.new_record??true:false), :required => true %>
+      </p>
+      <% end %>
+      <% if sla_level.safe_attribute?('sla_calendar_id') %>
+      <p>
+        <%= f.select :sla_calendar_id, SlaCalendar.all.collect { |p| [ p.name, p.id ] }, :include_blank => (f.object.new_record??true:false), :required => true %>
+      </p>
+      <% end %>
+
+  </div>
+
+  <% if !request.xhr? %>
+    <p>
+      <% if f.object.new_record? %>
+        <%= submit_tag l('sla_label.sla_level.new'), title: l(:button_create), class: "button-positive" %>
+      <% else %>
+        <%= submit_tag l('sla_label.sla_level.edit'), title: l(:button_update), class: "button-positive" %>
+      <% end %>
+    </p>
+  <% end %>
+<% end %>

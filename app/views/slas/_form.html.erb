@@ -1,0 +1,17 @@
+<%= labelled_form_for([@sla], html: { multipart: false, id: 'sla_form', class: 'tabular', remote: request.xhr? }) do |f| %>
+  <%= error_messages_for f.object %> 
+  <div class="box">
+      <% if sla.safe_attribute?('name') %>
+      <p>
+        <%= f.text_field :name, :required => true %>
+      </p>
+      <% end %>
+  </div>
+  <p>
+    <% if f.object.new_record? %>
+      <%= submit_tag l('sla_label.sla.new'), title: l(:button_create), class: "button-positive" %>
+    <% else %>
+      <%= submit_tag l('sla_label.sla.edit'), title: l(:button_update), class: "button-positive" %>
+    <% end %>
+  </p>
+<% end %>

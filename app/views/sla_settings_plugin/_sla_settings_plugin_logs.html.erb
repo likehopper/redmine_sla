@@ -1,0 +1,5 @@
+<p>
+  <label for="settings_sla_log_level"><%= l('sla_label.sla_log.error_level') %></label>
+  <%= select_tag 'settings[sla_log_level]', options_for_select(Sla.sla_log_levels.map {|k, v| [l(k), v]},
+    @settings["sla_log_level"]) %>
+</p>

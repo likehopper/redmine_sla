@@ -1,0 +1,12 @@
+<ul>
+  <% if @sla_level %>
+    <li><%= context_menu_link l(:button_show), sla_level_path(@sla_level), class: 'icon icon-magnifier', disabled: !@can[:edit] %></li>
+    <li><%= context_menu_link l(:button_edit), edit_sla_level_path(@sla_level), class: 'icon icon-edit', disabled: !@can[:edit] %></li>
+  <% end %>
+  <li><%= context_menu_link l(:button_delete),
+            sla_levels_path(id: @sla_level_ids, back_url: @back),
+            method: :delete, class: 'icon icon-del', disabled: !@can[:delete],
+            data: { confirm: l('sla_label.sla_level.count',count: @sla_level_ids.count)+"\n"+l(:text_are_you_sure) }
+  %></li>
+  <%= call_hook(:view_sla_levels_context_menu_end, { sla_level: @sla_level, sla_levels: @sla_levels, can: @can, back: @back, project: @project }) %>
+</ul>

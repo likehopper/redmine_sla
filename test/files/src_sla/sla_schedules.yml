@@ -1,0 +1,536 @@
+---
+# TMA HO
+sla_tma_ho_lundi_am:
+  sla_calendar_id: 1
+  dow: 1
+  start_time: "09:30:00"
+  end_time: "12:29:59"
+  match: t
+sla_tma_ho_lundi_pm:
+  sla_calendar_id: 1
+  dow: 1
+  start_time: "14:00:00"
+  end_time: "17:59:59"
+  match: t
+sla_tma_ho_mardi_am:
+  sla_calendar_id: 1
+  dow: 2
+  start_time: "09:30:00"
+  end_time: "12:29:59"
+  match: t
+sla_tma_ho_mardi_pm:
+  sla_calendar_id: 1
+  dow: 2
+  start_time: "14:00:00"
+  end_time: "17:59:59"
+  match: t
+sla_tma_ho_mercredi_am:
+  sla_calendar_id: 1
+  dow: 3
+  start_time: "09:30:00"
+  end_time: "12:29:59"
+  match: t
+sla_tma_ho_mercredi_pm:
+  sla_calendar_id: 1
+  dow: 3
+  start_time: "14:00:00"
+  end_time: "17:59:59"
+  match: t
+sla_tma_ho_jeudi_am:
+  sla_calendar_id: 1
+  dow: 4
+  start_time: "09:30:00"
+  end_time: "12:29:59"
+  match: t
+sla_tma_ho_jeudi_pm:
+  sla_calendar_id: 1
+  dow: 4
+  start_time: "14:00:00"
+  end_time: "17:59:59"
+  match: t
+sla_tma_ho_vendredi_am:
+  sla_calendar_id: 1
+  dow: 5
+  start_time: "09:30:00"
+  end_time: "12:29:59"
+  match: t
+sla_tma_ho_vendredi_pm:
+  sla_calendar_id: 1
+  dow: 5
+  start_time: "14:00:00"
+  end_time: "17:59:59"
+  match: t
+# INFO STD HO ( request )
+sla_info_std_ho_request_lundi:
+  sla_calendar_id: 2
+  dow: 1
+  start_time: "09:00:00"
+  end_time: "18:59:59"
+  match: t
+sla_info_std_ho_request_mardi:
+  sla_calendar_id: 2
+  dow: 2
+  start_time: "09:00:00"
+  end_time: "18:59:59"
+  match: t
+sla_info_std_ho_request_mercredi:
+  sla_calendar_id: 2
+  dow: 3
+  start_time: "09:00:00"
+  end_time: "18:59:59"
+  match: t
+sla_info_std_ho_request_jeudi:
+  sla_calendar_id: 2
+  dow: 4
+  start_time: "09:00:00"
+  end_time: "18:59:59"
+  match: t
+sla_info_std_ho_request_vendredi:
+  sla_calendar_id: 2
+  dow: 5
+  start_time: "09:00:00"
+  end_time: "18:59:59"
+  match: t
+# INFO STD HO ( incident )
+sla_info_std_ho_dimanche:
+  sla_calendar_id: 3
+  dow: 0
+  start_time: "00:00:00"
+  end_time: "23:59:59"
+  match: f
+sla_info_std_ho_lundi_1:
+  sla_calendar_id: 3
+  dow: 1
+  start_time: "00:00:00"
+  end_time: "08:59:59"
+  match: f
+sla_info_std_ho_lundi_2:
+  sla_calendar_id: 3
+  dow: 1
+  start_time: "09:00:00"
+  end_time: "18:59:59"
+  match: t
+sla_info_std_ho_lundi_3:
+  sla_calendar_id: 3
+  dow: 1
+  start_time: "19:00:00"
+  end_time: "23:59:59"
+  match: f
+sla_info_std_ho_mardi_1:
+  sla_calendar_id: 3
+  dow: 2
+  start_time: "00:00:00"
+  end_time: "08:59:59"
+  match: f
+sla_info_std_ho_mardi_2:
+  sla_calendar_id: 3
+  dow: 2
+  start_time: "09:00:00"
+  end_time: "18:59:59"
+  match: t
+sla_info_std_ho_mardi_3:
+  sla_calendar_id: 3
+  dow: 2
+  start_time: "19:00:00"
+  end_time: "23:59:59"
+  match: f
+sla_info_std_ho_mercredi_1:
+  sla_calendar_id: 3
+  dow: 3
+  start_time: "00:00:00"
+  end_time: "08:59:59"
+  match: f
+sla_info_std_ho_mercredi_2:
+  sla_calendar_id: 3
+  dow: 3
+  start_time: "09:00:00"
+  end_time: "18:59:59"
+  match: t
+sla_info_std_ho_mercredi_3:
+  sla_calendar_id: 3
+  dow: 3
+  start_time: "19:00:00"
+  end_time: "23:59:59"
+  match: f
+sla_info_std_ho_jeudi_1:
+  sla_calendar_id: 3
+  dow: 4
+  start_time: "00:00:00"
+  end_time: "08:59:59"
+  match: f
+sla_info_std_ho_jeudi_2:
+  sla_calendar_id: 3
+  dow: 4
+  start_time: "09:00:00"
+  end_time: "18:59:59"
+  match: t
+sla_info_std_ho_jeudi_3:
+  sla_calendar_id: 3
+  dow: 4
+  start_time: "19:00:00"
+  end_time: "23:59:59"
+  match: f
+sla_info_std_ho_vendredi_1:
+  sla_calendar_id: 3
+  dow: 5
+  start_time: "00:00:00"
+  end_time: "08:59:59"
+  match: f
+sla_info_std_ho_vendredi_2:
+  sla_calendar_id: 3
+  dow: 5
+  start_time: "09:00:00"
+  end_time: "18:59:59"
+  match: t
+sla_info_std_ho_vendredi_3:
+  sla_calendar_id: 3
+  dow: 5
+  start_time: "19:00:00"
+  end_time: "23:59:59"
+  match: f
+sla_info_std_ho_samedi:
+  sla_calendar_id: 3
+  dow: 6
+  start_time: "00:00:00"
+  end_time: "23:59:59"
+  match: f
+# INFO STD HNO
+sla_info_std_hno_dimanche:
+  sla_calendar_id: 4
+  dow: 0
+  start_time: "00:00:00"
+  end_time: "23:59:59"
+  match: t
+sla_info_std_hno_lundi_1:
+  sla_calendar_id: 4
+  dow: 1
+  start_time: "00:00:00"
+  end_time: "08:59:59"
+  match: t
+sla_info_std_hno_lundi_2:
+  sla_calendar_id: 4
+  dow: 1
+  start_time: "09:00:00"
+  end_time: "18:59:59"
+  match: f
+sla_info_std_hno_lundi_3:
+  sla_calendar_id: 4
+  dow: 1
+  start_time: "19:00:00"
+  end_time: "23:59:59"
+  match: t
+sla_info_std_hno_mardi_1:
+  sla_calendar_id: 4
+  dow: 2
+  start_time: "00:00:00"
+  end_time: "08:59:59"
+  match: t
+sla_info_std_hno_mardi_2:
+  sla_calendar_id: 4
+  dow: 2
+  start_time: "09:00:00"
+  end_time: "18:59:59"
+  match: f
+sla_info_std_hno_mardi_3:
+  sla_calendar_id: 4
+  dow: 2
+  start_time: "19:00:00"
+  end_time: "23:59:59"
+  match: t
+sla_info_std_hno_mercredi_1:
+  sla_calendar_id: 4
+  dow: 3
+  start_time: "00:00:00"
+  end_time: "08:59:59"
+  match: t
+sla_info_std_hno_mercredi_2:
+  sla_calendar_id: 4
+  dow: 3
+  start_time: "09:00:00"
+  end_time: "18:59:59"
+  match: f
+sla_info_std_hno_mercredi_3:
+  sla_calendar_id: 4
+  dow: 3
+  start_time: "19:00:00"
+  end_time: "23:59:59"
+  match: t
+sla_info_std_hno_jeudi_1:
+  sla_calendar_id: 4
+  dow: 4
+  start_time: "00:00:00"
+  end_time: "08:59:59"
+  match: t
+sla_info_std_hno_jeudi_2:
+  sla_calendar_id: 4
+  dow: 4
+  start_time: "09:00:00"
+  end_time: "18:59:59"
+  match: f
+sla_info_std_hno_jeudi_3:
+  sla_calendar_id: 4
+  dow: 4
+  start_time: "19:00:00"
+  end_time: "23:59:59"
+  match: t
+sla_info_std_hno_vendredi_1:
+  sla_calendar_id: 4
+  dow: 5
+  start_time: "00:00:00"
+  end_time: "08:59:59"
+  match: t
+sla_info_std_hno_vendredi_2:
+  sla_calendar_id: 4
+  dow: 5
+  start_time: "09:00:00"
+  end_time: "18:59:59"
+  match: f
+sla_info_std_hno_vendredi_3:
+  sla_calendar_id: 4
+  dow: 5
+  start_time: "19:00:00"
+  end_time: "23:59:59"
+  match: t
+sla_info_std_hno_samedi:
+  sla_calendar_id: 4
+  dow: 6
+  start_time: "00:00:00"
+  end_time: "23:59:59"
+  match: t
+# INFO SPE HO ( request )
+sla_info_spe_ho_request_lundi:
+  sla_calendar_id: 5
+  dow: 1
+  start_time: "08:00:00"
+  end_time: "19:59:59"
+  match: t
+sla_info_spe_ho_request_mardi:
+  sla_calendar_id: 5
+  dow: 2
+  start_time: "08:00:00"
+  end_time: "19:59:59"
+  match: t
+sla_info_spe_ho_request_mercredi:
+  sla_calendar_id: 5
+  dow: 3
+  start_time: "08:00:00"
+  end_time: "19:59:59"
+  match: t
+sla_info_spe_ho_request_jeudi:
+  sla_calendar_id: 5
+  dow: 4
+  start_time: "08:00:00"
+  end_time: "19:59:59"
+  match: t
+sla_info_spe_ho_request_vendredi:
+  sla_calendar_id: 5
+  dow: 5
+  start_time: "08:00:00"
+  end_time: "19:59:59"
+  match: t
+# INFO SPE HO ( incident )
+sla_info_spe_ho_dimanche:
+  sla_calendar_id: 6
+  dow: 0
+  start_time: "00:00:00"
+  end_time: "23:59:59"
+  match: f
+sla_info_spe_ho_lundi_1:
+  sla_calendar_id: 6
+  dow: 1
+  start_time: "00:00:00"
+  end_time: "07:59:59"
+  match: f
+sla_info_spe_ho_lundi_2:
+  sla_calendar_id: 6
+  dow: 1
+  start_time: "08:00:00"
+  end_time: "19:59:59"
+  match: t
+sla_info_spe_ho_lundi_3:
+  sla_calendar_id: 6
+  dow: 1
+  start_time: "20:00:00"
+  end_time: "23:59:59"
+  match: f
+sla_info_spe_ho_mardi_1:
+  sla_calendar_id: 6
+  dow: 2
+  start_time: "00:00:00"
+  end_time: "07:59:59"
+  match: f
+sla_info_spe_ho_mardi_2:
+  sla_calendar_id: 6
+  dow: 2
+  start_time: "08:00:00"
+  end_time: "19:59:59"
+  match: t
+sla_info_spe_ho_mardi_3:
+  sla_calendar_id: 6
+  dow: 2
+  start_time: "20:00:00"
+  end_time: "23:59:59"
+  match: f
+sla_info_spe_ho_mercredi_1:
+  sla_calendar_id: 6
+  dow: 3
+  start_time: "00:00:00"
+  end_time: "07:59:59"
+  match: f
+sla_info_spe_ho_mercredi_2:
+  sla_calendar_id: 6
+  dow: 3
+  start_time: "08:00:00"
+  end_time: "19:59:59"
+  match: t
+sla_info_spe_ho_mercredi_3:
+  sla_calendar_id: 6
+  dow: 3
+  start_time: "20:00:00"
+  end_time: "23:59:59"
+  match: f
+sla_infospe_ho_jeudi_1:
+  sla_calendar_id: 6
+  dow: 4
+  start_time: "00:00:00"
+  end_time: "07:59:59"
+  match: f
+sla_info_spe_ho_jeudi_2:
+  sla_calendar_id: 6
+  dow: 4
+  start_time: "08:00:00"
+  end_time: "19:59:59"
+  match: t
+sla_info_spe_ho_jeudi_3:
+  sla_calendar_id: 6
+  dow: 4
+  start_time: "20:00:00"
+  end_time: "23:59:59"
+  match: f
+sla_info_spe_ho_vendredi_1:
+  sla_calendar_id: 6
+  dow: 5
+  start_time: "00:00:00"
+  end_time: "07:59:59"
+  match: f
+sla_info_spe_ho_vendredi_2:
+  sla_calendar_id: 6
+  dow: 5
+  start_time: "08:00:00"
+  end_time: "19:59:59"
+  match: t
+sla_info_spe_ho_vendredi_3:
+  sla_calendar_id: 6
+  dow: 5
+  start_time: "20:00:00"
+  end_time: "23:59:59"
+  match: f
+sla_info_spe_ho_samedi:
+  sla_calendar_id: 6
+  dow: 6
+  start_time: "00:00:00"
+  end_time: "23:59:59"
+  match: f
+# INFO SPE HNO
+sla_info_spe_hno_dimanche:
+  sla_calendar_id: 7
+  dow: 0
+  start_time: "00:00:00"
+  end_time: "23:59:59"
+  match: t
+sla_info_spe_hno_lundi_1:
+  sla_calendar_id: 7
+  dow: 1
+  start_time: "00:00:00"
+  end_time: "07:59:59"
+  match: t
+sla_info_spe_hno_lundi_2:
+  sla_calendar_id: 7
+  dow: 1
+  start_time: "08:00:00"
+  end_time: "19:59:59"
+  match: f
+sla_info_spe_hno_lundi_3:
+  sla_calendar_id: 7
+  dow: 1
+  start_time: "20:00:00"
+  end_time: "23:59:59"
+  match: t
+sla_info_spe_hno_mardi_1:
+  sla_calendar_id: 7
+  dow: 2
+  start_time: "00:00:00"
+  end_time: "07:59:59"
+  match: t
+sla_info_spe_hno_mardi_2:
+  sla_calendar_id: 7
+  dow: 2
+  start_time: "08:00:00"
+  end_time: "19:59:59"
+  match: f
+sla_info_spe_hno_mardi_3:
+  sla_calendar_id: 7
+  dow: 2
+  start_time: "20:00:00"
+  end_time: "23:59:59"
+  match: t
+sla_info_spe_hno_mercredi_1:
+  sla_calendar_id: 7
+  dow: 3
+  start_time: "00:00:00"
+  end_time: "07:59:59"
+  match: t
+sla_info_spe_hno_mercredi_2:
+  sla_calendar_id: 7
+  dow: 3
+  start_time: "08:00:00"
+  end_time: "19:59:59"
+  match: f
+sla_info_spe_hno_mercredi_3:
+  sla_calendar_id: 7
+  dow: 3
+  start_time: "20:00:00"
+  end_time: "23:59:59"
+  match: t
+sla_info_spe_hno_jeudi_1:
+  sla_calendar_id: 7
+  dow: 4
+  start_time: "00:00:00"
+  end_time: "07:59:59"
+  match: t
+sla_info_spe_hno_jeudi_2:
+  sla_calendar_id: 7
+  dow: 4
+  start_time: "08:00:00"
+  end_time: "19:59:59"
+  match: f
+sla_info_spe_hno_jeudi_3:
+  sla_calendar_id: 7
+  dow: 4
+  start_time: "20:00:00"
+  end_time: "23:59:59"
+  match: t
+sla_info_spe_hno_vendredi_1:
+  sla_calendar_id: 7
+  dow: 5
+  start_time: "00:00:00"
+  end_time: "07:59:59"
+  match: t
+sla_info_spe_hno_vendredi_2:
+  sla_calendar_id: 7
+  dow: 5
+  start_time: "08:00:00"
+  end_time: "19:59:59"
+  match: f
+sla_info_spe_hno_vendredi_3:
+  sla_calendar_id: 7
+  dow: 5
+  start_time: "20:00:00"
+  end_time: "23:59:59"
+  match: t
+sla_info_spe_hno_samedi:
+  sla_calendar_id: 7
+  dow: 6
+  start_time: "00:00:00"
+  end_time: "23:59:59"
+  match: t

@@ -1,0 +1,19 @@
+<% html_title(l(:sla_label_global_settings)) %>
+<div class="content"> 
+  <div class="contextual">
+    <%= link_to l('sla_label.sla_level_term.plural'), sla_level_terms_path, class: 'icon icon-cancel' %>
+  </div>
+  <div class="title-sla-settings title-sla_level_term">
+    <%= title l('sla_label.sla_level_term.plural') %>
+  </div>
+
+  <h3>n°<%= @sla_level_term.sla_level.id %>&nbsp;:&nbsp;<%= @sla_level_term.sla_level.name %></h3>
+  <h3>n°<%= @sla_level_term.sla_type.id %>&nbsp;:&nbsp;<%= @sla_level_term.sla_type.name %></h3>
+
+  <h4>n°<%= @sla_level_term.priority.id %>&nbsp;:&nbsp;<%= @sla_level_term.priority.name %></h4>
+  <p><%= @sla_level_term.term %></p>
+
+</div>
+<% content_for :sidebar do %>
+  <% render partial: 'slas/sidebar' %>
+<% end %>

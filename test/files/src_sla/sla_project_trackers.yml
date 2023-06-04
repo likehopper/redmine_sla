@@ -1,0 +1,60 @@
+---
+#
+#
+# SLA TMA :
+#      - GTI/GTR HO on tracker_bug
+#      - no SLA on tracker_feature_request
+#      -  just GTI HO on tracker_support_request
+#
+# Managed Services STD HO only on tracker_change_request
+#
+# TMA HO GTI/GTR on tracker_bug_request
+one:
+  project_id: 1
+  tracker_id: 1
+  sla_id: 1
+#
+# No SLA on tracker_feature_request
+#
+#two:
+#  tracker_id: 2
+#  sla_level_id: null
+#
+# TMA HO GTI only on tracker_support_request
+three:
+  project_id: 1
+  tracker_id: 3
+  sla_id: 2  
+#
+#
+# SLA INFO STD :
+#      - GTI/GTR HO continued on awh-incident
+#      - GTI/GTR HO/HNO continued on awh-requete
+#
+four:
+  project_id: 2
+  tracker_id: 4
+  sla_id: 3
+#
+# Managed Services STD HO/HNO continued on tracker_production_incident
+five: 
+  project_id: 2
+  tracker_id: 5
+  sla_id: 4
+#
+#
+# SLA INFO SPE :
+#      - GTI/GTR HO continued on awh-incident
+#      - GTI/GTR HO/HNO continued on awh-requete
+#
+# Managed Services SPE HO only on tracker_change_request
+six:
+  project_id: 3
+  tracker_id: 4
+  sla_id: 5
+#
+# Managed Services SPE HO/HNO continued on tracker_production_incident
+seven: 
+  project_id: 3
+  tracker_id: 5
+  sla_id: 6
