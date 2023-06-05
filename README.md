@@ -2,8 +2,8 @@
 
 ## Overview
 
-- Website:	https://github.com/likehopper/redmine_sla
-- Code repository:	git@github.com:likehopper/redmine_sla.git
+- Website: <https://github.com/likehopper/redmine_sla>
+- Code repository: `git@github.com:likehopper/redmine_sla.git`
 
 
 ### Digest
