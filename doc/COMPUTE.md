@@ -2,6 +2,7 @@
 
 The foundation for calculating SLAs is based on the use of PostgreSQL's generate_series function.
 
+
 ## Concepts
 
 As part of Service Level Agreements (SLA), we usually calculate intervention and times commitments.
@@ -14,6 +15,7 @@ The duration of the resolution commitment goes from the creation of the issue an
 - Resolved: a solution is proposed (pending validation)
 - Feedback: a request for additional information is in progress (pending after reporter)
 - Closed, Rejected: issue is closed, no more actions are expected.
+
 
 ## Summary
 
@@ -30,6 +32,7 @@ For example, an issue was created on 06/01/2023 at 10:00 a.m. and it was closed 
 - 2023-06-01 10:08
 - 2023-06-01 10:09
 - 2023-06-01 10:10
+
 
 ## Issues statuses
 
@@ -53,9 +56,11 @@ And for the resolution engagement, we filter with the status "New" or "Awarded".
 
 Easy and efficient!
 
+
 ## SLA Calendars
 
 The SLA Calendars will finally make it possible to complete the times of activity or non-activity.
+
 
 ### SLA Holidays
 
@@ -64,6 +69,7 @@ SLA Holidays are completely non-working days: the lines corresponding to these d
 The notion carried by the “match” boolean:
 - if it is false, then the days will be deleted, ie time is suspended.
 - if it is true, then an SLA cannot start on the holiday but, if it started earlier then it will continue.
+
 
 ### Schedules
 
