@@ -16,10 +16,7 @@ Redmine SLA plugin gives the possibility of managing service levels.
 It provides flexible configuration of calendars, times and terms.
 It calculates types of response times for project trackers.
 
-<<<<<<< HEAD
-=======
 
->>>>>>> c693a43db392d0131b63673ceb0d4a011f1f9d7f
 ### Features
 
 These are the features of this plugin :
