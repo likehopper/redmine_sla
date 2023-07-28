@@ -26,7 +26,10 @@ And one view :
 - sla_view_journals : rebuilds issues status journal from its creation to "now"
 
 ## Drawing
-![MCD!](images/redmine_sla_mcd.png "MCD")
+<div style=" width:800px; height:550px; " >
+
+![Redmine SLA - MCD](images/mcd/redmine_sla_mcd.png)
+</div>
 
 ## Comments
 ...
