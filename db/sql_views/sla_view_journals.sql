@@ -7,9 +7,9 @@ AS
 SELECT
 	issues.id::INTEGER AS issue_id,
 	(1)::INTEGER AS from_status_id,
-	sla_get_date(issues.created_on::TIMESTAMP) AS from_status_date,
+	sla_get_date(issues.created_on::TIMESTAMP WITHOUT TIME ZONE) AS from_status_date,
 	(1)::INTEGER AS to_status_id,
-	sla_get_date(issues.created_on::TIMESTAMP) AS to_status_date
+	sla_get_date(issues.created_on::TIMESTAMP WITHOUT TIME ZONE) AS to_status_date
 FROM
 	issues
 )
@@ -37,9 +37,9 @@ SELECT
 			jd2.prop_key LIKE 'status_id'			
 		AND
 			j2.id  < j1.id
-	),i1.created_on)::TIMESTAMP) AS from_status_date,
+	),i1.created_on)::TIMESTAMP WITHOUT TIME ZONE) AS from_status_date,
 	jd1.value::integer AS to_status_id,
-	sla_get_date(j1.created_on::TIMESTAMP) AS to_status_date
+	sla_get_date(j1.created_on::TIMESTAMP WITHOUT TIME ZONE) AS to_status_date
 FROM
 	issues AS i1
 INNER JOIN
@@ -75,9 +75,9 @@ SELECT
                         jd3.property LIKE 'attr'
                 AND
                         jd3.prop_key LIKE 'status_id'
-        ),i2.created_on)::TIMESTAMP) AS from_status_date,
+        ),i2.created_on)::TIMESTAMP WITHOUT TIME ZONE) AS from_status_date,
         i2.status_id AS to_status_id,
-        sla_get_date(COALESCE( i2.closed_on, NOW() )::TIMESTAMP ) AS to_status_date
+        sla_get_date(COALESCE( i2.closed_on, NOW() )::TIMESTAMP WITHOUT TIME ZONE ) AS to_status_date
 FROM
         issues AS i2
 )

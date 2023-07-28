@@ -8,7 +8,7 @@ CREATE OR REPLACE FUNCTION sla_get_level(
 $BODY$
   DECLARE v_issue_project_id INTEGER ;
   DECLARE v_issue_tracker_id INTEGER ;
-  DECLARE v_issue_created_on TIMESTAMPTZ ;
+  DECLARE v_issue_created_on TIMESTAMP WITHOUT TIME ZONE ;
   DECLARE v_sla_cache sla_caches ;
 BEGIN
   

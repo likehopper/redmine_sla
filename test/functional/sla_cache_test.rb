@@ -12,6 +12,7 @@ class SlaCacheTest < ActiveSupport::TestCase
     :slas,
     :sla_calendars,
     :sla_holidays,
+    :sla_calendar_holidays,
     :sla_schedules,
     :sla_types,
     :sla_levels,
