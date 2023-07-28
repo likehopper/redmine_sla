@@ -7,9 +7,9 @@ CREATE OR REPLACE FUNCTION sla_get_spent(
 $BODY$
   DECLARE v_issue_project_id INTEGER ;
   DECLARE v_issue_tracker_id INTEGER ;
-  DECLARE v_issue_created_on TIMESTAMP ;
-  DECLARE v_issue_closed_on TIMESTAMP ;
-  DECLARE v_current_timestamp TIMESTAMP ;
+  DECLARE v_issue_created_on TIMESTAMP WITHOUT TIME ZONE ;
+  DECLARE v_issue_closed_on TIMESTAMP WITHOUT TIME ZONE ;
+  DECLARE v_current_timestamp TIMESTAMP WITHOUT TIME ZONE ;
   DECLARE v_sla_cache sla_caches ;
   DECLARE v_sla_spent sla_cache_spents ;
 BEGIN
@@ -25,7 +25,7 @@ BEGIN
   END IF ;
 
   -- We get the date and time from now
-  v_current_timestamp := sla_get_date(NOW()::TIMESTAMP);
+  v_current_timestamp := sla_get_date(NOW()::TIMESTAMP WITHOUT TIME ZONE);
 
   RAISE DEBUG
     'sla_get_spent	v_current_timestamp = %', v_current_timestamp ;
