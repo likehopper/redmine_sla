@@ -53,7 +53,7 @@ namespace :redmine do
 
           Rails.logger.info "rake redmine:plugins:redmine_sla:update Project ##{project.id.to_s} = #{project.identifier} "
            
-          project.issues.where(tracker_id: SlaProjectTrackers.where(project_id: project.id).map(&:tracker_id)).each do |issue|
+          project.issues.where(tracker_id: SlaProjectTracker.where(project_id: project.id).map(&:tracker_id)).each do |issue|
               
             Rails.logger.info "rake redmine:plugins:redmine_sla:update Issue n°#{issue.id.to_s} [ tracker_id = #{issue.tracker_id.to_s} ] [ status_id = #{issue.status_id.to_s} ] TODO #{issue.subject}  "
             SlaCacheSpent.update_by_issue(issue.id)
