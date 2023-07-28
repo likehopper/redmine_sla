@@ -39,7 +39,7 @@ class SlaSchedule < ActiveRecord::Base
   validates :match, exclusion: [nil]
   
   validates_uniqueness_of :sla_calendar_id,
-    :scope => [ :dow ],
+    :scope => [ :dow, :start_time, :end_time, :match ],
     :message => l('sla_label.sla_schedule.exists')
 
   # TODO: other constraint like start time before end time
