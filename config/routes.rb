@@ -1,8 +1,11 @@
 
 # SLAs project configuration ( activation of SLAs by trackers : sla_project_trackers )
 resources :projects do
-  resources :sla_project_trackers, path: "/settings/slas", :only => [:new, :create, :update, :edit, :destroy]
+  resources :sla_project_trackers, path: "/settings/slas", :only => [ :new, :create, :update, :edit, :destroy]
 end
+# ProjectTrackers / API
+match '/projects/:project_id/slas', :controller => 'sla_project_trackers', :action => 'index', :via => :get
+
 
 # Configuration globales : noms des SLA
 resources :slas, path: "sla/slas" do
@@ -45,6 +48,8 @@ resources :sla_calendars, path: "sla/calendars" do
 end
 # context_menu : bulk_destroy
 match 'sla/calendars', :controller => 'sla_calendars', :action => 'destroy', :via => :delete
+# Schedules / API
+match 'sla/schedules', :controller => 'sla_schedules', :action => 'index', :via => :get
 
 resources :sla_levels, path: "sla/levels" do
   collection do

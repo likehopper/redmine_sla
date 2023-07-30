@@ -4,7 +4,6 @@ if User.current.allowed_to?(:view_sla, @project, :global => true)
   sla_cache = SlaCache.find_or_new(issue.id)
 
   if ( !sla_cache.nil? && sla_cache.sla_level_id > 0  )
-    Rails.logger.warn "======>>> sla_level_id = #{sla_cache.sla_level_id} <<<====== "
 
 %>
 <hr />

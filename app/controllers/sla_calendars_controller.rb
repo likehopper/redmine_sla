@@ -20,6 +20,7 @@ class SlaCalendarsController < ApplicationController
 
   unloadable
 
+  accept_api_auth :index
   before_action :require_admin, except: [:show]
 
   before_action :find_sla_calendar, only: [:show, :edit, :update]
@@ -37,6 +38,13 @@ class SlaCalendarsController < ApplicationController
     @entity_count = @query.sla_calendars.count
     @entity_pages = Paginator.new @entity_count, per_page_option, params['page']
     @entities = @query.sla_calendars(offset: @entity_pages.offset, limit: @entity_pages.per_page) 
+    respond_to do |format|
+      format.html do
+      end
+      format.api do
+        @offset, @limit = api_offset_and_limit
+      end
+    end    
   end
 
   def new
@@ -72,7 +80,6 @@ class SlaCalendarsController < ApplicationController
   end
 
   def context_menu
-    Rails.logger.warn "======>>> controllers / sla_calendar->context_menu() <<<====== "
     if @sla_calendars.size == 1
       @sla_calendar = @sla_calendars.first
     end
@@ -119,12 +126,7 @@ class SlaCalendarsController < ApplicationController
   #end
 
   def sla_calendar_params
-    Rails.logger.warn "======>>> controllers / sla_calendar->sla_calendar_params() <<<====== "
     params.require(:sla_calendar).permit(:name, sla_schedules_attributes: SlaSchedule.attribute_names.map(&:to_sym).push(:_destroy) )
-    #params.require(:sla_calendar).permit(:name, sla_schedules_attributes: [:sla_calendar_id, :dow, :start_time, :end_time, :match])
-    #sla_calendar_params = params.permit(:sla_calendar_id, :dow, :start_time, :end_time, :match)
-    #sla_calendar_params.merge! ({sla_schedules_attributes: params[:sla_schedules]}) if params[:sla_schedules].present?
-    #sla_calendar_params
   end    
 
 end
