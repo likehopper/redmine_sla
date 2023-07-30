@@ -20,6 +20,7 @@ class SlasController < ApplicationController
 
   unloadable
 
+  accept_api_auth :index
   before_action :require_admin
   before_action :authorize_global
 
@@ -32,11 +33,17 @@ class SlasController < ApplicationController
   include QueriesHelper
 
   def index
-    Rails.logger.warn "======>>> sla->index() <<<====== "
     retrieve_query(Queries::SlaQuery) 
     @entity_count = @query.slas.count
     @entity_pages = Paginator.new @entity_count, per_page_option, params['page']
     @entities = @query.slas(offset: @entity_pages.offset, limit: @entity_pages.per_page) 
+    respond_to do |format|
+      format.html do
+      end
+      format.api do
+        @offset, @limit = api_offset_and_limit
+      end
+    end
   end
 
   def new
@@ -72,7 +79,6 @@ class SlasController < ApplicationController
   end
 
   def context_menu
-    Rails.logger.warn "======>>> sla->context_menu() <<<====== "
     if @slas.size == 1
       @sla = @slas.first
     end

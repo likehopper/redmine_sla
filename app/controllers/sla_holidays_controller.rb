@@ -20,6 +20,7 @@ class SlaHolidaysController < ApplicationController
 
   unloadable
 
+  accept_api_auth :index
   before_action :require_admin
   before_action :authorize_global
 
@@ -36,6 +37,13 @@ class SlaHolidaysController < ApplicationController
     @entity_count = @query.sla_holidays.count
     @entity_pages = Paginator.new @entity_count, per_page_option, params['page']
     @entities = @query.sla_holidays(offset: @entity_pages.offset, limit: @entity_pages.per_page) 
+    respond_to do |format|
+      format.html do
+      end
+      format.api do
+        @offset, @limit = api_offset_and_limit
+      end
+    end    
   end
 
   def new

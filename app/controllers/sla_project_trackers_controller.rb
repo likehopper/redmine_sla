@@ -20,8 +20,28 @@ class SlaProjectTrackersController < ApplicationController
 
   unloadable
 
+  accept_api_auth :index
+
   before_action :find_project_tracker, :only => [:update, :edit, :destroy]
-  before_action :find_project, :only => [:create, :edit, :update, :destroy]
+  before_action :find_project, :only => [ :index, :create, :edit, :update, :destroy]
+
+  helper :sla_project_trackers
+  helper :queries
+  include QueriesHelper
+
+  def index
+    retrieve_query(Queries::SlaProjectTrackerQuery) 
+    @entity_count = @query.sla_project_trackers.count
+    @entity_pages = Paginator.new @entity_count, per_page_option, params['page']
+    @entities = @query.sla_project_trackers(offset: @entity_pages.offset, limit: @entity_pages.per_page)
+    respond_to do |format|
+      format.html do
+      end
+      format.api do
+        @offset, @limit = api_offset_and_limit
+      end
+    end      
+  end
 
   def new
     @sla_project_tracker = SlaProjectTracker.new

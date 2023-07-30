@@ -22,6 +22,7 @@ class SlaSchedulesController < ApplicationController
 
   unloadable
 
+  accept_api_auth :index
   before_action :require_admin
   before_action :authorize_global
 
@@ -38,7 +39,14 @@ class SlaSchedulesController < ApplicationController
     retrieve_query(Queries::SlaScheduleQuery) 
     @entity_count = @query.sla_schedules.count
     @entity_pages = Paginator.new @entity_count, per_page_option, params['page']
-    @entities = @query.sla_schedules(offset: @entity_pages.offset, limit: @entity_pages.per_page) 
+    @entities = @query.sla_schedules(offset: @entity_pages.offset, limit: @entity_pages.per_page)
+    respond_to do |format|
+      format.html do
+      end
+      format.api do
+        @offset, @limit = api_offset_and_limit
+      end
+    end      
   end
 
   def new
@@ -48,12 +56,9 @@ class SlaSchedulesController < ApplicationController
 
   def create
     @sla_schedule = SlaSchedule.new
-    #params[:sla_schedule]["start_date"] = params[:sla_schedule]["start_date"].strftime("%H:%M:00")
-    #params[:sla_schedule]["end_date"] = params[:sla_schedule]["end_date"].strftime("%H:%M:59")  
     @sla_schedule.safe_attributes = params[:sla_schedule]
     @sla_schedule.start_date = @sla_schedule.start_date.strftime("%H:%M:00")
     @sla_schedule.end_date = @sla_schedule.end_date.strftime("%H:%M:59")
-    Rails.logger.warn "======>>> controller / sla_schedule-create() <<<====== #{@sla_schedule.end_date.strftime("%H:%M:59")}"
     if @sla_schedule.save
       flash[:notice] = l(:notice_successful_create)
       redirect_back_or_default sla_schedules_path
@@ -63,12 +68,9 @@ class SlaSchedulesController < ApplicationController
   end
 
   def update
-    #params[:sla_schedule]["start_date"] = params[:sla_schedule]["start_date"].strftime("%H:%M:00")
-    #params[:sla_schedule]["end_date"] = params[:sla_schedule]["end_date"].strftime("%H:%M:59")
     @sla_schedule.safe_attributes = params[:sla_schedule]
     @sla_schedule.start_date = @sla_schedule.start_date.strftime("%H:%M:00")
     @sla_schedule.end_date = @sla_schedule.end_date.strftime("%H:%M:59")
-    Rails.logger.warn "======>>> controller / sla_schedule-update() <<<====== #{@sla_schedule.end_date.strftime("%H:%M:59")}"
     if @sla_schedule.save
       flash[:notice] = l(:notice_successful_update)
       redirect_back_or_default sla_schedules_path
@@ -84,7 +86,6 @@ class SlaSchedulesController < ApplicationController
   end
 
   def context_menu
-    Rails.logger.warn "======>>> controllers / sla_schedule->context_menu() <<<====== "
     if @sla_schedules.size == 1
       @sla_schedule = @sla_schedules.first
     end
@@ -128,7 +129,6 @@ class SlaSchedulesController < ApplicationController
 
   # https://dev.to/pezza/dynamic-nested-forms-with-turbo-3786
   def setup_sla_calendar
-    Rails.logger.warn "======>>> controllers / sla_schedule->setup_sla_calendar() <<<====== "
     @sla_calendar = SlaCalendar.new(sla_schedules: [SlaSchedule.new])
   end
 

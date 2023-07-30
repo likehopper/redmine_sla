@@ -20,6 +20,7 @@ class SlaLevelsController < ApplicationController
 
   unloadable
 
+  accept_api_auth :index
   before_action :require_admin, except: [:show]
 
   before_action :find_sla_level, only: [:show, :edit, :update]
@@ -37,6 +38,13 @@ class SlaLevelsController < ApplicationController
     @entity_count = @query.sla_levels.count
     @entity_pages = Paginator.new @entity_count, per_page_option, params['page']
     @entities = @query.sla_levels(offset: @entity_pages.offset, limit: @entity_pages.per_page) 
+    respond_to do |format|
+      format.html do
+      end
+      format.api do
+        @offset, @limit = api_offset_and_limit
+      end
+    end    
   end
 
   def new
@@ -72,7 +80,6 @@ class SlaLevelsController < ApplicationController
   end
 
   def context_menu
-    Rails.logger.warn "======>>> sla_level->context_menu() <<<====== "
     if @sla_levels.size == 1
       @sla_level = @sla_levels.first
     end
