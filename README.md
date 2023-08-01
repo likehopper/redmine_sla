@@ -1,7 +1,9 @@
 # redmine_sla
 
-- Website :	<https://github.com/likehopper/redmine_sla>
-- Code repository :	<git@github.com:likehopper/redmine_sla.git>
+<div style=" width:445px; height:245px; " >
+
+![Redmine SLA - Issue Patch](doc/images/redmine_sla_issue_patch.png)
+</div>
 
 
 ## Overview
