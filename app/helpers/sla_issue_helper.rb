@@ -21,27 +21,28 @@ module SlaIssueHelper
   include ActionView::Context
   include ActionView::Helpers::TagHelper
 
-  def sla_bar(purcent, options={})
+  def sla_bar(purcent, is_closed)
 
-    width = options[:width] || '100;'
-    legend = options[:legend] || ''
+    width = '200'
 
     fill = label = purcent
     unfill = 100 - purcent
 
+    # Colors used for an active issue depending on progress [ 0% < 80% < 100% ] = [ good < warn < fail ]
     case purcent
-    when 0..79
-      css = 'inprogress'
-    when 80..100
-      css = 'warn'
-    else # > 100
-      fill = 100
-      unfill = 0
-      label = '>100'
-      css = 'fail'
+      when 0..79
+        css = 'good'
+      when 80..100
+        css = 'warn'
+      else # > 100
+        fill = 100
+        unfill = 0
+        label = '>100'
+        css = 'fail'
     end # case purcent
       
-    if options[:done]
+    # If issue is closed, then bars are shown in pastel shades according to the respect of the sla
+    if is_closed
       if ( purcent > 100 )
         css = 'doneko'
       else
@@ -53,8 +54,38 @@ module SlaIssueHelper
             content_tag('tr',
               ( fill > 0 ? content_tag('td', "#{label}%" , :style => "width: #{fill}%;", :class => css) : ''.html_safe ) +
               ( unfill > 0 ? content_tag('td', "" , :style => "width: #{unfill}%;", :class => 'todo') : ''.html_safe )
-            ), :class => 'sla', :style => "width: #{width}px;").html_safe +
-            content_tag('span', legend.html_safe, :class => 'pourcent').html_safe
+            ), :class => 'sla', :style => "width: #{width}px;").html_safe
+  
   end
+
+  def sla_pie(purcent, is_closed )
+
+    label = purcent.to_s.concat("%")
+
+    # CCS colors used for an active issue depending on progress [ 0% < 80% < 100% ] = [ good < warn < fail ]
+    case purcent
+      when 0..79
+        css = 'good'
+      when 80..100
+        css = 'warn'
+      else # > 100
+        label = '>100%'
+        purcent = 100
+        css = 'fail'
+    end # case purcent
+      
+    # If issue is closed, then pie are shown in dark shades according to the respect of the sla
+    if is_closed
+      if ( label == '>100%' )
+        css = 'doneko'
+      else
+        css = 'doneok'
+      end
+    end
+
+    return content_tag('div', label, :class => 'pie '+css, :style => "--p:"+purcent.to_s).html_safe
+
+  end
+
 
 end

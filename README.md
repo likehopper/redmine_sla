@@ -119,7 +119,10 @@ More information about installation of Redmine plugins, you can find in the offi
 - Functional tests <docs/TESTING.md>
 - Conceptual Data Model <docs/MCD.md>
 - Step-by-step use case <docs/USECASE.md>
+  - Example 01 <docs/EXAMPLE-01.md>
+  - Example 03 <docs/EXAMPLE-02.md>
 - SLA Compute Explanation <docs/COMPUTE.md>
+- Plugin settings <docs/SETTINGS.md>
 - Tasks <docs/TASKS.md>
 - Change log <CHANGELOG.md>
 - License <LICENSE>
