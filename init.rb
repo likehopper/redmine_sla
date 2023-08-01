@@ -41,6 +41,7 @@ Redmine::Plugin.register :redmine_sla do
       'sla_log_level' => '1',
       'sla_cache_ttl' => '1',
       'sla_time_zone' => 'Etc/UTC',
+      'sla_display'   => 'bar',
     },
     # Ref. file "app/views/sla_settings_plugin/_sla_settings_plugin.html.erb" 
     :partial => 'sla_settings_plugin/sla_settings_plugin'

@@ -9,19 +9,17 @@ if User.current.allowed_to?(:view_sla, @project, :global => true)
 <hr />
 <div class="sla attribute">
   
-  <div class="label"><%= l(:sla_label_abbreviation) -%></div>
+  <div class="label"><%= l('sla_label.sla.plural') -%></div>
 
   <div class="value">
     <%= link_to sla_cache.sla_level[:name], sla_level_path(sla_cache.sla_level),
-      title: l(:button_show)+" : "+l('sla_label.sla_level.singular') -%>
+        title: l(:button_show)+" : "+l('sla_label.sla_level.singular') -%>
     &nbsp;|&nbsp;
     <%= link_to sla_cache.sla_level.sla_calendar[:name], sla_calendar_path(sla_cache.sla_level.sla_calendar),
-      title: l(:button_show)+" : "+l('sla_label.sla_calendar.singular') -%>
-
+        title: l(:button_show)+" : "+l('sla_label.sla_calendar.singular') -%>
     <table>
-
+      <tr>
 <%
-
     SlaType.all.each { |sla_type|
 
       sla_level_term = SlaLevelTerm.find_by_level_type(sla_cache.sla_level_id,sla_type.id,issue.priority_id)
@@ -43,21 +41,20 @@ if User.current.allowed_to?(:view_sla, @project, :global => true)
         is_closed = IssueStatus.find(issue.status_id).is_closed
 
         sla_helper = Object.new.extend(SlaIssueHelper)
-
   -%>
-      <tr>
-        <th valign="top"><%= sla_type.name -%></th>
-        <td valign="top" class="sla"><%=
-          sla_helper.sla_bar sla_purcent,
-            :width => 400,
-            :legend => "#{sla_spent_txt}&nbsp;#{l(:field_sla)}&nbsp;#{sla_term_txt}",
-            :done => is_closed
-          -%></td>
-      </tr>
+        <td><%= sla_type.name -%><br /><%= sla_spent_txt -%>&nbsp;/&nbsp;<%= sla_term_txt -%></td>
+        <td>
+          <% if ( ( Setting.plugin_redmine_sla["sla_display"] || 'bar' ) == 'pie' ) %>
+            <%= sla_helper.sla_pie sla_purcent, is_closed -%>
+          <% else %>
+            <%= sla_helper.sla_bar sla_purcent, is_closed -%>
+          <% end %>
+        </td>
 <%
       end # if ( !sla_spent.nil? && !sla_term.nil? ) 
     } # SlaTypes.all.each { |sla_type|
 %>
+      </tr>
     </table>
   </div>
 </div>
