@@ -1,4 +1,4 @@
-/***** Progress bar *****/
+/*** Progress bar ***/
 table.sla {
     border-collapse: collapse;
     border-spacing: 0pt;
@@ -7,14 +7,73 @@ table.sla {
     float:left;
     margin: 1px 6px 1px 0px;
 }
-
 table.sla td { height: 1em; }
-table.sla td.inprogress { background: #a2dda2 none repeat scroll 0%; }
+/*** Color used for an active issue for the upcoming time ***/
+table.sla td.todo { background: #cccccc none repeat scroll 0%; }
+/*** CSS colors used for an active issue depending on progress [ 0% < 80% < 100% ] = [ good < warn < fail ]***/
+table.sla td.good { background: #a2dda2 none repeat scroll 0%; }
+table.sla td.warn { background: #ff9955 none repeat scroll 0%; }
+table.sla td.fail { background: #ff6868 none repeat scroll 0%; }
+/*** If issue is closed, then bars are shown in pastel shades according to the respect of the sla ***/
 table.sla td.doneok { background: #c9dfc9 none repeat scroll 0%; }
 table.sla td.doneko { background: #dfc9c9 none repeat scroll 0%; }
-table.sla td.fail { background: #ff6868 none repeat scroll 0%; }
-table.sla td.warn { background: #ff9955 none repeat scroll 0%; }
-table.sla td.todo { background: #cccccc none repeat scroll 0%; }
+
+
+/*** Progress pie ***/
+.pie {
+  --p:20;
+  --b:4px;
+  --c:green;
+  --w:50px;
+  
+  width: var(--w);
+  aspect-ratio: 1;
+  position: relative;
+  display: inline-grid;
+  margin: 5px;
+  place-content: center;
+  font-size: 12px;
+  font-weight: normal;
+  font-family: sans-serif;
+}
+.pie.good {
+  --c:green;
+}
+.pie.warn {
+  --c:orange;
+}
+.pie.fail {
+  --c:red;
+}
+.pie.doneok {
+  --c:darkgreen;
+}
+.pie.doneko {
+  --c:darkred;
+}
+.pie:before,
+.pie:after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+.pie:before {
+  inset: 0;
+  background:
+    radial-gradient(farthest-side,var(--c) 98%,#0000) top/var(--b) var(--b) no-repeat,
+    conic-gradient(var(--c) calc(var(--p)*1%),#0000 0);
+  -webkit-mask: radial-gradient(farthest-side,#0000 calc(99% - var(--b)),#000 calc(100% - var(--b)));
+          mask: radial-gradient(farthest-side,#0000 calc(99% - var(--b)),#000 calc(100% - var(--b)));
+}
+.pie:after {
+  inset: calc(50% - var(--b)/2);
+  background: var(--c);
+  transform: rotate(calc(var(--p)*3.6deg)) translateY(calc(50% - var(--w)/2));
+}
+/*** Thanks for pie to https://www.freecodecamp.org/news/css-only-pie-chart/ ***/
+
+
+/*** Administration ***/
 
 #admin-menu a.redmine-sla { background-image:url('../images/sla_16.png'); }
 
