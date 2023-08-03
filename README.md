@@ -1,6 +1,6 @@
 # redmine_sla
 
-<div style=" width:445px; height:245px; " >
+<div style=" width:480px; height:166px; " >
 
 ![Redmine SLA - Issue Patch](doc/images/redmine_sla_issue_patch.png)
 </div>
@@ -8,8 +8,9 @@
 
 ## Overview
 
-- Website: <https://github.com/likehopper/redmine_sla>
-- Code repository: `git@github.com:likehopper/redmine_sla.git`
+- Website: [https://github.com/likehopper/redmine_sla](https://github.com/likehopper/redmine_sla)
+- Code repository: [git@github.com:likehopper/redmine_sla.git](git@github.com:likehopper/redmine_sla.git)
+- Redmine plugins directory: [https://www.redmine.org/plugins/redmine_sla](https://www.redmine.org/plugins/redmine_sla)
 
 
 ### Digest
@@ -47,6 +48,7 @@ These are the features of this plugin :
     - Viewing SLA Columns
   - In view
     - Summary by type
+    - Responsive display
 - For the time log
   - In list
     - Filter on SLAs
@@ -69,7 +71,7 @@ Here is a list of possible evolutions without prioritization :
 - Have a corrector for a status log issue
 - Clear cache completely or after a given date
 - Mask SLA plugin columns and filters if module is disabled or user doesn't have access
-- Improve display and editing week' schedules of calendars ( e.g. with https://github.com/starsirius/day-schedule-selector.git )
+- Improve display and editing week' schedules of calendars ( e.g. with [https://github.com/starsirius/day-schedule-selector.git](https://github.com/starsirius/day-schedule-selector.git) )
 - Display of public holidays per year in nested ## form in calendars
 - Ability to export and import all or part of each element
 - Improve display and editing of terms in tabular form
@@ -118,18 +120,19 @@ More information about installation of Redmine plugins, you can find in the offi
 
 ## More informations
 
-- Functional tests <docs/TESTING.md>
-- Conceptual Data Model <docs/MCD.md>
-- Step-by-step use case <docs/USECASE.md>
-  - Example 01 <docs/EXAMPLE-01.md>
-  - Example 03 <docs/EXAMPLE-02.md>
-- SLA Compute Explanation <docs/COMPUTE.md>
-- Plugin settings <docs/SETTINGS.md>
-- Tasks <docs/TASKS.md>
-- Change log <CHANGELOG.md>
-- License <LICENSE>
+- [Functional tests](doc/TESTING.md)
+- [Conceptual Data Model](doc/MCD.md)
+- [Step-by-step use case](doc/USECASE.md)
+  - [Example 01](doc/EXAMPLE-01.md)
+  - [Example 03](doc/EXAMPLE-02.md)
+- [SLA Compute Explanation](doc/COMPUTE.md)
+- [Plugin settings](doc/SETTINGS.md)
+- [API Rest for SLA](doc/API.md)
+- [Tasks](doc/TASKS.md)
+- [Change log](CHANGELOG.md)
+- [License](LICENSE)
 
 
 ### sources / thanks
 
-- Icons created by Freepik - Flaticon <https://www.flaticon.com/authors/freepik>
+- [Icons created by Freepik - Flaticon](https://www.flaticon.com/authors/freepik)
