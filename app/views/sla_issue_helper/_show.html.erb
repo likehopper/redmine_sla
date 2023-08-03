@@ -12,13 +12,14 @@ if User.current.allowed_to?(:view_sla, @project, :global => true)
   <div class="label"><%= l('sla_label.sla.plural') -%></div>
 
   <div class="value">
-    <%= link_to sla_cache.sla_level[:name], sla_level_path(sla_cache.sla_level),
-        title: l(:button_show)+" : "+l('sla_label.sla_level.singular') -%>
-    &nbsp;|&nbsp;
-    <%= link_to sla_cache.sla_level.sla_calendar[:name], sla_calendar_path(sla_cache.sla_level.sla_calendar),
-        title: l(:button_show)+" : "+l('sla_label.sla_calendar.singular') -%>
-    <table>
-      <tr>
+
+    <ul class="flex-container">
+      <li class="flex-item">&#9658;&nbsp;<%= link_to sla_cache.sla_level[:name], sla_level_path(sla_cache.sla_level),
+        title: l(:button_show)+" : "+l('sla_label.sla_level.singular') -%></li>
+      <li class="flex-item">&#9658;&nbsp;<%= link_to sla_cache.sla_level.sla_calendar[:name], sla_calendar_path(sla_cache.sla_level.sla_calendar),
+        title: l(:button_show)+" : "+l('sla_label.sla_calendar.singular') -%></li>
+    </ul>
+      <ul class="flex-container">      
 <%
     SlaType.all.each { |sla_type|
 
@@ -42,20 +43,28 @@ if User.current.allowed_to?(:view_sla, @project, :global => true)
 
         sla_helper = Object.new.extend(SlaIssueHelper)
   -%>
-        <td><%= sla_type.name -%><br /><%= sla_spent_txt -%>&nbsp;/&nbsp;<%= sla_term_txt -%></td>
-        <td>
-          <% if ( ( Setting.plugin_redmine_sla["sla_display"] || 'bar' ) == 'pie' ) %>
-            <%= sla_helper.sla_pie sla_purcent, is_closed -%>
-          <% else %>
-            <%= sla_helper.sla_bar sla_purcent, is_closed -%>
-          <% end %>
-        </td>
+        <li class="flex-item">
+          <table>
+            <tr>
+              <td  style="vertical-align: middle" rowspan="2">
+                <%= sla_helper.sla_display sla_purcent, is_closed, Setting.plugin_redmine_sla["sla_display"] || 'bar' -%>
+              </td>
+              <td style="vertical-align: bottom">
+                <strong><%= sla_type.name -%></strong>
+              </td>
+            </tr>
+            <tr>
+              <td style="vertical-align: top">
+                <%= sla_spent_txt -%>&nbsp;/&nbsp;<%= sla_term_txt -%>
+              </td>
+            </tr>
+          </table>
+        </li>
 <%
       end # if ( !sla_spent.nil? && !sla_term.nil? ) 
     } # SlaTypes.all.each { |sla_type|
 %>
-      </tr>
-    </table>
+    </ul>
   </div>
 </div>
 <%

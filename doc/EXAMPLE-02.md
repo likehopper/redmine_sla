@@ -35,7 +35,7 @@ In the projects, we will apply this SLA to the tracker « Support request » :
 
 The SLA configuration bring together the entire definition of the SLA
 
-To begin, go to `Administration » SLA Global settings` (https://[redmine-host]/sla/slas). Add "SLA TMA tracker_support_request" as new "Service Levels Agreement".
+To begin, go to `Administration » SLA Global settings` (https://[redmine-host]/sla/slas). Add "SLA TMA tracker_support_request" as new "Service Level Agreements".
 <div style=" width:50%; height:50%; " >
 
 ![Redmine SLA - Example 02 - 01](images/example_02/redmine_sla_doc_example_02_01.png)
