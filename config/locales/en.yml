@@ -126,7 +126,7 @@ en:
     # Sla
     sla:
       singular: *sla
-      plural: Service Levels Agreement
+      plural: Service Level Agreements
       count:
         zero: None SLA
         one: One SLA

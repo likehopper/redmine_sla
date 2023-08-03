@@ -7,62 +7,160 @@ Some of the SLA data is exposed through Redmine's REST API for the resources des
 
 ## Slas
 
-To retrieve the list of Slas :
+### Listing Slas
+
+`GET /sla/slas.[format]`
+
+Returns a paginated list of Slas. By default, it returns all Slas.
+
+<u>Parameters:</u>
+- offset: skip this number of items in response (optional)
+- limit: number of itmes per page (optional)
+- sort: column to sort with. Append :desc to invert the order.
+
+<u>Examples:</u>
 
 `curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/slas.json"`
 
 
 ## Sla Types
 
-To retrieve the list of Sla Types :
+###  Listing Sla Types
+
+`GET /sla/types.[format]`
+
+Returns a paginated list of Sla Types. By default, it returns all Sla Types.
+
+<u>Parameters:</u>
+- offset: skip this number of items in response (optional)
+- limit: number of itmes per page (optional)
+- sort: column to sort with. Append :desc to invert the order.
+
+<u>Examples:</u>
 
 `curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/types.json"`
 
 
-## SLA Statuses
+## Sla Statuses
 
-To retrieve the list of Sla Statuses :
+### Listing Sla Statuses
+
+`GET /sla/statuses.[format]`
+
+Returns a paginated list of Sla Statuses. By default, it returns all Sla Statuses.
+
+<u>Parameters:</u>
+- offset: skip this number of items in response (optional)
+- limit: number of itmes per page (optional)
+- sort: column to sort with. Append :desc to invert the order.
+
+<u>Examples:</u>
 
 `curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/statuses.json"`
 
 
-## SLA Schedules
+## Sla Schedules
 
-To retrieve the list of Sla Schedules :
+### Listing Sla Statuses
+
+`GET /sla/schedules.[format]`
+
+Returns a paginated list of Sla Statuses. By default, it returns all Sla Statuses.
+
+<u>Parameters:</u>
+- offset: skip this number of items in response (optional)
+- limit: number of itmes per page (optional)
+- sort: column to sort with. Append :desc to invert the order.
+
+<u>Examples:</u>
 
 `curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/schedules.json"`
 
 
 ## Sla Holidays
 
-To retrieve the list of Sla Holidays :
+### Listing Sla Holidays
+
+`GET /sla/holidays.[format]`
+
+Returns a paginated list of Sla Holidays. By default, it returns all Sla Holidays.
+
+<u>Parameters:</u>
+- offset: skip this number of items in response (optional)
+- limit: number of itmes per page (optional)
+- sort: column to sort with. Append :desc to invert the order.
+
+<u>Examples:</u>
 
 `curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/holidays.json"`
 
 
 ## Sla Calendar Holildays
 
-To retrieve the list of Sla Calendar Holidays :
+### Listing Sla Calendar Holildays
+
+`GET /sla/calendar_holidays.[format]`
+
+Returns a paginated list of Sla Calendar Holildays. By default, it returns all Sla Calendar Holildays.
+
+<u>Parameters:</u>
+- offset: skip this number of items in response (optional)
+- limit: number of itmes per page (optional)
+- sort: column to sort with. Append :desc to invert the order.
+
+<u>Examples:</u>
 
 `curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/calendar_holidays.json"`
 
 
 ## Sla Levels
 
-To retrieve the list of Sla Levels :
+### Listing Sla Levels
+
+`GET /sla/levels.[format]`
+
+Returns a paginated list of Sla Levels. By default, it returns all Sla Levels.
+
+<u>Parameters:</u>
+- offset: skip this number of items in response (optional)
+- limit: number of itmes per page (optional)
+- sort: column to sort with. Append :desc to invert the order.
+
+<u>Examples:</u>
 
 `curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/levels.json"`
 
 
 ## Sla Level Terms
+
+### Listing Sla Level Terms
+
+`GET /sla/level_terms.[format]`
  
-To retrieve the list of Sla Level Terms :
+Returns a paginated list of Sla Level Terms. By default, it returns all Sla Level Terms.
+
+<u>Parameters:</u>
+- offset: skip this number of items in response (optional)
+- limit: number of itmes per page (optional)
+- sort: column to sort with. Append :desc to invert the order.
+
+<u>Examples:</u>
 
 `curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/level_terms.json"`
 
 
 ## Sla Project Trackers
 
-To retrieve the list of Sla Project Trackers:
+### Listing Sla Project Trackers
 
+`GET /projects/[project-identifier]/slas.[format]`
+
+Returns a paginated list of Sla Project Trackers. By default, it returns all Sla Project Trackers.
+
+<u>Parameters:</u>
+- offset: skip this number of items in response (optional)
+- limit: number of itmes per page (optional)
+- sort: column to sort with. Append :desc to invert the order.
+
+<u>Examples:</u>
 `curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/projects/[project-identifier]/slas.json"`
