@@ -38,8 +38,7 @@ if User.current.allowed_to?(:view_sla, @project, :global => true)
         sla_spent_txt = ChronicDuration.output(sla_spent*60, :format => :short, :limit_to_hours => true, :units => 2, :joiner => '', :keep_zero => true )
         sla_term_txt = ChronicDuration.output(sla_term*60, :format => :short, :limit_to_hours => true, :units => 2, :joiner => '')
 
-        sla_purcent = ( sla_spent * 100 / sla_term ).round()
-        is_closed = IssueStatus.find(issue.status_id).is_closed
+        sla_percent = ( sla_spent * 100 / sla_term ).round()
 
         sla_helper = Object.new.extend(SlaIssueHelper)
   -%>
@@ -47,7 +46,7 @@ if User.current.allowed_to?(:view_sla, @project, :global => true)
           <table>
             <tr>
               <td  style="vertical-align: middle" rowspan="2">
-                <%= sla_helper.sla_display sla_purcent, is_closed, Setting.plugin_redmine_sla["sla_display"] || 'bar' -%>
+                <%= sla_helper.sla_display sla_percent, issue.status.is_closed, Setting.plugin_redmine_sla["sla_display"] || 'bar' -%>
               </td>
               <td style="vertical-align: bottom">
                 <strong><%= sla_type.name -%></strong>

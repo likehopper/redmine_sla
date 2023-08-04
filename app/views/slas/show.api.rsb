@@ -1,0 +1,4 @@
+    api.sla do
+      api.id @sla.id
+      api.name @sla.name
+    end
