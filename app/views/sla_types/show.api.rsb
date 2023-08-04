@@ -1,0 +1,4 @@
+    api.sla_types do
+      api.id @sla_types.id
+      api.name @sla_types.name
+    end

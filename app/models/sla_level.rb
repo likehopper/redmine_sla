@@ -69,6 +69,6 @@ class SlaLevel < ActiveRecord::Base
   # Print text for link objects
   def to_s
     name.to_s
-  end  
+  end 
 
 end

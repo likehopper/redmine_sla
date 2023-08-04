@@ -38,9 +38,6 @@ class SlaCache < ActiveRecord::Base
 
   def self.find_or_new(param_issue_id)
     ActiveRecord::Base.connection.execute("SELECT sla_get_level(#{param_issue_id}) ; ")
-    #tmp_s = ActiveRecord::Base.connection.select_value("SELECT sla_get_level(#{param_issue_id}) ; ")
-    #tmp_a = tmp_s.split(",")
-    #Rails.logger.warn "======>>> sla_cache_id = #{tmp_a[0]} sla_level_id = #{tmp_a[1]} <<<====== "
     sla_cache = self.find_by_issue(param_issue_id)
     sla_cache
   end
@@ -69,5 +66,8 @@ class SlaCache < ActiveRecord::Base
   def update()
     ActiveRecord::Base.connection.execute("SELECT sla_get_level(#{self.issue_id}) ; ")
   end
+
+  #def to_h()
+  #end
     
 end
