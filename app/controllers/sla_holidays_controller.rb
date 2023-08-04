@@ -20,7 +20,7 @@ class SlaHolidaysController < ApplicationController
 
   unloadable
 
-  accept_api_auth :index
+  accept_api_auth :index, :create, :show, :update, :destroy
   before_action :require_admin
   before_action :authorize_global
 
@@ -46,6 +46,14 @@ class SlaHolidaysController < ApplicationController
     end    
   end
 
+  def show
+    respond_to do |format|
+      format.html do
+        end
+      format.api
+    end
+  end
+
   def new
     @sla_holiday = SlaHoliday.new
     @sla_holiday.safe_attributes = params[:sla_holiday]
@@ -55,10 +63,23 @@ class SlaHolidaysController < ApplicationController
     @sla_holiday = SlaHoliday.new
     @sla_holiday.safe_attributes = params[:sla_holiday]
     if @sla_holiday.save
-      flash[:notice] = l(:notice_successful_create)
-      redirect_back_or_default sla_holidays_path
+      respond_to do |format|
+        format.html do
+          flash[:notice] = l(:notice_successful_create)
+          redirect_back_or_default sla_holidays_path
+        end
+        format.api do
+          render :action => 'show', :status => :created,
+          :location => sla_holiday_url(@sla_holiday)
+        end
+      end
     else
-      render :new
+      respond_to do |format|
+        format.html do
+          render :action => 'new'
+        end
+        format.api {render_validation_errors(@sla_holiday)}
+      end
     end
   end
 
@@ -66,16 +87,36 @@ class SlaHolidaysController < ApplicationController
     @sla_holiday.safe_attributes = params[:sla_holiday]
     if @sla_holiday.save
       flash[:notice] = l(:notice_successful_update)
-      redirect_back_or_default sla_holidays_path
+      respond_to do |format|
+        format.html do
+          redirect_back_or_default sla_holidays_path
+        end
+        format.api  {render_api_ok}
+      end
     else
-      render :edit
+      respond_to do |format|
+        format.html {render :action => 'edit'}
+        format.api  {render_validation_errors(@sla_holiday)}
+      end
     end
   end
 
   def destroy
-    @sla_holidays.each(&:destroy)
-    flash[:notice] = l(:notice_successful_delete)
-    redirect_back_or_default sla_holidays_path
+    #@sla_holidays.each(&:destroy)
+    @sla_holidays.each do |sla_holiday|
+      begin
+        sla_holiday.reload.destroy
+      rescue ::ActiveRecord::RecordNotFound # raised by #reload if sla_holiday no longer exists
+        # nothing to do, sla_holiday was already deleted (eg. by a parent)
+      end
+    end
+    respond_to do |format|
+      format.html do
+        flash[:notice] = l(:notice_successful_delete)
+        redirect_back_or_default sla_holidays_path
+      end
+      format.api {render_api_ok}
+    end
   end
 
   def context_menu

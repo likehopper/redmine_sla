@@ -21,40 +21,27 @@ module SlaIssueHelper
   include ActionView::Context
   include ActionView::Helpers::TagHelper
 
-  def sla_display( percent, is_closed, type="bar" )
+  def sla_display( percent, is_closed=false, type="bar" )
 
     label = percent.to_s.concat("%")
 
     # CCS colors used for an active issue depending on progress [ 0% < 80% < 100% ] = [ good < warn < fail ]
+    # If issue is closed, then pie are shown in dark shades according to the respect of the sla
     case percent
       when 0..79
-        css_color = 'good'
+        css_color = is_closed ? 'doneok' : 'good'
       when 80..100
-        css_color = 'warn'
+        css_color = is_closed ? 'doneok' : 'warn'
       else # > 100
-        css_color = 'fail'
+        css_color = is_closed ? 'doneko' : 'fail'
         label = '>100%'
         percent = 100
-    end # case purcent
-      
-    # If issue is closed, then pie are shown in dark shades according to the respect of the sla
-    if is_closed
-      if ( label == '>100%' )
-        css_color = 'doneko'
-      else
-        css_color = 'doneok'
-      end
-    end
+    end # case percent
 
-    if ( type == "pie" )
-      css_form = "sla_pie"
-    else
-      css_form = "sla_bar"
-    end
-
-    css_class = 'sla_display '+css_color+' '+css_form
-
-    return content_tag('div', label, :label =>  label, :class => css_class, :style => "--p:"+percent.to_s).html_safe
+    css_type = ( type == "pie" ? "sla_pie" : "sla_bar" )
+    css_class = [ 'sla_display', css_color, css_type ].join(' ')
+    
+    return content_tag('div', label, :label=>label, :class=>css_class, :style=>"--p:#{percent.to_s}").html_safe
 
   end
 
