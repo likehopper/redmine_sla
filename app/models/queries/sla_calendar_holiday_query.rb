@@ -23,7 +23,7 @@ class Queries::SlaCalendarHolidayQuery < Query
   def initialize_available_filters
     add_available_filter 'sla_calendar_id', :type => :list, :values => lambda {all_sla_calendar_values}
     add_available_filter 'sla_holiday_id', :type => :list, :values => lambda {all_sla_holiday_values}
-    add_available_filter 'match', type: :boolean
+    add_available_filter 'match', :type => :list, :values => [[l(:general_text_yes), "1"], [l(:general_text_no), "0"]]
   end
 
   def available_columns

@@ -41,6 +41,8 @@ class SlaLevel < ActiveRecord::Base
 
   validates_uniqueness_of :name, :case_sensitive => false
 
+  validates_uniqueness_of :sla, :scope => [ :sla_calendar ]
+
   safe_attributes *%w[name sla_id sla_calendar_id]
 
   def self.visible_condition(user, options = {})

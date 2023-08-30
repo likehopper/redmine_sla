@@ -20,7 +20,7 @@ class SlaCalendarHolidaysController < ApplicationController
 
   unloadable
 
-  accept_api_auth :index
+  accept_api_auth :index, :create, :show, :update, :destroy
   before_action :require_admin
   before_action :authorize_global
 
@@ -43,6 +43,14 @@ class SlaCalendarHolidaysController < ApplicationController
       format.api do
         @offset, @limit = api_offset_and_limit
       end
+    end    
+  end
+
+  def show
+    respond_to do |format|
+      format.html do
+        end
+      format.api
     end
   end
 
@@ -55,27 +63,63 @@ class SlaCalendarHolidaysController < ApplicationController
     @sla_calendar_holiday = SlaCalendarHoliday.new
     @sla_calendar_holiday.safe_attributes = params[:sla_calendar_holiday]
     if @sla_calendar_holiday.save
-      flash[:notice] = l(:notice_successful_create)
-      redirect_back_or_default sla_calendar_holidays_path
+      respond_to do |format|
+        format.html do
+          flash[:notice] = l(:notice_successful_create)
+          redirect_back_or_default sla_calendar_holidays_path
+        end
+        format.api do
+          render :action => 'show', :status => :created,
+          :location => sla_calendar_holiday_url(@sla_calendar_holiday)
+        end
+      end
     else
-      render :new
+      respond_to do |format|
+        format.html do
+          render :action => 'new'
+        end
+        format.api {render_validation_errors(@sla_calendar_holiday)}
+      end
     end
+
   end
 
   def update
     @sla_calendar_holiday.safe_attributes = params[:sla_calendar_holiday]
     if @sla_calendar_holiday.save
       flash[:notice] = l(:notice_successful_update)
-      redirect_back_or_default sla_calendar_holidays_path
+      respond_to do |format|
+        format.html do
+          redirect_back_or_default sla_calendar_holidays_path
+        end
+        format.api  {render_api_ok}
+      end
     else
-      render :edit
+      respond_to do |format|
+        format.html {render :action => 'edit'}
+        format.api  {render_validation_errors(@sla_calendar_holiday)}
+      end
     end
   end
 
   def destroy
-    @sla_calendar_holidays.each(&:destroy)
-    flash[:notice] = l(:notice_successful_delete)
-    redirect_back_or_default sla_calendar_holidays_path
+    #@sla_calendar_holidays.each(&:destroy)
+    #flash[:notice] = l(:notice_successful_delete)
+    #redirect_back_or_default sla_calendar_holidays_path
+    @sla_calendar_holidays.each do |sla_calendar_holiday|
+      begin
+        sla_calendar_holiday.reload.destroy
+      rescue ::ActiveRecord::RecordNotFound # raised by #reload if sla_calendar_holiday no longer exists
+        # nothing to do, sla_calendar_holiday was already deleted (eg. by a parent)
+      end
+    end
+    respond_to do |format|
+      format.html do
+        flash[:notice] = l(:notice_successful_delete)
+        redirect_back_or_default sla_calendar_holidays_path
+      end
+      format.api {render_api_ok}
+    end        
   end
 
   def context_menu

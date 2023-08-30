@@ -20,13 +20,12 @@ class SlaLevelsController < ApplicationController
 
   unloadable
 
-  accept_api_auth :index
+  accept_api_auth :index, :create, :show, :update, :destroy
   before_action :require_admin, except: [:show]
+  before_action :authorize_global
 
   before_action :find_sla_level, only: [:show, :edit, :update]
   before_action :find_sla_levels, only: [:context_menu, :destroy]
-
-  before_action :authorize_global
 
   helper :sla_levels
   helper :context_menus
@@ -47,6 +46,14 @@ class SlaLevelsController < ApplicationController
     end    
   end
 
+  def show
+    respond_to do |format|
+      format.html do
+        end
+      format.api
+    end
+  end
+
   def new
     @sla_level = SlaLevel.new
     @sla_level.safe_attributes = params[:sla_level]
@@ -56,10 +63,23 @@ class SlaLevelsController < ApplicationController
     @sla_level = SlaLevel.new
     @sla_level.safe_attributes = params[:sla_level]
     if @sla_level.save
-      flash[:notice] = l(:notice_successful_create)
-      redirect_back_or_default sla_levels_path
+      respond_to do |format|
+        format.html do
+          flash[:notice] = l(:notice_successful_create)
+          redirect_back_or_default sla_levels_path
+        end
+        format.api do
+          render :action => 'show', :status => :created,
+          :location => sla_level_url(@sla_level)
+        end
+      end
     else
-      render :new
+      respond_to do |format|
+        format.html do
+          render :action => 'new'
+        end
+        format.api {render_validation_errors(@sla_level)}
+      end
     end
   end
 
@@ -67,16 +87,38 @@ class SlaLevelsController < ApplicationController
     @sla_level.safe_attributes = params[:sla_level]
     if @sla_level.save
       flash[:notice] = l(:notice_successful_update)
-      redirect_back_or_default sla_levels_path
+      respond_to do |format|
+        format.html do
+          redirect_back_or_default sla_levels_path
+        end
+        format.api  {render_api_ok}
+      end
     else
-      render :edit
+      respond_to do |format|
+        format.html {render :action => 'edit'}
+        format.api  {render_validation_errors(@sla_level)}
+      end
     end
   end
 
   def destroy
-    @sla_levels.each(&:destroy)
-    flash[:notice] = l(:notice_successful_delete)
-    redirect_back_or_default sla_levels_path
+    #@sla_levels.each(&:destroy)
+    #flash[:notice] = l(:notice_successful_delete)
+    #redirect_back_or_default sla_levels_path
+    @sla_levels.each do |sla_level|
+      begin
+        sla_level.reload.destroy
+      rescue ::ActiveRecord::RecordNotFound # raised by #reload if sla_level no longer exists
+        # nothing to do, sla_level was already deleted (eg. by a parent)
+      end
+    end
+    respond_to do |format|
+      format.html do
+        flash[:notice] = l(:notice_successful_delete)
+        redirect_back_or_default sla_levels_path
+      end
+      format.api {render_api_ok}
+    end       
   end
 
   def context_menu
@@ -114,7 +156,8 @@ class SlaLevelsController < ApplicationController
   end
 
   def find_sla_levels
-    @sla_levels = SlaLevel.visible.where(id: (params[:id]||params[:ids])).to_a
+    @sla_levels = SlaLevel.visible.where(id: (params[:id] || params[:ids])).to_a
+    #@sla_level = @sla_levels.first if @sla_levels.count == 1
     raise ActiveRecord::RecordNotFound if @sla_levels.empty?
     #raise Unauthorized unless @sla_levels.all?(&:visible?)
   rescue ActiveRecord::RecordNotFound

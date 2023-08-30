@@ -20,7 +20,7 @@ class SlaLevelTermsController < ApplicationController
 
   unloadable
 
-  accept_api_auth :index
+  accept_api_auth :index, :create, :show, :update, :destroy
   before_action :require_admin
   before_action :authorize_global
 
@@ -46,6 +46,14 @@ class SlaLevelTermsController < ApplicationController
     end    
   end
 
+  def show
+    respond_to do |format|
+      format.html do
+        end
+      format.api
+    end
+  end  
+
   def new
     @sla_level_term = SlaLevelTerm.new
     @sla_level_term.safe_attributes = params[:sla_level_term]
@@ -55,10 +63,23 @@ class SlaLevelTermsController < ApplicationController
     @sla_level_term = SlaLevelTerm.new
     @sla_level_term.safe_attributes = params[:sla_level_term]
     if @sla_level_term.save
-      flash[:notice] = l(:notice_successful_create)
-      redirect_back_or_default sla_level_terms_path
+      respond_to do |format|
+        format.html do
+          flash[:notice] = l(:notice_successful_create)
+          redirect_back_or_default sla_level_terms_path
+        end
+        format.api do
+          render :action => 'show', :status => :created,
+          :location => sla_level_term_url(@sla_level_term)
+        end
+      end
     else
-      render :new
+      respond_to do |format|
+        format.html do
+          render :action => 'new'
+        end
+        format.api {render_validation_errors(@sla_level_term)}
+      end
     end
   end
 
@@ -66,16 +87,38 @@ class SlaLevelTermsController < ApplicationController
     @sla_level_term.safe_attributes = params[:sla_level_term]
     if @sla_level_term.save
       flash[:notice] = l(:notice_successful_update)
-      redirect_back_or_default sla_level_terms_path
+      respond_to do |format|
+        format.html do
+          redirect_back_or_default sla_level_terms_path
+        end
+        format.api  {render_api_ok}
+      end
     else
-      render :edit
+      respond_to do |format|
+        format.html {render :action => 'edit'}
+        format.api  {render_validation_errors(@sla_level_term)}
+      end
     end
   end
 
   def destroy
-    @sla_level_terms.each(&:destroy)
-    flash[:notice] = l(:notice_successful_delete)
-    redirect_back_or_default sla_level_terms_path
+    #@sla_level_terms.each(&:destroy)
+    #flash[:notice] = l(:notice_successful_delete)
+    #redirect_back_or_default sla_level_terms_path
+    @sla_level_terms.each do |sla_level_term|
+      begin
+        sla_level_term.reload.destroy
+      rescue ::ActiveRecord::RecordNotFound # raised by #reload if sla_level_term no longer exists
+        # nothing to do, sla_level_term was already deleted (eg. by a parent)
+      end
+    end
+    respond_to do |format|
+      format.html do
+        flash[:notice] = l(:notice_successful_delete)
+        redirect_back_or_default sla_level_terms_path
+      end
+      format.api {render_api_ok}
+    end       
   end
  
   def context_menu

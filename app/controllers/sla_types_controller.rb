@@ -20,7 +20,7 @@ class SlaTypesController < ApplicationController
 
   unloadable
 
-  accept_api_auth :index
+  accept_api_auth :index, :create, :show, :update, :destroy
   before_action :require_admin
   before_action :authorize_global
 
@@ -46,6 +46,14 @@ class SlaTypesController < ApplicationController
     end    
   end
 
+  def show
+    respond_to do |format|
+      format.html do
+        end
+      format.api
+    end
+  end  
+
   def new
     @sla_type = SlaType.new
     @sla_type.safe_attributes = params[:sla_type]
@@ -55,10 +63,23 @@ class SlaTypesController < ApplicationController
     @sla_type = SlaType.new
     @sla_type.safe_attributes = params[:sla_type]
     if @sla_type.save
-      flash[:notice] = l(:notice_successful_create)
-      redirect_back_or_default sla_types_path
+      respond_to do |format|
+        format.html do
+          flash[:notice] = l(:notice_successful_create)
+          redirect_back_or_default sla_types_path
+        end
+        format.api do
+          render :action => 'show', :status => :created,
+          :location => sla_type_url(@sla_type)
+        end
+      end
     else
-      render :new
+      respond_to do |format|
+        format.html do
+          render :action => 'new'
+        end
+        format.api {render_validation_errors(@sla_type)}
+      end
     end
   end
 
@@ -66,16 +87,38 @@ class SlaTypesController < ApplicationController
     @sla_type.safe_attributes = params[:sla_type]
     if @sla_type.save
       flash[:notice] = l(:notice_successful_update)
-      redirect_back_or_default sla_types_path
+      respond_to do |format|
+        format.html do
+          redirect_back_or_default sla_types_path
+        end
+        format.api  {render_api_ok}
+      end
     else
-      render :edit
+      respond_to do |format|
+        format.html {render :action => 'edit'}
+        format.api  {render_validation_errors(@sla_type)}
+      end
     end
   end
 
   def destroy
-    @sla_types.each(&:destroy)
-    flash[:notice] = l(:notice_successful_delete)
-    redirect_back_or_default sla_types_path
+    #@sla_types.each(&:destroy)
+    #flash[:notice] = l(:notice_successful_delete)
+    #redirect_back_or_default sla_types_path
+    @sla_types.each do |sla_type|
+      begin
+        sla_type.reload.destroy
+      rescue ::ActiveRecord::RecordNotFound # raised by #reload if sla_type no longer exists
+        # nothing to do, sla_type was already deleted (eg. by a parent)
+      end
+    end
+    respond_to do |format|
+      format.html do
+        flash[:notice] = l(:notice_successful_delete)
+        redirect_back_or_default sla_types_path
+      end
+      format.api {render_api_ok}
+    end    
   end
 
   def context_menu

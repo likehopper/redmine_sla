@@ -2,9 +2,9 @@
   <div class="fields">
     <%= f.label :dow %>
     <%= f.select :dow, I18n.t('date.day_names').map.with_index.to_h  %>
-    <%= f.label :start_date %>    
+    <%= f.label :start_time %>    
     <%= f.time_field :start_time, value: (f.object.start_time.strftime("%H:%M") unless f.object.start_time.blank?), min: 'hh:mm', max: 'hh:mm' %>
-    <%= f.label :end_date %>
+    <%= f.label :end_time %>
     <%= f.time_field :end_time, value: (f.object.end_time.strftime("%H:%M") unless f.object.end_time.blank?), min: 'hh:mm', max: 'hh:mm' %>
     <%= f.label :match %>
     <%= f.check_box :match %>
