@@ -49,7 +49,16 @@ end
 # context_menu : bulk_destroy
 match 'sla/calendars', :controller => 'sla_calendars', :action => 'destroy', :via => :delete
 # Schedules / API
-match 'sla/schedules', :controller => 'sla_schedules', :action => 'index', :via => :get
+#match 'sla/schedules', :controller => 'sla_schedules', :action => 'index', :via => :get
+
+resources :sla_schedules, path: "sla/schedules" do
+  collection do
+    get 'context_menu'
+  end  
+end
+# context_menu : bulk_destroy
+match 'sla/schedules', :controller => 'sla_schedules', :action => 'destroy', :via => :delete
+
 
 resources :sla_levels, path: "sla/levels" do
   collection do

@@ -1,0 +1,8 @@
+    api.sla_schedule do
+      api.id @sla_schedule.id
+      api.sla_calendar_id @sla_schedule.sla_calendar_id
+      api.dow @sla_schedule.dow
+      api.start_time @sla_schedule.start_time
+      api.end_time @sla_schedule.end_time
+      api.match @sla_schedule.match
+    end

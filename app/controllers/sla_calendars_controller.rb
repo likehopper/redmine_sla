@@ -20,7 +20,7 @@ class SlaCalendarsController < ApplicationController
 
   unloadable
 
-  accept_api_auth :index
+  accept_api_auth :index, :create, :show, :update, :destroy
   before_action :require_admin, except: [:show]
 
   before_action :find_sla_calendar, only: [:show, :edit, :update]
@@ -47,6 +47,14 @@ class SlaCalendarsController < ApplicationController
     end    
   end
 
+  def show
+    respond_to do |format|
+      format.html do
+        end
+      format.api
+    end
+  end    
+
   def new
     @sla_calendar = SlaCalendar.new
     @sla_calendar.safe_attributes = params[:sla_calendar]
@@ -55,28 +63,65 @@ class SlaCalendarsController < ApplicationController
   def create
     @sla_calendar = SlaCalendar.new()
     @sla_calendar.safe_attributes = params[:sla_calendar]
-    if @sla_calendar.save
-      flash[:notice] = l(:notice_successful_create)
-      redirect_back_or_default sla_calendars_path
+    if @sla_calendar.save && @sla_calendar.update(sla_calendar_params)
+      respond_to do |format|
+        format.html do
+          flash[:notice] = l(:notice_successful_create)
+          redirect_back_or_default sla_calendars_path
+        end
+        format.api do
+          render :action => 'show', :status => :created,
+          :location => sla_calendar_url(@sla_calendar)
+        end
+      end
     else
-      render :new
+      respond_to do |format|
+        format.html do
+          render :action => 'new'
+        end
+        format.api {render_validation_errors(@sla_calendar)}
+      end
     end
+
   end
 
   def update
     @sla_calendar.safe_attributes = params[:sla_calendar]
-    if @sla_calendar.update(sla_calendar_params)
+    if @sla_calendar.save && @sla_calendar.update(sla_calendar_params)
       flash[:notice] = l(:notice_successful_update)
-      redirect_back_or_default sla_calendars_path
+      respond_to do |format|
+        format.html do
+          redirect_back_or_default sla_calendars_path
+        end
+        format.api  {render_api_ok}
+      end
     else
-      render :edit
+      respond_to do |format|
+        format.html {render :action => 'edit'}
+        format.api  {render_validation_errors(@sla_calendar)}
+      end
     end
+
   end
 
   def destroy
-    @sla_calendars.each(&:destroy)
-    flash[:notice] = l(:notice_successful_delete)
-    redirect_back_or_default sla_calendars_path
+    #@sla_calendars.each(&:destroy)
+    #flash[:notice] = l(:notice_successful_delete)
+    #redirect_back_or_default sla_calendars_path
+    @sla_calendars.each do |sla_calendar|
+      begin
+        sla_calendar.reload.destroy
+      rescue ::ActiveRecord::RecordNotFound # raised by #reload if sla_calendar no longer exists
+        # nothing to do, sla_calendar was already deleted (eg. by a parent)
+      end
+    end
+    respond_to do |format|
+      format.html do
+        flash[:notice] = l(:notice_successful_delete)
+        redirect_back_or_default sla_calendars_path
+      end
+      format.api {render_api_ok}
+    end    
   end
 
   def context_menu

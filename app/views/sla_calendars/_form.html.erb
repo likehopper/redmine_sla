@@ -6,7 +6,7 @@
     <legend><%= l('sla_label.sla_calendar.singular') %></legend>
     <div>
       <%= sla_calendar_form.label :name %>
-      <%= sla_calendar_form.text_field :name %>
+      <%= sla_calendar_form.text_field :name, :required => true %>
     </div>
     <fieldset>
       <legend><%= l('sla_label.sla_schedule.plural') %></legend>
@@ -14,10 +14,7 @@
         <%= render "sla_schedule_fields", f: sla_schedules_form %>
       <% end %>
       <%= link_to_add_fields "Add Schedule", sla_calendar_form, :sla_schedules %>
-    </fieldset>  
-    <fieldset>
-      <legend><%= l('sla_label.sla_holiday.plural') %></legend>
-    </fieldset>  
+    </fieldset>    
   </fieldset>
   <%= sla_calendar_form.submit %>
 <% end %>

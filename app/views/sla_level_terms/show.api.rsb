@@ -1,0 +1,7 @@
+    api.sla_level_term do
+      api.id @sla_level_term.id
+      api.sla_level_id @sla_level_term.sla_level_id
+      api.sla_type_id @sla_level_term.sla_type_id
+      api.priority_id @sla_level_term.priority_id
+      api.term @sla_level_term.term
+    end

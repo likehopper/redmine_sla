@@ -213,6 +213,7 @@ fr:
       new: Ajouter des Jours fériés d'un calendrier de SLA
       edit: Editer des Jours fériés d'un calendrier de SLA
       delete: Supprimer des Jours fériés d'un calendrier de SLA
+      exists: Ce jour férié existe déja dans ce calendrier de SLA
 
     # SlaLevel
     sla_level:

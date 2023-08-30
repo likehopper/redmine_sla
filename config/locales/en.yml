@@ -213,6 +213,7 @@ en:
       new: New SLA Calendar's Holidays
       edit: Edit SLA Calendar's Holidays
       delete: Delete SLA Calendar's Holidays
+      exists: This holiday is already present in this SLA Calendar's Holidays
 
     # SlaLevel
     sla_level:

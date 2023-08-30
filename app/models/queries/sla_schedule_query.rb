@@ -22,10 +22,11 @@ class Queries::SlaScheduleQuery < Query
 
   def initialize_available_filters
     add_available_filter 'sla_calendar_id', :type => :list, :values => lambda {all_sla_calendar_values}
-    add_available_filter 'dow', type: :integer 
-    add_available_filter 'start_time', type: :time
-    add_available_filter 'end_time', type: :time
-    add_available_filter 'match', type: :boolean
+    add_available_filter 'dow', type: :list, :values => I18n.t('date.day_names').map.with_index{|name,id| [name.to_s, id.to_s] } 
+    # TODO : type time need to override query class ;(
+    # add_available_filter 'start_time', type: :text
+    # add_available_filter 'end_time', type: :text
+    add_available_filter 'match', :type => :list, :values => [[l(:general_text_yes), "1"], [l(:general_text_no), "0"]]
   end
 
   def available_columns
@@ -35,9 +36,10 @@ class Queries::SlaScheduleQuery < Query
 
     @available_columns << QueryColumn.new(:sla_calendar, :sortable => nil, :default_order => nil, :groupable => false )
     @available_columns << QueryColumn.new(:dow, :sortable => nil, :default_order => nil, :groupable => false )
-    @available_columns << QueryColumn.new(:start_time, :sortable => nil, :default_order => nil, :groupable => false )
-    @available_columns << QueryColumn.new(:end_time, :sortable => nil, :default_order => nil, :groupable => false )
-    @available_columns << QueryColumn.new(:match, :grosortable => nil, :default_order => nil, :groupableupable => false )
+    # TODO : type tim need to override query class ;(
+    # @available_columns << QueryColumn.new(:start_time, :sortable => nil, :default_order => nil, :groupable => false )
+    # @available_columns << QueryColumn.new(:end_time, :sortable => nil, :default_order => nil, :groupable => false )
+    @available_columns << QueryColumn.new(:match, :sortable => nil, :default_order => nil, :groupableupable => false )
     @available_columns
   end
 
@@ -94,15 +96,5 @@ class Queries::SlaScheduleQuery < Query
     }
     @all_sla_calendar_values = values
   end
-
-  def all_sla_holiday_values
-    return @all_sla_holiday_values if @all_sla_holiday_values
-
-    values ||= []
-    SlaHoliday.pluck(:name,:id).map { |name,id|
-      values << [name.to_s,id.to_s]
-    }
-    @all_sla_holiday_values = values
-  end  
 
 end

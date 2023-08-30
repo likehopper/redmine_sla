@@ -1,0 +1,48 @@
+<%= labelled_form_for([@sla_schedule], html: { multipart: false, id: 'sla_schedule_form', class: 'tabular', remote: request.xhr? }) do |f| %>
+  <%= error_messages_for f.object %>
+
+  <div class="box">
+
+    <% if sla_schedule.safe_attribute?('sla_calendar_id') %>
+    <p>
+      <%= f.select :sla_calendar_id, SlaCalendar.all.collect { |p| [ p.name, p.id ] }, :required => true, :include_blank => (@sla_schedule.new_record??true:false) %>
+    </p>
+    <% end %>  
+
+    <% if sla_schedule.safe_attribute?('dow') %>
+    <p>
+      <%= f.select :dow, I18n.t('date.day_names').map.with_index.to_h, :required => true %>
+    </p>
+    <% end %>
+
+    <% if sla_schedule.safe_attribute?('start_time') %>
+    <p>
+      <%= f.time_field :start_time, value: (f.object.start_time.strftime("%H:%M") unless f.object.start_time.blank?), min: 'hh:mm', max: 'hh:mm', :required => true %>
+    </p>
+    <% end %>
+
+    <% if sla_schedule.safe_attribute?('end_time') %>
+    <p>
+      <%= f.time_field :end_time, value: (f.object.end_time.strftime("%H:%M") unless f.object.end_time.blank?), min: 'hh:mm', max: 'hh:mm', :required => true %>
+    </p>
+    <% end %>
+
+    <% if sla_schedule.safe_attribute?('match') %>
+      <p>
+        <%= f.check_box :match, :required => true %>
+      </p>
+    <% end %>
+
+  </div>
+
+  <% if !request.xhr? %>
+    <p>
+      <% if f.object.new_record? %>
+        <%= submit_tag l('sla_label.sla_schedule.new'), title: l(:button_create), class: "button-positive" %>
+      <% else %>
+        <%= submit_tag l('sla_label.sla_schedule.edit'), title: l(:button_update), class: "button-positive" %>
+      <% end %>
+    </p>
+  <% end %>
+
+<% end %>
