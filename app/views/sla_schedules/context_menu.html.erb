@@ -1,0 +1,12 @@
+<ul>
+  <% if @sla_schedule %>
+    <li><%= context_menu_link l(:button_show), sla_schedule_path(@sla_schedule), class: 'icon icon-magnifier', disabled: !@can[:edit] %></li>
+    <li><%= context_menu_link l(:button_edit), edit_sla_schedule_path(@sla_schedule), class: 'icon icon-edit', disabled: !@can[:edit] %></li>
+  <% end %>
+  <li><%= context_menu_link l(:button_delete),
+            sla_schedules_path(id: @sla_schedule_ids, back_url: @back),
+            method: :delete, class: 'icon icon-del', disabled: !@can[:delete],
+            data: { confirm: l('sla_label.sla_schedule.count',count: @sla_schedule_ids.count)+"\n"+l(:text_are_you_sure) }
+  %></li>
+  <%= call_hook(:view_sla_schedules_context_menu_end, { sla_schedule: @sla_schedule, sla_schedules: @sla_schedules, can: @can, back: @back, project: @project }) %>
+</ul>

@@ -1,0 +1,4 @@
+    api.sla_calendar do
+      api.id @sla_calendar.id
+      api.name @sla_calendar.name
+    end

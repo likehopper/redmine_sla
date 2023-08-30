@@ -1,8 +1,8 @@
 # Example n°1 : Simple service levels with only response time
 
-For a support service, open Monday to Friday from 9:30 a.m. to 12:30 p.m. and from 2:00 p.m. to 6:00 p.m., we want to monitor only commitments on issues handling times.
+For a support service, open Monday to Friday from 9:30 a.m. to 12:30 a.m. and from 2:00 p.m. to 6:00 p.m., we want to monitor only commitments on issues handling times.
 
-**Support in working hours**
+**Calendar Support Tracker**
 | Dow       | Start time  |	End time  |
 |-----------|-------------|-----------|
 | Monday    |    09:30    |   12:30   |
@@ -19,9 +19,9 @@ For a support service, open Monday to Friday from 9:30 a.m. to 12:30 p.m. and fr
 Outside these hours, or during the defined vacation days, the calculation of times will be suspended.
 The delay will be calculated as long as the issue is in the « new » status during the working hours above. 
 
-In the projects, we will apply this SLA to the tracker « Support request » :
+In the projects, we will apply this SLA to the tracker « Support » :
 
-**LEVEL TMA tracker_support_requets**
+**Level Support Tracker**
 | Issue priorities / SLA Levels | Response time |
 |-------------------------------|---------------|
 | Minor                         |      24h      |
@@ -33,7 +33,7 @@ In the projects, we will apply this SLA to the tracker « Support request » :
 
 The SLA configuration bring together the entire definition of the SLA
 
-To begin, go to `Administration » SLA Global settings` (https://[redmine-host]/sla/slas). Add "SLA TMA tracker_support_request" as new "Service Level Agreements".
+To begin, go to `Administration » SLA Global settings` (https://[redmine-host]/sla/slas). Add "Sla Support Tracker" as new "Service Level Agreements".
 <div style=" width:50%; height:50%; " >
 
 ![Redmine SLA - Example 01 - 01](images/example_01/redmine_sla_doc_example_01_01.png)
@@ -63,11 +63,11 @@ Restart Redmine for applys patches with all sla types:
 
 The SLA Statuses' configuration allows to define for which statuses the time elapses.
 
-Go to `Administration » SLA Global settings » SLA Statuses` (https://[redmine-host]/sla/statuses). Add "SLA Statuses" for "Response time" with thhis statuses :
+Go to `Administration » SLA Global settings » SLA Statuses` (https://[redmine-host]/sla/statuses). Add "SLA Statuses" for "Response time" with this statuses :
 - New
 <div style=" width:50%; height:50%; " >
 
-![Redmine SLA - Example 01 - 04](images/example_01/redmine_sla_doc_example_01_04.png)
+![Redmine SLA - Example 01 - 03](images/example_01/redmine_sla_doc_example_01_03.png)
 </div>
 
 The addition of this tuple indicates that the ticket creation delay should be calculated only when then issue was is in this status (i.e. while the ticket is in this status).
@@ -77,10 +77,10 @@ The addition of this tuple indicates that the ticket creation delay should be ca
 
 This module is used to list all the holidays (non-working days or even exceptional closing days) that will be needed in the SLA duration count.
 
-Go to `Administration » SLA Global settings » SLA Holidays` ( https://[redmine-host]/sla/holidays). Add new "SLA Holidays" like "New Year" for example, and all the others to come for your tests (even if they are not real public holidays).
+Go to `Administration » SLA Global settings » SLA Holidays` ( https://[redmine-host]/sla/holidays). Add new "SLA Holidays" like "New Year's Day" for example, and all the others to come for your tests (even if they are not real public holidays).
 <div style=" width:50%; height:50%; " >
 
-![Redmine SLA - Example 01 - 06](images/example_01/redmine_sla_doc_example_01_06.png)
+![Redmine SLA - Example 01 - 04](images/example_01/redmine_sla_doc_example_01_04.png)
 </div>
 
 
@@ -92,16 +92,16 @@ If the "match" field is checked, then the issue can be opened in this time slot 
 
 Typically, for support activities, deadlines are suspended outside business hours. If an issue is opened during non-working hours, then the calculation starts at the next working hour. Conversely, in the case of web hosting, an issue can be opened at any time and continues regardless of the time. If an exit is opened during working hours then it continues during non-working hours and vice versa.
 
-Go to Administration » SLA Global settings » SLA Calendar ( https://[redmine-host]/sla/calendars ). Add "TMA in working hours" as new "SLA Calendar"
+Go to Administration » SLA Global settings » SLA Calendar ( https://[redmine-host]/sla/calendars ). Add "Calendar Support Tracker" as new "SLA Calendar"
 <div style=" width:50%; height:50%; " >
 
-![Redmine SLA - Example 01 - 07](images/example_01/redmine_sla_doc_example_01_07.png)
+![Redmine SLA - Example 01 - 05](images/example_01/redmine_sla_doc_example_01_05.png)
 </div>
 
 Edit this SLA Calendar and add schedules :
 <div style=" width:50%; height:50%; " >
 
-![Redmine SLA - Example 01 - 08](images/example_01/redmine_sla_doc_example_01_08.png)
+![Redmine SLA - Example 01 - 06](images/example_01/redmine_sla_doc_example_01_06.png)
 </div>
 
 We are here in the case of a support service, so only the opening hours count. Tickets are processed during working hours and counting is suspended outside these hours.
@@ -117,10 +117,10 @@ For SLA Calendars' Holidays, the "match" field has the opposite meaning to SLA C
 By default, we add a public holiday to remove it from the calculations. However, if the "match" field is checked, then the time will be counted. However, if a ticket is open on this slot, then it cannot start until the next working hour.
 
 
-Go to `Administration » SLA Global settings » SLA Calendars' Holidays` (https://[redmine-host]/sla/calendar_holidays). Add "TMA in working hours" as new "SLA Calendars' Holidays"
+Go to `Administration » SLA Global settings » SLA Calendars' Holidays` (https://[redmine-host]/sla/calendar_holidays). Add new "SLA Calendars' Holidays" :
 <div style=" width:50%; height:50%; " >
 
-![Redmine SLA - Example 01 - 09](images/example_01/redmine_sla_doc_example_01_09.png)
+![Redmine SLA - Example 01 - 07](images/example_01/redmine_sla_doc_example_01_07.png)
 </div>
 
 For our example, which is a support service, public holidays are equivalent to times that shouldn't be counted.
@@ -130,10 +130,10 @@ For our example, which is a support service, public holidays are equivalent to t
 
 After declaring SLAs and SLA Schedules, they can be linked to define service levels. In other words, the SLA Levels make it possible to know the moment "when" commitments will apply.
 
-Go to `Administration » SLA Global settings » SLA Levels` (https://[redmine-host]/sla/levels). Add "TMA in working hours" as new "SLA Levels"
+Go to `Administration » SLA Global settings » SLA Levels` (https://[redmine-host]/sla/levels). Add "Level Support" as new "SLA Levels"
 <div style=" width:50%; height:50%; " >
 
-![Redmine SLA - Example 01 - 10](images/example_01/redmine_sla_doc_example_01_10.png)
+![Redmine SLA - Example 01 - 08](images/example_01/redmine_sla_doc_example_01_08.png)
 </div>
 
 
@@ -141,10 +141,10 @@ Go to `Administration » SLA Global settings » SLA Levels` (https://[redmine-
 
 Finally, we can define the SLA Terms. For an SLA Level, an SLA Type and a priority, you can define a time commitment (in minutes).
 
-Go to `Administration » SLA Global settings » SLA Terms` (https://[redmine-host]/sla/level_terms). Add "TMA in working hours" as new "SLA Terms"
+Go to `Administration » SLA Global settings » SLA Terms` (https://[redmine-host]/sla/level_terms). Add "Terms Support Tracker" for each SLA Type / Priority as new "SLA Terms"
 <div style=" width:50%; height:50%; " >
 
-![Redmine SLA - Example 01 - 11](images/example_01/redmine_sla_doc_example_01_12.png)
+![Redmine SLA - Example 01 - 09](images/example_01/redmine_sla_doc_example_01_09.png)
 </div>
 
 
@@ -153,13 +153,13 @@ Go to `Administration » SLA Global settings » SLA Terms` (https://[redmine-h
 Go to your project' settings ( https://[redmine-host]/projects/[project-identifier]/settings ). Active SLA module for your project.
 <div style=" width:50%; height:50%; " >
 
-![Redmine SLA - Example 01 - 13](images/example_01/redmine_sla_doc_example_01_13.png)
+![Redmine SLA - Example 01 - 10](images/example_01/redmine_sla_doc_example_01_10.png)
 </div>
 
 The tab should appear `SLA Project settings`, go to this tab (http://[redmine-host]/projects/[project-identifier]/settings/slas). With "New SLA project's tracker" définie à SLA for a tracker.
 <div style=" width:50%; height:50%; " >
 
-![Redmine SLA - Example 01 - 14](images/example_01/redmine_sla_doc_example_01_14.png)
+![Redmine SLA - Example 01 - 11](images/example_01/redmine_sla_doc_example_01_11.png)
 </div>
 
 
@@ -168,11 +168,21 @@ The tab should appear `SLA Project settings`, go to this tab (http://[redmine-ho
 When you go to a project's issue, you should see the SLA appear if it matches with the status and priority.
 <div style=" width:50%; height:50%; " >
 
-![Redmine SLA - Example 01 - 15](images/example_01/redmine_sla_doc_example_01_15.png)
+![Redmine SLA - Example 01 - 12](images/example_01/redmine_sla_doc_example_01_12.png)
 </div>
 
 
-### Rôles 
+## implementation of this example with the APIs
+
+You can deploy this example on a fresh Redmine with this bash script [Script Example 01](scripts/EXAMPLE-01.bash) which use the plugin's API.
+
+
+> **_REQUIREMENTS:_** The code requires curl and jq commands.
+
+> **_NOTE:_** The code has not been optimized to precisely highlight the use of APIs.
+
+
+## Rôles
 
 Until then, you were an administrator. However, in order for the members of your project to be able to see the SLAs, or even manage their activation within the project, you must grant them this right.
 

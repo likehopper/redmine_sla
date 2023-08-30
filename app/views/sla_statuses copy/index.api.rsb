@@ -1,0 +1,9 @@
+api.array :sla_statuses, api_meta(:total_count => @entity_count, :offset => @offset, :limit => @limit) do
+  @entities.each do |entity|
+    api.entity do
+      api.id entity.id
+      api.sla_type entity.sla_type
+      api.status entity.status
+    end
+  end
+end

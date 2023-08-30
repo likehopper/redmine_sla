@@ -22,13 +22,13 @@ class SlaSchedulesController < ApplicationController
 
   unloadable
 
-  accept_api_auth :index
+  accept_api_auth :index, :create, :show, :update, :destroy
   before_action :require_admin
   before_action :authorize_global
 
   before_action :find_sla_schedule, only: [:show, :edit, :update]
   before_action :find_sla_schedules, only: [:context_menu, :destroy]
-  before_action :setup_sla_calendar
+  #before_action :setup_sla_calendar
 
   helper :sla_schedules
   helper :context_menus
@@ -49,6 +49,14 @@ class SlaSchedulesController < ApplicationController
     end      
   end
 
+  def show
+    respond_to do |format|
+      format.html do
+        end
+      format.api
+    end
+  end
+  
   def new
     @sla_schedule = SlaSchedule.new
     @sla_schedule.safe_attributes = params[:sla_schedule]
@@ -57,32 +65,68 @@ class SlaSchedulesController < ApplicationController
   def create
     @sla_schedule = SlaSchedule.new
     @sla_schedule.safe_attributes = params[:sla_schedule]
-    @sla_schedule.start_date = @sla_schedule.start_date.strftime("%H:%M:00")
-    @sla_schedule.end_date = @sla_schedule.end_date.strftime("%H:%M:59")
+    @sla_schedule.start_time = @sla_schedule.start_time.strftime("%H:%M:00")
+    @sla_schedule.end_time = @sla_schedule.end_time.strftime("%H:%M:59")
     if @sla_schedule.save
-      flash[:notice] = l(:notice_successful_create)
-      redirect_back_or_default sla_schedules_path
+      respond_to do |format|
+        format.html do
+          flash[:notice] = l(:notice_successful_create)
+          redirect_back_or_default sla_schedules_path
+        end
+        format.api do
+          render :action => 'show', :status => :created,
+          :location => sla_schedule_url(@sla_schedule)
+        end
+      end
     else
-      render action: 'new'
+      respond_to do |format|
+        format.html do
+          render :action => 'new'
+        end
+        format.api {render_validation_errors(@sla_schedule)}
+      end
     end
   end
 
   def update
     @sla_schedule.safe_attributes = params[:sla_schedule]
-    @sla_schedule.start_date = @sla_schedule.start_date.strftime("%H:%M:00")
-    @sla_schedule.end_date = @sla_schedule.end_date.strftime("%H:%M:59")
+    @sla_schedule.start_time = @sla_schedule.start_time.strftime("%H:%M:00")
+    @sla_schedule.end_time = @sla_schedule.end_time.strftime("%H:%M:59")
     if @sla_schedule.save
       flash[:notice] = l(:notice_successful_update)
-      redirect_back_or_default sla_schedules_path
+      respond_to do |format|
+        format.html do
+          redirect_back_or_default sla_schedules_path
+        end
+        format.api  {render_api_ok}
+      end
     else
-      render action: 'edit'
+      respond_to do |format|
+        format.html {render :action => 'edit'}
+        format.api  {render_validation_errors(@sla_schedule)}
+      end
     end
+
   end
 
   def destroy
-    @sla_schedules.each(&:destroy)
-    flash[:notice] = l(:notice_successful_delete)
-    redirect_back_or_default sla_schedules_path
+    #@sla_schedules.each(&:destroy)
+    #flash[:notice] = l(:notice_successful_delete)
+    #redirect_back_or_default sla_schedules_path
+    @sla_schedules.each do |sla_schedule|
+      begin
+        sla_schedule.reload.destroy
+      rescue ::ActiveRecord::RecordNotFound # raised by #reload if sla_schedule no longer exists
+        # nothing to do, sla_schedule was already deleted (eg. by a parent)
+      end
+    end
+    respond_to do |format|
+      format.html do
+        flash[:notice] = l(:notice_successful_delete)
+        redirect_back_or_default sla_schedules_path
+      end
+      format.api {render_api_ok}
+    end       
   end
 
   def context_menu
@@ -128,8 +172,8 @@ class SlaSchedulesController < ApplicationController
   end
 
   # https://dev.to/pezza/dynamic-nested-forms-with-turbo-3786
-  def setup_sla_calendar
-    @sla_calendar = SlaCalendar.new(sla_schedules: [SlaSchedule.new])
-  end
+  #def setup_sla_calendar
+  #  @sla_calendar = SlaCalendar.new(sla_schedules: [SlaSchedule.new])
+  #end
 
 end

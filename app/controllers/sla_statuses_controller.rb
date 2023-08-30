@@ -20,7 +20,7 @@ class SlaStatusesController < ApplicationController
 
   unloadable
 
-  accept_api_auth :index
+  accept_api_auth :index, :create, :show, :update, :destroy
   before_action :require_admin
   before_action :authorize_global
 
@@ -45,37 +45,81 @@ class SlaStatusesController < ApplicationController
       end
     end    
   end
+  
+  def show
+    respond_to do |format|
+      format.html do
+        end
+      format.api
+    end
+  end  
 
   def new
     @sla_status = SlaStatus.new
-    #@sla_status.safe_attributes = params[:sla_status]
+    @sla_status.safe_attributes = params[:sla_status]
   end
 
   def create
     @sla_status = SlaStatus.new
     @sla_status.safe_attributes = params[:sla_status]
     if @sla_status.save
-      flash[:notice] = l(:notice_successful_create)
-      redirect_back_or_default sla_statuses_path
+      respond_to do |format|
+        format.html do
+          flash[:notice] = l(:notice_successful_create)
+          redirect_back_or_default sla_statuses_path
+        end
+        format.api do
+          render :action => 'show', :status => :created,
+          :location => sla_status_url(@sla_status)
+        end
+      end
     else
-      render :new
+      respond_to do |format|
+        format.html do
+          render :action => 'new'
+        end
+        format.api {render_validation_errors(@sla_status)}
+      end
     end
+
   end
 
   def update
     @sla_status.safe_attributes = params[:sla_status]
     if @sla_status.save
       flash[:notice] = l(:notice_successful_update)
-      redirect_back_or_default sla_statuses_path
+      respond_to do |format|
+        format.html do
+          redirect_back_or_default sla_statuses_path
+        end
+        format.api  {render_api_ok}
+      end
     else
-      render :edit
+      respond_to do |format|
+        format.html {render :action => 'edit'}
+        format.api  {render_validation_errors(@sla_status)}
+      end
     end
   end
 
   def destroy
-    @sla_statuses.each(&:destroy)
-    flash[:notice] = l(:notice_successful_delete)
-    redirect_back_or_default sla_statuses_path
+    #@sla_statuses.each(&:destroy)
+    #flash[:notice] = l(:notice_successful_delete)
+    #redirect_back_or_default sla_statuses_path
+    @sla_statuses.each do |sla_status|
+      begin
+        sla_status.reload.destroy
+      rescue ::ActiveRecord::RecordNotFound # raised by #reload if sla_status no longer exists
+        # nothing to do, sla_status was already deleted (eg. by a parent)
+      end
+    end
+    respond_to do |format|
+      format.html do
+        flash[:notice] = l(:notice_successful_delete)
+        redirect_back_or_default sla_statuses_path
+      end
+      format.api {render_api_ok}
+    end        
   end
 
   def context_menu
