@@ -63,7 +63,7 @@ class SlaCalendarsController < ApplicationController
   def create
     @sla_calendar = SlaCalendar.new()
     @sla_calendar.safe_attributes = params[:sla_calendar]
-    if @sla_calendar.save && @sla_calendar.update(sla_calendar_params)
+    if @sla_calendar.save && @sla_calendar.update(sla_calendar_params) && sla_schedules_overlapless
       respond_to do |format|
         format.html do
           flash[:notice] = l(:notice_successful_create)
@@ -82,12 +82,11 @@ class SlaCalendarsController < ApplicationController
         format.api {render_validation_errors(@sla_calendar)}
       end
     end
-
   end
 
   def update
     @sla_calendar.safe_attributes = params[:sla_calendar]
-    if @sla_calendar.save && @sla_calendar.update(sla_calendar_params)
+    if @sla_calendar.save && @sla_calendar.update(sla_calendar_params) && sla_schedules_overlapless
       flash[:notice] = l(:notice_successful_update)
       respond_to do |format|
         format.html do
@@ -101,7 +100,6 @@ class SlaCalendarsController < ApplicationController
         format.api  {render_validation_errors(@sla_calendar)}
       end
     end
-
   end
 
   def destroy
@@ -166,12 +164,33 @@ class SlaCalendarsController < ApplicationController
     render_404
   end
 
-  #def sla_calendar_params
-  #  params.require(:sla_calendar).permit(:name, sla_schedules_attributes: [:_destroy, :id, :dow, :start_time, :end_time, :match] )
-  #end
-
   def sla_calendar_params
     params.require(:sla_calendar).permit(:name, sla_schedules_attributes: SlaSchedule.attribute_names.map(&:to_sym).push(:_destroy) )
-  end    
+  end   
+  
+  def sla_schedules_overlapless
+    sla_schedules_nodestroy = params.to_unsafe_h[:sla_calendar][:sla_schedules_attributes]
+    #Rails.logger.debug "==>> sla_calendar_overlapless ALL #{sla_schedules_nodestroy}"
+    sla_schedules_nodestroy = sla_schedules_nodestroy.select {|k,v| v[:_destroy]!=1 }
+    #Rails.logger.debug "==>> sla_calendar_overlapless NoDestroy= #{sla_schedules_nodestroy}"
+    if ( sla_schedules_nodestroy.count > 1 )
+      sla_schedules_nodestroy.each do |key,value|
+        #Rails.logger.debug "==>> sla_calendar_overlapless TEST key=#{key} value=#{value}"
+        start_time = sla_schedules_nodestroy.select {|k,v| key!=k && value[:dow]==v[:dow] && v[:start_time].delete('^0-9')<value[:start_time].delete('^0-9') && value[:start_time].delete('^0-9')<v[:end_time].delete('^0-9') }
+        #Rails.logger.debug "==>> sla_calendar_overlapless START #{start_time}"
+        if start_time.count > 0
+          @sla_calendar.errors.add(:base,l('sla_label.sla_schedule.overlaps'))
+          return false
+        end
+        end_time = sla_schedules_nodestroy.select {|k,v| key!=k && value[:dow]==v[:dow] && v[:start_time].delete('^0-9')<value[:end_time].delete('^0-9') && value[:end_time].delete('^0-9')<v[:end_time].delete('^0-9') }
+        #Rails.logger.debug "==>> sla_calendar_overlapless END #{end_time}"
+        if end_time.count > 0
+          @sla_calendar.errors.add(:base,l('sla_label.sla_schedule.overlaps'))
+          return false
+        end
+      end
+    end
+    true
+  end
 
 end

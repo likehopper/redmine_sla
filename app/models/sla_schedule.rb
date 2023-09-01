@@ -27,23 +27,30 @@ class SlaSchedule < ActiveRecord::Base
 
   #default_scope { joins(:sla_calendar).order(dow: :asc, start_time: :asc) }  
   default_scope { joins(:sla_calendar).order("sla_schedules.dow ASC, sla_schedules.start_time ASC") }  
-  
+
+  # It is important not to convert times based on time zone !
+  # ( cf. https://api.rubyonrails.org/classes/ActiveRecord/Timestamp.html )
+  self.skip_time_zone_conversion_for_attributes = [:start_time,:end_time]
+
   validates_presence_of :sla_calendar
   validates_presence_of :dow
   validates_presence_of :start_time
   validates_presence_of :end_time
 
-  validates_associated :sla_calendar
+  #validates_associated :sla_calendar
 
   validates :match, inclusion: [true, false]
   validates :match, exclusion: [nil]
   
   validates_uniqueness_of :sla_calendar_id,
-    :scope => [ :dow, :start_time, :end_time, :match ],
+    :scope => [ :dow, :start_time ],
     :message => l('sla_label.sla_schedule.exists')
 
-  # TODO: other constraint like start time before end time
-  # TODO: other constraint like time slot not in another time slot 
+  validates_uniqueness_of :sla_calendar_id,
+    :scope => [ :dow, :start_time, :end_time ],
+    :message => l('sla_label.sla_schedule.exists')
+
+  validate :sla_schedules_inconsistency
 
   safe_attributes *%w[sla_calendar_id dow start_time end_time match]
 
@@ -78,5 +85,20 @@ class SlaSchedule < ActiveRecord::Base
   def to_s
     name.to_s
   end  
+
+  def sla_schedules_inconsistency
+    # Format datas
+    @start_time = self.start_time.strftime("%H:%M")
+    @end_time = self.end_time.strftime("%H:%M")
+    # Logs 
+    Rails.logger.debug "==>> sla_schedules_inconsistency ID=#{self.id}, #{self.sla_calendar_id}, #{self.dow}, #{@start_time} #{@end_time}"
+    Rails.logger.debug "==>> sla_schedules_inconsistency #{@start_time} < #{@end_time}) = #{@start_time < @end_time}"
+    Rails.logger.debug "==>> sla_schedules_inconsistency ok? #{self.marked_for_destruction?}"
+    # Start must be strictly before end!
+    if ( not ( @start_time < @end_time ) ) 
+      Rails.logger.debug "==>> sla_schedules_inconsistency END ERROR"
+      errors.add(:base,l('sla_label.sla_schedule.inconsistency'))
+    end
+  end
     
 end

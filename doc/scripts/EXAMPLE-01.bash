@@ -178,15 +178,15 @@ SLA_CALENDAR_ID=$ID
 #
 SCHEDULES=(
   '"dow": "1", "start_time": "09:30", "end_time": "12h29" , "match": "true"'
-  '"dow": "1", "start_time": "14:00", "end_time": "18h00" , "match": "true"'
+  '"dow": "1", "start_time": "14:00", "end_time": "17h59" , "match": "true"'
   '"dow": "2", "start_time": "09:30", "end_time": "12h29" , "match": "true"'
-  '"dow": "2", "start_time": "14:00", "end_time": "18h00" , "match": "true"'
+  '"dow": "2", "start_time": "14:00", "end_time": "17h59" , "match": "true"'
   '"dow": "3", "start_time": "09:30", "end_time": "12h29" , "match": "true"'
-  '"dow": "3", "start_time": "14:00", "end_time": "18h00" , "match": "true"'
+  '"dow": "3", "start_time": "14:00", "end_time": "17h59" , "match": "true"'
   '"dow": "4", "start_time": "09:30", "end_time": "12h29" , "match": "true"'
-  '"dow": "4", "start_time": "14:00", "end_time": "18h00" , "match": "true"'
+  '"dow": "4", "start_time": "14:00", "end_time": "17h59" , "match": "true"'
   '"dow": "5", "start_time": "09:30", "end_time": "12h29" , "match": "true"'
-  '"dow": "5", "start_time": "14:00", "end_time": "18h00" , "match": "true"'
+  '"dow": "5", "start_time": "14:00", "end_time": "17h59" , "match": "true"'
 )
 for i in $(echo ${!SCHEDULES[@]}); do
   SCHEDULE=${SCHEDULES[$i]}

@@ -201,6 +201,8 @@ fr:
       delete: Supprimer un Horaire de SLA
       miss: Horaire de SLA absent
       exists: Ce crénau existe déjà
+      overlaps: Les horaires se recouvrent
+      inconsistency: Les horaires sont incohérents
 
     # SlaCalendarHoliday
     sla_calendar_holiday:

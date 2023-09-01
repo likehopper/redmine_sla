@@ -188,7 +188,7 @@ en:
       delete: Delete SLA Calendar
       miss: Miss SLA Calendar
 
-    # SlaScheduler
+    # SlaSchedule
     sla_schedule:
       singular: *sla_schedule
       plural:  SLA Schedules
@@ -201,6 +201,8 @@ en:
       delete: Del SLA Schedule
       miss: Miss SLA Schedule
       exists: This slot alredy exists
+      overlaps: Schedules overlap
+      inconsistency: It inconsistency schedules
 
     # SlaCalendarHoliday
     sla_calendar_holiday:

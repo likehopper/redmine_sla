@@ -3,19 +3,19 @@ one:
   name: TMA - HO
 two:
   id: 2
-  name: Managed services std - HO - Request
+  name: Managed Services std - HO - Request
 three:
   id: 3
-  name: Managed services std - HO - Incident
+  name: Managed Services std - HO - Incident
 four:
   id: 4
   name: Managed Services std - HNO - Incident
 five:
   id: 5
-  name: Managed services spe - HO - Request
+  name: Managed Services spe - HO - Request
 six:
   id: 6
-  name: Managed services spe - HO - Incident
+  name: Managed Services spe - HO - Incident
 seven:
   id: 7
   name: Managed Services spe - HNO - Incident  
