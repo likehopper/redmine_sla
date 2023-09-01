@@ -176,13 +176,13 @@ class SlaCalendarsController < ApplicationController
     if ( sla_schedules_nodestroy.count > 1 )
       sla_schedules_nodestroy.each do |key,value|
         #Rails.logger.debug "==>> sla_calendar_overlapless TEST key=#{key} value=#{value}"
-        start_time = sla_schedules_nodestroy.select {|k,v| key!=k && value[:dow]==v[:dow] && v[:start_time].delete('^0-9')<value[:start_time].delete('^0-9') && value[:start_time].delete('^0-9')<v[:end_time].delete('^0-9') }
+        start_time = sla_schedules_nodestroy.select {|k,v| key!=k && value[:dow]==v[:dow] && v[:start_time].delete('^0-9')<=value[:start_time].delete('^0-9') && value[:start_time].delete('^0-9')<=v[:end_time].delete('^0-9') }
         #Rails.logger.debug "==>> sla_calendar_overlapless START #{start_time}"
         if start_time.count > 0
           @sla_calendar.errors.add(:base,l('sla_label.sla_schedule.overlaps'))
           return false
         end
-        end_time = sla_schedules_nodestroy.select {|k,v| key!=k && value[:dow]==v[:dow] && v[:start_time].delete('^0-9')<value[:end_time].delete('^0-9') && value[:end_time].delete('^0-9')<v[:end_time].delete('^0-9') }
+        end_time = sla_schedules_nodestroy.select {|k,v| key!=k && value[:dow]==v[:dow] && v[:start_time].delete('^0-9')<=value[:end_time].delete('^0-9') && value[:end_time].delete('^0-9')<=v[:end_time].delete('^0-9') }
         #Rails.logger.debug "==>> sla_calendar_overlapless END #{end_time}"
         if end_time.count > 0
           @sla_calendar.errors.add(:base,l('sla_label.sla_schedule.overlaps'))
