@@ -27,7 +27,7 @@ These are the features of this plugin :
   - SLA update step
   - SLA calculation time zone
   - SLA log level (but no log currently)
-- Manage at the global administration
+- Manage at the global administration ( with full API support )
   - SLAs
   - SLA Types
   - SLA Statuses
@@ -123,9 +123,9 @@ More information about installation of Redmine plugins, you can find in the offi
 - [Functional tests](doc/TESTING.md)
 - [Conceptual Data Model](doc/MCD.md)
 - [Step-by-step use case](doc/USECASE.md)
-  - [Example 01](doc/EXAMPLE-01.md)
-  - [Example 02](doc/EXAMPLE-02.md)
-  - [Example 03](doc/EXAMPLE-03.md) 
+  - [Example 01](doc/EXAMPLE-01.md) ( and API implementation [Script Example 01](doc/scripts/EXAMPLE-01.bash) )
+  - [Example 02](doc/EXAMPLE-02.md) ( and API implementation [Script Example 02](doc/scripts/EXAMPLE-02.bash) )
+  - [Example 03](doc/EXAMPLE-03.md) ( and API implementation [Script Example 03](doc/scripts/EXAMPLE-03.bash) )
 - [SLA Compute Explanation](doc/COMPUTE.md)
 - [Plugin settings](doc/SETTINGS.md)
 - [API Rest for SLA](doc/API.md)

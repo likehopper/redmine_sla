@@ -60,7 +60,7 @@ echo "Ok: the API KEY size (${#APIKEY}) is correct."
 #
 # SLA
 #
-NAME="SLA Bug Tracker"
+NAME="Sla Managed Services"
 DATA="{ \"sla\": { \"name\": \"$NAME\" } }"
 EXEC=`curl -s -H "Content-Type: application/json" -X POST --data "$DATA" -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/slas.json"`
 ID=`echo $EXEC|jq -r ".sla|.id"`
@@ -213,9 +213,9 @@ fi
 SLA_HOLIDAY_ID=$ID
 #
 #
-# SLA CALENDAR
+# SLA CALENDAR 1
 #
-NAME="Calendar Bug Tracker"
+NAME="Calendar HO Managed Services"
 DATA="{ \"sla_calendar\": { \"name\": \"$NAME\" } }"
 EXEC=`curl -s -H "Content-Type: application/json" -X POST --data "$DATA" -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/calendars.json"`
 ID=`echo $EXEC|jq -r ".sla_calendar|.id"`
@@ -233,26 +233,56 @@ else
                 exit 1
         fi
 fi
-SLA_CALENDAR_ID=$ID
+SLA_CALENDAR1_ID=$ID
 #
 #
-# SLA SCHEDULE
+# SLA CALENDAR 2
+#
+NAME="Calendar HNO Managed Services"
+DATA="{ \"sla_calendar\": { \"name\": \"$NAME\" } }"
+EXEC=`curl -s -H "Content-Type: application/json" -X POST --data "$DATA" -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/calendars.json"`
+ID=`echo $EXEC|jq -r ".sla_calendar|.id"`
+if [ $((ID+0)) -gt 0 ]; then
+        echo "Ok: sla_calendar add n°$ID"
+else
+        ERROR=`echo $EXEC|jq -r ".errors[0]"`
+        if [ "$ERROR" == "Name has already been taken" ]; then
+                SEARCH="name=$(urlencode "$NAME")"
+                EXEC=`curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/calendars.json?$SEARCH"`
+                ID=`echo $EXEC|jq -r ".sla_calendars[0]|.id"`
+                echo "Ok: sla_calendar exists n°$ID"
+        else
+                echo "Error: $ERROR"
+                exit 1
+        fi
+fi
+SLA_CALENDAR2_ID=$ID
+#
+#
+# SLA SCHEDULE 1
 #
 SCHEDULES=(
-  '"dow": "1", "start_time": "09:30", "end_time": "12h29" , "match": "true"'
-  '"dow": "1", "start_time": "14:00", "end_time": "17h59" , "match": "true"'
-  '"dow": "2", "start_time": "09:30", "end_time": "12h29" , "match": "true"'
-  '"dow": "2", "start_time": "14:00", "end_time": "17h59" , "match": "true"'
-  '"dow": "3", "start_time": "09:30", "end_time": "12h29" , "match": "true"'
-  '"dow": "3", "start_time": "14:00", "end_time": "17h59" , "match": "true"'
-  '"dow": "4", "start_time": "09:30", "end_time": "12h29" , "match": "true"'
-  '"dow": "4", "start_time": "14:00", "end_time": "17h59" , "match": "true"'
-  '"dow": "5", "start_time": "09:30", "end_time": "12h29" , "match": "true"'
-  '"dow": "5", "start_time": "14:00", "end_time": "17h59" , "match": "true"'
+  '"dow": "0", "start_time": "00:00", "end_time": "23h59" , "match": "false"'
+  '"dow": "1", "start_time": "00:00", "end_time": "08h59" , "match": "false"'
+  '"dow": "1", "start_time": "09:00", "end_time": "18h59" , "match": "true"'
+  '"dow": "1", "start_time": "19:00", "end_time": "23h59" , "match": "false"'
+  '"dow": "2", "start_time": "00:00", "end_time": "08h59" , "match": "false"'
+  '"dow": "2", "start_time": "09:00", "end_time": "18h59" , "match": "true"'
+  '"dow": "2", "start_time": "19:00", "end_time": "23h59" , "match": "false"'
+  '"dow": "3", "start_time": "00:00", "end_time": "08h59" , "match": "false"'
+  '"dow": "3", "start_time": "09:00", "end_time": "18h59" , "match": "true"'
+  '"dow": "3", "start_time": "19:00", "end_time": "23h59" , "match": "false"'
+  '"dow": "4", "start_time": "00:00", "end_time": "08h59" , "match": "false"'
+  '"dow": "4", "start_time": "09:00", "end_time": "18h59" , "match": "true"'
+  '"dow": "4", "start_time": "19:00", "end_time": "23h59" , "match": "false"'
+  '"dow": "5", "start_time": "00:00", "end_time": "08h59" , "match": "false"'
+  '"dow": "5", "start_time": "09:00", "end_time": "18h59" , "match": "true"'
+  '"dow": "5", "start_time": "19:00", "end_time": "23h59" , "match": "false"'
+  '"dow": "6", "start_time": "00:00", "end_time": "23h59" , "match": "false"'
 )
 for i in $(echo ${!SCHEDULES[@]}); do
   SCHEDULE=${SCHEDULES[$i]}
-  DATA="{ \"sla_schedule\": { \"sla_calendar_id\": \"$SLA_CALENDAR_ID\", $SCHEDULE } }"
+  DATA="{ \"sla_schedule\": { \"sla_calendar_id\": \"$SLA_CALENDAR1_ID\", $SCHEDULE } }"
   EXEC=`curl -s -H "Content-Type: application/json" -X POST --data "$DATA" -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/schedules.json"`
   ID=`echo $EXEC|jq -r ".sla_schedule|.id"`
   if [ $((ID+0)) -gt 0 ]; then
@@ -262,7 +292,7 @@ for i in $(echo ${!SCHEDULES[@]}); do
           if [ "$ERROR" == "SLA Calendar This slot alredy exists" ]; then
                   DOW=`echo $DATA|jq -r ".sla_schedule|.dow"`
                   START_TIME=`echo $DATA|jq -r ".sla_schedule|.start_time"`
-                  SEARCH="sla_calendar_id=$SLA_CALENDAR_ID&dow=$DOW"
+                  SEARCH="sla_calendar_id=$SLA_CALENDAR1_ID&dow=$DOW"
                   EXEC=`curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/schedules.json?$SEARCH"`
                   # TODO : plugin must retrun TIME ( NOT TIMESTAMP )
                   START_TIME="2000-01-01T${START_TIME}:00Z"
@@ -276,9 +306,56 @@ for i in $(echo ${!SCHEDULES[@]}); do
 done
 #
 #
-# SLA CALENDAR HOLIDAY
+# SLA SCHEDULE 2
 #
-DATA="{ \"sla_calendar_holiday\": { \"sla_calendar_id\": \"$SLA_CALENDAR_ID\", \"sla_holiday_id\": \"$SLA_HOLIDAY_ID\", \"match\": \"false\" } }"
+SCHEDULES=(
+  '"dow": "0", "start_time": "00:00", "end_time": "23h59" , "match": "true"'
+  '"dow": "1", "start_time": "00:00", "end_time": "08h59" , "match": "true"'
+  '"dow": "1", "start_time": "09:00", "end_time": "18h59" , "match": "false"'
+  '"dow": "1", "start_time": "19:00", "end_time": "23h59" , "match": "true"'
+  '"dow": "2", "start_time": "00:00", "end_time": "08h59" , "match": "true"'
+  '"dow": "2", "start_time": "09:00", "end_time": "18h59" , "match": "false"'
+  '"dow": "2", "start_time": "19:00", "end_time": "23h59" , "match": "true"'
+  '"dow": "3", "start_time": "00:00", "end_time": "08h59" , "match": "true"'
+  '"dow": "3", "start_time": "09:00", "end_time": "18h59" , "match": "false"'
+  '"dow": "3", "start_time": "19:00", "end_time": "23h59" , "match": "true"'
+  '"dow": "4", "start_time": "00:00", "end_time": "08h59" , "match": "true"'
+  '"dow": "4", "start_time": "09:00", "end_time": "18h59" , "match": "false"'
+  '"dow": "4", "start_time": "19:00", "end_time": "23h59" , "match": "true"'
+  '"dow": "5", "start_time": "00:00", "end_time": "08h59" , "match": "true"'
+  '"dow": "5", "start_time": "09:00", "end_time": "18h59" , "match": "false"'
+  '"dow": "5", "start_time": "19:00", "end_time": "23h59" , "match": "true"'
+  '"dow": "6", "start_time": "00:00", "end_time": "23h59" , "match": "true"'
+)
+for i in $(echo ${!SCHEDULES[@]}); do
+  SCHEDULE=${SCHEDULES[$i]}
+  DATA="{ \"sla_schedule\": { \"sla_calendar_id\": \"$SLA_CALENDAR2_ID\", $SCHEDULE } }"
+  EXEC=`curl -s -H "Content-Type: application/json" -X POST --data "$DATA" -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/schedules.json"`
+  ID=`echo $EXEC|jq -r ".sla_schedule|.id"`
+  if [ $((ID+0)) -gt 0 ]; then
+          echo "Ok: sla_schedule add n°$ID"
+  else
+          ERROR=`echo $EXEC|jq -r ".errors[0]"`
+          if [ "$ERROR" == "SLA Calendar This slot alredy exists" ]; then
+                  DOW=`echo $DATA|jq -r ".sla_schedule|.dow"`
+                  START_TIME=`echo $DATA|jq -r ".sla_schedule|.start_time"`
+                  SEARCH="sla_calendar_id=$SLA_CALENDAR2_ID&dow=$DOW"
+                  EXEC=`curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/schedules.json?$SEARCH"`
+                  # TODO : plugin must retrun TIME ( NOT TIMESTAMP )
+                  START_TIME="2000-01-01T${START_TIME}:00Z"
+                  ID=`echo $EXEC|jq -r ".sla_schedules[]|select(.start_time==\"$START_TIME\")|.id"`
+                  echo "Ok: sla_schedule exists n°$ID"
+          else
+                  echo "Error: $ERROR"
+                  exit 1
+          fi
+  fi
+done
+#
+#
+# SLA CALENDAR HOLIDAY HO
+#
+DATA="{ \"sla_calendar_holiday\": { \"sla_calendar_id\": \"$SLA_CALENDAR1_ID\", \"sla_holiday_id\": \"$SLA_HOLIDAY_ID\", \"match\": \"false\" } }"
 EXEC=`curl -s -H "Content-Type: application/json" -X POST --data "$DATA" -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/calendar_holidays.json"`
 ID=`echo $EXEC|jq -r ".sla_calendar_holiday|.id"`
 if [ $((ID+0)) -gt 0 ]; then
@@ -286,7 +363,7 @@ if [ $((ID+0)) -gt 0 ]; then
 else
         ERROR=`echo $EXEC|jq -r ".errors[0]"`
         if [ "$ERROR" == "SLA Calendar This holiday is already present in this SLA Calendar's Holidays" ]; then
-                SEARCH="sla_calendar_holiday_id=$SLA_CALENDAR_ID&sla_holiday_id=$SLA_HOLIDAY_ID"
+                SEARCH="sla_calendar_holiday_id=$SLA_CALENDAR1_ID&sla_holiday_id=$SLA_HOLIDAY_ID"
                 EXEC=`curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/calendar_holidays.json?$SEARCH"`
                 ID=`echo $EXEC|jq -r ".sla_calendar_holidays[0]|.id"`
                 echo "Ok: sla_calendar_holiday_id exists n°$ID"
@@ -297,10 +374,31 @@ else
 fi
 #
 #
-# SLA LEVEL
+# SLA CALENDAR HOLIDAY HNO
 #
-NAME="Level Bug Tracker"
-DATA="{ \"sla_level\": { \"name\": \"$NAME\", \"sla_id\": \"$SLA_ID\", \"sla_calendar_id\": \"$SLA_CALENDAR_ID\" } }"
+DATA="{ \"sla_calendar_holiday\": { \"sla_calendar_id\": \"$SLA_CALENDAR2_ID\", \"sla_holiday_id\": \"$SLA_HOLIDAY_ID\", \"match\": \"true\" } }"
+EXEC=`curl -s -H "Content-Type: application/json" -X POST --data "$DATA" -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/calendar_holidays.json"`
+ID=`echo $EXEC|jq -r ".sla_calendar_holiday|.id"`
+if [ $((ID+0)) -gt 0 ]; then
+        echo "Ok: sla_calendar_holiday add n°$ID"
+else
+        ERROR=`echo $EXEC|jq -r ".errors[0]"`
+        if [ "$ERROR" == "SLA Calendar This holiday is already present in this SLA Calendar's Holidays" ]; then
+                SEARCH="sla_calendar_holiday_id=$SLA_CALENDAR2_ID&sla_holiday_id=$SLA_HOLIDAY_ID"
+                EXEC=`curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/calendar_holidays.json?$SEARCH"`
+                ID=`echo $EXEC|jq -r ".sla_calendar_holidays[0]|.id"`
+                echo "Ok: sla_calendar_holiday_id exists n°$ID"
+        else
+                echo "Error: $ERROR"
+                exit 1
+        fi
+fi
+#
+#
+# SLA LEVEL HO
+#
+NAME="Level HO Managed Services"
+DATA="{ \"sla_level\": { \"name\": \"$NAME\", \"sla_id\": \"$SLA_ID\", \"sla_calendar_id\": \"$SLA_CALENDAR1_ID\" } }"
 EXEC=`curl -s -H "Content-Type: application/json" -X POST --data "$DATA" -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/levels.json"`
 ID=`echo $EXEC|jq -r ".sla_level|.id"`
 if [ $((ID+0)) -gt 0 ]; then
@@ -308,7 +406,7 @@ if [ $((ID+0)) -gt 0 ]; then
 else
         ERROR=`echo $EXEC|jq -r ".errors[0]"`
         if [ "$ERROR" == "Name has already been taken" ]; then
-                SEARCH="sla_id=$SLA_ID&sla_calendar_id=$SLA_CALENDAR_ID"
+                SEARCH="sla_id=$SLA_ID&sla_calendar_id=$SLA_CALENDAR1_ID"
                 EXEC=`curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/levels.json?$SEARCH"`
                 ID=`echo $EXEC|jq -r ".sla_levels[0]|.id"`
                 echo "Ok: sla_level exists n°$ID"
@@ -317,19 +415,42 @@ else
                 exit 1
         fi
 fi
-SLA_LEVEL_ID=$ID
+SLA_LEVEL1_ID=$ID
 #
 #
-# SLA LEVEL TERMS
+# SLA LEVEL HNO
+#
+NAME="Level HNO Managed Services"
+DATA="{ \"sla_level\": { \"name\": \"$NAME\", \"sla_id\": \"$SLA_ID\", \"sla_calendar_id\": \"$SLA_CALENDAR2_ID\" } }"
+EXEC=`curl -s -H "Content-Type: application/json" -X POST --data "$DATA" -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/levels.json"`
+ID=`echo $EXEC|jq -r ".sla_level|.id"`
+if [ $((ID+0)) -gt 0 ]; then
+        echo "Ok: sla_level add n°$ID"
+else
+        ERROR=`echo $EXEC|jq -r ".errors[0]"`
+        if [ "$ERROR" == "Name has already been taken" ]; then
+                SEARCH="sla_id=$SLA_ID&sla_calendar_id=$SLA_CALENDAR2_ID"
+                EXEC=`curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/levels.json?$SEARCH"`
+                ID=`echo $EXEC|jq -r ".sla_levels[0]|.id"`
+                echo "Ok: sla_level exists n°$ID"
+        else
+                echo "Error: $ERROR"
+                exit 1
+        fi
+fi
+SLA_LEVEL2_ID=$ID
+#
+#
+# SLA LEVEL TERMS HO
 #
 LEVEL_TERMS=(
-  '"priority_id": "1", "term": "1440"'
-  '"priority_id": "2", "term": "480"'
-  '"priority_id": "3", "term": "240"'
+  '"priority_id": "1", "term": "60"'
+  '"priority_id": "2", "term": "30"'
+  '"priority_id": "3", "term": "15"'
 )
 for i in $(echo ${!LEVEL_TERMS[@]}); do
   LEVEL_TERM=${LEVEL_TERMS[$i]}
-  DATA="{ \"sla_level_term\": { \"sla_level_id\": \"$SLA_LEVEL_ID\", \"sla_type_id\": \"$SLA_TYPE1_ID\", $LEVEL_TERM } }"
+  DATA="{ \"sla_level_term\": { \"sla_level_id\": \"$SLA_LEVEL1_ID\", \"sla_type_id\": \"$SLA_TYPE1_ID\", $LEVEL_TERM } }"
   EXEC=`curl -s -H "Content-Type: application/json" -X POST --data "$DATA" -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/level_terms.json"`
   ID=`echo $EXEC|jq -r ".sla_level_term|.id"`
   if [ $((ID+0)) -gt 0 ]; then
@@ -338,7 +459,7 @@ for i in $(echo ${!LEVEL_TERMS[@]}); do
           ERROR=`echo $EXEC|jq -r ".errors[0]"`
           if [ "$ERROR" == "SLA Level This term alredy exists" ]; then
                   PRIORITY_ID=`echo $DATA|jq -r ".sla_level_term|.priority_id"`
-                  SEARCH="sla_level_id=$SLA_LEVEL_ID&sla_type_id=$SLA_TYPE1_ID&priority_id=$PRIORITY_ID"
+                  SEARCH="sla_level_id=$SLA_LEVEL1_ID&sla_type_id=$SLA_TYPE1_ID&priority_id=$PRIORITY_ID"
                   EXEC=`curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/level_terms.json?$SEARCH"`
                   ID=`echo $EXEC|jq -r ".sla_level_terms[0]|.id"`
                   echo "Ok: sla_level_term exists n°$ID"
@@ -349,13 +470,13 @@ for i in $(echo ${!LEVEL_TERMS[@]}); do
   fi
 done
 LEVEL_TERMS=(
-  '"priority_id": "1", "term": "4320"'
-  '"priority_id": "2", "term": "1920"'
-  '"priority_id": "3", "term": "1200"'
+  '"priority_id": "1", "term": "1440"'
+  '"priority_id": "2", "term": "480"'
+  '"priority_id": "3", "term": "120"'
 )
 for i in $(echo ${!LEVEL_TERMS[@]}); do
   LEVEL_TERM=${LEVEL_TERMS[$i]}
-  DATA="{ \"sla_level_term\": { \"sla_level_id\": \"$SLA_LEVEL_ID\", \"sla_type_id\": \"$SLA_TYPE2_ID\", $LEVEL_TERM } }"
+  DATA="{ \"sla_level_term\": { \"sla_level_id\": \"$SLA_LEVEL1_ID\", \"sla_type_id\": \"$SLA_TYPE2_ID\", $LEVEL_TERM } }"
   EXEC=`curl -s -H "Content-Type: application/json" -X POST --data "$DATA" -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/level_terms.json"`
   ID=`echo $EXEC|jq -r ".sla_level_term|.id"`
   if [ $((ID+0)) -gt 0 ]; then
@@ -364,7 +485,63 @@ for i in $(echo ${!LEVEL_TERMS[@]}); do
           ERROR=`echo $EXEC|jq -r ".errors[0]"`
           if [ "$ERROR" == "SLA Level This term alredy exists" ]; then
                   PRIORITY_ID=`echo $DATA|jq -r ".sla_level_term|.priority_id"`
-                  SEARCH="sla_level_id=$SLA_LEVEL_ID&sla_type_id=$SLA_TYPE2_ID&priority_id=$PRIORITY_ID"
+                  SEARCH="sla_level_id=$SLA_LEVEL1_ID&sla_type_id=$SLA_TYPE2_ID&priority_id=$PRIORITY_ID"
+                  EXEC=`curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/level_terms.json?$SEARCH"`
+                  ID=`echo $EXEC|jq -r ".sla_level_terms[0]|.id"`
+                  echo "Ok: sla_level_term exists n°$ID"
+          else
+                  echo "Error: $ERROR"
+                  exit 1
+          fi
+  fi
+done
+#
+#
+# SLA LEVEL TERMS HNO
+#
+LEVEL_TERMS=(
+  '"priority_id": "1", "term": "120"'
+  '"priority_id": "2", "term": "60"'
+  '"priority_id": "3", "term": "30"'
+)
+for i in $(echo ${!LEVEL_TERMS[@]}); do
+  LEVEL_TERM=${LEVEL_TERMS[$i]}
+  DATA="{ \"sla_level_term\": { \"sla_level_id\": \"$SLA_LEVEL2_ID\", \"sla_type_id\": \"$SLA_TYPE1_ID\", $LEVEL_TERM } }"
+  EXEC=`curl -s -H "Content-Type: application/json" -X POST --data "$DATA" -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/level_terms.json"`
+  ID=`echo $EXEC|jq -r ".sla_level_term|.id"`
+  if [ $((ID+0)) -gt 0 ]; then
+          echo "Ok: sla_level_term add n°$ID"
+  else
+          ERROR=`echo $EXEC|jq -r ".errors[0]"`
+          if [ "$ERROR" == "SLA Level This term alredy exists" ]; then
+                  PRIORITY_ID=`echo $DATA|jq -r ".sla_level_term|.priority_id"`
+                  SEARCH="sla_level_id=$SLA_LEVEL2_ID&sla_type_id=$SLA_TYPE1_ID&priority_id=$PRIORITY_ID"
+                  EXEC=`curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/level_terms.json?$SEARCH"`
+                  ID=`echo $EXEC|jq -r ".sla_level_terms[0]|.id"`
+                  echo "Ok: sla_level_term exists n°$ID"
+          else
+                  echo "Error: $ERROR"
+                  exit 1
+          fi
+  fi
+done
+LEVEL_TERMS=(
+  '"priority_id": "1", "term": "2880"'
+  '"priority_id": "2", "term": "720"'
+  '"priority_id": "3", "term": "240"'
+)
+for i in $(echo ${!LEVEL_TERMS[@]}); do
+  LEVEL_TERM=${LEVEL_TERMS[$i]}
+  DATA="{ \"sla_level_term\": { \"sla_level_id\": \"$SLA_LEVEL2_ID\", \"sla_type_id\": \"$SLA_TYPE2_ID\", $LEVEL_TERM } }"
+  EXEC=`curl -s -H "Content-Type: application/json" -X POST --data "$DATA" -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/level_terms.json"`
+  ID=`echo $EXEC|jq -r ".sla_level_term|.id"`
+  if [ $((ID+0)) -gt 0 ]; then
+          echo "Ok: sla_level_term add n°$ID"
+  else
+          ERROR=`echo $EXEC|jq -r ".errors[0]"`
+          if [ "$ERROR" == "SLA Level This term alredy exists" ]; then
+                  PRIORITY_ID=`echo $DATA|jq -r ".sla_level_term|.priority_id"`
+                  SEARCH="sla_level_id=$SLA_LEVEL2_ID&sla_type_id=$SLA_TYPE2_ID&priority_id=$PRIORITY_ID"
                   EXEC=`curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/level_terms.json?$SEARCH"`
                   ID=`echo $EXEC|jq -r ".sla_level_terms[0]|.id"`
                   echo "Ok: sla_level_term exists n°$ID"
