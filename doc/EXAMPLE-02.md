@@ -23,7 +23,7 @@ Resolution time will be calculated as long as the issue is in a "new" and "In pr
 
 In the projects, we will apply this SLA to the tracker « Bugs » :
 
-**Level Bug Tracker**
+**Bug Tracker Terms**
 | Issue priorities / SLA Levels | Response time | Resolution deadline |
 |-------------------------------|---------------|---------------------|
 | Minor                         |      24h      |         72h         |
@@ -135,7 +135,7 @@ For our example, which is a support service, public holidays are equivalent to t
 
 After declaring SLAs and SLA Schedules, they can be linked to define service levels. In other words, the SLA Levels make it possible to know the moment "when" commitments will apply.
 
-Go to `Administration » SLA Global settings » SLA Levels` (https://[redmine-host]/sla/levels). Add "Level Bug Tracker" as new "SLA Levels"
+Go to `Administration » SLA Global settings » SLA Levels` (https://[redmine-host]/sla/levels). Add "Level Bug Tracker" as new "SLA Levels":
 <div style=" width:50%; height:50%; " >
 
 ![Redmine SLA - Example 02 - 08](images/example_02/redmine_sla_doc_example_02_08.png)
@@ -146,7 +146,7 @@ Go to `Administration » SLA Global settings » SLA Levels` (https://[redmine-
 
 Finally, we can define the SLA Terms. For an SLA Level, an SLA Type and a priority, you can define a time commitment (in minutes).
 
-Go to `Administration » SLA Global settings » SLA Terms` (https://[redmine-host]/sla/level_terms). Add "Terms Bug Tracker" for each SLA Type / Priority as new "SLA Terms"
+Go to `Administration » SLA Global settings » SLA Terms` (https://[redmine-host]/sla/level_terms). Add "Terms Bug Tracker" for each SLA Type / Priority as new "SLA Terms":
 <div style=" width:50%; height:50%; " >
 
 ![Redmine SLA - Example 02 - 09](images/example_02/redmine_sla_doc_example_02_09.png)
@@ -155,13 +155,13 @@ Go to `Administration » SLA Global settings » SLA Terms` (https://[redmine-h
 
 ## Apply SLA to a Project
 
-Go to your project' settings ( https://[redmine-host]/projects/[project-identifier]/settings ). Active SLA module for your project.
+Go to your project' settings ( https://[redmine-host]/projects/[project-identifier]/settings ). Active SLA module for your project:
 <div style=" width:50%; height:50%; " >
 
 ![Redmine SLA - Example 02 - 10](images/example_02/redmine_sla_doc_example_02_10.png)
 </div>
 
-The tab should appear `SLA Project settings`, go to this tab (http://[redmine-host]/projects/[project-identifier]/settings/slas). With "New SLA project's tracker" définie à SLA for a tracker.
+The tab should appear `SLA Project settings`, go to this tab (http://[redmine-host]/projects/[project-identifier]/settings/slas). With "New SLA project's tracker" define the SLA for a tracker:
 <div style=" width:50%; height:50%; " >
 
 ![Redmine SLA - Example 02 - 11](images/example_02/redmine_sla_doc_example_02_11.png)
@@ -170,11 +170,21 @@ The tab should appear `SLA Project settings`, go to this tab (http://[redmine-ho
 
 ## View SLA into an issue
 
-When you go to a project's issue, you should see the SLA appear if it matches with the status and priority.
+When you go to a project's issue, you should see the SLA appear if it matches with the status and priority:
 <div style=" width:50%; height:50%; " >
 
 ![Redmine SLA - Example 02 - 12](images/example_02/redmine_sla_doc_example_02_12.png)
 </div>
+
+
+## implementation of this example with the APIs
+
+You can deploy this example on a fresh Redmine with this bash script [Script Example 02](scripts/EXAMPLE-02.bash) which use the plugin's API.
+
+
+> **_REQUIREMENTS:_** The code requires curl and jq commands.
+
+> **_NOTE:_** The code has not been optimized to precisely highlight the use of APIs.
 
 
 ## Roles

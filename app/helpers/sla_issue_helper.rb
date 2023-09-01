@@ -23,6 +23,10 @@ module SlaIssueHelper
 
   def sla_display( percent, is_closed=false, type="bar" )
 
+    if type == "none"
+      return ""
+    end
+
     label = percent.to_s.concat("%")
 
     # CCS colors used for an active issue depending on progress [ 0% < 80% < 100% ] = [ good < warn < fail ]

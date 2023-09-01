@@ -25,7 +25,7 @@ BEGIN
   -- We get the information already in the cache (if it is there, then it is good)
   SELECT
     "sla_caches"."id" AS "id",
-    "sla_caches"."issue_id" AS "issue__id",
+    "sla_caches"."issue_id" AS "issue_id",
     "sla_caches"."sla_level_id" AS "sla_level_id",
     "sla_caches"."start_date" AS "start_date"
 	INTO
