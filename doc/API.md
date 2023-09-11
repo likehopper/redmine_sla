@@ -7,7 +7,7 @@ Some of the SLA data is exposed through Redmine's REST API for the resources des
 | Resources              | Status | Notes          | Availability |
 |------------------------|--------|----------------|--------------|
 | [Slas](API/API_slas.md)                   | Stable |                |      1.0     |
-| [Sla Types](API/API_sla_types.md)              | Stable |                |      1.0     |
+| [Sla Types](API/API_sla_types.md)              | Stable |                |      1.0     |
 | [Sla Statuses](API/API_sla_statuses.md)           | Stable |                |      1.0     |
 | [Slas Schedules](API/API_sla_schedules.md)         | Stable |                |      1.0     |
 | [Slas Holidays](API/API_sla_holidays.md)          | Stable |                |      1.0     |
