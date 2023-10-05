@@ -22,8 +22,9 @@ With three functions :
 - sla_get_level : identifies the start date of the SLA and the associated level
 - sla_get_spent : the heart of the plugin responsible for calculating the times spent
 
-And one view :
-- sla_view_journals : rebuilds issues status journal from its creation to "now"
+And two views :
+- sla_view_journal_statuses : simplified the selection of journals for statuses
+- sla_view_roll_statuses : rebuilds issues statuses journal from its creation to "now"
 
 ## Drawing
 <div style=" width:800px; height:550px; " >
