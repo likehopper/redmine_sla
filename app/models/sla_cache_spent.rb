@@ -44,7 +44,7 @@ class SlaCacheSpent < ActiveRecord::Base
   end
 
   def self.update_by_issue_type(param_issue_id,param_type_id)
-      return ActiveRecord::Base.connection.select_values("SELECT * FROM sla_get_spent(#{param_issue_id},#{param_type_id}) AS slp(sla_cache_id bigint, sla_level_id integer, updated_on TIMESTAMP WITHOUT TIME ZONE, spent bigint, term integer ) ; ")
+      return ActiveRecord::Base.connection.select_values("SELECT * FROM sla_get_spent(#{param_issue_id},#{param_type_id}) AS slp(sla_cache_id integer, sla_level_id integer, updated_on TIMESTAMP WITHOUT TIME ZONE, spent integer, term integer ) ; ")
   end    
 
   # Instance method for update cache

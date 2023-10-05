@@ -96,10 +96,10 @@ BEGIN
   FROM
     "issues"
   INNER JOIN
-    "sla_view_journals" ON ( "issues"."id" = "sla_view_journals"."issue_id" )
+    "sla_view_roll_statuses" ON ( "issues"."id" = "sla_view_roll_statuses"."issue_id" )
   INNER JOIN
     ( SELECT generate_series ( v_issue_created_on, v_issue_closed_on, '1 minute' ) AS minutes ) AS "calendrier"
-      ON ( "calendrier"."minutes" BETWEEN "sla_view_journals"."from_status_date" AND "sla_view_journals"."to_status_date" - INTERVAL '1 minute' )
+      ON ( "calendrier"."minutes" BETWEEN "sla_view_roll_statuses"."from_status_date" AND "sla_view_roll_statuses"."to_status_date" - INTERVAL '1 minute' )
   INNER JOIN
     "sla_schedules"
 			ON ( DATE_PART('dow',calendrier.minutes) = "sla_schedules"."dow" AND "calendrier"."minutes"::TIME BETWEEN "sla_schedules"."start_time" AND "sla_schedules"."end_time" )
@@ -115,7 +115,7 @@ BEGIN
   WHERE
     "issues"."id" = p_issue_id		
   AND
-    "sla_view_journals"."from_status_id" IN ( SELECT DISTINCT "sla_statuses"."status_id" FROM "sla_statuses" WHERE "sla_statuses"."sla_type_id" = p_sla_type_id )
+    "sla_view_roll_statuses"."from_status_id" IN ( SELECT DISTINCT "sla_statuses"."status_id" FROM "sla_statuses" WHERE "sla_statuses"."sla_type_id" = p_sla_type_id )
   AND
     "sla_project_trackers"."project_id" = "issues"."project_id"
   AND
