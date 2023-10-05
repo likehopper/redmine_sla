@@ -63,7 +63,7 @@ BEGIN
 	-- So we can find the expected level according to the project, tracker, created date and time
   SELECT DISTINCT
     -- Preparing the record for the cache, ID will be determined on insert in the cache
-    NULL::bigint AS "id",
+    NULL::integer AS "id",
     "p_issue_id" AS "issue_id",
 		"sla_levels"."id" AS "sla_level_id",
     "calendrier"."minutes" AS "start_date"
