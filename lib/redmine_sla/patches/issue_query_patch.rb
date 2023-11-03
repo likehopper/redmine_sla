@@ -31,22 +31,26 @@ module RedmineSla
           alias_method :available_filters_without_sla, :available_filters
           alias_method :available_filters, :available_filters_with_sla
 
-          self.available_columns << QueryColumn.new(
+          sla_get_level = QueryColumn.new(
             :sla_get_level,
             :caption => Proc.new { l(:sla_label_abbreviation)+" "+l("sla_label.sla_level.singular") },
-            :groupable => false,
+            :groupable => true,
             :sortable => "(SELECT sla_levels.name FROM sla_caches INNER JOIN sla_levels ON ( sla_caches.sla_level_id = sla_levels.id ) WHERE sla_caches.issue_id = issues.id ORDER BY sla_levels.name)",
           )
+          def sla_get_level.group_by_statement
+            self.sortable
+          end
+          self.available_columns << sla_get_level
 
           if ActiveRecord::Base.connection.table_exists? 'sla_types'
             SlaType.all.each { |sla_type|
               name = "sla_get_respect_#{sla_type.id}"
-              self.available_columns << QueryColumn.new(
+              sla_get_respect = QueryColumn.new(
                 name.to_sym,
                 :caption => Proc.new { l(:sla_label_abbreviation)+" "+l(:label_sla_respect)+" "+sla_type.name },
-                :groupable => false,
+                :groupable => true,
                 :sortable => "(
-                  SELECT CASE
+                  SELECT DISTINCT CASE
                     WHEN sla_cache_spents.spent IS NULL THEN 0
                     WHEN (sla_level_terms.term-sla_cache_spents.spent)>0 THEN 1
                     ELSE 2 END AS sla_respect
@@ -59,6 +63,10 @@ module RedmineSla
                   ORDER BY sla_respect
                 )",
               )
+              def sla_get_respect.group_by_statement
+                self.sortable
+              end
+              self.available_columns << sla_get_respect
             }
           end
 

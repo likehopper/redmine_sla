@@ -25,7 +25,7 @@ module RedmineSla
     module TimeEntryPatch
 
       def sla_get_level
-        sla_cache = SlaCache.find_or_new(id)
+        sla_cache = SlaCache.find_or_new(issue_id)
         if ( sla_cache.nil? )
           return nil
         end        
