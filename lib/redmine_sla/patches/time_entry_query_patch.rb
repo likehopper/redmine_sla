@@ -32,35 +32,46 @@ module RedmineSla
             alias_method :available_filters_without_sla, :available_filters
             alias_method :available_filters, :available_filters_with_sla
     
-            
-                self.available_columns << QueryColumn.new(
+              sla_get_level = QueryColumn.new(
                   :sla_get_level,
                   :caption => Proc.new { l(:sla_label_abbreviation)+" "+l("sla_label.sla_level.singular") },
                   :groupable => true,
                   :sortable => "(SELECT sla_levels.name FROM sla_caches INNER JOIN sla_levels ON ( sla_caches.sla_level_id = sla_levels.id ) WHERE sla_caches.issue_id = issues.id ORDER BY sla_levels.name)",
                 )
+                
+                def sla_get_level.group_by_statement
+                  "(SELECT sla_levels.name FROM sla_caches INNER JOIN sla_levels ON ( sla_caches.sla_level_id = sla_levels.id ) WHERE sla_caches.issue_id = issues.id ORDER BY sla_levels.name)"
+                end
+                self.available_columns << sla_get_level
+
 
                 if ActiveRecord::Base.connection.table_exists? 'sla_types'
                   SlaType.all.each { |sla_type|
                     name = "sla_get_respect_#{sla_type.id}"
-                    self.available_columns << QueryColumn.new(
+
+                    sla_get_respect = QueryColumn.new(
                       name.to_sym,
                       :caption => Proc.new { l(:sla_label_abbreviation)+" "+l(:label_sla_respect)+" "+sla_type.name },
                       :groupable => true,
                       :sortable => "(
-                        SELECT CASE
+                        SELECT distinct CASE
                           WHEN sla_cache_spents.spent IS NULL THEN 0
                           WHEN (sla_level_terms.term-sla_cache_spents.spent)>0 THEN 1
                           ELSE 2 END AS sla_respect
-                        FROM issues AS sub_issues
+                        FROM time_entries sub_time_entries						
+                        INNER join issues AS sub_issues ON sub_time_entries.issue_id=sub_issues.id
                         LEFT JOIN sla_caches ON ( sub_issues.id = sla_caches.issue_id )
                         LEFT JOIN sla_cache_spents ON ( sla_caches.id = sla_cache_spents.sla_cache_id AND sla_cache_spents.sla_type_id = #{sla_type.id} )
                         LEFT JOIN sla_levels ON ( sla_caches.sla_level_id = sla_levels.id )
                         LEFT JOIN sla_level_terms ON ( sla_levels.id = sla_level_terms.sla_level_id AND sla_level_terms.sla_type_id = #{sla_type.id} )
-                        WHERE sub_issues.id = issues.id
+                        WHERE sub_time_entries.id = time_entries.id
                         ORDER BY sla_respect
                       )",
                     )
+                    def sla_get_respect.group_by_statement
+                      self.sortable
+                    end
+                    self.available_columns << sla_get_respect
                   }
                 end
                 
