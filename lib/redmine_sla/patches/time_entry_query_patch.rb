@@ -54,7 +54,7 @@ module RedmineSla
                       :caption => Proc.new { l(:sla_label_abbreviation)+" "+l(:label_sla_respect)+" "+sla_type.name },
                       :groupable => true,
                       :sortable => "(
-                        SELECT distinct CASE
+                        SELECT DISTINCT CASE
                           WHEN sla_cache_spents.spent IS NULL THEN 0
                           WHEN (sla_level_terms.term-sla_cache_spents.spent)>0 THEN 1
                           ELSE 2 END AS sla_respect
