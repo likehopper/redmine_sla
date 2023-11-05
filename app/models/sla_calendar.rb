@@ -20,9 +20,11 @@ class SlaCalendar < ActiveRecord::Base
 
   unloadable
 
+  has_many :sla_levels
+  has_many :sla_schedules, inverse_of: :sla_calendar, :dependent => :destroy
+
   include Redmine::SafeAttributes
 
-  has_many :sla_schedules, inverse_of: :sla_calendar, :dependent => :destroy
   accepts_nested_attributes_for :sla_schedules, allow_destroy: true, :reject_if => proc { |attributes| attributes.any? {|k,v| v.blank?} } # :any_blank
   #accepts_nested_attributes_for :sla_calendar_holidays, allow_destroy: true, reject_if: :all_blank
 

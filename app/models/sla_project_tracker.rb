@@ -24,6 +24,10 @@ class SlaProjectTracker < ActiveRecord::Base
   belongs_to :tracker
   belongs_to :sla
 
+  has_many :sla_levels, through: :sla
+  has_many :sla_level_terms, through: :sla_levels
+  has_many :sla_types, through: :sla_level_terms
+
   include Redmine::SafeAttributes
 
   default_scope { joins(:tracker).order("trackers.name ASC") }  
