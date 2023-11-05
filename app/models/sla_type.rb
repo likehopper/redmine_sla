@@ -20,7 +20,11 @@ class SlaType < ActiveRecord::Base
 
   unloadable
   
-  has_many :sla_level_term
+  has_many :sla_level_terms
+
+  has_many :sla_levels, through: :sla_level_terms
+  has_many :slas, through: :sla_levels
+  has_many :sla_project_trackers, through: :slas
 
   include Redmine::SafeAttributes
 

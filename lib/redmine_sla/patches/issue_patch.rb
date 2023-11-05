@@ -48,15 +48,16 @@ module RedmineSla
         sla_spent = sla_cache_spent[:spent]     
         return ( ( sla_term - sla_spent ) > 0 )
       end
-      
+
       if ActiveRecord::Base.connection.table_exists? 'sla_types'
         SlaType.all.each { |sla_type|
+          Rails.logger.debug "==>> IssuePatch InstanceMethods sla_get_respect_#{sla_type.id} for #{sla_type.name.to_sym} <<==="
           define_method("sla_get_respect_#{sla_type.id}") do 
             sla_get_respect(id,sla_type.id)
           end
         }
       end
-
+      
       def self.included(base) # :nodoc:
         base.extend(ClassMethods)
         base.send(:include, InstanceMethods)

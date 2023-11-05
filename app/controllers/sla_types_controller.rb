@@ -62,7 +62,9 @@ class SlaTypesController < ApplicationController
   def create
     @sla_type = SlaType.new
     @sla_type.safe_attributes = params[:sla_type]
+
     if @sla_type.save
+      post_create
       respond_to do |format|
         format.html do
           flash[:notice] = l(:notice_successful_create)
@@ -147,7 +149,7 @@ class SlaTypesController < ApplicationController
     render layout: false
   end
 
-  private
+  private  
 
   def find_sla_type
     @sla_type = SlaType.find(params[:id])
@@ -162,6 +164,21 @@ class SlaTypesController < ApplicationController
     #raise Unauthorized unless @sla_types.all?(&:visible?)
   rescue ActiveRecord::RecordNotFound
     render_404
+  end
+
+  def post_create
+
+    sla_type = @sla_type
+
+    Rails.logger.debug "==>> IssuePatch sla_types_controler sla_get_respect_#{sla_type.id} for #{sla_type.name.to_sym} <<==="
+    RedmineSla::Patches::IssuePatch::define_method("sla_get_respect_#{sla_type.id}") do 
+      sla_get_respect(id,sla_type.id)
+    end
+    Rails.logger.debug "==>> TimeEntryPatch  sla_types_controler sla_get_respect_#{sla_type.id} for #{sla_type.name.to_sym} <<==="
+    RedmineSla::Patches::TimeEntryPatch::define_method("sla_get_respect_#{sla_type.id}") do 
+      sla_get_respect(id,sla_type.id)
+    end
+
   end
 
 end

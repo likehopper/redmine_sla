@@ -17,6 +17,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 class Sla < ActiveRecord::Base
+  
+  unloadable
+
+  has_many :sla_project_trackers
+  has_many :sla_levels
+  
+  has_many :sla_level_terms, through: :sla_levels
 
   include Redmine::SafeAttributes
 
