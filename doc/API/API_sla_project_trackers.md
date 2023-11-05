@@ -2,7 +2,7 @@
 
 ### Listing Sla Project Trackers
 
-`GET /projects/[project-identifier]/slas.[format]`
+`GET /projects/[project-identifier]/slas/index.[format]`
 
 Returns a paginated list of Sla Project Trackers. By default, it returns all Sla Project Trackers.
 
@@ -11,4 +11,4 @@ Returns a paginated list of Sla Project Trackers. By default, it returns all Sla
 - tracker_id
 
 <u>Examples:</u>
-`curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/projects/[project-identifier]/slas.json"`
+`curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/projects/[project-identifier]/slas/index.json"`
