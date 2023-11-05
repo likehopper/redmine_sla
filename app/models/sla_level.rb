@@ -22,9 +22,11 @@ class SlaLevel < ActiveRecord::Base
   
   belongs_to :sla
   belongs_to :sla_calendar
+  
+  has_many :sla_level_terms
+  has_many :sla_caches
 
-  has_many :sla_cache
-  has_many :sla_level_term
+  has_many :sla_project_trackers, through: :sla
 
   include Redmine::SafeAttributes
 

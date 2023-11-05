@@ -19,6 +19,7 @@
 class SlaSchedule < ActiveRecord::Base
 
   unloadable
+  
   belongs_to :sla_calendar
 
   include Redmine::SafeAttributes

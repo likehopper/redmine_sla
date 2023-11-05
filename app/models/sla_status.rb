@@ -19,6 +19,7 @@
 class SlaStatus < ActiveRecord::Base
 
   unloadable
+  
   belongs_to :sla_type
   belongs_to :status, :class_name => 'IssueStatus'
 

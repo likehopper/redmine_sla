@@ -24,6 +24,9 @@ class SlaLevelTerm < ActiveRecord::Base
   belongs_to :sla_type
   belongs_to :priority, :class_name => 'IssuePriority'
 
+  #has_many :slas, through: :sla_levels
+  #has_many :sla_project_trackers, through: :slas
+  
   include Redmine::SafeAttributes
 
   scope :visible, ->(*args) { where(SlaLevelTerm.visible_condition(args.shift || User.current, *args)) }
