@@ -76,7 +76,7 @@ RedmineApp::Application.config.after_initialize do
     Issue.send(:include, RedmineSla::Patches::IssuePatch)
   end
 
-  unless Issue.included_modules.include? RedmineSla::Patches::TimeEntryPatch
+  unless TimeEntry.included_modules.include? RedmineSla::Patches::TimeEntryPatch
     TimeEntry.send(:include, RedmineSla::Patches::TimeEntryPatch)
   end
 
