@@ -2,10 +2,8 @@
 # SLAs project configuration ( activation of SLAs by trackers : sla_project_trackers )
 resources :projects do
   resources :sla_project_trackers, path: "/settings/slas", :only => [ :new, :create, :update, :edit, :destroy]
+  resources :sla_project_trackers, path: "/settings/slas/index(.:format)", :only => [ :index ]
 end
-# ProjectTrackers / API
-match '/projects/:project_id/slas', :controller => 'sla_project_trackers', :action => 'index', :via => :get
-
 
 # Configuration globales : noms des SLA
 resources :slas, path: "sla/slas" do
