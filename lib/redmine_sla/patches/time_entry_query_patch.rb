@@ -32,7 +32,7 @@ module RedmineSla
             alias_method :available_filters_without_sla, :available_filters
             alias_method :available_filters, :available_filters_with_sla
                    
-            def sql_for_sla_respect_field(field,operator,value,sla_type_id)
+            def sql_for_slas_sla_respect_field(field,operator,value,sla_type_id)
               condition =
                 if value.size > 1
                   '1=1'
@@ -56,7 +56,7 @@ module RedmineSla
               "(#{Issue.table_name}.id IN (#{issue_ids}))"
             end
        
-            def sql_for_sla_level_id_field(field, operator, value)
+            def sql_for_slas_sla_level_id_field(field, operator, value)
               neg = (operator == '!' ? 'NOT' : '')
               condition = "( sla_caches.sla_level_id #{neg} IN (#{value.join(',')}) AND sla_level_terms.term IS NOT NULL"
               issue_ids = "
@@ -92,9 +92,9 @@ module RedmineSla
           #     INNER JOIN sla_levels ON ( sla_levels.sla_id = slas.id )
           #     WHERE sla_project_trackers.project_id = #{project.id}
           values = SlaLevel.joins(:sla_project_trackers).where("sla_project_trackers.project_id = ?", project.id).select("sla_levels.id, sla_levels.name").distinct.pluck(:name,:id)
-          add_available_filter('sla_level_id',
+          add_available_filter('slas.sla_level_id',
+                              :name => l("sla_label.sla_level.singular"),
                               :type => :list,
-                              :name => l(:sla_label_abbreviation)+" "+l("sla_label.sla_level.singular"),
                               :values => values
           ) unless available_filters_without_sla.key?('sla_level_id') && !User.current.allowed_to?(:view_sla, project, :global => true)
 
@@ -125,11 +125,18 @@ module RedmineSla
             SlaType.joins(:sla_project_trackers).where("sla_project_trackers.project_id = ?", project.id).select("sla_types.id, sla_types.name").distinct.each { |sla_type|
 
               # SLA RESPECT : Filter
-              add_available_filter("sla_respect_#{sla_type.id}",
+              add_available_filter("slas.sla_respect_#{sla_type.id}",
+                :name => l(:label_sla_respect)+" "+sla_type.name,
                 :type => :list,
-                :name => l(:sla_label_abbreviation)+" "+l(:label_sla_respect)+" "+sla_type.name,
                 :values => [[l(:general_text_Yes), '1'], [l(:general_text_No), '0']]
               ) unless available_filters_without_sla.key?("sla_respect_#{sla_type.id}") && !User.current.allowed_to?(:view_sla, project, :global => true)    
+
+              # SLA RESPECT : Filter Function
+              if ! singleton_methods.include? "sql_for_slas_sla_respect_#{sla_type.id}_field".to_sym
+                define_singleton_method("sql_for_slas_sla_respect_#{sla_type.id}_field") do |field, operator, value|
+                  sql_for_slas_sla_respect_field(field,operator,value,sla_type.id)
+                end
+              end
 
               # SLA RESPECT : Column
               name_to_sym = "sla_get_respect_#{sla_type.id}".to_sym
@@ -157,12 +164,6 @@ module RedmineSla
                 self.sortable
               end
               self.available_columns << sla_get_respect
-
-              if ! singleton_methods.include? "sql_for_sla_respect_#{sla_type.id}_field".to_sym
-                define_singleton_method("sql_for_sla_respect_#{sla_type.id}_field") do |field, operator, value|
-                  sql_for_sla_respect_field(field,operator,value,sla_type.id)
-                end
-              end
 
             }
 

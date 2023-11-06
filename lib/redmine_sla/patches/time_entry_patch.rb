@@ -50,7 +50,6 @@ module RedmineSla
       
       if ActiveRecord::Base.connection.table_exists? 'sla_types'
         SlaType.all.each { |sla_type|
-          Rails.logger.debug "==>> TimeEntryPatch InstanceMethods sla_get_respect_#{sla_type.id} for #{sla_type.name.to_sym} <<==="
           define_method("sla_get_respect_#{sla_type.id}") do 
             sla_get_respect(id,sla_type.id)
           end
