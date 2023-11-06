@@ -12,6 +12,7 @@ fr:
 
   sla_dictionary:
     sla: &sla Niveau de service
+    slas: &slas Niveaux de service
     name: &name Nom
     start_date: &start_date Date de début
     end_date: &end_date Date de fin
@@ -30,6 +31,7 @@ fr:
     sla_level: &sla_level Niveau de SLA
 
   field_sla: *sla
+  field_slas: *slas
   field_name: *name
   field_start_date: *start_date
   field_end_time: *end_time
