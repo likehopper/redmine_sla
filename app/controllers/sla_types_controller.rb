@@ -167,18 +167,13 @@ class SlaTypesController < ApplicationController
   end
 
   def post_create
-
     sla_type = @sla_type
-
-    Rails.logger.debug "==>> IssuePatch sla_types_controler sla_get_respect_#{sla_type.id} for #{sla_type.name.to_sym} <<==="
     RedmineSla::Patches::IssuePatch::define_method("sla_get_respect_#{sla_type.id}") do 
       sla_get_respect(id,sla_type.id)
     end
-    Rails.logger.debug "==>> TimeEntryPatch  sla_types_controler sla_get_respect_#{sla_type.id} for #{sla_type.name.to_sym} <<==="
     RedmineSla::Patches::TimeEntryPatch::define_method("sla_get_respect_#{sla_type.id}") do 
       sla_get_respect(id,sla_type.id)
     end
-
   end
 
 end
