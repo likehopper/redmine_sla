@@ -99,7 +99,7 @@ module RedmineSla
           # SLA LEVEL : Column
           sla_get_level = QueryColumn.new(
             :sla_get_level,
-            :caption => Proc.new { l(:sla_label_abbreviation)+" "+l("sla_label.sla_level.singular") },
+            :caption => "📢 "+l("sla_label.sla_level.singular"),
             :groupable => true,
             :sortable => "(SELECT sla_levels.name FROM sla_caches INNER JOIN sla_levels ON ( sla_caches.sla_level_id = sla_levels.id ) WHERE sla_caches.issue_id = issues.id ORDER BY sla_levels.name)",
           )
@@ -141,7 +141,7 @@ module RedmineSla
               self.available_columns.delete_if {|x| x.name == name }
               sla_get_respect = QueryColumn.new(
                 name_to_sym,
-                :caption => Proc.new { l(:sla_label_abbreviation)+" "+l(:label_sla_respect)+" "+sla_type.name },
+                :caption => "⏰ "+l(:label_sla_respect)+" "+sla_type.name,
                 :groupable => true,
                 :sortable => "(
                   SELECT DISTINCT CASE
