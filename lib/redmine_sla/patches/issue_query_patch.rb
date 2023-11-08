@@ -80,7 +80,10 @@ module RedmineSla
 
       def available_filters_with_sla
 
-        if @available_filters.blank?
+        if @available_filters.blank? &&
+           project&.project.module_enabled?(:sla) &&
+           ( User.current.admin? || User.current.allowed_to?(:view_sla, project, :global => true) ) 
+
           # SLA LEVEL : Filter
           # Equivalent query without "has_many...through"
           # for select only active sla_levels for this project :
@@ -94,7 +97,7 @@ module RedmineSla
                               :name => l(:field_sla_level),
                               :type => :list,
                               :values => values
-          ) unless available_filters_without_sla.key?('sla_level_id') && !User.current.allowed_to?(:view_sla, project, :global => true)
+          ) unless available_filters_without_sla.has_key?('slas.sla_level_id')
 
           # SLA LEVEL : Column
           sla_get_level = QueryColumn.new(
@@ -127,7 +130,7 @@ module RedmineSla
                 :name => l(:label_sla_respect)+" "+sla_type.name,
                 :type => :list,
                 :values => [[l(:general_text_Yes), '1'], [l(:general_text_No), '0']]
-              ) unless available_filters_without_sla.key?("sla_respect_#{sla_type.id}") && !User.current.allowed_to?(:view_sla, project, :global => true)              
+              ) unless available_filters_without_sla.key?("slas.sla_respect_#{sla_type.id}") && User.current.allowed_to?(:view_sla, project, :global => true)
     
               # SLA RESPECT : Filter Function
               if ! singleton_methods.include? "sql_for_slas_sla_respect_#{sla_type.id}_field".to_sym
