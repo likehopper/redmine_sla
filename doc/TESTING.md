@@ -16,3 +16,26 @@ Now, you have to run the units tests: `bundle exec rake redmine:plugins:test:fun
 
 ## Explore tests
 We suggest that you go see in the interface how the SLA are built with the comments in the section USECASE.
+
+### Users
+
+Five users have been created by the fixtures, the logins of which are:
+- admin
+- manager
+- developer
+- reporter
+- other
+  
+The password for each user is their login/name.
+
+### Roles
+
+Here are the roles of the available users
+
+| Name        | is_admin  | sla_manage  | sla_view  | Description |
+|-------------|-----------|-------------|-----------|-------------|
+| `admin`     |     x     |             |           | all this includes the SLA admin interface access |
+| `manager`   |           |      x      |     x     | View and manage SALs in projects                 |
+| `developer` |           |             |     x     | Only sees SLAs in project tickets                |
+| `reporter`  |           |             |           | Access projects without seeing SLAs in tickets   |
+| `other`     |           |             |           | Don't access any projects             |

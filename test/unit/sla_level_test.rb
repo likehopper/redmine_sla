@@ -1,9 +1,28 @@
+# frozen_string_literal: true
+
+# Redmine SLA - Redmine's Plugin 
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
 require File.expand_path('../../test_helper', __FILE__)
 
 class SlaLevelTest < ActiveSupport::TestCase
-  #include ActiveModel::Lint::Tests
 
-  fixtures :users,
+  fixtures \
+    :users,
+    :email_addresses,
     :roles,
     :enumerations,
     :issue_statuses,
@@ -45,15 +64,15 @@ class SlaLevelTest < ActiveSupport::TestCase
       issue_id = array_issue["issue_id"]
       @issue = Issue.find(issue_id) ;
 
-      puts "- process issue_id = #{issue_id}"
+      # puts "- process issue_id = #{issue_id}"
 
       if ( array_issue["sla_types"].empty? )
-        puts "- - process NO SLA for issue_id = #{issue_id}"
+        # puts "- - process NO SLA for issue_id = #{issue_id}"
       else 
 
         array_issue["sla_types"].each_key { |sla_type_id|
 
-          puts "- - process sla_type_id = #{sla_type_id}"
+          # puts "- - process sla_type_id = #{sla_type_id}"
 
           spent = array_issue["sla_types"][sla_type_id]["spent"].to_i
           term = array_issue["sla_types"][sla_type_id]["term"].to_i
@@ -61,11 +80,11 @@ class SlaLevelTest < ActiveSupport::TestCase
           sla_type_name = SlaType.find(sla_type_id).name
 
           if ( sla_type_name.nil? )
-            puts "- - - sla_type_id = #{sla_type_id} NOT FOUND"
+            # puts "- - - sla_type_id = #{sla_type_id} NOT FOUND"
             assert false
           end
 
-          puts "- - - > expected > spent = #{spent} for term = #{term}"
+          # puts "- - - > expected > spent = #{spent} for term = #{term}"
 
           sla_cache = SlaCache.find_or_new(issue_id)
           
@@ -78,15 +97,15 @@ class SlaLevelTest < ActiveSupport::TestCase
           sla_cache_spent = SlaCacheSpent.find_or_new(sla_cache.id,sla_type_id)
           sla_type_spent_issue = sla_cache_spent[:spent]
         
-          puts "- - - > found > spent = #{sla_type_spent_issue} for term = #{sla_type_term_issue}"
+          # puts "- - - > found > spent = #{sla_type_spent_issue} for term = #{sla_type_term_issue}"
 
           if ( sla_type_term_issue != term )
-            puts "- - - => DELAY #{sla_type_name} FAILED ==>> expected #{term} vs #{sla_type_term_issue} found"
+            # puts "- - - => DELAY #{sla_type_name} FAILED ==>> expected #{term} vs #{sla_type_term_issue} found"
             assert false
           end
 
           if ( sla_type_spent_issue != spent )
-            puts "- - - => SPENT #{sla_type_name} FAILED ==>> expected #{spent} vs #{sla_type_spent_issue} found"
+            # puts "- - - => SPENT #{sla_type_name} FAILED ==>> expected #{spent} vs #{sla_type_spent_issue} found"
             assert false
           end
 

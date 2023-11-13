@@ -130,7 +130,7 @@ module RedmineSla
                 :name => l(:label_sla_respect)+" "+sla_type.name,
                 :type => :list,
                 :values => [[l(:general_text_Yes), '1'], [l(:general_text_No), '0']]
-              ) unless available_filters_without_sla.key?("slas.sla_respect_#{sla_type.id}") && User.current.allowed_to?(:view_sla, project, :global => true)
+              ) unless available_filters_without_sla.key?("slas.sla_respect_#{sla_type.id}")
     
               # SLA RESPECT : Filter Function
               if ! singleton_methods.include? "sql_for_slas_sla_respect_#{sla_type.id}_field".to_sym
