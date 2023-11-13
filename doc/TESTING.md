@@ -10,9 +10,12 @@ Drop database, create database for core and all plugins : `bundle exec rake db:d
 First you can build fixtures with this command : `bundle exec rake redmine:plugins:redmine_sla:build_fixture TESTOPTS="-v -w -b" --trace`
 
 ## Lauch tests
-Now, you have to run the units tests: `bundle exec rake redmine:plugins:test:functionals NAME=redmine_sla TESTOPTS="-v -w -b" --trace`
+Now, you can run the units tests (such as controller actions or SLA calculations): `bundle exec rake redmine:plugins:test:units NAME=redmine_sla TESTOPTS="-v -w -b" --trace`
+But also functionals tests: `bundle exec rake redmine:plugins:test:functionals NAME=redmine_sla TESTOPTS="-v -w -b" --trace`
+But also functionals tests (like access rights): `bundle exec rake redmine:plugins:test:functionals NAME=redmine_sla TESTOPTS="-v -w -b" --trace`
+And why not all the tests: `bundle exec rake redmine:plugins:test NAME=redmine_sla TESTOPTS="-v -w -b" --trace`
 
-> **_NOTE:_** It's possible to reload defaults data after tests success : `bundle exec rake db:drop db:create db:migrate redmine:plugins:migrate redmine:load_default_data`
+> **_NOTE:_** It's possible to reload default data after tests success : `bundle exec rake db:drop db:create db:migrate redmine:plugins:migrate redmine:load_default_data`
 
 ## Explore tests
 We suggest that you go see in the interface how the SLA are built with the comments in the section USECASE.
