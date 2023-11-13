@@ -81,7 +81,7 @@ module RedmineSla
       def available_filters_with_sla
 
         if @available_filters.blank? &&
-           project&.project.module_enabled?(:sla) &&
+           project&.module_enabled?(:sla) &&
            ( User.current.admin? || User.current.allowed_to?(:view_sla, project, :global => true) ) 
 
           # SLA LEVEL : Filter
