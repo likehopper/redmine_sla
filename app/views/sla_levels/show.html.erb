@@ -20,7 +20,7 @@
   <tr>
     <th width="240px" colspan="2" style="border-top: solid darkgrey; border-left: solid darkgrey; border-right: solid darkgrey; text-align: right;"><%= l("sla_label.sla_level.plural") -%>&nbsp;<%= image_tag("arrow_right.png") -%></th>
     <% @sla_types= @sla_level
-          .sla_level_term
+          .sla_level_terms
           #.unscoped # To view all sla_types
           .select("sla_level_terms.sla_type_id AS id, sla_types.name AS name")
           .joins(:sla_type)
@@ -34,7 +34,7 @@
     <th width="240px" colspan="2" style="border-bottom: solid darkgrey; border-left: solid darkgrey; border-right: solid darkgrey; text-align: left;"><%= image_tag("arrow_down.png") -%>&nbsp;<%= l(:enumeration_issue_priorities) -%></th>
   </tr>
   <%  @sla_level
-        .sla_level_term
+        .sla_level_terms
         #.unscoped # To view all priorites
         .select("sla_level_terms.priority_id AS id, enumerations.name AS name, enumerations.position AS position")
         .joins(:priority)
