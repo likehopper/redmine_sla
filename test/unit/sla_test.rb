@@ -18,7 +18,7 @@
 
 require File.expand_path('../../test_helper', __FILE__)
 
-class SlaCacheTest < ActiveSupport::TestCase
+class SlaTest < ActiveSupport::TestCase
 
   fixtures \
     :users,
@@ -47,21 +47,35 @@ class SlaCacheTest < ActiveSupport::TestCase
     :journals,
     :journal_details
 
-  setup do
+  include Redmine::I18n
+
+  def setup
+    User.current = nil
+    set_language_if_valid 'en'
   end
 
-  test "#SlaCaches purge" do
-    SlaCache.purge()
-    assert SlaCache.count(:all).zero?
+  def teardown
+    User.current = nil
   end
 
-  test "#SlaCaches count" do
-    assert SlaCache.count(:all).zero?
-  end
-
-  def test_truth
+  test "the truth" do
     assert true
   end
 
-end
+  test "Just initialize" do
+    sla = Sla.new
+    assert_nil sla.name
+  end
 
+  test "should not save Sla without name" do
+    sla = Sla.new
+    assert_not sla.save, "Saved the Sla without name"
+  end
+
+  test "should save Sla with name" do
+    sla = Sla.new
+    sla.name = "Sla Test !"
+    assert sla.save, "Saved the Sla with name"
+  end
+
+end
