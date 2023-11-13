@@ -10,18 +10,26 @@ Drop database, create database for core and all plugins : `bundle exec rake db:d
 First you can build fixtures with this command : `bundle exec rake redmine:plugins:redmine_sla:build_fixture TESTOPTS="-v -w -b" --trace`
 
 ## Lauch tests
-Now, you can run the units tests (such as controller actions or SLA calculations): `bundle exec rake redmine:plugins:test:units NAME=redmine_sla TESTOPTS="-v -w -b" --trace`
+
+### Units
+Now, you can run the units tests: `bundle exec rake redmine:plugins:test:units NAME=redmine_sla TESTOPTS="-v -w -b" --trace`
+
+> **_NOTE:_** Unit tests are such as controller actions or SLA calculations.
+
+### Functionals
 But also functionals tests: `bundle exec rake redmine:plugins:test:functionals NAME=redmine_sla TESTOPTS="-v -w -b" --trace`
-But also functionals tests (like access rights): `bundle exec rake redmine:plugins:test:functionals NAME=redmine_sla TESTOPTS="-v -w -b" --trace`
+
+> **_NOTE:_** Unit tests are particularly like access rights.
+
+### All
 And why not all the tests: `bundle exec rake redmine:plugins:test NAME=redmine_sla TESTOPTS="-v -w -b" --trace`
 
 > **_NOTE:_** It's possible to reload default data after tests success : `bundle exec rake db:drop db:create db:migrate redmine:plugins:migrate redmine:load_default_data`
 
-## Explore tests
+## Explore tests
 We suggest that you go see in the interface how the SLA are built with the comments in the section USECASE.
 
-### Users
-
+### Users
 Five users have been created by the fixtures, the logins of which are:
 - admin
 - manager
@@ -31,9 +39,8 @@ Five users have been created by the fixtures, the logins of which are:
   
 The password for each user is their login/name.
 
-### Roles
-
-Here are the roles of the available users
+### Roles
+Here are the roles of the available users:
 
 | Name        | is_admin  | sla_manage  | sla_view  | Description |
 |-------------|-----------|-------------|-----------|-------------|
