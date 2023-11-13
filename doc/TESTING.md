@@ -24,10 +24,10 @@ But also functionals tests: `bundle exec rake redmine:plugins:test:functionals N
 ### All
 And why not all the tests: `bundle exec rake redmine:plugins:test NAME=redmine_sla TESTOPTS="-v -w -b" --trace`
 
-> **_NOTE:_** It's possible to reload default data after tests success : `bundle exec rake db:drop db:create db:migrate redmine:plugins:migrate redmine:load_default_data`
-
 ## Explore tests
 We suggest that you go see in the interface how the SLA are built with the comments in the section USECASE.
+
+> **_NOTE:_** It's possible to reload default data after tests success : `bundle exec rake db:drop db:create db:migrate redmine:plugins:migrate redmine:load_default_data`
 
 ### Users
 Five users have been created by the fixtures, the logins of which are:
