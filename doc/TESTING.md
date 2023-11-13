@@ -19,7 +19,7 @@ Now, you can run the units tests: `bundle exec rake redmine:plugins:test:units N
 ### Functionals
 But also functionals tests: `bundle exec rake redmine:plugins:test:functionals NAME=redmine_sla TESTOPTS="-v -w -b" --trace`
 
-> **_NOTE:_** Unit tests are particularly like access rights.
+> **_NOTE:_** Functional tests are particularly like access rights.
 
 ### All
 And why not all the tests: `bundle exec rake redmine:plugins:test NAME=redmine_sla TESTOPTS="-v -w -b" --trace`
