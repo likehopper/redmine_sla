@@ -74,7 +74,7 @@ roles_001:
     - :import_issues
   position: 1
 roles_002:
-  name: Developer
+  name: Resolver
   id: 2
   builtin: 0
   issues_visibility: default
