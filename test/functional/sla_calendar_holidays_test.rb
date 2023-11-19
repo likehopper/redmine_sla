@@ -50,7 +50,7 @@ class SlaCalendarHolidaysControllerTest < Redmine::ControllerTest
     end
   end  
 
-  ### As admin ###
+  ### As admin #1 ###
 
   test "should get success on index as admin" do
     @request.session[:user_id] = 1
@@ -80,7 +80,7 @@ class SlaCalendarHolidaysControllerTest < Redmine::ControllerTest
     end
   end
 
-  ### As manager ###
+  ### As manager #2 ###
 
   test "should return 403 on get index as manager" do
     @request.session[:user_id] = 2
@@ -106,7 +106,7 @@ class SlaCalendarHolidaysControllerTest < Redmine::ControllerTest
     end
   end
 
-  ### As developper ###
+  ### As developper #3 ###
 
   test "should return 403 on get index as developper" do
     @request.session[:user_id] = 3
@@ -132,9 +132,9 @@ class SlaCalendarHolidaysControllerTest < Redmine::ControllerTest
     end
   end
 
-  ### As reporter ###
+  ### As reporter #4 ###
 
-  test "should return 403 on get index as reporter" do
+  test "should return 403 on get index as sysadmin" do
     @request.session[:user_id] = 4
     with_settings :default_language => "en" do
       get :index
@@ -142,7 +142,7 @@ class SlaCalendarHolidaysControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should return 403 on get show as reporter" do
+  test "should return 403 on get show as sysadmin" do
     @request.session[:user_id] = 4
     with_settings :default_language => "en" do
       get(:show, :params => {:id => 1})
@@ -150,7 +150,7 @@ class SlaCalendarHolidaysControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should return 403 on get edit as reporter" do
+  test "should return 403 on get edit as sysadmin" do
     @request.session[:user_id] = 4
     with_settings :default_language => "en" do
       get(:edit, :params => {:id => 1})
@@ -158,9 +158,9 @@ class SlaCalendarHolidaysControllerTest < Redmine::ControllerTest
     end
   end
 
-  ### As other ###
+  ### As other #5 ###
 
-  test "should return 403 on get index as other" do
+  test "should return 403 on get index as reporter" do
     @request.session[:user_id] = 5
     with_settings :default_language => "en" do
       get :index
@@ -168,7 +168,7 @@ class SlaCalendarHolidaysControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should return success on get show as other" do
+  test "should return success on get show as reporter" do
     @request.session[:user_id] = 5
     with_settings :default_language => "en" do
       get(:show, :params => {:id => 1})
@@ -176,8 +176,34 @@ class SlaCalendarHolidaysControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should return success on get edit as other" do
+  test "should return success on get edit as reporter" do
     @request.session[:user_id] = 5
+    with_settings :default_language => "en" do
+      get(:edit, :params => {:id => 1})
+      assert_response 403
+    end
+  end
+
+  ### As other #6 ###
+
+  test "should return 403 on get index as other" do
+    @request.session[:user_id] = 6
+    with_settings :default_language => "en" do
+      get :index
+      assert_response 403
+    end
+  end
+
+  test "should return success on get show as other" do
+    @request.session[:user_id] = 6
+    with_settings :default_language => "en" do
+      get(:show, :params => {:id => 1})
+      assert_response 403
+    end
+  end
+
+  test "should return success on get edit as other" do
+    @request.session[:user_id] = 6
     with_settings :default_language => "en" do
       get(:edit, :params => {:id => 1})
       assert_response 403
