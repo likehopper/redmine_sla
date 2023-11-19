@@ -20,33 +20,6 @@ require File.expand_path('../../test_helper', __FILE__)
 
 class SlaCalendarHolidaysControllerTest < Redmine::ControllerTest
 
-  fixtures \
-    :users,
-    :email_addresses,
-    :roles,
-    :enumerations,
-    :issue_statuses,
-    :trackers,
-    :workflows,
-    :slas,
-    :sla_calendars,
-    :sla_holidays,
-    :sla_calendar_holidays,
-    :sla_schedules,
-    :sla_types,
-    :sla_levels,
-    :sla_level_terms,
-    :sla_statuses,
-    :projects,
-    :members,
-    :member_roles,
-    :projects_trackers,
-    :sla_project_trackers,
-    :enabled_modules,
-    :issues,
-    :journals,
-    :journal_details
-
   include Redmine::I18n
 
   def setup
