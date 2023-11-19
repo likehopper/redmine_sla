@@ -104,8 +104,8 @@ namespace :redmine do
         issue_statuses = {
           "New"      => { "id" => 1, "name" => "New",      "is_closed" => false, "position" => 1 },
           "Assigned" => { "id" => 2, "name" => "Assigned", "is_closed" => false, "position" => 2 },
-          "Resolved" => { "id" => 3, "name" => "Resolved", "is_closed" => false, "position" => 3 },
-          "Feedback" => { "id" => 4, "name" => "Feedback", "is_closed" => false, "position" => 4 },
+          "Feedback" => { "id" => 3, "name" => "Feedback", "is_closed" => false, "position" => 3 },
+          "Resolved" => { "id" => 4, "name" => "Resolved", "is_closed" => false, "position" => 4 },
           "Closed"   => { "id" => 5, "name" => "Closed",   "is_closed" => true,  "position" => 5 },
           "Rejected" => { "id" => 6, "name" => "Rejected", "is_closed" => true,  "position" => 6 },
         }
@@ -161,7 +161,7 @@ namespace :redmine do
             member_new = {
                 "id" => member_id,
                 "project_id" => project_id, 
-                "user_id" => 2, # manager
+                "user_id" => 2, # user manager
                 "created_on" => "2021-11-11 11:11:11 CET",
                 "mail_notification" => false,
             }
@@ -172,17 +172,17 @@ namespace :redmine do
             member_role_new = {
                 "id" => member_role_id,
                 "member_id" => member_id,
-                "role_id" => 1,
+                "role_id" => 1, # role manager
             }
             member_roles[member_role_identifier] = member_role_new   
 
-            # members module activation for user developer
+            # members module activation for role « resolver » ( user developer & sysadmin )
             member_id += 1
             member_identifier = project_identifier+"_members_"+member_id.to_s.rjust(4,"0")
             member_new = {
                 "id" => member_id,
                 "project_id" => project_id, 
-                "user_id" => 3,
+                "user_id" => row["resolver"], #  role resolver = user developer & sysadmin
                 "created_on" => "2021-11-11 11:11:11 CET",
                 "mail_notification" => false,
             }
@@ -193,7 +193,7 @@ namespace :redmine do
             member_role_new = {
                 "id" => member_role_id,
                 "member_id" => member_id,
-                "role_id" => 2,
+                "role_id" => 2, # role resolver
             }
             member_roles[member_role_identifier] = member_role_new  
 
@@ -203,7 +203,7 @@ namespace :redmine do
             member_new = {
                 "id" => member_id,
                 "project_id" => project_id, 
-                "user_id" => 4,
+                "user_id" => 5, # user reporter
                 "created_on" => "2021-11-11 11:11:11 CET",
                 "mail_notification" => false,
             }
@@ -214,7 +214,7 @@ namespace :redmine do
             member_role_new = {
                 "id" => member_role_id,
                 "member_id" => member_id,
-                "role_id" => 3,
+                "role_id" => 3, # role reporter
             }
             member_roles[member_role_identifier] = member_role_new          
 
@@ -282,8 +282,8 @@ namespace :redmine do
               "description" => row["issue_description"],
               "project_id" => project_id,
               "tracker_id" => tracker_id,
-              "assigned_to_id" => 1,
-              "author_id" => 1,
+              "assigned_to_id" => row["resolver"], # role resolver = user developer & sysadmin
+              "author_id" => 5, # user reporter
               "status_id" => status_id,
               "priority_id" => enumerations[row["issue_priority"]]["id"],
               "created_on" => row["issue_date_created"],
@@ -308,7 +308,7 @@ namespace :redmine do
 
           journal_new = {
             "id" => journal_id_1,
-            "user_id" => 1,
+            "user_id" => 5, # user reporter
             "journalized_id" => issue_id,
             "journalized_type" => "Issue",
             "created_on" => row["issue_date_assigned"],
@@ -317,7 +317,7 @@ namespace :redmine do
           journals[journal_identifier_1] = journal_new
           journal_new = {
             "id" => journal_id_2,
-            "user_id" => 1,
+            "user_id" => row["resolver"], # role resolver = user developer & sysadmin
             "journalized_id" => issue_id,
             "journalized_type" => "Issue",
             "created_on" => row["issue_date_resolved"],
@@ -326,7 +326,7 @@ namespace :redmine do
           journals[journal_identifier_2] = journal_new
           journal_new = {
             "id" => journal_id_3,
-            "user_id" => 1,
+            "user_id" => 2, # user manager
             "journalized_id" => issue_id,
             "journalized_type" => "Issue",
             "created_on" => row["issue_date_closed"],
