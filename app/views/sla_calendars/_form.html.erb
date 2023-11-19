@@ -1,12 +1,12 @@
 <%= javascript_include_tag :redmine_sla, :plugin => 'redmine_sla' %>
-<%= form_with model: @sla_calendar, local: true do |sla_calendar_form| %>
+<%= form_with model: @sla_calendar, id: 'sla_calendar-form', local: true do |sla_calendar_form| %>
   <%= error_messages_for @sla_calendar %>
   <%= error_messages_for @sla_schedule %>
   <fieldset>
     <legend><%= l('sla_label.sla_calendar.singular') %></legend>
     <div>
-      <%= sla_calendar_form.label :name %>
-      <%= sla_calendar_form.text_field :name, :required => true %>
+      <%= sla_calendar_form.label :name, :for => "sla_calendar_name"%><span class="required"> *</span>
+      <%= sla_calendar_form.text_field :name, :id => "sla_calendar_name", :required => true %>
     </div>
     <fieldset>
       <legend><%= l('sla_label.sla_schedule.plural') %></legend>
@@ -16,5 +16,9 @@
       <%= link_to_add_fields "Add Schedule", sla_calendar_form, :sla_schedules %>
     </fieldset>    
   </fieldset>
-  <%= sla_calendar_form.submit %>
+  <% if sla_calendar_form.object.new_record? %>
+    <%= submit_tag l('sla_label.sla_calendar.new'), title: l(:button_create), class: "button-positive" %>
+  <% else %>
+    <%= submit_tag l('sla_label.sla_calendar.edit'), title: l(:button_update), class: "button-positive" %>
+  <% end %>  
 <% end %>

@@ -20,38 +20,12 @@ require File.expand_path('../../test_helper', __FILE__)
 
 class SlaLevelTest < ActiveSupport::TestCase
 
-  fixtures \
-    :users,
-    :email_addresses,
-    :roles,
-    :enumerations,
-    :issue_statuses,
-    :trackers,
-    :workflows,
-    :slas,
-    :sla_calendars,
-    :sla_holidays,
-    :sla_calendar_holidays,
-    :sla_schedules,
-    :sla_types,
-    :sla_levels,
-    :sla_level_terms,
-    :sla_statuses,
-    :projects,
-    :members,
-    :member_roles,
-    :projects_trackers,
-    :sla_project_trackers,
-    :enabled_modules,
-    :issues,
-    :journals,
-    :journal_details
-
   setup do
   end
 
-    # Load yml config
-    @@array_fixtures_issues = YAML.load_file(Dir.pwd+"/plugins/redmine_sla/test/config/fixtures.yml")
+  # TODO: put array_fixtures_issues in setup ?
+  # Load yml config
+  @@array_fixtures_issues = YAML.load_file(Dir.pwd+"/plugins/redmine_sla/test/config/fixtures.yml")
 
 
   test "#SlaLevelTest SLA for issues from fixtures" do
@@ -64,7 +38,7 @@ class SlaLevelTest < ActiveSupport::TestCase
       issue_id = array_issue["issue_id"]
       @issue = Issue.find(issue_id) ;
 
-      # puts "- process issue_id = #{issue_id}"
+      puts "- process issue_id = #{issue_id}"
 
       if ( array_issue["sla_types"].empty? )
         # puts "- - process NO SLA for issue_id = #{issue_id}"

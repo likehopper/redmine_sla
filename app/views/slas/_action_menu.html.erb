@@ -1,0 +1,10 @@
+<div class="contextual">
+  <%= link_to l('sla_label.sla.plural'), slas_path, class: 'icon icon-cancel' %>
+  <%= link_to l(:button_edit), edit_sla_path(@sla), title: l(:button_edit),
+              :class => 'icon icon-edit', :accesskey => accesskey(:edit) if @sla.editable? %>
+  <%= link_to l(:button_delete), sla_path(@sla),
+              :data => {:confirm => l(:text_are_you_sure)}, title: l(:button_delete),
+              :method => :delete,
+              :class => 'icon icon-del' if @sla.deletable? %>
+</div>
+  
