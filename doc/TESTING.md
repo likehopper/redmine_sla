@@ -38,7 +38,8 @@ We suggest that you go see in the interface how the SLA are built with the comme
 Five users have been created by the fixtures, the logins of which are:
 - admin
 - manager
-- developer
+- developer ( only access to one project of TMA )
+- sysadmin ( only access to two projects of infrastructure )
 - reporter
 - other
   
@@ -51,6 +52,6 @@ Here are the roles of the available users:
 |-------------|-----------|-------------|-----------|-------------|
 | `admin`     |     x     |             |           | all this includes the SLA admin interface access |
 | `manager`   |           |      x      |     x     | View and manage SALs in projects                 |
-| `developer` |           |             |     x     | Only sees SLAs in project tickets                |
+| `resolver`  |           |             |     x     | Only sees SLAs in project tickets                |
 | `reporter`  |           |             |           | Access projects without seeing SLAs in tickets   |
 | `other`     |           |             |           | Don't access any projects             |
