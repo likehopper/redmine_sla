@@ -1,11 +1,7 @@
 <% html_title(l(:sla_label_global_settings)) -%>
 <div class="content"> 
   <div class="contextual">
-    <% if User.current.admin? -%>
-      <%= link_to l('sla_label.sla_calendar.plural'), sla_calendars_path, class: 'icon icon-cancel' -%>
-    <% else -%>
-      <%= link_to l(:button_back), :back, :class => 'button', :title => l(:button_back) -%>
-    <% end -%>
+    <%= render :partial => 'action_menu' %>
   </div>
   <div class="title-sla-settings title-sla_calendar">
     <%= title l('sla_label.sla_calendar.plural') -%>

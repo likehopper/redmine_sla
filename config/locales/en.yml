@@ -137,6 +137,7 @@ en:
       edit: Edit SLA
       delete: Delete SLA
       miss: Miss SLA
+      notice_successful_create: "SLA %{id} created."
 
     # SlaType
     sla_type:
@@ -150,6 +151,7 @@ en:
       edit: Edit SLA Type
       delete: Delete SLA Type
       miss: Miss SLA Type
+      notice_successful_create: "SLA Type %{id} created."
 
     # SlaStatus
     sla_status:
@@ -189,6 +191,7 @@ en:
       edit: Edit SLA Calendar
       delete: Delete SLA Calendar
       miss: Miss SLA Calendar
+      notice_successful_create: "SLA Calendar %{id} created."
 
     # SlaSchedule
     sla_schedule:

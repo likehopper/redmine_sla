@@ -67,7 +67,9 @@ class SlaTypesController < ApplicationController
       post_create
       respond_to do |format|
         format.html do
-          flash[:notice] = l(:notice_successful_create)
+          flash[:notice] = l("sla_label.sla_type.notice_successful_create",
+            :id => view_context.link_to("##{@sla_type.id}", sla_type_path(@sla_type), :title => @sla_type.name)
+          )
           redirect_back_or_default sla_types_path
         end
         format.api do

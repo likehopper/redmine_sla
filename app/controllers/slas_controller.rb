@@ -65,7 +65,9 @@ class SlasController < ApplicationController
     if @sla.save
       respond_to do |format|
         format.html do
-          flash[:notice] = l(:notice_successful_create)
+          flash[:notice] = l("sla_label.sla.notice_successful_create",
+            :id => view_context.link_to("##{@sla.id}", sla_path(@sla), :title => @sla.name)
+          )
           redirect_back_or_default slas_path
         end
         format.api do
