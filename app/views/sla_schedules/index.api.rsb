@@ -4,8 +4,8 @@ api.array :sla_schedules, api_meta(:total_count => @entity_count, :offset => @of
       api.id entity.id
       api.sla_calendar_id entity.sla_calendar_id
       api.dow entity.dow
-      api.start_time entity.start_time
-      api.end_time entity.end_time
+      api.start_time entity.start_time.strftime('%H:%M')
+      api.end_time entity.end_time.strftime('%H:%M')
       api.match entity.match
     end
   end
