@@ -42,7 +42,15 @@ module SlaIssueHelper
         percent = 100
     end # case percent
 
-    css_type = ( type == "pie" ? "sla_pie" : "sla_bar" )
+    case type
+      when "pie - modern"
+        css_type = "sla_pie_modern"
+      when "pie - flat"
+        css_type = "sla_pie_flat"
+      else
+        css_type = "sla_bar"
+    end
+
     css_class = [ 'sla_display', css_color, css_type ].join(' ')
     
     return content_tag('div', label, :label=>label, :class=>css_class, :style=>"--p:#{percent.to_s}").html_safe

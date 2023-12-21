@@ -68,11 +68,11 @@
     border-radius: 5%;   
   }
 
-  .sla_pie {
-    --p:20;
+  .sla_pie_modern {
+    --p:50;
     --b:5px;
-    --c:green;
     --w:50px;
+    --c:green;
     width: var(--w);
     aspect-ratio: 1;
     position: relative;
@@ -83,13 +83,13 @@
     font-weight: bold;
     font-family: sans-serif;
   }
-  .sla_pie:before,
-  .sla_pie:after {
+  .sla_pie_modern:before,
+  .sla_pie_modern:after {
     content: "";
     position: absolute;
     border-radius: 50%;
   }
-  .sla_pie:before {
+  .sla_pie_modern:before {
     inset: 0;
     background:
       radial-gradient(farthest-side,var(--c) 98%,#0000) top/var(--b) var(--b) no-repeat,
@@ -97,12 +97,37 @@
     -webkit-mask: radial-gradient(farthest-side,#0000 calc(99% - var(--b)),#000 calc(100% - var(--b)));
             mask: radial-gradient(farthest-side,#0000 calc(99% - var(--b)),#000 calc(100% - var(--b)));
   }
-  .sla_pie:after {
+  .sla_pie_modern:after {
     inset: calc(50% - var(--b)/2);
     background: var(--c);
     transform: rotate(calc(var(--p)*3.6deg)) translateY(calc(50% - var(--w)/2));
   }
   /*** Thanks for PieChart to https://www.freecodecamp.org/news/css-only-pie-chart/ ***/
+
+  .sla_pie_flat {
+    --p: 50;
+    --b: 8px;
+    --w: 40px;
+    --c: green;
+    --r: darkgrey;
+    width: var(--w);
+    height: var(--w);
+    margin: 1em auto;
+    border: var(--b) solid transparent;
+    border-radius: 50%;
+    background: linear-gradient(lightyellow, lightyellow) padding-box,
+    conic-gradient(var(--c) calc(var(--p)*1%), var(--r) calc(var(--p)*1%)) border-box;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+  }
+  .sla_pie_flat p {
+    position: relative;
+    z-index: 1;
+    font-size: 12px;
+  }
 
 }
 
