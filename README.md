@@ -108,7 +108,7 @@ Here is a list of possible evolutions without prioritization :
 3. Launch install plugin to create tables, functions and view `rake redmine:plugins:migrate NAME=redmine_sla`
 4. Restart your application server (apache with passenger, nginx with passenger, unicorn, puma, etc.) and Additionals is ready to use.
 
-More information about installation of Redmine plugins, you can find in the official [Redmine plugin documentation](https://www.redmine.org/projects/redmine/wiki/Plugins>).
+More information about installation of Redmine plugins, you can find in the official [Redmine plugin documentation](https://www.redmine.org/projects/redmine/wiki/Plugins).
 
 
 ### Uninstall
