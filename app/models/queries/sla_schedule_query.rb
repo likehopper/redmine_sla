@@ -18,6 +18,8 @@
 
 class Queries::SlaScheduleQuery < Query
 
+  unloadable
+
   self.queried_class = SlaSchedule
 
   def initialize_available_filters
@@ -67,18 +69,13 @@ class Queries::SlaScheduleQuery < Query
   def sla_schedules(options={})
     order_option = [group_by_sort_order, (options[:order] || sort_clause)].flatten.reject(&:blank?)
 
-    scope = SlaSchedule.visible.
-        where(statement).
+    scope = self.queried_class.visible.where(statement).
         includes(((options[:include] || [])).uniq).
         where(options[:conditions]).
         order(order_option).
         joins(joins_for_order_statement(order_option.join(','))).
         limit(options[:limit]).
         offset(options[:offset])
-
-    if has_custom_field_column?
-      scope = scope.preload(:custom_values)
-    end
 
     sla_schedules = scope.to_a
 

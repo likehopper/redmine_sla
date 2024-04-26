@@ -176,5 +176,12 @@
 .title-sla_level h2 { background-image:url('../images/sla_level_32.png'); }
 .icon-sla_level_term { background-image:url('../images/sla_level_term_16.png'); }
 .title-sla_level_term h2 { background-image:url('../images/sla_level_term_32.png'); }
+.icon-sla_cache { background-image:url('../images/sla_cache_16.png'); }
+.title-sla_cache h2 { background-image:url('../images/sla_cache_32.png'); }
+.icon-sla_cache_spent { background-image:url('../images/sla_cache_spent_16.png'); }
+.title-sla_cache_spent h2 { background-image:url('../images/sla_cache_spent_32.png'); }
+
+.icon-sla_cache_refresh { background-image:url('../images/sla_cache_refresh_16.png'); }
+.icon-sla_cache_spent_refresh { background-image:url('../images/sla_cache_spent_refresh_16.png'); }
 
 .redmine_sla_footer { border-top: 1px solid#bbb; font-size: 0.9em; color: #aaa; padding: 5px; text-align:center;}

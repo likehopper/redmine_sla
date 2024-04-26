@@ -13,4 +13,4 @@ SELECT DATE_TRUNC( 'MINUTE', TIMEZONE(
       ), 'Etc/UTC' )
   ), p_date AT TIME ZONE 'Etc/UTC'
 ) )
-;$BODY$;
+$BODY$

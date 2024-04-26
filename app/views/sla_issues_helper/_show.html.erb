@@ -29,6 +29,8 @@ if User.current.allowed_to?(:view_sla, @project, :global => true)
       end
       sla_term = sla_level_term[:term]
 
+      Rails.logger.info "==>> SLA ISSUE SHOW ==> sla_cache = #{sla_cache.id}"
+
       sla_cache_spent = SlaCacheSpent.find_or_new(sla_cache.id,sla_type.id)
       sla_spent = sla_cache_spent[:spent]
         
@@ -40,7 +42,7 @@ if User.current.allowed_to?(:view_sla, @project, :global => true)
 
         sla_percent = ( sla_spent * 100 / sla_term ).round()
 
-        sla_helper = Object.new.extend(SlaIssueHelper)
+        sla_helper = Object.new.extend(SlaIssuesHelper)
   -%>
         <li class="flex-item">
           <table>

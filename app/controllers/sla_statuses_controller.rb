@@ -126,9 +126,10 @@ class SlaStatusesController < ApplicationController
     if @sla_statuses.size == 1
       @sla_status = @sla_statuses.first
     end
+    can_show = @sla_statuses.detect{|c| !c.visible?}.nil?
     can_edit = @sla_statuses.detect{|c| !c.editable?}.nil?
     can_delete = @sla_statuses.detect{|c| !c.deletable?}.nil?
-    @can = {edit: can_edit, delete: can_delete}
+    @can = {show: can_show, edit: can_edit, delete: can_delete}
     @back = back_url
     @sla_status_ids, @safe_attributes, @selected = [], [], {}
     @sla_statuses.each do |e|

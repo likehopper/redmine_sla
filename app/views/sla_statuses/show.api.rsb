@@ -1,5 +1,5 @@
     api.sla_status do
       api.id @sla_status.id
-      api.sla_type_id @sla_status.sla_type_id
-      api.status_id @sla_status.status_id
+      api.sla_type @sla_status.sla_type
+      api.status @sla_status.status
     end

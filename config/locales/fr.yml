@@ -5,6 +5,9 @@ fr:
 
   msgerror: Message d'erreur
 
+  button_refresh: Actualiser
+  notice_successful_refresh: L'actualisation est terminée
+
   sla_log_level_none: Aucun
   sla_log_level_error: Erreurs
   sla_log_level_info: Informations
@@ -20,34 +23,41 @@ fr:
     start_time: &start_time Heure de début
     end_time: &end_time Heure de fin
     date: &date Date
+    updated_on: &updated_on Mis-à-jour
     priority: &priority Priorité
     match: &match Correspondance
     term: &term Engagement
     status: &status Statut
+    spent: &spent Temps passé
     sla_holiday: &sla_holiday Jour férié de SLA
     sla_calendar: &sla_calendar Calendrier de SLA
     sla_schedule: &sla_schedule Horaire de SLA
     sla_type: &sla_type Type de SLA
     sla_level: &sla_level Niveau de SLA
+    sla_cache: &sla_cache Cache de SLA
+    sla_cache_spent: &sla_cache_spent Délai du cache de SLA
 
   field_sla: *sla
   field_slas: *slas
   field_name: *name
   field_start_date: *start_date
-  field_end_time: *end_time
+  field_end_date: *end_date
   field_dow: *dow
   field_start_time: *start_time
-  field_end_date: *end_date
+  field_end_time: *end_time
   field_date: *date
   field_priority: *priority
   field_match: *match
   field_term: *term
   field_status: *status
+  field_spent: *spent
   field_sla_holiday: *sla_holiday
   field_sla_calendar: *sla_calendar
   field_sla_schedule: *sla_schedule
   field_sla_type: *sla_type
   field_sla_level: *sla_level
+  field_sla_cache: *sla_cache
+  field_sla_cache_spent: *sla_cache_spent
 
   activerecord:
     models:
@@ -56,6 +66,8 @@ fr:
       sla_schedule: *sla_schedule
       sla_type: *sla_type
       sla_level: *sla_level
+      sla_cache: *sla_cache
+      sla_cache_spent: *sla_cache_spent
     attributes:
       sla:
         sla: *sla
@@ -107,6 +119,20 @@ fr:
         sla_type_id: *sla_type
         priority: *priority
         term: *term
+      sla_cache:
+        sla_cache: *sla_cache
+        sla_cache_id: *sla_cache
+        sla_level: *sla_level
+        sla_level_id: *sla_level
+        start_date: *start_date
+        updated_on: *updated_on
+      sla_cache_spent:
+        sla_cache_spent: *sla_cache_spent
+        sla_cache_spent_id: *sla_cache_spent
+        sla_type: *sla_type
+        sla_type_id: *sla_type
+        spent: *spent
+        updated_on: *updated_on
 
   sla_label_abbreviation: SLA
   sla_label_global_settings: Configuration globale des SLA
@@ -115,11 +141,6 @@ fr:
 
   sla_label:
 
-    # SlaCache
-    sla_cache:
-      manage: Gestion du cache des SLA
-      ttl: Durée de vie du cache des SLA (en minutes)
-      
     # SlaLog
     sla_log:
       error_logs: Journaux d'erreurs des SLA
@@ -257,6 +278,33 @@ fr:
       edit: Editer un Tracker de projet de SLA
       delete: Supprimer un Tracker de projet de SLA
       exists: Ce tracker existe déjà
+
+    # SlaCache
+    sla_cache:
+      singular: Cache de SLA
+      plural: Caches de SLA
+      count:
+        zero: Pas de Cache SLA
+        one: Un Cache de SLA
+        other: "%{count} Caches de SLA"
+      show: Voir un cache de SLA
+      delete: Purge de Cache de SLA
+      miss: Cache de SLA manquant
+      manage: Gestion de Cache de SLA
+      ttl: Durée de vie de Cache de SLA (en minutes) 
+
+    # SlaCacheSpent
+    sla_cache_spent:
+      singular: Délai du cache de SLA
+      plural: Délais du cache de SLA
+      count:
+        zero: Pas de délai du cache SLA
+        one: Un délai du cache de SLA
+        other: "%{count} délais du cache de SLA"
+      show: Voir un délai du cache de SLA
+      delete: Purge de délai du cache de SLA
+      miss: Délai du cache de SLA manquant
+      manage: Gestion de délai du cache de SLA
 
   # Autres
   label_sla_title_horaire_am: Horaires AM

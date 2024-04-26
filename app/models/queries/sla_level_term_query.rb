@@ -18,6 +18,8 @@
 
 class Queries::SlaLevelTermQuery < Query
 
+  unloadable
+  
   self.queried_class = SlaLevelTerm
 
   def initialize_available_filters
@@ -32,10 +34,10 @@ class Queries::SlaLevelTermQuery < Query
     @available_columns = []
     group = l("label_filter_group_#{self.class.name.underscore}")
 
-    @available_columns << QueryColumn.new(:sla_level, :sortable => nil, :default_order => nil, :groupable => false)
-    @available_columns << QueryColumn.new(:sla_type, :sortable => nil, :default_order => nil, :groupable => false)
-    @available_columns << QueryColumn.new(:priority, :sortable => nil, :default_order => nil, :groupable => false)
-    @available_columns << QueryColumn.new(:term, :sortable => nil, :default_order => nil, :groupable => false)
+    @available_columns << QueryColumn.new(:sla_level, :sortable => "#{SlaLevel.table_name}.name", :default_order => :asc, :groupable => true)
+    @available_columns << QueryColumn.new(:sla_type, :sortable => "#{SlaType.table_name}.name", :default_order => :asc, :groupable => true)
+    @available_columns << QueryColumn.new(:priority, :sortable => "#{IssuePriority.table_name}.position", :default_order => :asc, :groupable => true)
+    @available_columns << QueryColumn.new(:term, :sortable => "#{SlaLevelTerm.table_name}.term", :default_order => nil, :groupable => false)
     @available_columns
   end
 
@@ -61,8 +63,7 @@ class Queries::SlaLevelTermQuery < Query
   def sla_level_terms(options={})
     order_option = [group_by_sort_order, (options[:order] || sort_clause)].flatten.reject(&:blank?)
 
-    scope = SlaLevelTerm.visible.
-        where(statement).
+    scope = base_scope.
         includes(((options[:include] || [])).uniq).
         where(options[:conditions]).
         order(order_option).
@@ -70,16 +71,16 @@ class Queries::SlaLevelTermQuery < Query
         limit(options[:limit]).
         offset(options[:offset])
 
-    if has_custom_field_column?
-      scope = scope.preload(:custom_values)
-    end
-
     sla_level_terms = scope.to_a
-
     sla_level_terms
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)
   end
+
+  # For Query Class
+  def base_scope
+    self.queried_class.visible.where(statement)
+  end  
 
   # TODO: not yes in use
   def all_sla_level_values

@@ -127,9 +127,10 @@ class SlasController < ApplicationController
     if @slas.size == 1
       @sla = @slas.first
     end
+    can_show = @slas.detect{|c| !c.visible?}.nil?
     can_edit = @slas.detect{|c| !c.editable?}.nil?
     can_delete = @slas.detect{|c| !c.deletable?}.nil?
-    @can = {edit: can_edit, delete: can_delete}
+    @can = {show: can_show, edit: can_edit, delete: can_delete}
     @back = back_url
     @sla_ids, @safe_attributes, @selected = [], [], {}
     @slas.each do |e|
@@ -158,10 +159,11 @@ class SlasController < ApplicationController
   end
 
   def find_slas
-    @slas = Sla.visible.where(id: (params[:id] || params[:ids])).to_a
+    params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]] 
+    @slas = Sla.find(params[:ids])
     @sla = @slas.first if @slas.count == 1
     raise ActiveRecord::RecordNotFound if @slas.empty?
-    #raise Unauthorized unless @slas.all?(&:visible?)
+    raise Unauthorized unless @slas.all?(&:visible?)
   rescue ActiveRecord::RecordNotFound
     render_404
   end

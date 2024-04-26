@@ -4,8 +4,8 @@ class CreateSlaStatuses < ActiveRecord::Migration[5.2]
     create_table :sla_statuses do |t|
       t.belongs_to :status,
         references: :IssueStatuses,
-        foreign_key: { on_delete: :cascade, to_table: :issue_statuses }
-      t.belongs_to :sla_type, foreign_key: { on_delete: :cascade }
+        foreign_key: { name: 'sla_statuses_issue_statuses_fkey', on_delete: :cascade, to_table: :issue_statuses }
+      t.belongs_to :sla_type, foreign_key: { name: 'sla_statuses_sla_types_fkey', on_delete: :cascade }
     end
     say "Created table sla_level_terms"
 

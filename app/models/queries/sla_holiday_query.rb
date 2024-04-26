@@ -18,6 +18,8 @@
 
 class Queries::SlaHolidayQuery < Query
 
+  unloadable
+  
   self.queried_class = SlaHoliday
 
   def initialize_available_filters
@@ -28,10 +30,8 @@ class Queries::SlaHolidayQuery < Query
   def available_columns
     return @available_columns if @available_columns
     @available_columns = []
-    group = l("label_filter_group_#{self.class.name.underscore}")
-
-    @available_columns << QueryColumn.new(:name, :sortable => nil, :default_order => nil, :groupable => false)
-    @available_columns << QueryColumn.new(:date, :sortable => nil, :default_order => nil, :groupable => false)
+    @available_columns << QueryColumn.new(:name, :sortable => "#{SlaHoliday.table_name}.name", :default_order => nil, :default_order => nil, :groupable => false)
+    @available_columns << QueryColumn.new(:date, :sortable => "#{SlaHoliday.table_name}.date", :default_order => :desc, :groupable => false)
     @available_columns
   end
 
@@ -53,24 +53,23 @@ class Queries::SlaHolidayQuery < Query
   def sla_holidays(options={})
     order_option = [group_by_sort_order, (options[:order] || sort_clause)].flatten.reject(&:blank?)
 
-    scope = SlaHoliday.visible.
-        where(statement).
+    scope = base_scope.
         includes(((options[:include] || [])).uniq).
         where(options[:conditions]).
         order(order_option).
         joins(joins_for_order_statement(order_option.join(','))).
         limit(options[:limit]).
         offset(options[:offset])
-
-    if has_custom_field_column?
-      scope = scope.preload(:custom_values)
-    end
-
     sla_holidays = scope.to_a
-
     sla_holidays
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)
   end
+
+  # For Query Class
+  def base_scope
+    self.queried_class.visible.where(statement)
+  end
+
 
 end

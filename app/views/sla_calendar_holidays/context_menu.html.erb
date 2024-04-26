@@ -1,6 +1,6 @@
 <ul>
-  <% if @sla_calendar_holiday %>
-    <li><%= context_menu_link l(:button_show), sla_calendar_holiday_path(@sla_calendar_holiday), class: 'icon icon-magnifier', disabled: !@can[:edit] %></li>
+  <% if @sla_calendar_holiday_ids.count == 1 %>
+    <li><%= context_menu_link l(:button_show), sla_calendar_holiday_path(@sla_calendar_holiday), class: 'icon icon-magnifier', disabled: !@can[:show] %></li>
     <li><%= context_menu_link l(:button_edit), edit_sla_calendar_holiday_path(@sla_calendar_holiday), class: 'icon icon-edit', disabled: !@can[:edit] %></li>
   <% end %>
   <li><%= context_menu_link l(:button_delete),

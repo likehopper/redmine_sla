@@ -1,0 +1,11 @@
+api.array :sla_cache_spents, api_meta(:total_count => @entity_count, :offset => @offset, :limit => @limit) do
+  @entities.each do |entity|
+    api.entity do
+      api.id entity.id
+      api.sla_cache_id entity.sla_cache_id
+      api.sla_type_id entity.sla_type_id
+      api.spent entity.spent
+      api.updated_on entity.updated_on
+    end
+  end
+end

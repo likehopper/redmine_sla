@@ -20,17 +20,36 @@ class SlaCache < ActiveRecord::Base
 
   unloadable
   
-  belongs_to :issue
   belongs_to :sla_level
+  belongs_to :issue
+  belongs_to :project
 
-  acts_as_activity_provider :type => "sla",
-                            :permission => :view_sla,
-                            :scope => preload({:issue => :project})
+  has_many :sla_cache_spents
+ 
+  include Redmine::SafeAttributes
+  safe_attributes *%w[]
 
-  acts_as_searchable :columns => ["#{table_name}.subject"],
-                     :scope => lambda { includes([:issue => :project]).order("#{table_name}.id") },
-                     :project_key => "#{Issue.table_name}.project_id"             
+  default_scope {
+    joins(:sla_level,:issue,:project)
+  #  .order(start_date: :desc) 
+  }
 
+  scope :visible, lambda {|*args|
+    user = args.shift || User.current
+    joins(:sla_level,:issue,:project).
+      where(Issue.visible_condition(user, *args))
+  }
+
+  validates_uniqueness_of :issue
+
+  def self.visible_condition(user, options = {})
+    '1=1'
+  end
+
+  def visible?(user = nil)
+    user ||= User.current
+    user.allowed_to?(:manage_sla, nil, global: true)
+  end
 
   def self.find_by_issue(param_issue_id)
     return self.where(issue_id: param_issue_id).first
@@ -41,18 +60,16 @@ class SlaCache < ActiveRecord::Base
     sla_cache = self.find_by_issue(param_issue_id)
     sla_cache
   end
-  
-  # Class method for update cache
-  def self.update(param_issue_id)
-    ActiveRecord::Base.connection.execute("SELECT sla_get_level(#{param_issue_id}) ; ")
-  end
 
-  # Class method for update cache
-  def self.update_cascade(param_issue_id)
-    ActiveRecord::Base.connection.execute("SELECT sla_get_level(#{param_issue_id}) ; ")
-    SlaCacheSpent.update_by_issue(param_issue_id)
-    return SlaCache.where(issue_id: param_issue_id).first
-  end    
+  # Class method for refresh cache
+  def refresh
+    # First, delete the entry in the sla_cache
+    SlaCache.where(issue: self.issue_id).destroy_all
+    # Let's recalculate the sla_cache
+    ActiveRecord::Base.connection.execute("SELECT sla_get_level(#{self.issue_id}) ; ")
+    # Then, let's recalculate the sla_cache_spents !
+    SlaCacheSpent.update_by_issue(self.issue_id)
+  end  
 
   def self.destroy_by_issue_id(param_issue_id)
     return SlaCache.where(issue: param_issue_id).destroy_all
@@ -62,12 +79,17 @@ class SlaCache < ActiveRecord::Base
     return ActiveRecord::Base.connection.execute("TRUNCATE sla_caches CASCADE ; ")
   end  
 
-  # instance method for update cache
-  def update()
-    ActiveRecord::Base.connection.execute("SELECT sla_get_level(#{self.issue_id}) ; ")
+  def editable?(user = nil)
+    false
   end
 
-  #def to_h()
+  def deletable?(user = nil)
+    user ||= User.current
+    user.allowed_to?(:manage_sla, nil, global: true)
+  end
+
+  #def to_s()
+  #  issue.to_s.length > 47 ? "#{issue.to_s.first(47)}..." : issue.to_s
   #end
     
 end

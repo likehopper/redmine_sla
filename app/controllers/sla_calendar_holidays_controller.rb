@@ -126,9 +126,10 @@ class SlaCalendarHolidaysController < ApplicationController
     if @sla_calendar_holidays.size == 1
       @sla_calendar_holiday = @sla_calendar_holidays.first
     end
+    can_show = @sla_calendar_holidays.detect{|c| !c.visible?}.nil?
     can_edit = @sla_calendar_holidays.detect{|c| !c.editable?}.nil?
     can_delete = @sla_calendar_holidays.detect{|c| !c.deletable?}.nil?
-    @can = {edit: can_edit, delete: can_delete}
+    @can = {show: can_show, edit: can_edit, delete: can_delete}
     @back = back_url
     @sla_calendar_holiday_ids, @safe_attributes, @selected = [], [], {}
     @sla_calendar_holidays.each do |e|

@@ -9,6 +9,7 @@ $BODY$
   DECLARE v_issue_project_id INTEGER ;
   DECLARE v_issue_tracker_id INTEGER ;
   DECLARE v_issue_created_on TIMESTAMP WITHOUT TIME ZONE ;
+  DECLARE v_current_timestamp TIMESTAMP WITHOUT TIME ZONE ;
   DECLARE v_sla_cache sla_caches ;
 BEGIN
   
@@ -22,12 +23,17 @@ BEGIN
     RETURN NULL ;
   END IF ;
 
+  -- We get the date and time from now
+  v_current_timestamp := sla_get_date(NOW()::TIMESTAMP WITHOUT TIME ZONE);
+
   -- We get the information already in the cache (if it is there, then it is good)
   SELECT
     "sla_caches"."id" AS "id",
+    "sla_caches"."project_id" AS "project_id",
     "sla_caches"."issue_id" AS "issue_id",
     "sla_caches"."sla_level_id" AS "sla_level_id",
-    "sla_caches"."start_date" AS "start_date"
+    "sla_caches"."start_date" AS "start_date",
+    "sla_caches"."updated_on" AS "updated_on"
 	INTO
 		v_sla_cache
 	FROM
@@ -64,9 +70,11 @@ BEGIN
   SELECT DISTINCT
     -- Preparing the record for the cache, ID will be determined on insert in the cache
     NULL::integer AS "id",
+    "v_issue_project_id" AS "project_id",
     "p_issue_id" AS "issue_id",
 		"sla_levels"."id" AS "sla_level_id",
-    "calendrier"."minutes" AS "start_date"
+    "calendrier"."minutes" AS "start_date",
+    v_current_timestamp AS "updated_on"
 	INTO
 		v_sla_cache
   FROM            
@@ -117,13 +125,17 @@ BEGIN
 
   -- Insert the data in the level cache
   INSERT INTO "sla_caches" (
+    "project_id",
     "issue_id",
     "sla_level_id",
-    "start_date"
+    "start_date",
+    "updated_on"
   ) VALUES (
+    v_sla_cache."project_id", 
     v_sla_cache."issue_id",
     v_sla_cache."sla_level_id",
-    v_sla_cache."start_date"
+    v_sla_cache."start_date",
+    v_sla_cache."updated_on"
   ) RETURNING id INTO v_sla_cache."id" ;
 
   RAISE DEBUG

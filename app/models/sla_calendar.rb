@@ -30,7 +30,9 @@ class SlaCalendar < ActiveRecord::Base
 
   scope :visible, ->(*args) { where(SlaCalendar.visible_condition(args.shift || User.current, *args)) }
   
-  default_scope { order(name: :asc) }  
+  default_scope {
+    # order(name: :asc)
+  } 
 
   validates_presence_of :name
   

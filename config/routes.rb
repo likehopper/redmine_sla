@@ -1,8 +1,12 @@
 
 # SLAs project configuration ( activation of SLAs by trackers : sla_project_trackers )
 resources :projects do
-  resources :sla_project_trackers, path: "/settings/slas", :only => [ :new, :create, :update, :edit, :destroy]
-  resources :sla_project_trackers, path: "/settings/slas/index(.:format)", :only => [ :index ]
+  resources :sla_caches, path: "issues/slas", :only => [ :index, :show] do
+    collection do
+      get 'context_menu'
+    end
+  end
+  resources :sla_project_trackers, path: "/settings/slas", :only => [ :index, :new, :create, :update, :edit, :destroy]
 end
 
 # Configuration globales : noms des SLA
@@ -81,3 +85,26 @@ resources :sla_calendar_holidays, path: "sla/calendar_holidays" do
 end
 # context_menu : bulk_destroy
 match 'sla/calendar_holidays', :controller => 'sla_calendar_holidays', :action => 'destroy', :via => :delete
+
+resources :sla_caches, path: "sla/caches", except: [:new, :create, :edit, :update] do
+  member do
+    get 'refresh'
+  end
+  collection do
+    get 'context_menu', 'refresh'
+  end
+end
+# context_menu : bulk_destroy
+match 'sla/caches', :controller => 'sla_caches', :action => 'destroy', :via => :delete
+
+resources :sla_cache_spents, path: "sla/cache_spents", except: [:new, :create, :edit, :update] do
+  member do
+    get 'refresh'
+  end
+  collection do
+    get 'context_menu', 'refresh'
+  end
+end
+# context_menu : bulk_destroy
+match 'sla/cache_spents', :controller => 'sla_cache_spents', :action => 'destroy', :via => :delete
+#get 'sla/cache_spents/:sla_cache_id', to: 'sla_cache_spents#index', as: 'filtered_sla_cache_spents'

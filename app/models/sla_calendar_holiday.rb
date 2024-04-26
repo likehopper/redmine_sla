@@ -27,7 +27,10 @@ class SlaCalendarHoliday < ActiveRecord::Base
 
   scope :visible, ->(*args) { where(SlaCalendarHoliday.visible_condition(args.shift || User.current, *args)) }
 
-  default_scope { joins(:sla_calendar,:sla_holiday).order("sla_calendars.name ASC,sla_holidays.date DESC") }
+  default_scope {
+    joins(:sla_calendar,:sla_holiday)
+    #.order("sla_calendars.name ASC,sla_holidays.date DESC")
+  }
 
   validates_presence_of :sla_calendar
   validates_presence_of :sla_holiday
