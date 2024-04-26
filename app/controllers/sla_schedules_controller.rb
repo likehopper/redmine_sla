@@ -133,9 +133,10 @@ class SlaSchedulesController < ApplicationController
     if @sla_schedules.size == 1
       @sla_schedule = @sla_schedules.first
     end
+    can_show = @sla_schedules.detect{|c| !c.visible?}.nil?
     can_edit = @sla_schedules.detect{|c| !c.editable?}.nil?
     can_delete = @sla_schedules.detect{|c| !c.deletable?}.nil?
-    @can = {edit: can_edit, delete: can_delete}
+    @can = {show: can_show, edit: can_edit, delete: can_delete}
     @back = back_url
     @sla_schedule_ids, @safe_attributes, @selected = [], [], {}
     @sla_schedules.each do |e|

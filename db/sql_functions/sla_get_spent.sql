@@ -37,10 +37,13 @@ BEGIN
   END IF ;  
 	
 	SELECT
+    NULL::integer AS "id",
     "sla_cache_spents"."sla_cache_id" AS "sla_cache_id",
+    "sla_cache_spents"."project_id" AS "project_id",
+    "sla_cache_spents"."issue_id" AS "issue_id",
     "sla_cache_spents"."sla_type_id" AS "sla_type_id",
-    "sla_cache_spents"."updated_on" AS "updated_on",
-    "sla_cache_spents"."spent" AS "spent"
+    "sla_cache_spents"."spent" AS "spent",
+    "sla_cache_spents"."updated_on" AS "updated_on"
 	INTO	
     v_sla_spent
 	FROM
@@ -51,7 +54,7 @@ BEGIN
     "sla_cache_spents"."sla_type_id" = p_sla_type_id
 	;  
 
-	-- TheIf the time spent has just been calculated,
+	-- If the time spent has just been calculated,
   IF ( ( v_sla_spent IS NOT NULL ) AND ( v_sla_spent."updated_on" IS NOT NULL ) AND ( v_sla_spent."updated_on" = "v_current_timestamp" ) ) THEN
     -- then no need to redo the calculation
 		RETURN v_sla_spent ;
@@ -59,9 +62,7 @@ BEGIN
 
 	-- Retrieve issue data
   SELECT
-    -- DATE_TRUNC('MINUTE', COALESCE( v_sla_spent."updated_on", v_sla_cache."start_date" ) ),
     COALESCE( v_sla_spent."updated_on", v_sla_cache."start_date" ),
-    -- DATE_TRUNC('MINUTE', COALESCE( "issues"."closed_on", v_current_timestamp ) ),
     COALESCE( sla_get_date("issues"."closed_on"), v_current_timestamp ),
     tracker_id,
     project_id
@@ -87,10 +88,13 @@ BEGIN
 	
 	-- Calculate since it wasn't done
 	SELECT DISTINCT
+    NULL::integer AS "id",
     COALESCE( v_sla_spent."sla_cache_id", v_sla_cache."id" ) AS "sla_cache_id",
+    v_issue_project_id AS "sla_project_id",
+    p_issue_id AS "issue_id",
     p_sla_type_id AS "sla_type_id",
-    v_current_timestamp AS "updated_on",
-    COUNT(*) AS "spent"
+    COUNT(*) AS "spent",
+    v_current_timestamp AS "updated_on"
 	INTO
 		v_sla_spent
   FROM
@@ -137,21 +141,25 @@ BEGIN
 	END IF ;
 
 	-- Insert the data in the spent cache
-	INSERT INTO sla_cache_spents (
+  INSERT INTO sla_cache_spents (
     "sla_cache_id",
+    "project_id",
+    "issue_id",
     "sla_type_id",
-    "updated_on",
-    "spent"
+    "spent",
+    "updated_on"
   ) VALUES (
     v_sla_spent."sla_cache_id",
+    v_sla_spent."project_id",
+    v_sla_spent."issue_id",
     v_sla_spent."sla_type_id",
-    v_sla_spent."updated_on",
-    v_sla_spent."spent"
+    v_sla_spent."spent",
+    v_sla_spent."updated_on"
   )
   -- if data already exists, then do an update
-	ON CONFLICT ON CONSTRAINT sla_cache_spents_pkey DO UPDATE SET
-    "updated_on" = v_sla_spent."updated_on",
-    "spent" = "sla_cache_spents"."spent" + v_sla_spent."spent"
+	ON CONFLICT ON CONSTRAINT "sla_cache_spents_sla_caches_sla_types_ukey" DO UPDATE SET
+      "updated_on" = v_sla_spent."updated_on",
+      "spent" = "sla_cache_spents"."spent" + v_sla_spent."spent"
   ;
 
   RAISE DEBUG

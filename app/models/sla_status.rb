@@ -27,7 +27,10 @@ class SlaStatus < ActiveRecord::Base
 
   scope :visible, ->(*args) { where(SlaStatus.visible_condition(args.shift || User.current, *args)) }
 
-  default_scope { joins(:sla_type,:status).order("sla_types.name ASC,issue_statuses.position ASC") }
+  default_scope {
+    joins(:sla_type,:status)
+    #.order("sla_types.name ASC,issue_statuses.position ASC")
+  }
 
   validates_presence_of :sla_type
   validates_presence_of :status

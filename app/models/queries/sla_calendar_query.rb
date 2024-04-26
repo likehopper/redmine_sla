@@ -18,6 +18,8 @@
 
 class Queries::SlaCalendarQuery < Query
 
+  unloadable
+  
   self.queried_class = SlaCalendar
 
   def initialize_available_filters
@@ -29,7 +31,7 @@ class Queries::SlaCalendarQuery < Query
     @available_columns = []
     group = l("label_filter_group_#{self.class.name.underscore}")
 
-    @available_columns << QueryColumn.new(:name, :sortable => nil, :default_order => nil, :groupable => false)
+    @available_columns << QueryColumn.new(:name, :sortable => "#{SlaCalendar.table_name}.name", :default_order => :asc, :groupable => false)
     @available_columns
   end
 
@@ -49,8 +51,7 @@ class Queries::SlaCalendarQuery < Query
   def sla_calendars(options={})
     order_option = [group_by_sort_order, (options[:order] || sort_clause)].flatten.reject(&:blank?)
 
-    scope = SlaCalendar.visible.
-        where(statement).
+    scope = self.queried_class.visible.where(statement).
         includes(((options[:include] || [])).uniq).
         where(options[:conditions]).
         order(order_option).
@@ -58,15 +59,15 @@ class Queries::SlaCalendarQuery < Query
         limit(options[:limit]).
         offset(options[:offset])
 
-    if has_custom_field_column?
-      scope = scope.preload(:custom_values)
-    end
-
     sla_calendars = scope.to_a
-
     sla_calendars
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)
+  end
+
+  # For Query Class
+  def base_scope
+    self.queried_class.visible.where(statement)
   end
 
 end

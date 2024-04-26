@@ -6,26 +6,25 @@ class CreateSlaCacheSpents < ActiveRecord::Migration[5.2]
     
       dir.up do      
 
-        create_table :sla_cache_spents, id: false, force: :cascade do |t|
-          t.belongs_to :sla_cache, :null => false, foreign_key: { on_delete: :cascade }
-          t.belongs_to :sla_type, :null => false, foreign_key: { on_delete: :cascade }
-          #t.belongs_to :issue, :null => false, foreign_key: { on_delete: :cascade }
-          #t.integer :priority_id, :null => false
-          #t.integer :term, :null => false
-          t.datetime :updated_on, :null => false
+        create_table :sla_cache_spents do |t|
+          t.belongs_to :sla_cache, :null => false, foreign_key: { name: 'sla_cache_spents_sla_caches_fkey', on_delete: :cascade }
+          t.belongs_to :project, :null => false, foreign_key: { name: 'sla_caches_projectss_fkey', on_delete: :cascade }
+          t.belongs_to :issue, :null => false, foreign_key: { name: 'sla_caches_issues_fkey', on_delete: :cascade }
+          t.belongs_to :sla_type, :null => false, foreign_key: { name: 'sla_cache_spents_sla_types_fkey', on_delete: :cascade }
           t.integer :spent, :null => false
+          t.datetime :updated_on, :null => false
         end
-        say "Created table sla_cache_spent"
+        say "Created table sla_cache_spents"
 
-        # without issue
-        execute "ALTER TABLE sla_cache_spents ADD PRIMARY KEY ( sla_cache_id, sla_type_id ) ; "
+        add_index :sla_caches, [:project_id], :unique => false, name: 'sla_cache_spents_projects_key'
+        add_index :sla_caches, [:issue_id], :unique => false, name: 'sla_cache_spents_issues_key'
+        say "Created index on table sla_cache_spents"
+        
+        add_index :sla_cache_spents, [:sla_cache_id, :sla_type_id], :unique => true, name: 'sla_cache_spents_sla_caches_sla_types_ukey'
+        say "Created unique index on table sla_cache_spents"
 
-        # With issue
-        #execute "ALTER TABLE sla_cache_spents ADD PRIMARY KEY ( issue_id, sla_type_id ) ; "
-        #add_index :sla_cache_spents, [:sla_cache_id, :sla_type_id ], :unique => true, name: 'sla_cache_cache_type_ukey'
-        #add_index :sla_cache_spents, [:issue_id, :sla_type_id ], :unique => true, name: 'sla_cache_issue_type_ukey'
-
-        say "Created index on table sla_cache_spent"
+        execute "ALTER TABLE sla_cache_spents ADD CONSTRAINT sla_cache_spents_sla_caches_sla_types_ukey UNIQUE USING INDEX sla_cache_spents_sla_caches_sla_types_ukey;"
+        say "Created constraint on table sla_cache_spents"
 
         execute File.read(File.expand_path('../../sql_functions/sla_get_spent.sql', __FILE__))
         say "Created function sla_get_spent"

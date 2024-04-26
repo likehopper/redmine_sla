@@ -32,7 +32,10 @@ class SlaLevel < ActiveRecord::Base
 
   scope :visible, ->(*args) { where(SlaLevel.visible_condition(args.shift || User.current, *args)) }
 
-  default_scope { order(name: :asc) }  
+  default_scope {
+    joins(:sla,:sla_calendar)
+    # order(name: :asc)
+  }
   
   validates_presence_of :name
   validates_presence_of :sla

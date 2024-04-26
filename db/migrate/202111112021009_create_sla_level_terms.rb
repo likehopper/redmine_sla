@@ -2,8 +2,8 @@ class CreateSlaLevelTerms < ActiveRecord::Migration[5.2]
 
   def change
     create_table :sla_level_terms do |t|
-      t.belongs_to :sla_level, :null => false, foreign_key: { on_delete: :cascade }
-      t.belongs_to :sla_type, :null => false, foreign_key: { on_delete: :cascade }
+      t.belongs_to :sla_level, :null => false, foreign_key: { name: 'sla_level_sla_levels_terms_fkey', on_delete: :cascade }
+      t.belongs_to :sla_type, :null => false, foreign_key: { name: 'sla_level_terms_sla_types_fkey', on_delete: :cascade }
       t.integer :priority_id, :null => false
       t.integer :term, :null => false
     end

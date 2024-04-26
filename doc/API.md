@@ -14,4 +14,6 @@ Some of the SLA data is exposed through Redmine's REST API for the resources des
 | [Sla Calendar Holildays](API/API_sla_calendar_holidays.md) | Stable |                |      1.0     |
 | [Sla Levels](API/API_sla_levels.md)             | Stable |                |      1.0     |
 | [Sla Level Terms](API/API_sla_level_terms.md)        | Stable |                |      1.0     |
-| [Sla Project Trackers](API/API_slaçproject_trackers.md)   | Stable |                |      1.0     |
+| [Sla Project Trackers](API/API_sla_project_trackers.md)   | Stable |                |      1.0     |
+| [Sla Caches](API/API_sla_caches.md)   | Stable |                |      1.0     |
+| [Sla Cache Spents](API/API_sla_cache_spents.md)   | Stable |                |      1.0     |

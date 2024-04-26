@@ -18,6 +18,8 @@
 
 class Queries::SlaTypeQuery < Query
 
+  unloadable
+  
   self.queried_class = SlaType
 
   def initialize_available_filters
@@ -29,7 +31,7 @@ class Queries::SlaTypeQuery < Query
     @available_columns = []
     group = l("label_filter_group_#{self.class.name.underscore}")
 
-    @available_columns << QueryColumn.new(:name, :sortable => nil, :default_order => nil, :groupable => false )
+    @available_columns << QueryColumn.new(:name, :sortable => "#{SlaType.table_name}.name", :default_order => :asc, :groupable => false )
     @available_columns
   end
 
@@ -39,7 +41,7 @@ class Queries::SlaTypeQuery < Query
     #  "name" => {:operator => "*", :values => []}
     }
   end
-
+    
   def default_columns_names
     super.presence || [
       "name"
@@ -49,8 +51,7 @@ class Queries::SlaTypeQuery < Query
   def sla_types(options={})
     order_option = [group_by_sort_order, (options[:order] || sort_clause)].flatten.reject(&:blank?)
 
-    scope = SlaType.visible.
-        where(statement).
+    scope = base_scope.
         includes(((options[:include] || [])).uniq).
         where(options[:conditions]).
         order(order_option).
@@ -58,15 +59,15 @@ class Queries::SlaTypeQuery < Query
         limit(options[:limit]).
         offset(options[:offset])
 
-    if has_custom_field_column?
-      scope = scope.preload(:custom_values)
-    end
-
     sla_types = scope.to_a
-
     sla_types
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)
+  end
+
+  # For Query Class
+  def base_scope
+    self.queried_class.visible.where(statement)
   end
 
 end

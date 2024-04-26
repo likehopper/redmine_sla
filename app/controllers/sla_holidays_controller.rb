@@ -91,7 +91,7 @@ class SlaHolidaysController < ApplicationController
         format.html do
           redirect_back_or_default sla_holidays_path
         end
-        format.api  {render_api_ok}
+        format.api {render_api_ok}
       end
     else
       respond_to do |format|
@@ -123,9 +123,10 @@ class SlaHolidaysController < ApplicationController
     if @sla_holidays.size == 1
       @sla_holiday = @sla_holidays.first
     end
+    can_show = @sla_holidays.detect{|c| !c.visible?}.nil?
     can_edit = @sla_holidays.detect{|c| !c.editable?}.nil?
     can_delete = @sla_holidays.detect{|c| !c.deletable?}.nil?
-    @can = {edit: can_edit, delete: can_delete}
+    @can = {show: can_show, edit: can_edit, delete: can_delete}
     @back = back_url
     @sla_holiday_ids, @safe_attributes, @selected = [], [], {}
     @sla_holidays.each do |e|

@@ -18,6 +18,8 @@
 
 class Queries::SlaCalendarHolidayQuery < Query
 
+  unloadable
+  
   self.queried_class = SlaCalendarHoliday
 
   def initialize_available_filters
@@ -31,8 +33,8 @@ class Queries::SlaCalendarHolidayQuery < Query
     @available_columns = []
     group = l("label_filter_group_#{self.class.name.underscore}")
 
-    @available_columns << QueryColumn.new(:sla_calendar, :sortable => nil, :default_order => nil, :groupable => false)
-    @available_columns << QueryColumn.new(:sla_holiday, :sortable => nil, :default_order => nil, :groupable => false)
+    @available_columns << QueryColumn.new(:sla_calendar, :sortable => "#{SlaCalendar.table_name}.name", :default_order => :asc, :groupable => true)
+    @available_columns << QueryColumn.new(:sla_holiday, :sortable => "#{SlaHoliday.table_name}.date", :default_order => :desc, :groupable => true)
     @available_columns << QueryColumn.new(:match, :sortable => nil, :default_order => nil, :groupable => false)
     @available_columns
   end
@@ -52,13 +54,12 @@ class Queries::SlaCalendarHolidayQuery < Query
       "sla_holiday",
       "match"
     ].flat_map{|c| [c.to_s, c.to_sym]}
-  end
+  end 
   
   def sla_calendar_holidays(options={})
     order_option = [group_by_sort_order, (options[:order] || sort_clause)].flatten.reject(&:blank?)
 
-    scope = SlaCalendarHoliday.visible.
-        where(statement).
+    scope = base_scope.
         includes(((options[:include] || [])).uniq).
         where(options[:conditions]).
         order(order_option).
@@ -66,15 +67,15 @@ class Queries::SlaCalendarHolidayQuery < Query
         limit(options[:limit]).
         offset(options[:offset])
 
-    if has_custom_field_column?
-      scope = scope.preload(:custom_values)
-    end
-
     sla_calendar_holidays = scope.to_a
-
     sla_calendar_holidays
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)
+  end
+
+  # For Query Class
+  def base_scope
+    self.queried_class.visible.where(statement)
   end
 
   def all_sla_calendar_values

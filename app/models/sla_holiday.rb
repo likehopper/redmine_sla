@@ -26,7 +26,9 @@ class SlaHoliday < ActiveRecord::Base
 
   # TODO : permit group by year functionnal
   # TODO : permit order by name/date functionnal
-  default_scope { order(date: :desc) }
+  default_scope {
+    # order(date: :desc)
+  }
 
   validates_presence_of :name
   validates_presence_of :date

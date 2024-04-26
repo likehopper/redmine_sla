@@ -118,16 +118,17 @@ class SlaLevelsController < ApplicationController
         redirect_back_or_default sla_levels_path
       end
       format.api {render_api_ok}
-    end       
+    end
   end
 
   def context_menu
     if @sla_levels.size == 1
       @sla_level = @sla_levels.first
     end
+    can_show = @sla_levels.detect{|c| !c.visible?}.nil?
     can_edit = @sla_levels.detect{|c| !c.editable?}.nil?
     can_delete = @sla_levels.detect{|c| !c.deletable?}.nil?
-    @can = {edit: can_edit, delete: can_delete}
+    @can = {show: can_show, edit: can_edit, delete: can_delete}
     @back = back_url
     @sla_level_ids, @safe_attributes, @selected = [], [], {}
     @sla_levels.each do |e|

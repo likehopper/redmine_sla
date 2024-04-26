@@ -2,7 +2,7 @@ class CreateSlaSchedules < ActiveRecord::Migration[5.2]
 
   def change
     create_table :sla_schedules do |t|
-      t.belongs_to :sla_calendar, foreign_key: { on_delete: :cascade }
+      t.belongs_to :sla_calendar, foreign_key: { name: 'sla_schedules_sla_calendars_fkey', on_delete: :cascade }
       t.integer :dow, :null => false
       t.time :start_time, :null => false
       t.time :end_time, :null => false

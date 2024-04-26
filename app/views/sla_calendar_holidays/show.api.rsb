@@ -1,6 +1,6 @@
     api.sla_calendar_holiday do
       api.id @sla_calendar_holiday.id
-      api.sla_calendar_id @sla_calendar_holiday.sla_calendar_id
-      api.sla_holiday_id @sla_calendar_holiday.sla_holiday_id
+      api.sla_calendar @sla_calendar_holiday.sla_calendar
+      api.sla_holiday @sla_calendar_holiday.sla_holiday
       api.match @sla_calendar_holiday.match
     end

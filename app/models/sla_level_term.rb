@@ -32,9 +32,9 @@ class SlaLevelTerm < ActiveRecord::Base
   scope :visible, ->(*args) { where(SlaLevelTerm.visible_condition(args.shift || User.current, *args)) }
 
   default_scope {
-#      select("sla_levels.*, sla_level_terms.*, sla_types.*, enumerations.*")
+      # select("sla_levels.*, sla_level_terms.*, sla_types.*, enumerations.*")
       joins(:sla_level,:sla_type,:priority)
-      .order("sla_levels.name ASC, sla_types.name ASC, enumerations.position ASC") 
+      # .order("sla_levels.name ASC, sla_types.name ASC, enumerations.position ASC") 
   }
 
   validates_presence_of :sla_level
