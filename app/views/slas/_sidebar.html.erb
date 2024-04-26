@@ -41,6 +41,16 @@
       title: l(:sla_label_global_settings)+" : "+l('sla_label.sla_level_term.plural'),
       class: 'icon icon-sla_level_term'))
   %>
+  <%= 
+  content_tag(:li, link_to(l('sla_label.sla_cache.plural'), sla_caches_path,
+    title: l(:sla_label_global_settings)+" : "+l('sla_label.sla_cache.plural'),
+    class: 'icon icon-sla_cache'))
+  %>
+  <%= 
+  content_tag(:li, link_to(l('sla_label.sla_cache_spent.plural'), sla_cache_spents_path,
+    title: l(:sla_label_global_settings)+" : "+l('sla_label.sla_cache_spent.plural'),
+    class: 'icon icon-sla_cache_spent'))
+  %>
   </ul>
   <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
   <span class="redmine_sla_footer"><a href="https://www.flaticon.com/authors/freepik" title="icons">Icons created by Freepik - Flaticon</a></span>

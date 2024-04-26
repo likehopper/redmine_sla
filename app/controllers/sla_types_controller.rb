@@ -129,9 +129,10 @@ class SlaTypesController < ApplicationController
     if @sla_types.size == 1
       @sla_type = @sla_types.first
     end
+    can_show = @sla_types.detect{|c| !c.visible?}.nil?
     can_edit = @sla_types.detect{|c| !c.editable?}.nil?
     can_delete = @sla_types.detect{|c| !c.deletable?}.nil?
-    @can = {edit: can_edit, delete: can_delete}
+    @can = {show: can_show, edit: can_edit, delete: can_delete}
     @back = back_url
     @sla_type_ids, @safe_attributes, @selected = [], [], {}
     @sla_types.each do |e|

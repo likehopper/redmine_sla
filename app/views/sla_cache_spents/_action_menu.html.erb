@@ -1,0 +1,8 @@
+<div class="contextual">
+  <%= link_to l('sla_label.sla_cache_spent.plural'), sla_cache_spents_path, class: 'icon icon-cancel' %>
+  <%= link_to l(:button_delete), sla_cache_spent_path(@sla_cache_spent),
+              :data => {:confirm => l(:text_are_you_sure)}, title: l(:button_delete),
+              :method => :delete,
+              :class => 'icon icon-del' if @sla_cache_spent.deletable? %>
+</div>
+  

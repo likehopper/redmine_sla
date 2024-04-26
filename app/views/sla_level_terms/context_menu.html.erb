@@ -1,6 +1,6 @@
 <ul>
-  <% if @sla_level_term %>
-    <li><%= context_menu_link l(:button_show), sla_level_term_path(@sla_level_term), class: 'icon icon-magnifier', disabled: !@can[:edit] %></li>
+  <% if @sla_level_term_ids.count == 1 %>
+    <li><%= context_menu_link l(:button_show), sla_level_term_path(@sla_level_term), class: 'icon icon-magnifier', disabled: !@can[:show] %></li>
     <li><%= context_menu_link l(:button_edit), edit_sla_level_term_path(@sla_level_term), class: 'icon icon-edit', disabled: !@can[:edit] %></li>
   <% end %>
   <li><%= context_menu_link l(:button_delete),

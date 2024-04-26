@@ -13,6 +13,10 @@ Returns a paginated list of Slas. By default, it returns all Slas.
 
 `curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/slas.json"`
 
+To improve the presentation, you can use this command:
+`curl -s -H "Content-Type: application/json" -X GET -H "X-Redmine-API-Key: $APIKEY" "$TRACKER/sla/slas.json" | python3 -m json.tool`
+
+
 
 ### Showing a Sla
 

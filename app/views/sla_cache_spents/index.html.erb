@@ -1,0 +1,21 @@
+<% html_title(l(:sla_label_global_settings)) %>
+<div class="content"> 
+  <div class="title-sla-settings title-sla_cache_spent">
+    <%= title l('sla_label.sla_cache_spent.plural') %>
+  </div>
+  <%= form_tag(sla_cache_spents_path, method: :get, id: 'query_form') do %>
+    <%= render partial: 'queries/query_form' %>
+  <% end %>
+  <% if @query.valid? %>
+    <% if @entities.empty? %>
+      <p class="nodata"><%= l(:label_no_data) %></p>
+    <% else %>
+      <%= render_query_totals(@query) %>
+      <%= render partial: 'list', locals: { entities: @entities }%>
+      <span class="pagination"><%= pagination_links_full @entity_pages, @entity_count %></span>
+    <% end %>
+  <% end %>
+</div>
+<% content_for :sidebar do %>
+  <%= render partial: 'slas/sidebar' %>
+<% end %>

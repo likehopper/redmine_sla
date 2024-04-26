@@ -128,9 +128,10 @@ class SlaCalendarsController < ApplicationController
     if @sla_calendars.size == 1
       @sla_calendar = @sla_calendars.first
     end
+    can_show = @sla_calendars.detect{|c| !c.visible?}.nil?
     can_edit = @sla_calendars.detect{|c| !c.editable?}.nil?
     can_delete = @sla_calendars.detect{|c| !c.deletable?}.nil?
-    @can = {edit: can_edit, delete: can_delete}
+    @can = {show: can_show, edit: can_edit, delete: can_delete}
     @back = back_url
     @sla_calendar_ids, @safe_attributes, @selected = [], [], {}
     @sla_calendars.each do |e|

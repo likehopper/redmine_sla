@@ -1,6 +1,6 @@
     api.sla_level do
       api.id @sla_level.id
       api.name @sla_level.name
-      api.sla_id @sla_level.sla_id
-      api.sla_calendar_id @sla_level.sla_calendar_id
+      api.sla @sla_level.sla
+      api.sla_calendar @sla_level.sla_calendar
     end

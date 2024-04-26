@@ -1,0 +1,13 @@
+<% html_title(l(:sla_label_global_settings)) %>
+<div class="content"> 
+  <div class="contextual">
+    <%= link_to l('sla_label.sla_cache_spent.plural'), sla_cache_spents_path, class: 'icon icon-cancel' %>
+  </div>
+  <div class="title-sla-settings title-sla_cache_spent">
+    <%= title l('sla_label.sla_cache_spent.edit') %>
+  </div>  
+  <%= render partial: 'form', locals: { sla_cache_spent: @sla_cache_spent } %>
+</div>
+<% content_for :sidebar do %>
+  <%= render partial: 'slas/sidebar' %>
+<% end %>

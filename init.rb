@@ -21,7 +21,9 @@ require "redmine"
 require "nested_form"
 require "chronic"
 require "chronic_duration"
-require "composite_primary_keys"
+
+# For good translation of "sla_cache" in the plural
+require_relative "config/initializers/inflections.rb"
 
 Redmine::Plugin.register :redmine_sla do
 
@@ -89,4 +91,4 @@ RedmineApp::Application.config.after_initialize do
     TimeEntryQuery.send(:include, RedmineSla::Patches::TimeEntryQueryPatch)
   end  
 
-end  
+end

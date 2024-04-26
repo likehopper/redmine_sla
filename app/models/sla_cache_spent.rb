@@ -22,18 +22,58 @@ class SlaCacheSpent < ActiveRecord::Base
   
   belongs_to :sla_cache
   belongs_to :sla_type
-  
-  self.primary_keys = :sla_cache_id, :sla_type_id
+  belongs_to :project
+  belongs_to :issue
+
+  #has_one :issue, through: :sla_cache
+  #has_one :project, through: :sla_cache
+
+  include Redmine::SafeAttributes
+  #safe_attributes *%w[sla_cache_id sla_type_id updated_on spent]
+  safe_attributes *%w[]
+
+  default_scope {
+    joins(:sla_type,:issue,:project)
+  #  .order(start_date: :desc) 
+  }
+
+  scope :visible, lambda {|*args|
+    user = args.shift || User.current
+    joins(:sla_type,:issue,:project)
+      where(Issue.visible_condition(user, *args))
+  }
+
+  def self.visible_condition(user, options = {})
+    '1=1'
+  end
+
+  # def issue
+  #   sla_cache.issue if sla_cache
+  # end
+
+  # def project
+  #  issue.project if issue
+  # end  
+
+  def visible?(user = nil)
+    user ||= User.current
+    user.allowed_to?(:manage_sla, nil, global: true)
+  end
 
   def self.find_by_cache_type( param_sla_cache_id, param_type_id )
     return self.where( sla_cache_id: param_sla_cache_id, sla_type_id: param_type_id ).first
   end
-
+  
   def self.find_or_new( param_sla_cache_id, param_type_id)
     sla_cache = SlaCache.find( param_sla_cache_id )
     ActiveRecord::Base.connection.execute("SELECT sla_get_spent(#{sla_cache.issue_id},#{param_type_id}) ; ")
     sla_cache_spent = self.find_by_cache_type( param_sla_cache_id, param_type_id )
     sla_cache_spent
+  end
+
+  # Class method for refresh cache
+  def refresh
+    ActiveRecord::Base.connection.execute("SELECT sla_get_spent(#{self.sla_cache.issue_id},#{self.sla_type.id}) ; ")
   end
 
   # Class method for update cache
@@ -43,23 +83,17 @@ class SlaCacheSpent < ActiveRecord::Base
     }
   end
 
-  def self.update_by_issue_type(param_issue_id,param_type_id)
-      return ActiveRecord::Base.connection.select_values("SELECT * FROM sla_get_spent(#{param_issue_id},#{param_type_id}) AS slp(sla_cache_id integer, sla_level_id integer, updated_on TIMESTAMP WITHOUT TIME ZONE, spent integer, term integer ) ; ")
-  end    
-
-  # Instance method for update cache
-  #def update()
-  #  ActiveRecord::Base.connection.execute("SELECT sla_get_term(#{self.issue_id},#{self.sla_type.id}) ; ")
-  #end 
-
-  # TODO: prohibit access to properties and force the use of this method !
-  def getIssueSpent(issue_id,type_id)
-    # TODO: use the internal properties of the object!
-    return ActiveRecord::Base.connection.select_value("SELECT sla_get_spent(#{issue_id.to_s},#{type_id.to_s}) ; ")
-  end  
-
   def purge()
     return ActiveRecord::Base.connection.select_value("TRUNCATE sla_cache_spents CASCADE ; ")
   end    
+
+  def editable?(user = nil)
+    false
+  end
+
+  def deletable?(user = nil)
+    user ||= User.current
+    user.allowed_to?(:manage_sla, nil, global: true)
+  end  
     
 end

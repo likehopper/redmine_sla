@@ -20,7 +20,7 @@ module RedmineSla
   module Hooks
     class ViewsIssuesHook < Redmine::Hook::ViewListener
       # Render SLA on Issue's view
-      render_on :view_issues_show_details_bottom, :partial => "sla_issue_helper/show"
+      render_on :view_issues_show_details_bottom, :partial => "sla_issues_helper/show"
     end
   end
 end
