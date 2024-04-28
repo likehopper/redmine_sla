@@ -7,6 +7,7 @@ en:
 
   button_refresh: Refresh
   notice_successful_refresh: Refresh is done
+  notice_successful_purge: Purge is done
 
   sla_log_level_none: None
   sla_log_level_error: Errors
@@ -288,7 +289,8 @@ en:
         one: One SLA Cache
         other: "%{count} SLA Caches"
       show: Show SLA Cache
-      delete: Purge SLA Cache
+      delete: Destroy SLA Cache
+      purge: Purge SLA Cache
       miss: Miss SLA Cache
       manage: SLA Cache management
       ttl: SLA Cache Lifetime (in minutes) 
@@ -302,7 +304,8 @@ en:
         one: One SLA Cache spent
         other: "%{count} SLA Cache spents"
       show: Show SLA Cache spent
-      delete: Purge SLA Cache spent
+      delete: Delete SLA Cache spent
+      purge: Purge SLA Cache spent
       miss: Miss SLA Cache spent
       manage: SLA Cache spent management
       

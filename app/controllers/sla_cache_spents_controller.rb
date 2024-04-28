@@ -47,13 +47,13 @@ class SlaCacheSpentsController < ApplicationController
   end
 
   def show
-    @sla_cache_spent.reload.refresh
     respond_to do |format|
       format.html do
-        flash[:notice] = l(:notice_successful_refresh)
         redirect_back_or_default sla_cache_spents_path
+      end      
+      format.api do
+        @sla_cache_spent.reload.refresh
       end
-      format.api
     end
   end
 
@@ -66,12 +66,24 @@ class SlaCacheSpentsController < ApplicationController
     end  
     respond_to do |format|
       format.html do
+        flash[:notice] = l(:notice_successful_refresh)
         redirect_back_or_default sla_cache_spents_path
         end
       format.api {render_api_ok}
     end    
   end
 
+  def purge
+    SlaCacheSpent.purge 
+    respond_to do |format|
+      format.html do
+        flash[:notice] = l(:notice_successful_purge)
+        redirect_back_or_default sla_cache_spents_path
+        end
+      format.api {render_api_ok}
+    end    
+  end
+  
   def destroy
     @sla_cache_spents.each do |sla_cache_spent|
       begin

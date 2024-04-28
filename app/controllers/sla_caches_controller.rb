@@ -31,8 +31,8 @@ class SlaCachesController < ApplicationController
   rescue_from Query::QueryError, :with => :query_error
   
   helper :context_menus
-  helper :projects
-  helper :issues
+  #helper :projects
+  #helper :issues
   helper :queries
   include QueriesHelper
   helper :sla_caches
@@ -57,12 +57,12 @@ class SlaCachesController < ApplicationController
   end
 
   def show
-    @sla_cache.reload.refresh
     respond_to do |format|
       format.html do
         redirect_back_or_default sla_caches_path        
       end
       format.api do
+        @sla_cache.reload.refresh
         @sla_cache_spents = @sla_cache.sla_cache_spents.to_a
       end
     end
@@ -78,6 +78,17 @@ class SlaCachesController < ApplicationController
     respond_to do |format|
       format.html do
         flash[:notice] = l(:notice_successful_refresh)
+        redirect_back_or_default sla_caches_path
+        end
+      format.api {render_api_ok}
+    end    
+  end
+
+  def purge
+    SlaCache.purge 
+    respond_to do |format|
+      format.html do
+        flash[:notice] = l(:notice_successful_purge)
         redirect_back_or_default sla_caches_path
         end
       format.api {render_api_ok}
@@ -158,6 +169,7 @@ private
   end
 
   def find_sla_caches
+    Rails.logger.debug "==>> sla_caches find_sla_caches params = #{params}"
     params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]] 
     @sla_caches = SlaCache.find(params[:ids])
     @sla_cache = @sla_caches.first if @sla_caches.count == 1
