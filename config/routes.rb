@@ -91,7 +91,7 @@ resources :sla_caches, path: "sla/caches", except: [:new, :create, :edit, :updat
     get 'refresh'
   end
   collection do
-    get 'context_menu', 'refresh'
+    get 'context_menu', 'refresh', 'purge'
   end
 end
 # context_menu : bulk_destroy
@@ -102,9 +102,8 @@ resources :sla_cache_spents, path: "sla/cache_spents", except: [:new, :create, :
     get 'refresh'
   end
   collection do
-    get 'context_menu', 'refresh'
+    get 'context_menu', 'refresh', 'purge'
   end
 end
 # context_menu : bulk_destroy
 match 'sla/cache_spents', :controller => 'sla_cache_spents', :action => 'destroy', :via => :delete
-#get 'sla/cache_spents/:sla_cache_id', to: 'sla_cache_spents#index', as: 'filtered_sla_cache_spents'

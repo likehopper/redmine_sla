@@ -7,6 +7,7 @@ fr:
 
   button_refresh: Actualiser
   notice_successful_refresh: L'actualisation est terminée
+  notice_successful_purge: La purge est terminée
 
   sla_log_level_none: Aucun
   sla_log_level_error: Erreurs
@@ -288,7 +289,8 @@ fr:
         one: Un Cache de SLA
         other: "%{count} Caches de SLA"
       show: Voir un cache de SLA
-      delete: Purge de Cache de SLA
+      delete: Supprimer de Cache de SLA
+      purge: Purge de Cache de SLA
       miss: Cache de SLA manquant
       manage: Gestion de Cache de SLA
       ttl: Durée de vie de Cache de SLA (en minutes) 
@@ -302,7 +304,8 @@ fr:
         one: Un délai du cache de SLA
         other: "%{count} délais du cache de SLA"
       show: Voir un délai du cache de SLA
-      delete: Purge de délai du cache de SLA
+      delete: Supprimer de délai du cache de SLA
+      purge: Purge de délai du cache de SLA
       miss: Délai du cache de SLA manquant
       manage: Gestion de délai du cache de SLA
 
