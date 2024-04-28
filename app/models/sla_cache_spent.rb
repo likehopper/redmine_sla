@@ -76,16 +76,16 @@ class SlaCacheSpent < ActiveRecord::Base
     ActiveRecord::Base.connection.execute("SELECT sla_get_spent(#{self.sla_cache.issue_id},#{self.sla_type.id}) ; ")
   end
 
+  def self.purge()
+    return ActiveRecord::Base.connection.select_value("TRUNCATE sla_cache_spents CASCADE ; ")
+  end  
+
   # Class method for update cache
   def self.update_by_issue(param_issue_id)
     SlaType.all.each { |sla_type|
       ActiveRecord::Base.connection.execute("SELECT sla_get_spent(#{param_issue_id},#{sla_type.id}) ; ")
     }
   end
-
-  def purge()
-    return ActiveRecord::Base.connection.select_value("TRUNCATE sla_cache_spents CASCADE ; ")
-  end    
 
   def editable?(user = nil)
     false

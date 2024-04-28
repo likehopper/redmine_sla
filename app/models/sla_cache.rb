@@ -71,13 +71,14 @@ class SlaCache < ActiveRecord::Base
     SlaCacheSpent.update_by_issue(self.issue_id)
   end  
 
+  def self.purge
+    return ActiveRecord::Base.connection.execute("TRUNCATE sla_caches CASCADE ; ")
+  end
+    
   def self.destroy_by_issue_id(param_issue_id)
     return SlaCache.where(issue: param_issue_id).destroy_all
   end  
                   
-  def self.purge()
-    return ActiveRecord::Base.connection.execute("TRUNCATE sla_caches CASCADE ; ")
-  end  
 
   def editable?(user = nil)
     false

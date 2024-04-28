@@ -1,5 +1,11 @@
 <% html_title(l(:sla_label_global_settings)) %>
 <div class="content"> 
+  <div class="contextual">
+    <%= link_to l('sla_label.sla_cache_spent.purge'), purge_sla_cache_spents_path,
+          title: l('sla_label.sla_cache_spent.purge'), class: 'icon icon-del',
+          :data => {:confirm => l(:text_are_you_sure)} if User.current.admin?
+    %>
+  </div>
   <div class="title-sla-settings title-sla_cache_spent">
     <%= title l('sla_label.sla_cache_spent.plural') %>
   </div>
