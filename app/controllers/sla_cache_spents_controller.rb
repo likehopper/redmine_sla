@@ -27,6 +27,9 @@ class SlaCacheSpentsController < ApplicationController
   before_action :find_sla_cache_spent, only: [:show]
   before_action :find_sla_cache_spents, only: [:context_menu, :refresh, :destroy]
 
+  rescue_from Query::StatementInvalid, :with => :query_statement_invalid
+  rescue_from Query::QueryError, :with => :query_error
+    
   helper :context_menus
   #helper :sla_issues
   helper :queries
@@ -112,7 +115,7 @@ class SlaCacheSpentsController < ApplicationController
     @sla_cache_spents.each do |e|
       @sla_cache_spent_ids << e.id
       @safe_attributes.concat e.safe_attribute_names
-      attributes = e.safe_attribute_names - (%w(custom_field_values custom_fields))
+      attributes = e.safe_attribute_names
       attributes.each do |c|
         column_name = c.to_sym
         if @selected.key? column_name

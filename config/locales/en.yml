@@ -37,6 +37,7 @@ en:
     sla_level: &sla_level SLA Level
     sla_cache: &sla_cache SLA Cache
     sla_cache_spent: &sla_cache_spent SLA Cache spent
+    custom_field: &custom_field SLA Custom field
 
   field_sla: *sla
   field_slas: *slas
@@ -59,6 +60,7 @@ en:
   field_sla_level: *sla_level
   field_sla_cache: *sla_cache
   field_sla_cache_spent: *sla_cache_spent
+  field_custom_field: *custom_field
 
   activerecord:
     models:
@@ -157,6 +159,7 @@ en:
         other: "%{count} SLA"
       new: New SLA
       edit: Edit SLA
+      save: Save SLA
       delete: Delete SLA
       miss: Miss SLA
       notice_successful_create: "SLA %{id} created."
@@ -171,6 +174,7 @@ en:
         other: "%{count} SLA Types"
       new: New SLA Type
       edit: Edit SLA Type
+      save: Save SLA Type
       delete: Delete SLA Type
       miss: Miss SLA Type
       notice_successful_create: "SLA Type %{id} created."
@@ -185,6 +189,7 @@ en:
         other: "%{count} SLA Statuses"
       new: New SLA Status
       edit: Edit SLA Status
+      save: Save SLA Status
       delete: Delete SLA Statuses
       miss: Miss SLA Statuses
 
@@ -198,6 +203,7 @@ en:
         other: "%{count} SLA Holidays"
       new: New SLA Holiday
       edit: Edit SLA Holiday
+      save: Save SLA Holiday
       delete: Delete SLA Holiday
       miss: Miss SLA Holiday
 
@@ -211,6 +217,7 @@ en:
         other: "%{count} SLA Calendars"
       new: New SLA Calendar
       edit: Edit SLA Calendar
+      save: Save SLA Calendar
       delete: Delete SLA Calendar
       miss: Miss SLA Calendar
       notice_successful_create: "SLA Calendar %{id} created."
@@ -225,6 +232,7 @@ en:
         other: "%{count} SLA Schedules"
       new: New SLA Schedule
       edit: Edit SLA Schedule
+      save: Save SLA Schedule
       delete: Del SLA Schedule
       miss: Miss SLA Schedule
       exists: This slot alredy exists
@@ -241,6 +249,7 @@ en:
         other: "%{count} SLA Calendars' Holidays"
       new: New SLA Calendar's Holidays
       edit: Edit SLA Calendar's Holidays
+      save: Save SLA Calendar's Holidays
       delete: Delete SLA Calendar's Holidays
       exists: This holiday is already present in this SLA Calendar's Holidays
 
@@ -254,7 +263,9 @@ en:
         other: "%{count} SLA Levels"
       new: Add SLA Level
       edit: Edit SLA Level
+      save: Save SLA Level
       delete: Delete SLA Level
+      purge: Purge all SLA Terms of the SLA Level
       miss: Miss SLA Level
 
     # SlaLevelTerm
@@ -267,9 +278,11 @@ en:
         other: "%{count} SLA Terms"
       new: Add SLA Term
       edit: Edit SLA Term
+      save: Save SLA Term
       delete: Delete SLA Term
       miss: Miss SLA Term
       exists: This term alredy exists
+      negative: Negative term is impossible
 
     # SlaProjectTracker
     sla_project_tracker:
@@ -277,6 +290,7 @@ en:
       singular: SLA project's trackers
       new: New SLA project's trackers
       edit: Edit SLA project's trackers
+      save: Save SLA project's trackers
       delete: Delete SLA project's trackers
       exists: This tracker alredy exists
 

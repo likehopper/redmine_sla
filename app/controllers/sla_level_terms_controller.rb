@@ -102,9 +102,6 @@ class SlaLevelTermsController < ApplicationController
   end
 
   def destroy
-    #@sla_level_terms.each(&:destroy)
-    #flash[:notice] = l(:notice_successful_delete)
-    #redirect_back_or_default sla_level_terms_path
     @sla_level_terms.each do |sla_level_term|
       begin
         sla_level_term.reload.destroy
@@ -134,7 +131,7 @@ class SlaLevelTermsController < ApplicationController
     @sla_level_terms.each do |e|
       @sla_level_term_ids << e.id
       @safe_attributes.concat e.safe_attribute_names
-      attributes = e.safe_attribute_names - (%w(custom_field_values custom_fields))
+      attributes = e.safe_attribute_names
       attributes.each do |c|
         column_name = c.to_sym
         if @selected.key? column_name
@@ -149,11 +146,6 @@ class SlaLevelTermsController < ApplicationController
   end
  
   private
-
-  #def find_by_level_type( param_sla_level_id, param_type_id, param_priority_id)
-  #  # alternative to function sla_get_term
-  #  find_by_level_type = self.where( sla_level_id: param_sla_level_id, sla_type_id: param_type_id, priority_id: [0,param_priority_id] ).order(priority_id: :desc).first
-  #end
 
   def find_sla_level_term
     @sla_level_term = SlaLevelTerm.find(params[:id])

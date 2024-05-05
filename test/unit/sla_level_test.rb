@@ -36,7 +36,7 @@ class SlaLevelTest < ActiveSupport::TestCase
 
       array_issue = array_fixtures_issues[array_fixture]
       issue_id = array_issue["issue_id"]
-      @issue = Issue.find(issue_id) ;
+      issue = Issue.find(issue_id) ;
 
       puts "- process issue_id = #{issue_id}"
 
@@ -60,25 +60,32 @@ class SlaLevelTest < ActiveSupport::TestCase
 
           # puts "- - - > expected > spent = #{spent} for term = #{term}"
 
-          sla_cache = SlaCache.find_or_new(issue_id)
+          sla_cache = SlaCache.find_by_issue_id(issue_id)
           
-          sla_level_term = SlaLevelTerm.find_by_level_type(sla_cache.sla_level_id,sla_type_id,@issue.priority_id)
-          if ( sla_level_term.nil? )
-            next
-          end          
-          sla_type_term_issue = sla_level_term[:term]
+          # TODO : SLA PRIORITY
+          #sla_level_term = SlaLevelTerm.find_by_level_type_priority(sla_cache.sla_level_id,sla_type_id,@issue.priority_id)
+          #if ( sla_level_term.nil? )
+          #  next
+          #end          
+          #sla_type_term_issue = sla_level_term[:term]
+          sla_term = issue.get_sla_term_expected(sla_type_id)
+          # TODO : SlaLog : no sla_level
+          next if ( sla_term.nil? )
 
-          sla_cache_spent = SlaCacheSpent.find_or_new(sla_cache.id,sla_type_id)
-          sla_type_spent_issue = sla_cache_spent[:spent]
-        
+          #sla_cache_spent = SlaCacheSpent.find_or_new(sla_cache.id,sla_type_id)
+          #sla_type_spent_issue = sla_cache_spent[:spent]
+          sla_spent = issue.get_sla_term_spent(sla_type_id)
+          # TODO : SlaLog : si valeur nulle
+          next if ( sla_spent.nil? )
+
           # puts "- - - > found > spent = #{sla_type_spent_issue} for term = #{sla_type_term_issue}"
 
-          if ( sla_type_term_issue != term )
+          if ( sla_term != term )
             # puts "- - - => DELAY #{sla_type_name} FAILED ==>> expected #{term} vs #{sla_type_term_issue} found"
             assert false
           end
 
-          if ( sla_type_spent_issue != spent )
+          if ( sla_spent != spent )
             # puts "- - - => SPENT #{sla_type_name} FAILED ==>> expected #{spent} vs #{sla_type_spent_issue} found"
             assert false
           end

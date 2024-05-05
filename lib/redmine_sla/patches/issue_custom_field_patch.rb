@@ -16,46 +16,28 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-class SlaIssuesController < ApplicationController
+require_dependency 'issue_custom_field'
 
-  unloadable
+module RedmineSla
 
-  accept_api_auth :index
+  module Patches
 
-  before_action :find_project, :only => [ :index, :destroy]
+    # Patches Redmine's IssuesController dynamically
+    module IssueCustomFieldPatch  
 
-  helper :sla_issues
-  helper :queries
-  include QueriesHelper
+      def to_s
+        self.name
+      end
 
-  def index
-    Rails.logger.info "==>> SlaIssuesController ==> Index"
-  end
+      module ClassMethods
+      end
+  
+      module InstanceMethods      
+      end
 
-  def show
-    Rails.logger.info "==>> SlaIssuesController ==> Show"  
-  end
 
-  def update
-    Rails.logger.info "==>> SlaIssuesController ==> update"  
-  end
+    end
 
-  def destroy
-    Rails.logger.info "==>> SlaIssuesController ==> destroy"  
-  end
-
-private
-
-  def find_project
-    @project = Project.find(params[:project_id])
-  rescue ActiveRecord::RecordNotFound
-    render_404
-  end
-
-  def find_issue
-    @issue = Issue.find(params[:issue_id])
-  rescue ActiveRecord::RecordNotFound
-    render_404
   end
 
 end

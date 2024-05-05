@@ -102,7 +102,7 @@ class SlaSchedulesController < ApplicationController
       end
     else
       respond_to do |format|
-        format.html {render :action => 'edit'}
+        format.html {render :action => 'edit' }
         format.api  {render_validation_errors(@sla_schedule)}
       end
     end
@@ -110,9 +110,6 @@ class SlaSchedulesController < ApplicationController
   end
 
   def destroy
-    #@sla_schedules.each(&:destroy)
-    #flash[:notice] = l(:notice_successful_delete)
-    #redirect_back_or_default sla_schedules_path
     @sla_schedules.each do |sla_schedule|
       begin
         sla_schedule.reload.destroy
@@ -142,7 +139,7 @@ class SlaSchedulesController < ApplicationController
     @sla_schedules.each do |e|
       @sla_schedule_ids << e.id
       @safe_attributes.concat e.safe_attribute_names
-      attributes = e.safe_attribute_names - (%w(custom_field_values custom_fields))
+      attributes = e.safe_attribute_names
       attributes.each do |c|
         column_name = c.to_sym
         if @selected.key? column_name

@@ -59,16 +59,10 @@ class SlaCacheSpent < ActiveRecord::Base
     user ||= User.current
     user.allowed_to?(:manage_sla, nil, global: true)
   end
-
-  def self.find_by_cache_type( param_sla_cache_id, param_type_id )
-    return self.where( sla_cache_id: param_sla_cache_id, sla_type_id: param_type_id ).first
-  end
   
-  def self.find_or_new( param_sla_cache_id, param_type_id)
-    sla_cache = SlaCache.find( param_sla_cache_id )
-    ActiveRecord::Base.connection.execute("SELECT sla_get_spent(#{sla_cache.issue_id},#{param_type_id}) ; ")
-    sla_cache_spent = self.find_by_cache_type( param_sla_cache_id, param_type_id )
-    sla_cache_spent
+  def self.find_by_issue_and_type_id(issue,sla_type_id)
+    ActiveRecord::Base.connection.execute("SELECT sla_get_spent(#{issue.id},#{sla_type_id}) ; ")
+    self.find_by(issue_id: issue.id,sla_type_id: sla_type_id)
   end
 
   # Class method for refresh cache
@@ -81,9 +75,9 @@ class SlaCacheSpent < ActiveRecord::Base
   end  
 
   # Class method for update cache
-  def self.update_by_issue(param_issue_id)
+  def self.update_by_issue_id(issue_id)
     SlaType.all.each { |sla_type|
-      ActiveRecord::Base.connection.execute("SELECT sla_get_spent(#{param_issue_id},#{sla_type.id}) ; ")
+      ActiveRecord::Base.connection.execute("SELECT sla_get_spent(#{issue_id},#{sla_type.id}) ; ")
     }
   end
 

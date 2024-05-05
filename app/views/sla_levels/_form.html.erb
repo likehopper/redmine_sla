@@ -16,6 +16,11 @@
         <%= f.select :sla_calendar_id, SlaCalendar.all.collect { |p| [ p.name, p.id ] }, :include_blank => (f.object.new_record??true:false), :required => true %>
       </p>
       <% end %>
+      <% if sla_level.safe_attribute?('custom_field_id') %>
+      <p>
+        <%= f.select :custom_field_id, SlaCustomField.all.collect { |p| [ p.name, p.id ] }, :include_blank => true, :required => false %>
+      </p>
+      <% end %>
 
   </div>
 

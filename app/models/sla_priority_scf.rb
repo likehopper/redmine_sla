@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# Redmine SLA - Redmine's Plugin 
+# Redmine - project management software
+# Copyright (C) 2006-2023  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -16,36 +17,25 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require_dependency 'time_entry'
+class SlaPriorityScf < SlaPriority
 
-module RedmineSla
+  unloadable
 
-  module Patches
-    
-    module TimeEntryPatch
+  include ActiveModel::Model
 
-      def get_sla_level
-        issue.get_sla_level
-      end
-
-      def get_sla_cache
-        issue.get_sla_cache
-      end
-
-      def get_sla_respect(sla_type_id)
-        issue.get_sla_respect(sla_type_id)
-      end
-      
-      if ActiveRecord::Base.connection.table_exists? 'sla_types'
-        SlaType.all.each { |sla_type|
-          define_method("get_sla_respect_#{sla_type.id}") do 
-            self.get_sla_respect(sla_type.id)
-          end
-        }
-      end
-
-    end
-
+  def initialize(custom_field_id)
+    @scf = SlaCustomField.find(custom_field_id)
   end
-
+  
+  # For display one SlaPriority in IssueHelper
+  def find_by_issue(issue)
+    sla_priority = issue.custom_value_for(@scf.id)
+    SlaPriorityValue.new({ id: sla_priority, name: sla_priority })
+  end
+  
+  # For display all SlaPriority in SlaLevel views after self.create ( base on all values of the CustomField )
+  def all
+    @scf.possible_values.map { |name| SlaPriorityValue.new({ id: name, name: name }) }
+  end  
+  
 end

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# Redmine SLA - Redmine's Plugin 
+# Redmine - project management software
+# Copyright (C) 2006-2023  Jean-Philippe Lang
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -16,36 +17,25 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require_dependency 'time_entry'
+class SlaCustomField < IssueCustomField
+  
+  unloadable
 
-module RedmineSla
+  include ActiveModel::Model
 
-  module Patches
-    
-    module TimeEntryPatch
+  def self.class
+    Rails.logger.debug "==>> SlaCustomField self.class"
+    "IssueCustomField"
+  end
 
-      def get_sla_level
-        issue.get_sla_level
-      end
+  # TODO : filter on issue with an other method self.find_by_issue ( issue.available_custom_fields.find { |field| field.id == custom_field_id } )
+  def self.find(custom_field_id)
+    IssueCustomField.find_by(field_format: :list, id: custom_field_id)
+  end 
 
-      def get_sla_cache
-        issue.get_sla_cache
-      end
-
-      def get_sla_respect(sla_type_id)
-        issue.get_sla_respect(sla_type_id)
-      end
-      
-      if ActiveRecord::Base.connection.table_exists? 'sla_types'
-        SlaType.all.each { |sla_type|
-          define_method("get_sla_respect_#{sla_type.id}") do 
-            self.get_sla_respect(sla_type.id)
-          end
-        }
-      end
-
-    end
-
+  # To only list IssueCustomFields of type "list" in SlaLevel#edit
+  def self.all
+    IssueCustomField.where(field_format: :list)
   end
 
 end

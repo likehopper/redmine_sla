@@ -123,7 +123,7 @@ class SlaCachesController < ApplicationController
     @sla_caches.each do |e|
       @sla_cache_ids << e.id
       @safe_attributes.concat e.safe_attribute_names
-      attributes = e.safe_attribute_names - (%w(custom_field_values custom_fields))
+      attributes = e.safe_attribute_names
       attributes.each do |c|
         column_name = c.to_sym
         if @selected.key? column_name
@@ -144,24 +144,6 @@ private
     super
   end
 
-  # def retrieve_default_query(use_session)
-  #   return if params[:query_id].present?
-  #   return if api_request?
-  #   return if params[:set_filter]
-
-  #   if params[:without_default].present?
-  #     params[:set_filter] = 1
-  #     return
-  #   end
-  #   if !params[:set_filter] && use_session && session[:sla_cache_query]
-  #     query_id, project_id = session[:sla_cache_query].values_at(:id, :project_id)
-  #     return if SlaCacheQuery.where(id: query_id).exists? && project_id == @project&.id
-  #   end
-  #   if default_query = SlaCacheQuery.default(project: @project)
-  #     params[:query_id] = default_query.id
-  #   end
-  # end
-
   def find_sla_cache
     @sla_cache = SlaCache.find(params[:id])
   rescue ActiveRecord::RecordNotFound
@@ -169,7 +151,6 @@ private
   end
 
   def find_sla_caches
-    Rails.logger.debug "==>> sla_caches find_sla_caches params = #{params}"
     params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]] 
     @sla_caches = SlaCache.find(params[:ids])
     @sla_cache = @sla_caches.first if @sla_caches.count == 1
@@ -178,6 +159,5 @@ private
   rescue ActiveRecord::RecordNotFound
     render_404
   end
-
 
 end

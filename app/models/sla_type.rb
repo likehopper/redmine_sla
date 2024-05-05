@@ -64,7 +64,7 @@ class SlaType < ActiveRecord::Base
   end
 
   def self.human_attribute_name(*args)
-    #Rails.logger.warn "======>>> SlaType->human_attribute_name(#{args[0].to_s}) <<<====== "
+    Rails.logger.warn "==>> SlaType->human_attribute_name(#{args[0].to_s}) <<<====== "
     super
   end
 
