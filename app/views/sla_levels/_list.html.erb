@@ -38,17 +38,20 @@
             <% end %>
             <td class="buttons">
               <% if entity.editable_by?(User.current) %>
+              <%= link_to l(:button_add), nested_sla_level_path(entity),
+                          title: l('sla_label.sla_level_term.edit'),
+                          class: 'icon-only icon-sla_level_term' %>
               <%= link_to l(:button_show), sla_level_path(entity),
-                           title: l(:button_show),
-                           class: 'icon-only icon-magnifier' %>
+                          title: l(:button_show),
+                          class: 'icon-only icon-magnifier' %>
               <%= link_to l(:button_edit), edit_sla_level_path(entity),
-                           title: l(:button_edit),
-                           class: 'icon-only icon-edit' %>
+                          title: l(:button_edit),
+                          class: 'icon-only icon-edit' %>
               <%= link_to l(:button_delete), sla_level_path(entity),
-                           data: {confirm: l(:text_are_you_sure)},
-                           method: :delete,
-                           title: l(:button_delete),
-                           class: 'icon-only icon-del' %>
+                          data: {confirm: l(:text_are_you_sure)},
+                          method: :delete,
+                          title: l(:button_delete),
+                          class: 'icon-only icon-del' %>
               <% end %>
             </td>
           </tr>

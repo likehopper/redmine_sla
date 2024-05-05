@@ -24,34 +24,22 @@ module RedmineSla
     
     module TimeEntryPatch
 
-      def sla_get_level
-        sla_cache = SlaCache.find_or_new(issue_id)
-        if ( sla_cache.nil? )
-          return nil
-        end        
-        return sla_cache.sla_level[:name]
+      def get_sla_level
+        issue.get_sla_level
       end
 
-      def sla_get_respect(param_time_entry_id,param_sla_type_id)
-        time_entry = TimeEntry.find(param_time_entry_id)
-        sla_cache = SlaCache.find_or_new(time_entry.issue_id)
-        if ( sla_cache.nil? )
-          return nil
-        end
-        sla_level_term = SlaLevelTerm.find_by_level_type(sla_cache.sla_level_id,param_sla_type_id,sla_cache.issue.priority_id)
-        if ( sla_level_term.nil? )
-          return nil
-        end
-        sla_term = sla_level_term[:term]  
-        sla_cache_spent = SlaCacheSpent.find_or_new(sla_cache.id,param_sla_type_id)
-        sla_spent = sla_cache_spent[:spent]     
-        return ( ( sla_term - sla_spent ) > 0 )
+      def get_sla_cache
+        issue.get_sla_cache
+      end
+
+      def get_sla_respect(sla_type_id)
+        issue.get_sla_respect(sla_type_id)
       end
       
       if ActiveRecord::Base.connection.table_exists? 'sla_types'
         SlaType.all.each { |sla_type|
-          define_method("sla_get_respect_#{sla_type.id}") do 
-            sla_get_respect(id,sla_type.id)
+          define_method("get_sla_respect_#{sla_type.id}") do 
+            self.get_sla_respect(sla_type.id)
           end
         }
       end
@@ -61,7 +49,3 @@ module RedmineSla
   end
 
 end
-
-#unless Issue.included_modules.include? RedmineSla::Patches::TimeEntryPatch
-#  TimeEntry.send(:include, RedmineSla::Patches::TimeEntryPatch)
-#end

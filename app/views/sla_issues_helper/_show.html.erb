@@ -1,7 +1,7 @@
 <% 
 if User.current.allowed_to?(:view_sla, @project, :global => true)
 
-  sla_cache = SlaCache.find_or_new(issue.id)
+  sla_cache = issue.get_sla_cache
 
   if ( !sla_cache.nil? && sla_cache.sla_level_id > 0  )
 
@@ -23,16 +23,13 @@ if User.current.allowed_to?(:view_sla, @project, :global => true)
 <%
     SlaType.all.each { |sla_type|
 
-      sla_level_term = SlaLevelTerm.find_by_level_type(sla_cache.sla_level_id,sla_type.id,issue.priority_id)
-      if ( sla_level_term.nil? )
-        next
-      end
-      sla_term = sla_level_term[:term]
+      sla_term = issue.get_sla_term_expected(sla_type.id)
+      # TODO : SlaLog : no sla_level
+      next if ( sla_term.nil? )
 
-      Rails.logger.info "==>> SLA ISSUE SHOW ==> sla_cache = #{sla_cache.id}"
-
-      sla_cache_spent = SlaCacheSpent.find_or_new(sla_cache.id,sla_type.id)
-      sla_spent = sla_cache_spent[:spent]
+      sla_spent = issue.get_sla_term_spent(sla_type.id)
+      # TODO : SlaLog : no sla_cache_term > no priority ?
+      next if ( sla_spent.nil? )
         
       if ( !sla_spent.nil? && !sla_term.nil? ) 
 

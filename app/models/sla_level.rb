@@ -22,18 +22,22 @@ class SlaLevel < ActiveRecord::Base
   
   belongs_to :sla
   belongs_to :sla_calendar
-  
+  belongs_to :custom_field, :class_name => 'IssueCustomField'
+
   has_many :sla_level_terms
   has_many :sla_caches
 
   has_many :sla_project_trackers, through: :sla
+
+  accepts_nested_attributes_for :sla_level_terms, allow_destroy: true
+  validate :sla_level_terms_greater_than_or_equal_to_zero
 
   include Redmine::SafeAttributes
 
   scope :visible, ->(*args) { where(SlaLevel.visible_condition(args.shift || User.current, *args)) }
 
   default_scope {
-    joins(:sla,:sla_calendar)
+    joins(:sla,:sla_calendar).left_joins(:custom_field)
     # order(name: :asc)
   }
   
@@ -47,8 +51,15 @@ class SlaLevel < ActiveRecord::Base
   validates_uniqueness_of :name, :case_sensitive => false
 
   validates_uniqueness_of :sla, :scope => [ :sla_calendar ]
+  safe_attributes *%w[name sla_id sla_calendar_id custom_field_id]
 
-  safe_attributes *%w[name sla_id sla_calendar_id]
+  before_save do
+    # If the priority reference changes
+    if attribute_changed?(:custom_field_id)
+      # The terms of the old priorities must be deleted
+      SlaLevelTerm.where(sla_level_id: self.id).destroy_all
+    end
+  end
 
   def self.visible_condition(user, options = {})
     '1=1'
@@ -77,5 +88,16 @@ class SlaLevel < ActiveRecord::Base
   def to_s
     name.to_s
   end 
+
+  private
+
+  def sla_level_terms_greater_than_or_equal_to_zero
+    sla_level_terms.each do |child|
+      if child.term.negative?
+        errors.add(:base, l('sla_label.sla_level_term.negative'))
+        return
+      end
+    end
+  end
 
 end

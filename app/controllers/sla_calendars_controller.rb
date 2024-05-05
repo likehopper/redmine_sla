@@ -105,9 +105,6 @@ class SlaCalendarsController < ApplicationController
   end
 
   def destroy
-    #@sla_calendars.each(&:destroy)
-    #flash[:notice] = l(:notice_successful_delete)
-    #redirect_back_or_default sla_calendars_path
     @sla_calendars.each do |sla_calendar|
       begin
         sla_calendar.reload.destroy
@@ -137,7 +134,7 @@ class SlaCalendarsController < ApplicationController
     @sla_calendars.each do |e|
       @sla_calendar_ids << e.id
       @safe_attributes.concat e.safe_attribute_names
-      attributes = e.safe_attribute_names - (%w(custom_field_values custom_fields))
+      attributes = e.safe_attribute_names
       attributes.each do |c|
         column_name = c.to_sym
         if @selected.key? column_name

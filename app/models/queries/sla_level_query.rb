@@ -26,16 +26,16 @@ class Queries::SlaLevelQuery < Query
     add_available_filter 'name', type: :string
     add_available_filter 'sla_id', type: :list, :values => lambda {all_sla_values}
     add_available_filter 'sla_calendar_id', :type => :list, :values => lambda {all_sla_calendar_values}
+    add_available_filter 'custom_field_id', :type => :list, :values => lambda {all_sla_custom_fields_values}
   end
 
   def available_columns
     return @available_columns if @available_columns
     @available_columns = []
-    group = l("label_filter_group_#{self.class.name.underscore}")
-
     @available_columns << QueryColumn.new(:name, :sortable => "#{SlaLevel.table_name}.name", :default_order => :asc, :groupable => false)
     @available_columns << QueryColumn.new(:sla, :sortable => "#{Sla.table_name}.name", :default_order => :asc, :groupable => true)
     @available_columns << QueryColumn.new(:sla_calendar, :sortable => "#{SlaCalendar.table_name}.name", :default_order => :asc, :groupable => true)
+    @available_columns << QueryColumn.new(:custom_field, :sortable => "#{CustomField.table_name}.name", :default_order => :asc, :groupable => true)
     @available_columns
   end
 
@@ -52,7 +52,8 @@ class Queries::SlaLevelQuery < Query
     super.presence || [
       "name",
       "sla",
-      "sla_calendar"
+      "sla_calendar",
+      "custom_field"
     ].flat_map{|c| [c.to_s, c.to_sym]}
   end
   
@@ -96,6 +97,16 @@ class Queries::SlaLevelQuery < Query
       values << [name.to_s,id.to_s]
     }
     @all_sla_calendar_values = values
+  end
+
+  def all_sla_custom_fields_values
+    return @all_sla_custom_fields_values if @all_sla_custom_fields_values
+
+    values ||= []
+    SlaCustomField.pluck(:name,:id).map { |name,id|
+      values << [name.to_s,id.to_s]
+    }
+    @all_sla_custom_fields_values = values
   end
 
 end

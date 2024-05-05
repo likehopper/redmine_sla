@@ -135,7 +135,7 @@ class SlaCalendarHolidaysController < ApplicationController
     @sla_calendar_holidays.each do |e|
       @sla_calendar_holiday_ids << e.id
       @safe_attributes.concat e.safe_attribute_names
-      attributes = e.safe_attribute_names - (%w(custom_field_values custom_fields))
+      attributes = e.safe_attribute_names
       attributes.each do |c|
         column_name = c.to_sym
         if @selected.key? column_name

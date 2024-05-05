@@ -51,14 +51,9 @@ class SlaCache < ActiveRecord::Base
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 
-  def self.find_by_issue(param_issue_id)
-    return self.where(issue_id: param_issue_id).first
-  end
-
-  def self.find_or_new(param_issue_id)
-    ActiveRecord::Base.connection.execute("SELECT sla_get_level(#{param_issue_id}) ; ")
-    sla_cache = self.find_by_issue(param_issue_id)
-    sla_cache
+  def self.find_by_issue_id(issue_id)
+    ActiveRecord::Base.connection.execute("SELECT sla_get_level(#{issue_id}) ; ")
+    self.find_by(issue_id: issue_id)
   end
 
   # Class method for refresh cache
@@ -68,17 +63,16 @@ class SlaCache < ActiveRecord::Base
     # Let's recalculate the sla_cache
     ActiveRecord::Base.connection.execute("SELECT sla_get_level(#{self.issue_id}) ; ")
     # Then, let's recalculate the sla_cache_spents !
-    SlaCacheSpent.update_by_issue(self.issue_id)
+    SlaCacheSpent.update_by_issue_id(self.issue_id)
   end  
 
   def self.purge
     return ActiveRecord::Base.connection.execute("TRUNCATE sla_caches CASCADE ; ")
   end
     
-  def self.destroy_by_issue_id(param_issue_id)
-    return SlaCache.where(issue: param_issue_id).destroy_all
-  end  
-                  
+  def self.destroy_by_issue_id(issue_id)
+    return SlaCache.where(issue: issue_id).destroy_all
+  end              
 
   def editable?(user = nil)
     false

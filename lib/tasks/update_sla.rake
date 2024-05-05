@@ -56,7 +56,7 @@ namespace :redmine do
           project.issues.where(tracker_id: SlaProjectTracker.where(project_id: project.id).map(&:tracker_id)).each do |issue|
               
             Rails.logger.info "rake redmine:plugins:redmine_sla:update Issue n°#{issue.id.to_s} [ tracker_id = #{issue.tracker_id.to_s} ] [ status_id = #{issue.status_id.to_s} ] TODO #{issue.subject}  "
-            SlaCacheSpent.update_by_issue(issue.id)
+            SlaCacheSpent.update_by_issue_id(issue.id)
             Rails.logger.info "rake redmine:plugins:redmine_sla:update Issue n°#{issue.id.to_s} CACHE UPDATE"
 
           end

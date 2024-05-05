@@ -74,21 +74,32 @@ RedmineApp::Application.config.after_initialize do
   require_dependency 'projects_controller'
   ProjectsController.helper(RedmineSla::Patches::ProjectsHelperPatch)
   
+  # Adds methods on Redmine's Issues for SLA management
   unless Issue.included_modules.include? RedmineSla::Patches::IssuePatch
     Issue.send(:include, RedmineSla::Patches::IssuePatch)
   end
 
+  # Adds methods on Redmine's TimeEntry for SLA management
   unless TimeEntry.included_modules.include? RedmineSla::Patches::TimeEntryPatch
     TimeEntry.send(:include, RedmineSla::Patches::TimeEntryPatch)
   end
 
+  # Adds the "to_s" method on Redmine's IssueCustomField to display the name of the SlaCustomField in the sla_level list
+  unless IssueCustomField.included_modules.include? RedmineSla::Patches::IssueCustomFieldPatch
+    IssueCustomField.send(:include, RedmineSla::Patches::IssueCustomFieldPatch)
+  end  
+
   if (ActiveRecord::Base.connection.tables.include?('queries') rescue false) &&
-    # Seaarch on Redmine's issues
-    IssueQuery.included_modules.exclude?(RedmineSla::Patches::IssueQueryPatch)
-    IssueQuery.send(:include, RedmineSla::Patches::IssueQueryPatch)
-    # Search on Redmine's time entry
-    TimeEntryQuery.included_modules.exclude?(RedmineSla::Patches::TimeEntryQueryPatch)
-    TimeEntryQuery.send(:include, RedmineSla::Patches::TimeEntryQueryPatch)
+    # Adds methods on Redmine's Issues to Display/Filter/Sort 
+    unless IssueQuery.included_modules.include? RedmineSla::Patches::IssueQueryPatch
+      #IssueQuery.included_modules.exclude?(RedmineSla::Patches::IssueQueryPatch)
+      IssueQuery.send(:include, RedmineSla::Patches::IssueQueryPatch)
+    end
+    # Adds methods on Redmine's TimeEntry to Display/Filter/Sort
+    unless TimeEntryQuery.included_modules.include? RedmineSla::Patches::TimeEntryQueryPatch
+      #TimeEntryQuery.included_modules.exclude?(RedmineSla::Patches::TimeEntryQueryPatch)
+      TimeEntryQuery.send(:include, RedmineSla::Patches::TimeEntryQueryPatch)
+    end
   end  
 
 end

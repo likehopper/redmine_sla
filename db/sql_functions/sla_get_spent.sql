@@ -37,7 +37,7 @@ BEGIN
   END IF ;  
 	
 	SELECT
-    NULL::integer AS "id",
+    "sla_cache_spents"."id" AS "id",
     "sla_cache_spents"."sla_cache_id" AS "sla_cache_id",
     "sla_cache_spents"."project_id" AS "project_id",
     "sla_cache_spents"."issue_id" AS "issue_id",
@@ -160,7 +160,7 @@ BEGIN
 	ON CONFLICT ON CONSTRAINT "sla_cache_spents_sla_caches_sla_types_ukey" DO UPDATE SET
       "updated_on" = v_sla_spent."updated_on",
       "spent" = "sla_cache_spents"."spent" + v_sla_spent."spent"
-  ;
+  RETURNING id INTO v_sla_spent."id" ;
 
   RAISE DEBUG
     'sla_get_spent	END ------' ;

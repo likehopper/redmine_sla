@@ -27,7 +27,11 @@ class SlaSchedule < ActiveRecord::Base
   scope :visible, ->(*args) { where(SlaSchedule.visible_condition(args.shift || User.current, *args)) }
 
   #default_scope { joins(:sla_calendar).order(dow: :asc, start_time: :asc) }  
-  default_scope { joins(:sla_calendar).order("sla_schedules.dow ASC, sla_schedules.start_time ASC") }  
+  default_scope {
+      select("sla_schedules.*").
+      joins(:sla_calendar)
+      #order(dow: :asc, start_time: :asc)
+  }
 
   # It is important not to convert times based on time zone !
   # ( cf. https://api.rubyonrails.org/classes/ActiveRecord/Timestamp.html )
@@ -82,10 +86,6 @@ class SlaSchedule < ActiveRecord::Base
     user ||= User.current
     user.allowed_to?(:manage_sla, nil, global: true)
   end
-  
-  def to_s
-    name.to_s
-  end  
 
   def sla_schedules_inconsistency
     # Format datas
