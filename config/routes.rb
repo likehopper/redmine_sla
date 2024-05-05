@@ -56,16 +56,20 @@ match 'sla/calendars', :controller => 'sla_calendars', :action => 'destroy', :vi
 resources :sla_schedules, path: "sla/schedules" do
   collection do
     get 'context_menu'
-  end  
+  end
 end
 # context_menu : bulk_destroy
 match 'sla/schedules', :controller => 'sla_schedules', :action => 'destroy', :via => :delete
 
 
 resources :sla_levels, path: "sla/levels" do
+  member do
+    get 'nested'
+  end
   collection do
     get 'context_menu'
-  end  
+  end
+  resources :sla_level_terms, path: "sla/level_terms", shallow: true
 end
 # context_menu : bulk_destroy
 match 'sla/levels', :controller => 'sla_levels', :action => 'destroy', :via => :delete

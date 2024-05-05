@@ -8,8 +8,8 @@ class CreateSlaCacheSpents < ActiveRecord::Migration[5.2]
 
         create_table :sla_cache_spents do |t|
           t.belongs_to :sla_cache, :null => false, foreign_key: { name: 'sla_cache_spents_sla_caches_fkey', on_delete: :cascade }
-          t.belongs_to :project, :null => false, foreign_key: { name: 'sla_caches_projectss_fkey', on_delete: :cascade }
-          t.belongs_to :issue, :null => false, foreign_key: { name: 'sla_caches_issues_fkey', on_delete: :cascade }
+          t.belongs_to :project, :null => false, foreign_key: { name: 'sla_caches_projects_fkey', on_delete: :cascade }
+          t.belongs_to :issue, :null => false, foreign_key: { name: 'sla_cache_spents_issues_fkey', on_delete: :cascade }
           t.belongs_to :sla_type, :null => false, foreign_key: { name: 'sla_cache_spents_sla_types_fkey', on_delete: :cascade }
           t.integer :spent, :null => false
           t.datetime :updated_on, :null => false

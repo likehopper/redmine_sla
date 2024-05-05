@@ -22,7 +22,7 @@ class SlaLevelTerm < ActiveRecord::Base
   
   belongs_to :sla_level
   belongs_to :sla_type
-  belongs_to :priority, :class_name => 'IssuePriority'
+  #belongs_to :priority, :class_name => 'IssuePriority'
 
   #has_many :slas, through: :sla_levels
   #has_many :sla_project_trackers, through: :slas
@@ -33,23 +33,27 @@ class SlaLevelTerm < ActiveRecord::Base
 
   default_scope {
       # select("sla_levels.*, sla_level_terms.*, sla_types.*, enumerations.*")
-      joins(:sla_level,:sla_type,:priority)
+      #joins(:sla_level,:sla_type,:priority)
+      joins(:sla_level,:sla_type)
       # .order("sla_levels.name ASC, sla_types.name ASC, enumerations.position ASC") 
   }
 
   validates_presence_of :sla_level
   validates_presence_of :sla_type
-  validates_presence_of :priority, :if => Proc.new {|sla_level_term| sla_level_term.new_record? || sla_level_term.priority_id_changed?}
+  # Todo : validate priority presence with SlaPriority ?
+  #validates_presence_of :priority, :if => Proc.new {|sla_level_term| sla_level_term.new_record? || sla_level_term.priority_id_changed?}
+  validates_presence_of :priority
   validates_presence_of :term
+  validates :term, numericality: { greater_than_or_equal_to: 0 }
 
   validates_associated :sla_level
   validates_associated :sla_type
 
   validates_uniqueness_of :sla_level,
-    :scope => [ :sla_type, :priority_id ],
+    :scope => [ :sla_type, :priority ],
     :message => l('sla_label.sla_level_term.exists')
 
-  safe_attributes *%w[sla_level_id sla_type_id priority_id term]
+  safe_attributes *%w[sla_level_id sla_type_id priority term]
 
   def self.visible_condition(user, options = {})
     '1=1'
@@ -74,14 +78,18 @@ class SlaLevelTerm < ActiveRecord::Base
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 
-  # Print text for link objects
-  def to_s
-    name.to_s
+  # Find a contractual term through 3 parameters ( sla_level, sla_type and sla_priority ) for SlaLevel#show & SlaLevel#nested
+  def self.find_by_level_type_priority( sla_level_id, sla_type_id, sla_priority )
+    self.find_by( sla_level_id: sla_level_id, sla_type_id: sla_type_id, priority: sla_priority )
   end
 
-  def self.find_by_level_type( param_sla_level_id, param_type_id, param_priority_id)
-    # alternative to function sla_get_term
-    find_by_level_type = self.where( sla_level_id: param_sla_level_id, sla_type_id: param_type_id, priority_id: [0,param_priority_id] ).order(priority_id: :desc).first
+  # Find a contractual term through 2 parameters ( sla_cache, sla_type  )
+  def self.find_by_issue_and_type_id(issue,sla_type_id)
+    result = issue.get_sla_level
+    return result if result.nil?
+    sla_level_id, custom_field_id = result.values_at(:id, :custom_field_id) 
+    sla_priority = SlaPriority.create_by_issue(issue)
+    self.find_by( sla_level_id: sla_level_id, sla_type_id: sla_type_id, priority: sla_priority.id.to_s )
   end
 
 end

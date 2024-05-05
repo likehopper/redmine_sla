@@ -16,16 +16,13 @@
     <b><%= l('sla_label.sla_calendar.singular') -%> : </b><%=  -%>
     <%= link_to @sla_level.sla_calendar.name, sla_calendar_path(@sla_level.sla_calendar), title: l(:button_show) -%> 
   </p>
+  <% i=0 %>
+  <%= form_tag sla_level_path, method: :patch, id: "multiple_records_form" do %>
   <table style="border: none:" margin="8px">
   <tr>
     <th width="240px" colspan="2" style="border-top: solid darkgrey; border-left: solid darkgrey; border-right: solid darkgrey; text-align: right;"><%= l("sla_label.sla_level.plural") -%>&nbsp;<%= image_tag("arrow_right.png") -%></th>
     <% 
-
-        sla_types = @sla_level.sla_level_terms
-          #.unscoped # To view all sla_types
-          .select("sla_level_terms.sla_type_id AS id, sla_types.name AS name")
-          .order("sla_types.name")
-          .uniq.each do |sla_type|
+      SlaType.all.each do |sla_type|        
     -%>
       <th width="120px" rowspan="2" style="border: solid darkgrey;"><%= sla_type[:name] -%></th>
     <% end -%>
@@ -33,32 +30,28 @@
   <tr>
     <th width="240px" colspan="2" style="border-bottom: solid darkgrey; border-left: solid darkgrey; border-right: solid darkgrey; text-align: left;"><%= image_tag("arrow_down.png") -%>&nbsp;<%= l(:enumeration_issue_priorities) -%></th>
   </tr>
-  <% 
-    sla_level_term_priorities = @sla_level.sla_level_terms.distinct(:priority).pluck(:priority)
-    SlaPriority.create(@sla_level.custom_field_id).all.each do |sla_priority|
-      if ! sla_priority.id.to_s.in?(sla_level_term_priorities)
-        next
-      end
-    -%>
+  <%
+    SlaPriority.create(@sla_level.custom_field_id).all.each do |priority|
+  -%>
   <tr>
-    <th colspan="2" style="border: solid darkgrey;"><%= sla_priority.name -%></th>
-      <% sla_types.each do |sla_type| -%>
+    <th colspan="2" style="border: solid darkgrey;"><%= priority.name -%></th>
+      <% SlaType.all.each do |sla_type| -%>
         <td style="border: solid darkgrey; text-align: right;"><%
-          sla_level_term = SlaLevelTerm.find_by_level_type_priority(@sla_level.id,sla_type[:id],sla_priority.id)
-          if ( sla_level_term.nil? )
+          sla_level_term = SlaLevelTerm.find_by_level_type_priority(@sla_level.id,sla_type[:id],priority.id)
         -%>
-          &nbsp
-        <% else
-            sla_term = sla_level_term[:term]
-            sla_term_txt = ChronicDuration.output(sla_term*60, :format => :short, :limit_to_hours => true, :units => 2, :joiner => '')
-        -%>
-          <%= sla_term_txt -%>
-        <% end -%>
+          <% i+=1 %>
+          <%= hidden_field_tag "sla_level[sla_level_terms_attributes][#{i}][sla_level_id]", @sla_level.id %>
+          <%= hidden_field_tag "sla_level[sla_level_terms_attributes][#{i}][sla_type_id]", sla_type[:id] %>
+          <%= hidden_field_tag "sla_level[sla_level_terms_attributes][#{i}][priority]", priority.id %>
+          <%= text_field_tag "sla_level[sla_level_terms_attributes][#{i}][term]", ( sla_level_term.nil? ? "" : sla_level_term[:term] ) %>
+          <%= hidden_field_tag "sla_level[sla_level_terms_attributes][#{i}][id]", sla_level_term[:id] if ! sla_level_term.nil? %>
         </td>
     <% end -%>
   </tr>
-  <% end -%>
+<% end -%>
 </table>
+<%= submit_tag l('sla_label.sla_level_term.save') %>
+<% end -%>
 </div>
 <% content_for :sidebar do -%>
   <% render partial: 'slas/sidebar' -%>

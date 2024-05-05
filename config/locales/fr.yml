@@ -37,6 +37,7 @@ fr:
     sla_level: &sla_level Niveau de SLA
     sla_cache: &sla_cache Cache de SLA
     sla_cache_spent: &sla_cache_spent Délai du cache de SLA
+    custom_field: &custom_field SLA Champs personnalisés
 
   field_sla: *sla
   field_slas: *slas
@@ -59,6 +60,7 @@ fr:
   field_sla_level: *sla_level
   field_sla_cache: *sla_cache
   field_sla_cache_spent: *sla_cache_spent
+  field_custom_field: *custom_field
 
   activerecord:
     models:
@@ -157,6 +159,7 @@ fr:
         other: "%{count} SLA"
       new: Ajouter un SLA
       edit: Editer un SLA
+      save: Enregistrer un SLA
       delete: Supprimer un SLA
       miss: SLA absent
       notice_successful_create: "SLA %{id} créé."
@@ -171,6 +174,7 @@ fr:
         other: "%{count} Types de SLA"
       new: Ajouter un Type de SLA
       edit: Editer un Type de SLA
+      save: Enregistrer un Type de SLA
       delete: Supprimer un Type de SLA
       miss: Absence du Type de SLA
       notice_successful_create: "Type de SLA %{id} créé."
@@ -185,6 +189,7 @@ fr:
         other: "%{count} Statuts de SLA"
       new: Ajouter un Statut de SLA
       edit: Editer un Statut de SLA
+      save: Enregistrer un Statut de SLA
       delete: Supprimer un Statut de SLA
       miss: Statut de SLA absent
 
@@ -198,6 +203,7 @@ fr:
         other: "%{count} Jours fériés de SLA"
       new: Ajouter un Jour férié de SLA
       edit: Editer un Jour férié de SLA
+      save: Enregistrer un Jour férié de SLA
       delete: Supprimer un Jour férié de SLA
       miss: Jour férié de SLA absent
 
@@ -211,6 +217,7 @@ fr:
         other: "%{count} Calendriers de SLA"
       new: Ajouter un Calendrier de SLA
       edit: Editer un Calendrier de SLA
+      save: Enregistrer un Calendrier de SLA
       delete: Supprimer un Calendrier de SLA
       miss: Calendrier de SLA absent
       notice_successful_create: "Calendrier de SLA %{id} créé."
@@ -225,6 +232,7 @@ fr:
         other: "%{count} Horaires de SLA"
       new: Ajouter un Horaire de SLA
       edit: Editer un Horaire de SLA
+      save: Enregistrer un Horaire de SLA
       delete: Supprimer un Horaire de SLA
       miss: Horaire de SLA absent
       exists: Ce crénau existe déjà
@@ -241,6 +249,7 @@ fr:
         other: "%{count} Jours fériés des calendriers de SLA"      
       new: Ajouter des Jours fériés d'un calendrier de SLA
       edit: Editer des Jours fériés d'un calendrier de SLA
+      save: Enregistrer des Jours fériés d'un calendrier de SLA
       delete: Supprimer des Jours fériés d'un calendrier de SLA
       exists: Ce jour férié existe déja dans ce calendrier de SLA
 
@@ -254,7 +263,9 @@ fr:
         other: "%{count} Niveaux de SLA"      
       new: Ajouter un Niveau de SLA
       edit: Editer un Niveau de SLA
+      save: Enregistrer un Niveau de SLA
       delete: Supprimer un Niveau de SLA
+      purge: Purge de tous les Engagements de SLA du Niveau de SLA
       miss: Niveau de SLA absent
 
     # SlaLevelTerm
@@ -267,9 +278,11 @@ fr:
         other: "%{count} Engagements de SLA"      
       new: Ajouter un Engagement de SLA
       edit: Editer un Engagement de SLA
+      save: Enregistrer un Engagement de SLA
       delete: Supprimer un Engagement de SLA
       miss: Engagement de SLA absent
       exists: Cet engagement existe déjà
+      negative: Un engagement négatif est impossible
 
     # SlaProjectTracker
     sla_project_tracker:
@@ -278,6 +291,7 @@ fr:
       new: Ajouter un Tracker de projet de SLA
       edit: Editer un Tracker de projet de SLA
       delete: Supprimer un Tracker de projet de SLA
+      save: Enregistrer un Tracker de projet de SLA
       exists: Ce tracker existe déjà
 
     # SlaCache

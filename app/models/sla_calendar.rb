@@ -41,7 +41,7 @@ class SlaCalendar < ActiveRecord::Base
   safe_attributes *%w[name]
 
   def self.visible_condition(user, options = {})
-    Rails.logger.warn "======>>> models / sla_calendar->visible_condition() <<<====== "
+    Rails.logger.warn "==>> models / sla_calendar->visible_condition() <<<====== "
     '1=1'
   end
 

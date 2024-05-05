@@ -11,9 +11,9 @@
         <%= f.select :sla_type_id, SlaType.all.collect { |p| [ p.name, p.id ] }, :include_blank => (f.object.new_record??true:false), :required => true %>
       </p>
       <% end %>
-      <% if sla_level_term.safe_attribute?('priority_id') %>
+      <% if sla_level_term.safe_attribute?('priority') %>
       <p>
-        <%= f.select :priority_id, IssuePriority.all.collect { |p| [ p.name, p.id ] }, :include_blank => (f.object.new_record??true:false), :required => true %>
+        <%= f.select :priority, SlaPriority.all.collect { |p| [ p.name, p.id ] }, :include_blank => (f.object.new_record??true:false), :required => true %>
       </p>
       <% end %>
       <% if sla_level_term.safe_attribute?('term') %>
@@ -27,7 +27,7 @@
       <% if f.object.new_record? %>
         <%= submit_tag l('sla_label.sla_level_term.new'), title: l(:button_create), class: "button-positive" %>
       <% else %>
-        <%= submit_tag l('sla_label.sla_level_term.edit'), title: l(:button_update), class: "button-positive" %>
+        <%= submit_tag l('sla_label.sla_level_term.save'), title: l(:button_update), class: "button-positive" %>
       <% end %>
     </p>
   <% end %>

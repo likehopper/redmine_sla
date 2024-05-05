@@ -30,8 +30,6 @@ class Queries::SlaProjectTrackerQuery < Query
   def available_columns
     return @available_columns if @available_columns
     @available_columns = []
-    group = l("label_filter_group_#{self.class.name.underscore}")
-
     @available_columns << QueryColumn.new(:tracker, :sortable => nil, :default_order => nil, :groupable => false)
     @available_columns << QueryColumn.new(:sla, :sortable => nil, :default_order => nil, :groupable => false)
     @available_columns

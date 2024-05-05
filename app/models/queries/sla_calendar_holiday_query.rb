@@ -31,8 +31,6 @@ class Queries::SlaCalendarHolidayQuery < Query
   def available_columns
     return @available_columns if @available_columns
     @available_columns = []
-    group = l("label_filter_group_#{self.class.name.underscore}")
-
     @available_columns << QueryColumn.new(:sla_calendar, :sortable => "#{SlaCalendar.table_name}.name", :default_order => :asc, :groupable => true)
     @available_columns << QueryColumn.new(:sla_holiday, :sortable => "#{SlaHoliday.table_name}.date", :default_order => :desc, :groupable => true)
     @available_columns << QueryColumn.new(:match, :sortable => nil, :default_order => nil, :groupable => false)

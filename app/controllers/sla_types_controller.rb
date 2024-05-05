@@ -138,7 +138,7 @@ class SlaTypesController < ApplicationController
     @sla_types.each do |e|
       @sla_type_ids << e.id
       @safe_attributes.concat e.safe_attribute_names
-      attributes = e.safe_attribute_names - (%w(custom_field_values custom_fields))
+      attributes = e.safe_attribute_names
       attributes.each do |c|
         column_name = c.to_sym
         if @selected.key? column_name
@@ -169,13 +169,14 @@ class SlaTypesController < ApplicationController
     render_404
   end
 
+  # Dynamic creation of the new SlaType
   def post_create
     sla_type = @sla_type
-    RedmineSla::Patches::IssuePatch::define_method("sla_get_respect_#{sla_type.id}") do 
-      sla_get_respect(id,sla_type.id)
+    RedmineSla::Patches::IssuePatch::define_method("get_sla_respect_#{sla_type.id}") do 
+      self.get_sla_respect(sla_type.id)
     end
-    RedmineSla::Patches::TimeEntryPatch::define_method("sla_get_respect_#{sla_type.id}") do 
-      sla_get_respect(id,sla_type.id)
+    RedmineSla::Patches::TimeEntryPatch::define_method("get_sla_respect_#{sla_type.id}") do 
+      issue.get_sla_respect(sla_type.id)
     end
   end
 

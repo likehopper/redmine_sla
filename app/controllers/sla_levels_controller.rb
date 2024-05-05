@@ -24,7 +24,7 @@ class SlaLevelsController < ApplicationController
   before_action :require_admin, except: [:show]
   before_action :authorize_global
 
-  before_action :find_sla_level, only: [:show, :edit, :update]
+  before_action :find_sla_level, only: [:show, :edit, :update, :nested]
   before_action :find_sla_levels, only: [:context_menu, :destroy]
 
   helper :sla_levels
@@ -69,6 +69,7 @@ class SlaLevelsController < ApplicationController
           redirect_back_or_default sla_levels_path
         end
         format.api do
+          # TODO : not necessary ?
           render :action => 'show', :status => :created,
           :location => sla_level_url(@sla_level)
         end
@@ -85,26 +86,40 @@ class SlaLevelsController < ApplicationController
 
   def update
     @sla_level.safe_attributes = params[:sla_level]
+    if ! params[:sla_level][:sla_level_terms_attributes].nil?
+      @sla_level.update(sla_level_params)
+    end
+    if @sla_level.custom_field_id_changed?
+      flash[:warning] = l('sla_label.sla_level.purge')
+    end    
     if @sla_level.save
       flash[:notice] = l(:notice_successful_update)
       respond_to do |format|
-        format.html do
-          redirect_back_or_default sla_levels_path
-        end
+        format.html {redirect_back_or_default sla_levels_path}
         format.api  {render_api_ok}
       end
     else
       respond_to do |format|
-        format.html {render :action => 'edit'}
+        format.html do
+          if params[:sla_level][:sla_level_terms_attributes].nil?
+            render :action => 'edit'
+          else
+            render :action => 'nested'
+          end
+        end 
         format.api  {render_validation_errors(@sla_level)}
       end
     end
   end
 
+  def nested
+    respond_to do |format|
+      format.html do
+      end
+    end
+  end  
+
   def destroy
-    #@sla_levels.each(&:destroy)
-    #flash[:notice] = l(:notice_successful_delete)
-    #redirect_back_or_default sla_levels_path
     @sla_levels.each do |sla_level|
       begin
         sla_level.reload.destroy
@@ -134,7 +149,7 @@ class SlaLevelsController < ApplicationController
     @sla_levels.each do |e|
       @sla_level_ids << e.id
       @safe_attributes.concat e.safe_attribute_names
-      attributes = e.safe_attribute_names - (%w(custom_field_values custom_fields))
+      attributes = e.safe_attribute_names
       attributes.each do |c|
         column_name = c.to_sym
         if @selected.key? column_name
@@ -165,4 +180,17 @@ class SlaLevelsController < ApplicationController
     render_404
   end
 
+  def sla_level_params
+    params[:sla_level][:sla_level_terms_attributes].transform_values! do |value|
+      if value[:term].empty?
+        value[:_destroy] = true
+        value.delete(:term)
+      else
+        value[:_destroy] = false
+      end
+      value
+    end
+    params.require(:sla_level).permit(sla_level_terms_attributes: SlaLevelTerm.attribute_names.map(&:to_sym).push(:_destroy) )
+  end
+  
 end
