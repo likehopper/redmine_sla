@@ -75,8 +75,4 @@ class SlaCalendarHoliday < ActiveRecord::Base
     super
   end
 
-  def to_s
-    name.to_s
-  end
-
 end
