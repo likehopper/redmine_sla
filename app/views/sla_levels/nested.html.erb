@@ -35,18 +35,18 @@
     <th width="240px" colspan="2" style="border-bottom: solid darkgrey; border-left: solid darkgrey; border-right: solid darkgrey; text-align: left;"><%= image_tag("arrow_down.png") -%>&nbsp;<%= l(:enumeration_issue_priorities) -%></th>
   </tr>
   <%
-    SlaPriority.create(@sla_level.custom_field_id).all.each do |sla_priority|
+    SlaPriority.create(@sla_level.custom_field_id).all.each do |sla_priority_id|
   -%>
   <tr>
-    <th colspan="2" style="border: solid darkgrey;"><%= sla_priority.name -%></th>
+    <th colspan="2" style="border: solid darkgrey;"><%= sla_priority_id.name -%></th>
       <% SlaType.all.each do |sla_type| -%>
         <td style="border: solid darkgrey; text-align: right;"><%
-          sla_level_term = SlaLevelTerm.find_by_level_type_priority(@sla_level.id,sla_type[:id],sla_priority.id)
+          sla_level_term = SlaLevelTerm.find_by_level_type_priority(@sla_level.id,sla_type[:id],sla_priority_id.id)
         -%>
           <% i+=1 %>
           <%= hidden_field_tag "sla_level[sla_level_terms_attributes][#{i}][sla_level_id]", @sla_level.id %>
           <%= hidden_field_tag "sla_level[sla_level_terms_attributes][#{i}][sla_type_id]", sla_type[:id] %>
-          <%= hidden_field_tag "sla_level[sla_level_terms_attributes][#{i}][sla_priority]", sla_priority.id %>
+          <%= hidden_field_tag "sla_level[sla_level_terms_attributes][#{i}][sla_priority_id]", sla_priority_id.id %>
           <%= text_field_tag "sla_level[sla_level_terms_attributes][#{i}][term]", ( sla_level_term.nil? ? "" : sla_level_term[:term] ) %>
           <%= hidden_field_tag "sla_level[sla_level_terms_attributes][#{i}][id]", sla_level_term[:id] if ! sla_level_term.nil? %>
         </td>

@@ -29,25 +29,28 @@ class SlaPriorityScf < SlaPriority
   
   # For display one SlaPriorityScf by issue in IssueHelper
   def find_by_issue(issue)
-    self.find_by_priority_id(issue.custom_value_for(@scf.id))
+    self.find_by_priority_id(issue.custom_field_value(@scf.id))
   end
 
   # For display one SlaPriorityScf by priority_id in IssueHelper
   def find_by_priority_id(priority_id)
-    self.create_value(priority_id)
+    # TODO : LOG : on ActiveRecord::RecordNotFound si find et nil si find_by
+    return nil if priority_id.nil?
+    priority = @scf.enumerations.active.find(priority_id) 
+    self.create_value(priority.id,priority.name)
   end
   
   # For display all SlaPriority in SlaLevel views after self.create ( base on all values of the CustomField )
   def all
-    @scf.possible_values.map { |priority_id| self.create_value(priority_id) }
+    @scf.enumerations.active { |id,name| self.create_value(id,name) }
   end
 
   private
 
-  def create_value(priority_id)
-    priority_name = priority_id
-    #priority_name = "[CustomField] "+priority_id
-    SlaPriorityValue.new({ id: priority_id, name: priority_name })
-  end  
-  
+  # TODO : identify source priority
+  # def label / to_s / to_sym
+  #   priority_name = "[CustomField] "+priority_id
+  #   priority_name = "[IssuePriority] "+priority_name
+  # end
+
 end
