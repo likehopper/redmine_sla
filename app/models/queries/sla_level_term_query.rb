@@ -25,8 +25,7 @@ class Queries::SlaLevelTermQuery < Query
   def initialize_available_filters
     add_available_filter 'sla_level_id', :type => :list, :values => lambda {all_sla_level_values}
     add_available_filter 'sla_type_id', type: :list, :values => lambda {all_sla_type_values}
-    # TODO : display enumerations' text in filter ( otherwise, only display distinct values ​​in the SlaLevelTerm table )
-    # add_available_filter 'priority', :type => :list, :values => IssuePriority.all.collect{|s| [s.name, s.name] }
+    add_available_filter 'sla_priority', :type => :list, :values => SlaPriority.all.collect{|s|[s.name,s.id]}
     add_available_filter 'term', type: :integer    
   end
 
@@ -36,7 +35,13 @@ class Queries::SlaLevelTermQuery < Query
     @available_columns << QueryColumn.new(:sla_level, :sortable => "#{SlaLevel.table_name}.name", :default_order => :asc, :groupable => true)
     @available_columns << QueryColumn.new(:sla_type, :sortable => "#{SlaType.table_name}.name", :default_order => :asc, :groupable => true)
     # TODO : display enumerations' text in columns/groups
-    @available_columns << QueryColumn.new(:priority, :sortable => "#{SlaLevelTerm.table_name}.priority", :default_order => :asc, :groupable => true)
+    @available_columns << QueryColumn.new(:sla_priority, :sortable => "(
+      SELECT DISTINCT CASE WHEN sub_sla_levels.custom_field_id IS NULL THEN sub_enumerations.name ELSE sub_sla_level_terms.sla_priority END
+      FROM sla_levels AS sub_sla_levels
+      INNER JOIN sla_level_terms AS sub_sla_level_terms ON ( sub_sla_levels.id = sub_sla_level_terms.sla_level_id )
+      LEFT JOIN enumerations AS sub_enumerations ON ( ( CASE WHEN sub_sla_level_terms.sla_priority~E'^\\\\d+$' THEN sub_sla_level_terms.sla_priority::INTEGER ELSE 0 END ) = sub_enumerations.id )
+      WHERE sla_level_terms.sla_priority = sub_sla_level_terms.sla_priority
+    )", :default_order => :asc, :groupable => true)
     @available_columns << QueryColumn.new(:term, :sortable => "#{SlaLevelTerm.table_name}.term", :default_order => nil, :groupable => false)
     @available_columns
   end
@@ -55,7 +60,7 @@ class Queries::SlaLevelTermQuery < Query
     super.presence || [
       "sla_level",
       "sla_type",
-      "priority",
+      "sla_priority",
       "term"
     ].flat_map{|c| [c.to_s, c.to_sym]}
   end
