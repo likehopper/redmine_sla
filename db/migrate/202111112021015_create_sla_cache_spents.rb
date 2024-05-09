@@ -20,7 +20,8 @@ class CreateSlaCacheSpents < ActiveRecord::Migration[5.2]
         add_index :sla_caches, [:issue_id], :unique => false, name: 'sla_cache_spents_issues_key'
         say "Created index on table sla_cache_spents"
         
-        add_index :sla_cache_spents, [:sla_cache_id, :sla_type_id], :unique => true, name: 'sla_cache_spents_sla_caches_sla_types_ukey'
+        add_index :sla_cache_spents, [:sla_cache_id, :sla_type_id], :unique => true, name: 'sla_cache_spents_sla_caches_sla_types_ukey', \
+          comment: "This index is an important constraint for update the cache on conflict instead insert"
         say "Created unique index on table sla_cache_spents"
 
         execute "ALTER TABLE sla_cache_spents ADD CONSTRAINT sla_cache_spents_sla_caches_sla_types_ukey UNIQUE USING INDEX sla_cache_spents_sla_caches_sla_types_ukey;"

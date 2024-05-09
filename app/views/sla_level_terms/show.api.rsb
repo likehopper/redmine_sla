@@ -2,6 +2,6 @@
       api.id @sla_level_term.id
       api.sla_level @sla_level_term.sla_level
       api.sla_type @sla_level_term.sla_type
-      api.sla_priority @sla_level_term.sla_priority
+      api.sla_priority_id @sla_level_term.sla_priority_id
       api.term @sla_level_term.term
     end

@@ -53,19 +53,19 @@ class SlaPriority
   # For display one SlaPriority by Priority in Query/Filter
   def find_by_priority_id(priority_id)
     # TODO : LOG : on ActiveRecord::RecordNotFound si find et nil si find_by
-    priority = IssuePriority.find(priority_id)
+    priority = IssuePriority.active.find(priority_id)
     self.create_value(priority.id,priority.name)
   end  
 
   # For display all SlaPriority in SlaLevel views after self.create ( base on all values of IssuePriority )
   def all
-    IssuePriority.all { |id,name| self.create_value(id,name) }
+    IssuePriority.active.order(position: :asc) { |id,name| self.create_value(id,name) }
   end
 
   # TODO : all ( IssuePriority + ScfPriority ) use in SlaLevel for make filter !!!
   def self.all
     priorities = []
-    SlaLevel.joins(:sla_level_terms).distinct.pluck(:custom_field_id,:sla_priority).each { |custom_field_id,priority_id|
+    SlaLevel.joins(:sla_level_terms).distinct.pluck(:custom_field_id,:sla_priority_id).each { |custom_field_id,priority_id|
       priorities << SlaPriority.create(custom_field_id).find_by_priority_id(priority_id)
     }
     priorities
@@ -74,8 +74,13 @@ class SlaPriority
   private
 
   def create_value(priority_id,priority_name)
-    #priority_name = "[IssuePriority] "+priority_name
     SlaPriorityValue.new({ id: priority_id, name: priority_name })
-  end  
+  end
+  
+  # TODO : identify source priority
+  # def label / to_s / to_sym
+  #   priority_name = "[CustomField] "+priority_id
+  #   priority_name = "[IssuePriority] "+priority_name
+  # end  
   
 end
