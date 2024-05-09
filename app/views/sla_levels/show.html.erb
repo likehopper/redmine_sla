@@ -34,7 +34,7 @@
     <th width="240px" colspan="2" style="border-bottom: solid darkgrey; border-left: solid darkgrey; border-right: solid darkgrey; text-align: left;"><%= image_tag("arrow_down.png") -%>&nbsp;<%= l(:enumeration_issue_priorities) -%></th>
   </tr>
   <% 
-    sla_level_term_priorities = @sla_level.sla_level_terms.distinct(:priority).pluck(:priority)
+    sla_level_term_priorities = @sla_level.sla_level_terms.distinct(:sla_priority).pluck(:sla_priority)
     SlaPriority.create(@sla_level.custom_field_id).all.each do |sla_priority|
       if ! sla_priority.id.to_s.in?(sla_level_term_priorities)
         next

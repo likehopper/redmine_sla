@@ -29,7 +29,7 @@ class SlaPriority
       @id = hash[:id]
       @name = hash[:name]
     end
-  end  
+  end
 
   # Use in management ( cf. nested & show in view/sla_levels )
   def self.create(custom_field_id)
@@ -38,24 +38,44 @@ class SlaPriority
     else
       SlaPriorityScf.new(custom_field_id)
     end
-  end  
+  end
 
   # Use for display issues
   def self.create_by_issue(issue)
-    custom_field_id = issue.get_sla_level[:custom_field_id]
-    ( custom_field_id.nil? ? SlaPriority.new.find_by_issue(issue) : SlaPriorityScf.new(custom_field_id).find_by_issue(issue) )
-  end  
-
-  # For display one SlaPriority in IssueHelper
-  def find_by_issue(issue)
-    IssuePriority.find_by(id: issue.priority_id) { |id,name| SlaPriorityValue.new({ id: id, name: name }) }
+    SlaPriority.create(issue.get_sla_level[:custom_field_id]).find_by_issue(issue)
   end
 
-  # For display all SlaPriority in SlaLevel views after self.create ( base on all values of IssuePRiority )
+  # For display one SlaPriority by Issue in IssueHelper
+  def find_by_issue(issue)
+    self.find_by_priority_id(issue.priority_id)
+  end
+
+  # For display one SlaPriority by Priority in Query/Filter
+  def find_by_priority_id(priority_id)
+    # TODO : LOG : on ActiveRecord::RecordNotFound si find et nil si find_by
+    priority = IssuePriority.find(priority_id)
+    self.create_value(priority.id,priority.name)
+  end  
+
+  # For display all SlaPriority in SlaLevel views after self.create ( base on all values of IssuePriority )
   def all
-    IssuePriority.all.order(:position).each { |id,name| SlaPriorityValue.new({ id: id, name: name }) }    
+    IssuePriority.all { |id,name| self.create_value(id,name) }
   end
 
   # TODO : all ( IssuePriority + ScfPriority ) use in SlaLevel for make filter !!!
+  def self.all
+    priorities = []
+    SlaLevel.joins(:sla_level_terms).distinct.pluck(:custom_field_id,:sla_priority).each { |custom_field_id,priority_id|
+      priorities << SlaPriority.create(custom_field_id).find_by_priority_id(priority_id)
+    }
+    priorities
+  end
+
+  private
+
+  def create_value(priority_id,priority_name)
+    #priority_name = "[IssuePriority] "+priority_name
+    SlaPriorityValue.new({ id: priority_id, name: priority_name })
+  end  
   
 end

@@ -73,7 +73,7 @@ RedmineApp::Application.config.after_initialize do
 
   require_dependency 'projects_controller'
   ProjectsController.helper(RedmineSla::Patches::ProjectsHelperPatch)
-  
+
   # Adds methods on Redmine's Issues for SLA management
   unless Issue.included_modules.include? RedmineSla::Patches::IssuePatch
     Issue.send(:include, RedmineSla::Patches::IssuePatch)
@@ -87,7 +87,12 @@ RedmineApp::Application.config.after_initialize do
   # Adds the "to_s" method on Redmine's IssueCustomField to display the name of the SlaCustomField in the sla_level list
   unless IssueCustomField.included_modules.include? RedmineSla::Patches::IssueCustomFieldPatch
     IssueCustomField.send(:include, RedmineSla::Patches::IssueCustomFieldPatch)
-  end  
+  end
+
+  # Only to display SlaPriority or SlapriorityScf in sla/level_terms#index
+  unless QueriesHelper.included_modules.include? RedmineSla::Patches::QueriesHelperPatch
+    QueriesHelper.send(:include, RedmineSla::Patches::QueriesHelperPatch)
+  end
 
   if (ActiveRecord::Base.connection.tables.include?('queries') rescue false) &&
     # Adds methods on Redmine's Issues to Display/Filter/Sort 
@@ -100,6 +105,6 @@ RedmineApp::Application.config.after_initialize do
       #TimeEntryQuery.included_modules.exclude?(RedmineSla::Patches::TimeEntryQueryPatch)
       TimeEntryQuery.send(:include, RedmineSla::Patches::TimeEntryQueryPatch)
     end
-  end  
+  end
 
 end

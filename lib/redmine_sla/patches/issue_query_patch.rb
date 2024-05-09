@@ -48,7 +48,7 @@ module RedmineSla
               LEFT JOIN custom_values ON ( sla_levels.custom_field_id = custom_values.custom_field_id AND custom_values.customized_id = issues.id )
               LEFT JOIN sla_cache_spents ON ( sla_caches.id = sla_cache_spents.sla_cache_id AND sla_cache_spents.sla_type_id = #{sla_type_id} )
               LEFT JOIN sla_level_terms ON ( sla_caches.sla_level_id = sla_level_terms.sla_level_id AND sla_level_terms.sla_type_id = #{sla_type_id}
-                AND sla_level_terms.priority LIKE ( CASE
+                AND sla_level_terms.sla_priority LIKE ( CASE
                 WHEN sla_levels.custom_field_id IS NULL THEN CAST(issues.priority_id AS TEXT)
                 ELSE custom_values.value END
                 )
@@ -136,7 +136,7 @@ module RedmineSla
                   LEFT JOIN custom_values ON ( sla_levels.custom_field_id = custom_values.custom_field_id AND custom_values.customized_id = issues.id )
                   LEFT JOIN sla_cache_spents ON ( sla_caches.id = sla_cache_spents.sla_cache_id AND sla_cache_spents.sla_type_id = #{sla_type.id} )
                   LEFT JOIN sla_level_terms ON ( sla_caches.sla_level_id = sla_level_terms.sla_level_id AND sla_level_terms.sla_type_id = #{sla_type.id}
-                    AND sla_level_terms.priority LIKE ( CASE
+                    AND sla_level_terms.sla_priority LIKE ( CASE
                     WHEN sla_levels.custom_field_id IS NULL THEN CAST(issues.priority_id AS TEXT)
                     ELSE custom_values.value END
                     )
