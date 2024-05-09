@@ -26,22 +26,22 @@ module RedmineSla
         base.send(:include, InstanceMethods)
         base.class_eval do          
           unloadable
-          alias_method :column_value_without_custom_sla_priority, :column_value
-          alias_method :column_value, :column_value_with_custom_sla_priority
+          alias_method :column_value_without_custom_sla_priority_id, :column_value
+          alias_method :column_value, :column_value_with_custom_sla_priority_id
         end 
       end
     end
 
     module InstanceMethods
 
-      def column_value_with_custom_sla_priority(column, item, value, options={})
+      def column_value_with_custom_sla_priority_id(column, item, value, options={})
         content =
           case column.name
-          when :sla_priority
+          when :sla_priority_id
             SlaPriority.create(item.sla_level.custom_field_id).find_by_priority_id(value).name 
           else
-            # If it's not the sla_priority field, then call the old method ! 
-            column_value_without_custom_sla_priority(column, item, value)
+            # If it's not the sla_priority_id field, then call the old method ! 
+            column_value_without_custom_sla_priority_id(column, item, value)
           end
       end
     end

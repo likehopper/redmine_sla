@@ -54,11 +54,8 @@ class SlaLevel < ActiveRecord::Base
   safe_attributes *%w[name sla_id sla_calendar_id custom_field_id]
 
   before_save do
-    # If the sla_priority reference changes
-    if attribute_changed?(:custom_field_id)
-      # The terms of the old priorities must be deleted
-      SlaLevelTerm.where(sla_level_id: self.id).destroy_all
-    end
+    # If the sla_priority_id reference changes, then terms of the old priorities must be deleted
+    SlaLevelTerm.where(sla_level_id: self.id).destroy_all if attribute_changed?(:custom_field_id)
   end
 
   def self.visible_condition(user, options = {})
