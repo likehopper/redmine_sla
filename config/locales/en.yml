@@ -25,7 +25,7 @@ en:
     end_time: &end_time End time
     date: &date Date
     updated_on: &updated_on Update
-    priority: &priority Priority
+    sla_priority: &sla_priority SLA Priority
     match: &match Match
     term: &term Term
     status: &status Status
@@ -48,7 +48,7 @@ en:
   field_start_time: *start_time
   field_end_time: *end_time
   field_date: *date
-  field_priority: *priority
+  field_sla_priority: *sla_priority
   field_match: *match
   field_term: *term
   field_status: *status
@@ -120,7 +120,7 @@ en:
         sla_level_id: *sla_level
         sla_type: *sla_type
         sla_type_id: *sla_type
-        priority: *priority
+        sla_priority: *sla_priority
         term: *term
       sla_cache:
         sla_cache: *sla_cache

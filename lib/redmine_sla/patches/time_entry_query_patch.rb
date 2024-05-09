@@ -48,8 +48,8 @@ module RedmineSla
               LEFT JOIN custom_values ON ( sla_levels.custom_field_id = custom_values.custom_field_id AND custom_values.customized_id = issues.id )
               LEFT JOIN sla_cache_spents ON ( sla_caches.id = sla_cache_spents.sla_cache_id AND sla_cache_spents.sla_type_id = #{sla_type_id} )
               LEFT JOIN sla_level_terms ON ( sla_caches.sla_level_id = sla_level_terms.sla_level_id AND sla_level_terms.sla_type_id = #{sla_type_id}
-                AND sla_level_terms.priority LIKE ( CASE
-                WHEN sla_levels.custom_field_id IS NULL THEN CAST(issues.priority_id AS TEXT)
+                AND sla_level_terms.sla_priority LIKE ( CASE
+                WHEN sla_levels.custom_field_id IS NULL THEN CAST(issues.sla_priority AS TEXT)
                 ELSE custom_values.value END
                 )
               )
@@ -87,7 +87,7 @@ module RedmineSla
                               :name => l("sla_label.sla_level.singular"),
                               :type => :list,
                               :values => values
-          ) unless available_filters_without_sla_time_entry.key?('slas.sla_level_id')
+          ) unless available_filters.key?('slas.sla_level_id')
 
           # SLA LEVEL : Column
           time_entry_get_sla_level = QueryColumn.new(
@@ -138,7 +138,7 @@ module RedmineSla
                   LEFT JOIN custom_values ON ( sla_levels.custom_field_id = custom_values.custom_field_id AND custom_values.customized_id = issues.id )
                   LEFT JOIN sla_cache_spents ON ( sla_caches.id = sla_cache_spents.sla_cache_id AND sla_cache_spents.sla_type_id = #{sla_type.id} )
                   LEFT JOIN sla_level_terms ON ( sla_caches.sla_level_id = sla_level_terms.sla_level_id AND sla_level_terms.sla_type_id = #{sla_type.id}
-                    AND sla_level_terms.priority LIKE ( CASE
+                    AND sla_level_terms.sla_priority LIKE ( CASE
                     WHEN sla_levels.custom_field_id IS NULL THEN CAST(issues.priority_id AS TEXT)
                     ELSE custom_values.value END
                     )

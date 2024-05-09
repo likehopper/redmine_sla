@@ -11,11 +11,15 @@
     <%= title l('sla_label.sla_level.plural') -%>
   </div>  
 
-  <h3><%= @sla_level.name -%></h3>
+  <h3><%= l('sla_label.sla_level.singular') -%> : <%= link_to @sla_level.name, edit_sla_level_path(@sla_level), title: l(:button_show) -%></h3></h3>
   <p>
     <b><%= l('sla_label.sla_calendar.singular') -%> : </b><%=  -%>
     <%= link_to @sla_level.sla_calendar.name, sla_calendar_path(@sla_level.sla_calendar), title: l(:button_show) -%> 
   </p>
+  <p>
+    <b><%= l('sla_label.sla.singular') -%> : </b><%=  -%>
+    <%= link_to @sla_level.sla.name, sla_path(@sla_level.sla), title: l(:button_show) -%> 
+  </p>  
   <% i=0 %>
   <%= form_tag sla_level_path, method: :patch, id: "multiple_records_form" do %>
   <table style="border: none:" margin="8px">
@@ -31,18 +35,18 @@
     <th width="240px" colspan="2" style="border-bottom: solid darkgrey; border-left: solid darkgrey; border-right: solid darkgrey; text-align: left;"><%= image_tag("arrow_down.png") -%>&nbsp;<%= l(:enumeration_issue_priorities) -%></th>
   </tr>
   <%
-    SlaPriority.create(@sla_level.custom_field_id).all.each do |priority|
+    SlaPriority.create(@sla_level.custom_field_id).all.each do |sla_priority|
   -%>
   <tr>
-    <th colspan="2" style="border: solid darkgrey;"><%= priority.name -%></th>
+    <th colspan="2" style="border: solid darkgrey;"><%= sla_priority.name -%></th>
       <% SlaType.all.each do |sla_type| -%>
         <td style="border: solid darkgrey; text-align: right;"><%
-          sla_level_term = SlaLevelTerm.find_by_level_type_priority(@sla_level.id,sla_type[:id],priority.id)
+          sla_level_term = SlaLevelTerm.find_by_level_type_priority(@sla_level.id,sla_type[:id],sla_priority.id)
         -%>
           <% i+=1 %>
           <%= hidden_field_tag "sla_level[sla_level_terms_attributes][#{i}][sla_level_id]", @sla_level.id %>
           <%= hidden_field_tag "sla_level[sla_level_terms_attributes][#{i}][sla_type_id]", sla_type[:id] %>
-          <%= hidden_field_tag "sla_level[sla_level_terms_attributes][#{i}][priority]", priority.id %>
+          <%= hidden_field_tag "sla_level[sla_level_terms_attributes][#{i}][sla_priority]", sla_priority.id %>
           <%= text_field_tag "sla_level[sla_level_terms_attributes][#{i}][term]", ( sla_level_term.nil? ? "" : sla_level_term[:term] ) %>
           <%= hidden_field_tag "sla_level[sla_level_terms_attributes][#{i}][id]", sla_level_term[:id] if ! sla_level_term.nil? %>
         </td>

@@ -27,15 +27,27 @@ class SlaPriorityScf < SlaPriority
     @scf = SlaCustomField.find(custom_field_id)
   end
   
-  # For display one SlaPriority in IssueHelper
+  # For display one SlaPriorityScf by issue in IssueHelper
   def find_by_issue(issue)
-    sla_priority = issue.custom_value_for(@scf.id)
-    SlaPriorityValue.new({ id: sla_priority, name: sla_priority })
+    self.find_by_priority_id(issue.custom_value_for(@scf.id))
+  end
+
+  # For display one SlaPriorityScf by priority_id in IssueHelper
+  def find_by_priority_id(priority_id)
+    self.create_value(priority_id)
   end
   
   # For display all SlaPriority in SlaLevel views after self.create ( base on all values of the CustomField )
   def all
-    @scf.possible_values.map { |name| SlaPriorityValue.new({ id: name, name: name }) }
+    @scf.possible_values.map { |priority_id| self.create_value(priority_id) }
+  end
+
+  private
+
+  def create_value(priority_id)
+    priority_name = priority_id
+    #priority_name = "[CustomField] "+priority_id
+    SlaPriorityValue.new({ id: priority_id, name: priority_name })
   end  
   
 end

@@ -4,7 +4,7 @@ api.array :sla_level_terms, api_meta(:total_count => @entity_count, :offset => @
       api.id entity.id
       api.sla_level_id entity.sla_level_id
       api.sla_type_id entity.sla_type_id
-      api.priority entity.priority
+      api.sla_priority entity.sla_priority
       api.term entity.term
     end
   end

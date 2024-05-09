@@ -4,13 +4,13 @@ sla_tma_level_01_type_01_terms:
   id: 1
   sla_level_id: 1
   sla_type_id: 1
-  priority: 2
+  sla_priority: 2
   term: 60
 sla_tma_level_01_type_02_terms:
   id: 2
   sla_level_id: 1
   sla_type_id: 2
-  priority: 2
+  sla_priority: 2
   term: 120
 
 # TMA Support HO on tracker_support_request : GTI (1J) only
@@ -18,21 +18,21 @@ sla_tma_level_02_type_01_terms1:
   id: 3
   sla_level_id: 2
   sla_type_id: 1
-  priority: 1
+  sla_priority: 1
   term: 1680
 # TMA Support HO on tracker_support_request : GTI (1J) only
 sla_tma_level_02_type_01_terms2:
   id: 4
   sla_level_id: 2
   sla_type_id: 1
-  priority: 2
+  sla_priority: 2
   term: 840
 # TMA Support HO on tracker_support_request : GTI (1J) only
 sla_tma_level_02_type_01_terms3:
   id: 5
   sla_level_id: 2
   sla_type_id: 1
-  priority: 3
+  sla_priority: 3
   term: 420
 
 # INFO STD HO on tracker_change_request : GTI (1h) / GTR (8h)
@@ -40,13 +40,13 @@ sla_info_level_03_type_01_terms:
   id: 6
   sla_level_id: 3
   sla_type_id: 1
-  priority: 2
+  sla_priority: 2
   term: 60
 sla_info_level_03_type_02_terms:
   id: 7
   sla_level_id: 3
   sla_type_id: 2
-  priority: 2
+  sla_priority: 2
   term: 480
 
 # INFO STD HO continued on tracker_production_incident : GTI (15mn) / GTR (4h)
@@ -54,13 +54,13 @@ sla_info_level_04_type_01_terms:
   id: 8
   sla_level_id: 4
   sla_type_id: 1
-  priority: 2
+  sla_priority: 2
   term: 15
 sla_info_level_04_type_02_terms:
   id: 9
   sla_level_id: 4
   sla_type_id: 2
-  priority: 2
+  sla_priority: 2
   term: 240
 
 # INFO STD HNO continued on tracker_production_incident : GTI (30mn) / GTR (4h)
@@ -68,13 +68,13 @@ sla_info_level_05_type_01_terms:
   id: 10
   sla_level_id: 5
   sla_type_id: 1
-  priority: 2
+  sla_priority: 2
   term: 30
 sla_info_level_05_type_02_terms:
   id: 11
   sla_level_id: 5
   sla_type_id: 2
-  priority: 2
+  sla_priority: 2
   term: 240
 
 # INFO SPE HO on tracker_change_request : GTI (1h) / GTR (4h)
@@ -82,13 +82,13 @@ sla_info_level_06_type_01_terms:
   id: 12
   sla_level_id: 6
   sla_type_id: 1
-  priority: 2
+  sla_priority: 2
   term: 60
 sla_info_level_06_type_02_terms:
   id: 13
   sla_level_id: 6
   sla_type_id: 2
-  priority: 2
+  sla_priority: 2
   term: 240
 
 # INFO SPE HO continued on tracker_production_incident : GTI (15mn) / GTR (30mn)
@@ -96,13 +96,13 @@ sla_info_level_07_type_01_terms:
   id: 14
   sla_level_id: 7
   sla_type_id: 1
-  priority: 2
+  sla_priority: 2
   term: 15
 sla_info_level_07_type_02_terms:
   id: 15
   sla_level_id: 7
   sla_type_id: 2
-  priority: 2
+  sla_priority: 2
   term: 30
 
 # INFO SPE HNO continued on tracker_production_incident : GTI (30mn) / GTR (1h)
@@ -110,11 +110,11 @@ sla_info_level_08_type_01_terms:
   id: 16
   sla_level_id: 8
   sla_type_id: 1
-  priority: 2
+  sla_priority: 2
   term: 30
 sla_info_level_08_type_02_terms:
   id: 17
   sla_level_id: 8
   sla_type_id: 2
-  priority: 2
+  sla_priority: 2
   term: 60
