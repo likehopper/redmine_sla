@@ -13,8 +13,8 @@ class CreateSlaLogs < ActiveRecord::Migration[5.2]
           t.belongs_to :project, null: true, foreign_key: { name: 'sla_logs_projects_fkey', on_delete: :cascade }
           t.belongs_to :issue, null: true, foreign_key: { name: 'sla_logs_issues_fkey', on_delete: :cascade }
           t.belongs_to :sla_level, null: true, foreign_key: { name: 'sla_logs_sla_levels_fkey', on_delete: :cascade }
-          t.column :log_level, :sla_log_level, null: true
-          t.text :description, null: true
+          t.column :log_level, :sla_log_level, null: false 
+          t.text :description, null: false
         end
         say "Created table sla_logs"
 
