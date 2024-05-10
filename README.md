@@ -90,16 +90,17 @@ Here is a list of possible evolutions without prioritization :
 
 | Name               | requirement                      |
 |--------------------|----------------------------------|
-| `Redmine`          | >= 4.0                           |
+| `Redmine`          | >= 5.0                           |
 | `Ruby`             | >= 2.7                           |
-| `Rails`            | >= 5.2                           |
+| `Rails`            | >= 6.1                           |
 | `Database`         | PostgreSQL >= 11                 |
 
-> **_NOTE:_** It is important to note that, to calculate the SLAs, the plugin uses the features of Posgtres, including the Pl/Pgsql procedures.
+> **_NOTE:_** It is important to note that, to calculate the SLAs, the plugin uses the features of Posgtres, including the Pl/Pgsql procedures. And for this, in `config/application.rb` file, **you must add this line `config.active_record.schema_format = :sql`** in `RedmineApp::Application section`.
+
 
 > **_REMINDER:_** Make sure your database datestyle is set to ISO (Postgresql default setting). You can set it using: ALTER DATABASE "redmine_db" SET datestyle="ISO,MDY".
 
-> **_TIP:_** Prefer the global configuration of the time zone on "Etc/UTC".
+> **_TIP:_** Prefer the global configuration of the time zone on "Etc/UTC" ( and with `config.active_record.default_timezone = :local` in `RedmineApp::Application` section of `config/application.rb` file ).
 
 ### Install
 
