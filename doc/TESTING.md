@@ -26,6 +26,8 @@ But also functionals tests: `bundle exec rake redmine:plugins:test:system NAME=r
 
 > **_NOTE:_** System tests use a headless browser.
 
+> **_TIP:_** Recommended use Chromium ( and chromium-driver ) with these options  `**GOOGLE_CHROME_OPTS_ARGS = ["headless","disable-gpu","no-sandbox","disable-dev-shm-usage"]**` ( in `test/application_system_test_case.rb` file for example ).
+
 ### All
 And why not all the tests: `bundle exec rake redmine:plugins:test NAME=redmine_sla RAILS_ENV=testTESTOPTS="-v -w -b" --trace`
 
