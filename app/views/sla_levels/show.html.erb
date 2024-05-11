@@ -36,7 +36,7 @@
   <% 
     sla_level_term_priorities = @sla_level.sla_level_terms.distinct(:sla_priority_id).pluck(:sla_priority_id)
     SlaPriority.create(@sla_level.custom_field_id).all.each do |sla_priority_id|
-      if ! sla_priority_id.id.to_s.in?(sla_level_term_priorities)
+      if ! sla_priority_id.id.in?(sla_level_term_priorities)
         next
       end
     -%>
