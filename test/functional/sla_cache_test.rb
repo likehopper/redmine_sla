@@ -28,13 +28,5 @@ class SlaCacheTest < ActiveSupport::TestCase
     assert SlaCache.count(:all).zero?
   end
 
-  test "#SlaCaches count" do
-    assert SlaCache.count(:all).zero?
-  end
-
-  def test_truth
-    assert true
-  end
-
 end
 

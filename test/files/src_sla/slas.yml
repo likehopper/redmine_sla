@@ -17,3 +17,9 @@ sla_info_spe_ask:
 sla_info_spe_bug:
   id: 6
   name: SLA Managed Services Spécific tracker_production_incident
+sla_tma_bug_scf:
+  id: 7
+  name: SLA TMA tracker_bug_request with Sla Custom Field
+sla_tma_ask_scf:
+  id: 8
+  name: SLA TMA tracker_support_request Sla Custom Field

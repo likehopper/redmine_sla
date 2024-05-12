@@ -1,0 +1,10 @@
+<div class="contextual">
+  <%= link_to l('sla_label.sla_status.plural'), sla_statuses_path, class: 'icon icon-cancel' %>
+  <%= link_to l('sla_label.sla_status.edit'), edit_sla_status_path(@sla_status),
+        title: l('sla_label.sla_status.edit'), class: 'icon icon-edit',
+        :accesskey => accesskey(:edit) if @sla_status.editable? %>
+  <%= link_to l('sla_label.sla_status.delete'), sla_status_path(@sla_status),
+        data: {confirm: l(:text_are_you_sure)}, method: :delete,
+        title: l('sla_label.sla_status.delete'), class: 'icon icon-del',
+        :accesskey => accesskey(:delete) if @sla_status.deletable? %>
+</div>

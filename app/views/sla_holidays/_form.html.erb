@@ -1,4 +1,4 @@
-<%= labelled_form_for([@sla_holiday], html: { multipart: false, id: 'sla_holiday_form', class: 'tabular', remote: request.xhr? }) do |f| %>
+<%= labelled_form_for([@sla_holiday], html: { multipart: false, id: 'sla-holiday-form', class: 'tabular', remote: request.xhr? }) do |f| %>
   <%= error_messages_for f.object %>
   <div class="box">
       <% if sla_holiday.safe_attribute?('name') %>

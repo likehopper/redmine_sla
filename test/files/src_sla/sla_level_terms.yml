@@ -1,39 +1,67 @@
 ---
 # TMA Anomalie HO on tracker_bug_request: GTI (1h) / GTR (2h)
-sla_tma_level_01_type_01_terms:
+sla_tma_level_01_type_01_terms_01_priority:
   id: 1
+  id: 1
+  sla_level_id: 1
+  sla_type_id: 1
+  sla_priority_id: 1
+  priority_id: 1
+  term: 120
+sla_tma_level_01_type_02_terms_01_priority:
+  id: 2
+  sla_level_id: 1
+  sla_type_id: 2
+  sla_priority_id: 1
+  priority_id: 1
+  term: 240
+sla_tma_level_01_type_01_terms_02_priority:
+  id: 3
   sla_level_id: 1
   sla_type_id: 1
   sla_priority_id: 2
   priority_id: 2
   term: 60
-sla_tma_level_01_type_02_terms:
-  id: 2
+sla_tma_level_01_type_02_terms_02_priority:
+  id: 4
   sla_level_id: 1
   sla_type_id: 2
   sla_priority_id: 2
   priority_id: 2
   term: 120
+sla_tma_level_01_type_01_terms_03_priority:
+  id: 5
+  sla_level_id: 1
+  sla_type_id: 1
+  sla_priority_id: 3
+  priority_id: 3
+  term: 30
+sla_tma_level_01_type_02_terms_03_priority:
+  id: 6
+  sla_level_id: 1
+  sla_type_id: 2
+  sla_priority_id: 3
+  priority_id: 3
+  term: 60
+
 
 # TMA Support HO on tracker_support_request : GTI (1J) only
-sla_tma_level_02_type_01_terms1:
-  id: 3
+sla_tma_level_02_type_01_terms_01_priority:
+  id: 7
   sla_level_id: 2
   sla_type_id: 1
   sla_priority_id: 1
   priority_id: 1
   term: 1680
-# TMA Support HO on tracker_support_request : GTI (1J) only
-sla_tma_level_02_type_01_terms2:
-  id: 4
+sla_tma_level_02_type_01_terms_02_priority:
+  id: 8
   sla_level_id: 2
   sla_type_id: 1
   sla_priority_id: 2
   priority_id: 2
   term: 840
-# TMA Support HO on tracker_support_request : GTI (1J) only
-sla_tma_level_02_type_01_terms3:
-  id: 5
+sla_tma_level_02_type_01_terms_03_priority:
+  id: 9
   sla_level_id: 2
   sla_type_id: 1
   sla_priority_id: 3
@@ -42,14 +70,14 @@ sla_tma_level_02_type_01_terms3:
 
 # INFO STD HO on tracker_change_request : GTI (1h) / GTR (8h)
 sla_info_level_03_type_01_terms:
-  id: 6
+  id: 10
   sla_level_id: 3
   sla_type_id: 1
   sla_priority_id: 2
   priority_id: 2
   term: 60
 sla_info_level_03_type_02_terms:
-  id: 7
+  id: 11
   sla_level_id: 3
   sla_type_id: 2
   sla_priority_id: 2
@@ -58,14 +86,14 @@ sla_info_level_03_type_02_terms:
 
 # INFO STD HO continued on tracker_production_incident : GTI (15mn) / GTR (4h)
 sla_info_level_04_type_01_terms:
-  id: 8
+  id: 12
   sla_level_id: 4
   sla_type_id: 1
   sla_priority_id: 2
   priority_id: 2
   term: 15
 sla_info_level_04_type_02_terms:
-  id: 9
+  id: 13
   sla_level_id: 4
   sla_type_id: 2
   sla_priority_id: 2
@@ -74,14 +102,14 @@ sla_info_level_04_type_02_terms:
 
 # INFO STD HNO continued on tracker_production_incident : GTI (30mn) / GTR (4h)
 sla_info_level_05_type_01_terms:
-  id: 10
+  id: 14
   sla_level_id: 5
   sla_type_id: 1
   sla_priority_id: 2
   priority_id: 2
   term: 30
 sla_info_level_05_type_02_terms:
-  id: 11
+  id: 15
   sla_level_id: 5
   sla_type_id: 2
   sla_priority_id: 2
@@ -90,14 +118,14 @@ sla_info_level_05_type_02_terms:
 
 # INFO SPE HO on tracker_change_request : GTI (1h) / GTR (4h)
 sla_info_level_06_type_01_terms:
-  id: 12
+  id: 16
   sla_level_id: 6
   sla_type_id: 1
   sla_priority_id: 2
   priority_id: 2
   term: 60
 sla_info_level_06_type_02_terms:
-  id: 13
+  id: 17
   sla_level_id: 6
   sla_type_id: 2
   sla_priority_id: 2
@@ -106,14 +134,14 @@ sla_info_level_06_type_02_terms:
 
 # INFO SPE HO continued on tracker_production_incident : GTI (15mn) / GTR (30mn)
 sla_info_level_07_type_01_terms:
-  id: 14
+  id: 18
   sla_level_id: 7
   sla_type_id: 1
   sla_priority_id: 2
   priority_id: 2
   term: 15
 sla_info_level_07_type_02_terms:
-  id: 15
+  id: 19
   sla_level_id: 7
   sla_type_id: 2
   sla_priority_id: 2
@@ -122,16 +150,83 @@ sla_info_level_07_type_02_terms:
 
 # INFO SPE HNO continued on tracker_production_incident : GTI (30mn) / GTR (1h)
 sla_info_level_08_type_01_terms:
-  id: 16
+  id: 20
   sla_level_id: 8
   sla_type_id: 1
   sla_priority_id: 2
   priority_id: 2
   term: 30
 sla_info_level_08_type_02_terms:
-  id: 17
+  id: 21
   sla_level_id: 8
   sla_type_id: 2
   sla_priority_id: 2
   priority_id: 2
   term: 60
+
+# TMA Anomalie HO on tracker_bug_request: GTI (1h) / GTR (2h) with Sla Custom Field for Priority
+sla_tma_level_09_type_01_terms_01_priority:
+  id: 22
+  sla_level_id: 9
+  sla_type_id: 1
+  sla_priority_id: 1
+  custom_field_enumeration_id: 1
+  term: 240
+sla_tma_level_09_type_02_terms_01_priority:
+  id: 23
+  sla_level_id: 9
+  sla_type_id: 2
+  sla_priority_id: 1
+  custom_field_enumeration_id: 1
+  term: 480
+sla_tma_level_09_type_01_terms_02_priority:
+  id: 24
+  sla_level_id: 9
+  sla_type_id: 1
+  sla_priority_id: 2
+  custom_field_enumeration_id: 2
+  term: 120
+sla_tma_level_09_type_02_terms_02_priority:
+  id: 25
+  sla_level_id: 9
+  sla_type_id: 2
+  sla_priority_id: 2
+  custom_field_enumeration_id: 2
+  term: 240
+sla_tma_level_09_type_01_terms_03_priority:
+  id: 26
+  sla_level_id: 9
+  sla_type_id: 1
+  sla_priority_id: 3
+  custom_field_enumeration_id: 3
+  term: 60
+sla_tma_level_09_type_02_terms_03_priority:
+  id: 27
+  sla_level_id: 9
+  sla_type_id: 2
+  sla_priority_id: 3
+  custom_field_enumeration_id: 3
+  term: 120
+
+# TMA Support HO on tracker_support_request : GTI (1J) only with Sla Custom Field for Priority
+sla_tma_level_10_type_01_terms_01_priority:
+  id: 28
+  sla_level_id: 10
+  sla_type_id: 1
+  sla_priority_id: 1
+  custom_field_enumeration_id: 1
+  term: 1680
+sla_tma_level_10_type_01_terms_02_priority:
+  id: 29
+  sla_level_id: 10
+  sla_type_id: 1
+  sla_priority_id: 2
+  custom_field_enumeration_id: 2
+  term: 840
+sla_tma_level_10_type_01_terms_03_priority:
+  id: 30
+  sla_level_id: 10
+  sla_type_id: 1
+  sla_priority_id: 3
+  custom_field_enumeration_id: 3
+  term: 420

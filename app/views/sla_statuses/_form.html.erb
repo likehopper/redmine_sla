@@ -1,4 +1,4 @@
-<%= labelled_form_for([@sla_status], html: { multipart: false, id: 'sla_status_form', class: 'tabular', remote: request.xhr? }) do |f| %>
+<%= labelled_form_for([@sla_status], html: { multipart: false, id: 'sla-status-form', class: 'tabular', remote: request.xhr? }) do |f| %>
 <%= error_messages_for f.object %>
   <div class="box">
       <% if sla_status.safe_attribute?('sla_type_id') %>
