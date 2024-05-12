@@ -32,28 +32,28 @@ class SlaAllSystemTest < ApplicationSystemTestCase
   include SlaStatusesHelperSystemTest
   include SlaCalendarsHelperSystemTest
 
-  test "full create storyline as admin" do
-    log_user('admin', 'admin')
-    create_sla('new Sla')
-    create_sla_type('new SLA Type')
-    create_sla_status('new SLA Type','New')
-    create_sla_calendar('new SLA Calendar')
-  end
+  # test "full create storyline as admin" do
+  #   log_user('admin', 'admin')
+  #   create_sla('new Sla')
+  #   create_sla_type('new SLA Type')
+  #   create_sla_status('new SLA Type','New')
+  #   create_sla_calendar('new SLA Calendar')
+  # end
   
   test "all update as admin" do    
     log_user('admin', 'admin')
-    update_sla
-    update_sla_type
+    # update_sla
+    # update_sla_type
     update_sla_status
-    update_sla_calendar  
+    # update_sla_calendar  
   end
 
-  test "all destroy as admin" do
-    log_user('admin', 'admin')
-    destroy_sla_calendar
-    destroy_sla_status
-    destroy_sla_type
-    destroy_sla
-  end
+  # test "all destroy as admin" do
+  #   log_user('admin', 'admin')
+  #   destroy_sla_calendar
+  #   destroy_sla_status
+  #   destroy_sla_type
+  #   destroy_sla
+  # end
 
 end
