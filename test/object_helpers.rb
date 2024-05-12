@@ -48,7 +48,7 @@ module ObjectHelpers
     sla_type.reload
   end
 
-  # Generates an unsaved SlaType
+  # Generates an unsaved SlaStatus
   def SlaStatus.generate(attributes={})
     sla_status = SlaStatus.new()
     sla_status.sla_type_id = SlaType.generate!.id
@@ -57,7 +57,7 @@ module ObjectHelpers
     sla_status
   end
 
-  # Generates a saved SlaType
+  # Generates a saved SlaStatus
   def SlaStatus.generate!(attributes={}, &block)
     sla_status = SlaStatus.generate(attributes, &block)
     sla_status.save!
