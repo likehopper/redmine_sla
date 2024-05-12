@@ -47,17 +47,20 @@ module SlaStatusesHelperSystemTest
 
   def update_sla_status
     sla_status = SlaStatus.generate!
+    sla_type = SlaType.generate!
     visit "/sla/statuses/#{sla_status.id}"
-    page.first(:link,  l('sla_status.sla.edit')).click
+    page.first(:link,  l('sla_label.sla_status.edit')).click
     within('form#sla-status-form') do
-      fill_in 'Name', :with => 'mod SLA Status'
+      select sla_type.name, :from => 'sla_status[sla_type_id]'
+      select 'New', :from => 'sla_status[status_id]'
     end
     page.first(:button, l('sla_label.sla_status.save')).click
     # assert page.has_css?('#flash_notice')
     find 'div#flash_notice',
       :visible => true,
       :text => l("sla_label.sla_status.notice_successful_update", :id => "##{sla_status.id}" )
-    assert_equal 'mod SLA Status', sla_status.reload.name
+    assert_equal sla_type.id, sla_status.reload.sla_type.id
+    assert_equal 'New', sla_status.reload.status.name
     # TODO : teste in SlaStatus#index after filtering
   end
 
