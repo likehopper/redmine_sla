@@ -65,7 +65,9 @@ class SlaStatusesController < ApplicationController
     if @sla_status.save
       respond_to do |format|
         format.html do
-          flash[:notice] = l(:notice_successful_create)
+          flash[:notice] = l("sla_label.sla_status.notice_successful_create",
+            :id => view_context.link_to("##{@sla_status.id}", sla_path(@sla_status), :title => @sla_status.sla_type.name+" / "+@sla_status.status.name)
+          )
           redirect_back_or_default sla_statuses_path
         end
         format.api do
@@ -87,9 +89,11 @@ class SlaStatusesController < ApplicationController
   def update
     @sla_status.safe_attributes = params[:sla_status]
     if @sla_status.save
-      flash[:notice] = l(:notice_successful_update)
       respond_to do |format|
         format.html do
+          flash[:notice] = l("sla_label.sla_status.notice_successful_update",
+            :id => view_context.link_to("##{@sla_status.id}", sla_path(@sla_status), :title => @sla_status.sla_type.name+" / "+@sla_status.status.name)
+          )          
           redirect_back_or_default sla_statuses_path
         end
         format.api  {render_api_ok}

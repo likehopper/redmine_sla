@@ -1,0 +1,10 @@
+---
+cft_01_cf_01_tracker:
+  custom_field_id: 1
+  tracker_id: 1
+cft_01_cf_02_tracker:
+  custom_field_id: 1
+  tracker_id: 2
+cft_01_cf_03_tracker:
+  custom_field_id: 1
+  tracker_id: 3

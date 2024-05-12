@@ -1,10 +1,11 @@
 <div class="contextual">
   <%= link_to l('sla_label.sla_type.plural'), sla_types_path, class: 'icon icon-cancel' %>
-  <%= link_to l(:button_edit), edit_sla_type_path(@sla_type), title: l(:button_edit),
-              :class => 'icon icon-edit', :accesskey => accesskey(:edit) if @sla_type.editable? %>
-  <%= link_to l(:button_delete), sla_type_path(@sla_type),
-              :data => {:confirm => l(:text_are_you_sure)}, title: l(:button_delete),
-              :method => :delete,
-              :class => 'icon icon-del' if @sla_type.deletable? %>
+  <%= link_to l('sla_label.sla_type.edit'), edit_sla_type_path(@sla_type),
+        title: l('sla_label.sla_type.edit'), class: 'icon icon-edit',
+        :accesskey => accesskey(:edit) if @sla_type.editable? %>
+  <%= link_to l('sla_label.sla_type.delete'), sla_type_path(@sla_type),
+        data: {confirm: l(:text_are_you_sure)}, method: :delete,
+        title: l('sla_label.sla_type.delete'), class: 'icon icon-del',
+        :accesskey => accesskey(:delete) if @sla_type.deletable? %>
 </div>
   

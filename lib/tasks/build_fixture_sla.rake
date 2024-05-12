@@ -18,6 +18,25 @@ namespace :redmine do
 
     namespace :redmine_sla do
 
+      def get_easter(year,days)
+        a = year % 19
+        b = year / 100
+        c = year % 100
+        d = b / 4
+        e = b % 4
+        f = (b + 8) / 25
+        g = (b - f + 1) / 3
+        h = (19 * a + b - d - g + 15) % 30
+        i = c / 4
+        k = c % 4
+        l = (32 + 2 * e + 2 * i - h - k) % 7
+        m = (a + 11 * h + 22 * l) / 451
+        month = (h + l - 7 * m + 114) / 31
+        day = ((h + l - 7 * m + 114) % 31) + 1
+      
+        (Date.new(year, month,day)+days).strftime("%Y-%m-%d")
+      end      
+
       desc 'Build fixtures for plugin SLA'
       task :build_fixture, [:tz, :in, :out, :ff, :ff_red, :ff_sla]  => :environment  do |t, args|
 
@@ -92,12 +111,21 @@ namespace :redmine do
         issues ||= {}
         journals ||= {}
         journal_details ||= {}
+        custom_values ||= {}
 
-        # For priorities !!!
+        # For priorities & time entries !!!
         enumerations = {
           "Low"    => {"id" => 1, "name" => "Low",    "type" => "IssuePriority", "position" => 1, "position_name" => "lowest",  "active" => true, "is_default" => false },
           "Normal" => {"id" => 2, "name" => "Normal", "type" => "IssuePriority", "position" => 2, "position_name" => "default", "active" => true, "is_default" => true },
           "High"   => {"id" => 3, "name" => "High",   "type" => "IssuePriority", "position" => 3, "position_name" => "highest", "active" => true, "is_default" => false },
+          "Development"   => {"id" => 4, "name" => "Development",   "type" => "TimeEntryActivity", "position" => 1, "position_name" => nil, "active" => true, "is_default" => true },
+        }
+
+        # For compatibility with sla custom fields !
+        custom_field_enumerations = {
+          "Minor" => { "id" => 1 },
+          "Major" => { "id" => 2 },
+          "Blocking" => { "id" => 3 },
         }
 
         # For statuses
@@ -117,7 +145,73 @@ namespace :redmine do
           "tracker_support_request"     => { "id" => 3, "name" => "tracker_support_request",     "default_status_id" => 1, "position" => 3, "description" => "Description for TMA HO tracker Support request ( HO with GTI only )" },
           "tracker_change_request"      => { "id" => 4, "name" => "tracker_change_request",      "default_status_id" => 1, "position" => 4, "description" => "Description for INFO HO tracker change request ( HO continued with GTI/GTR )" },
           "tracker_production_incident" => { "id" => 5, "name" => "tracker_production_incident", "default_status_id" => 1, "position" => 5, "description" => "Description for INFO HNO tracker production incident ( HNO continued with GTI/GTR )" },
+          # "tracker_bug_cf"              => { "id" => 6, "name" => "tracker_bug_cf",              "default_status_id" => 1, "position" => 6, "description" => "Description for TMA HO tracker Bug ( HO with GTI/GTR ) with Custom Field" },
+          # "tracker_feature_request_cf"  => { "id" => 7, "name" => "tracker_feature_request_cf",  "default_status_id" => 1, "position" => 7, "description" => "Description for TMA HO tracker Feature request ( NO SLA ) with Custom Field" },
         }
+
+        # For workflows
+        workflow_base = {
+          "0to1"=> { "old_status_id" => 0, "new_status_id" => 1, "type" => "WorkflowTransition" },
+          "0to2"=> { "old_status_id" => 0, "new_status_id" => 2, "type" => "WorkflowTransition" },
+          "1to2"=> { "old_status_id" => 1, "new_status_id" => 2, "type" => "WorkflowTransition" },
+          "1to3"=> { "old_status_id" => 1, "new_status_id" => 3, "type" => "WorkflowTransition" },
+          "1to4"=> { "old_status_id" => 1, "new_status_id" => 4, "type" => "WorkflowTransition" },
+          "1to5"=> { "old_status_id" => 1, "new_status_id" => 5, "type" => "WorkflowTransition" },
+          "1to6"=> { "old_status_id" => 1, "new_status_id" => 6, "type" => "WorkflowTransition" },
+          "2to3"=> { "old_status_id" => 2, "new_status_id" => 3, "type" => "WorkflowTransition" },
+          "2to4"=> { "old_status_id" => 2, "new_status_id" => 4, "type" => "WorkflowTransition" },
+          "2to5"=> { "old_status_id" => 2, "new_status_id" => 5, "type" => "WorkflowTransition" },
+          "2to6"=> { "old_status_id" => 2, "new_status_id" => 6, "type" => "WorkflowTransition" },
+          "3to2"=> { "old_status_id" => 3, "new_status_id" => 2, "type" => "WorkflowTransition" },
+          "3to4"=> { "old_status_id" => 3, "new_status_id" => 4, "type" => "WorkflowTransition" },
+          "3to5"=> { "old_status_id" => 3, "new_status_id" => 5, "type" => "WorkflowTransition" },
+          "4to2"=> { "old_status_id" => 4, "new_status_id" => 2, "type" => "WorkflowTransition" },
+          "4to3"=> { "old_status_id" => 4, "new_status_id" => 3, "type" => "WorkflowTransition" },
+          "4to5"=> { "old_status_id" => 4, "new_status_id" => 5, "type" => "WorkflowTransition" },
+        } 
+        workflows = {}
+        # Preapre workflows for roles admin(1), manager(2), developer(3), sysadmin(4), reporter(5) and other(6)
+        for role_id in 1..6
+          # Preapre workflows for roles
+          trackers.each do |tracker|
+            workflow_base.each do |workflow|
+              workflows.store(workflow.first+"for#{role_id}with#{tracker[1]["id"]}",{ "role_id" => role_id, "tracker_id" => tracker[1]["id"] }.merge(workflow[1]))
+            end
+          end
+        end
+
+        # For sla_holidays
+        sla_holidays = {}
+        sla_holiday_id = 0
+        for year in 2021..2024
+          sla_holidays.store("#{(sla_holiday_id+=1)}", { "id" => sla_holiday_id, "date" => "#{year}-01-01",     "name" => "Jour de l'an" })
+          sla_holidays.store("#{(sla_holiday_id+=1)}", { "id" => sla_holiday_id, "date" => get_easter(year,1),  "name" => "Lundi de Pâques" })
+          sla_holidays.store("#{(sla_holiday_id+=1)}", { "id" => sla_holiday_id, "date" => "#{year}-05-01",     "name" => "Fête du travail" })
+          sla_holidays.store("#{(sla_holiday_id+=1)}", { "id" => sla_holiday_id, "date" => "#{year}-05-08",     "name" => "Victoire 1945" })
+          sla_holidays.store("#{(sla_holiday_id+=1)}", { "id" => sla_holiday_id, "date" => get_easter(year,39), "name" => "Ascension" })
+          sla_holidays.store("#{(sla_holiday_id+=1)}", { "id" => sla_holiday_id, "date" => get_easter(year,50), "name" => "Pentecôte" })
+          sla_holidays.store("#{(sla_holiday_id+=1)}", { "id" => sla_holiday_id, "date" => "#{year}-07-14",     "name" => "Fête nationale" })
+          sla_holidays.store("#{(sla_holiday_id+=1)}", { "id" => sla_holiday_id, "date" => "#{year}-08-15",     "name" => "Assomption" })
+          sla_holidays.store("#{(sla_holiday_id+=1)}", { "id" => sla_holiday_id, "date" => "#{year}-11-01",     "name" => "Toussaint" })
+          sla_holidays.store("#{(sla_holiday_id+=1)}", { "id" => sla_holiday_id, "date" => "#{year}-11-11",     "name" =>  "Armistice" })
+          sla_holidays.store("#{(sla_holiday_id+=1)}", { "id" => sla_holiday_id, "date" => "#{year}-12-25",     "name" => "Jour de Noël" })
+        end
+
+        # For sla_calendar_holidays
+        sla_calendar_holidays = {}
+        sla_calendar_holidays_id = 0
+        for sla_calendar_id in 1..7
+          sla_holidays.each do |sla_holiday|
+            sla_calendar_holidays.store(
+              "#{(sla_calendar_holidays_id+=1)}", { 
+                "id" => sla_calendar_holidays_id,
+                "sla_calendar_id" => sla_calendar_id,
+                "sla_holiday_id" => sla_holiday[1]["id"],
+                "match" => ( [4,7].include?(sla_calendar_id) ? true : false ),
+              }
+            )
+          end
+        end
 
         file_tz_csv_header = CSV.read(file_tz_csv).shift
         Setting.plugin_redmine_sla['sla_time_zone'] = file_tz_csv_header[0].to_s
@@ -285,7 +379,7 @@ namespace :redmine do
               "assigned_to_id" => row["resolver"], # role resolver = user developer & sysadmin
               "author_id" => 5, # user reporter
               "status_id" => status_id,
-              "priority_id" => enumerations[row["issue_priority"]]["id"],
+              "priority_id" => ( row["custom_field_name"].empty? ? enumerations[row["issue_priority"]]["id"] : enumerations["Normal"]["id"] ) ,
               "created_on" => row["issue_date_created"],
               "updated_on" => row["issue_date_closed"],
               "closed_on" => row["issue_date_closed"],
@@ -297,7 +391,16 @@ namespace :redmine do
               "lft" => 1,
               "rgt" => 2,
           }          
+          
+          
           issues[issue_identifier] = issue_new
+
+          custom_values.store( custom_values.size+1, { "id" => custom_values.size+1,
+            "customized_type"   => "Issue",
+            "customized_id"	    => issue_id,
+            "custom_field_id"   => 1,
+            "value"             =>  custom_field_enumerations[row["issue_priority"]]["id"]
+          } ) if ! row["custom_field_name"].empty?
 
           journal_id_1 = ( ( issue_id - 1 ) * 3 ) + 1
           journal_id_2 = journal_id_1 + 1
@@ -434,6 +537,8 @@ namespace :redmine do
         File.write( file_out_fixtures+"/journals.yml", journals.to_yaml )
         # Write journal_details files in yaml with array journal_details
         File.write( file_out_fixtures+"/journal_details.yml", journal_details.to_yaml )
+        # Write custom_values files in yaml with array custom_values
+        File.write( file_out_fixtures+"/custom_values.yml", custom_values.to_yaml )
 
         # Write enumerations files in yaml with array enumerations
         File.write( file_out_fixtures+"/enumerations.yml", enumerations.to_yaml )
@@ -441,7 +546,14 @@ namespace :redmine do
         File.write( file_out_fixtures+"/issue_statuses.yml", issue_statuses.to_yaml )
         # Write trackers files in yaml with array trackers
         File.write( file_out_fixtures+"/trackers.yml", trackers.to_yaml )
+        # Write workflows files in yaml with array workflows
+        File.write( file_out_fixtures+"/workflows.yml", workflows.to_yaml )
 
+        # Write sla_holidays files in yaml with array sla_holidays
+        File.write( file_out_fixtures+"/sla_holidays.yml", sla_holidays.to_yaml )
+        # Write sla_calendar_holidays files in yaml with array sla_calendar_holidays
+        File.write( file_out_fixtures+"/sla_calendar_holidays.yml", sla_calendar_holidays.to_yaml )
+        
         File.write( file_out_fixtures+"/projects.yml", projects.to_yaml )
         File.write( file_out_fixtures+"/members.yml", members.to_yaml )
         File.write( file_out_fixtures+"/member_roles.yml", member_roles.to_yaml )

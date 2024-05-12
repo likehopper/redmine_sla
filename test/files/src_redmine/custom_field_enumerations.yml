@@ -1,0 +1,79 @@
+---
+Minor:
+  id: 1
+  custom_field_id: 1
+  name: Minor
+  active: true
+  position: 0
+Major:
+  id: 2
+  custom_field_id: 1
+  name: Major
+  active: true
+  position: 1
+Blocking:
+  id: 3
+  custom_field_id: 1
+  name: Blocking
+  active: true
+  position: 2
+Immediate:
+  id: 4
+  custom_field_id: 1
+  name: Immediate
+  active: false
+  position: 3
+Item1for2:
+  id: 5
+  custom_field_id: 2
+  name: Item1
+  active: true
+  position: 0
+Item2for2:
+  id: 6
+  custom_field_id: 2
+  name: Item2
+  active: true
+  position: 1
+Item3for2:
+  id: 7
+  custom_field_id: 2
+  name: Item3
+  active: true
+  position: 2
+Item1for3:
+  id: 8
+  custom_field_id: 3
+  name: Item1
+  active: true
+  position: 0
+Item2for3:
+  id: 9
+  custom_field_id: 3
+  name: Item2
+  active: true
+  position: 1
+Item3for3:
+  id: 10
+  custom_field_id: 3
+  name: Item3
+  active: true
+  position: 2
+Item1for5:
+  id: 11
+  custom_field_id: 5
+  name: Item1
+  active: true
+  position: 0
+Item2for5:
+  id: 12
+  custom_field_id: 5
+  name: Item2
+  active: true
+  position: 1
+Item3for5:
+  id: 13
+  custom_field_id: 5
+  name: Item3
+  active: true
+  position: 2  

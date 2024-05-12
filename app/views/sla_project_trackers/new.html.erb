@@ -1,5 +1,5 @@
 <% html_title(l('sla_label.sla_project_tracker.new')) %>
 <%= title l('sla_label.sla_project_tracker.new') %>
-<%= labelled_form_for([@sla_project_tracker],url: project_sla_project_trackers_path(Project.find(params[:project_id])), html: { multipart: false, id: 'sla_project_tracker_form', class: 'tabular', remote: request.xhr? }) do |f| %>
+<%= labelled_form_for([@sla_project_tracker],url: project_sla_project_trackers_path(Project.find(params[:project_id])), html: { multipart: false, id: 'sla-project-tracker-form', class: 'tabular', remote: request.xhr? }) do |f| %>
   <%= render partial: 'form', locals: { sla_project_tracker: @sla_project_tracker, f: f } %>
 <% end %>

@@ -163,6 +163,7 @@ fr:
       delete: Supprimer un SLA
       miss: SLA absent
       notice_successful_create: "SLA %{id} créé."
+      notice_successful_update: "SLA %{id} mis à jour."
 
     # SlaType
     sla_type:
@@ -178,6 +179,7 @@ fr:
       delete: Supprimer un Type de SLA
       miss: Absence du Type de SLA
       notice_successful_create: "Type de SLA %{id} créé."
+      notice_successful_update: "Type de SLA %{id} mis à jour."
 
     # SlaStatus
     sla_status:
@@ -192,6 +194,8 @@ fr:
       save: Enregistrer un Statut de SLA
       delete: Supprimer un Statut de SLA
       miss: Statut de SLA absent
+      notice_successful_create: "Statut de SLA %{id} créé."
+      notice_successful_update: "Statut de SLA %{id} mis à jour."
 
     # SlaHoliday
     sla_holiday:
@@ -206,6 +210,8 @@ fr:
       save: Enregistrer un Jour férié de SLA
       delete: Supprimer un Jour férié de SLA
       miss: Jour férié de SLA absent
+      notice_successful_create: "Jour férié de SLA %{id} créé."
+      notice_successful_update: "Jour férié de SLA %{id} mis à jour."
 
     # SlaCalendar
     sla_calendar:
@@ -221,6 +227,7 @@ fr:
       delete: Supprimer un Calendrier de SLA
       miss: Calendrier de SLA absent
       notice_successful_create: "Calendrier de SLA %{id} créé."
+      notice_successful_update: "Calendrier de SLA %{id} mis à jour."
 
     # SlaSchedule
     sla_schedule:
@@ -267,6 +274,8 @@ fr:
       delete: Supprimer un Niveau de SLA
       purge: Purge de tous les Engagements de SLA du Niveau de SLA
       miss: Niveau de SLA absent
+      notice_successful_create: "Niveau de SLA %{id} créé."
+      notice_successful_update: "Niveau de SLA %{id} mis à jour."
 
     # SlaLevelTerm
     sla_level_term:

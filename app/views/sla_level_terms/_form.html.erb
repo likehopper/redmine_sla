@@ -1,4 +1,4 @@
-<%= labelled_form_for([@sla_level_term], html: { multipart: false, id: 'sla_level_term_form', class: 'tabular', remote: request.xhr? }) do |f| %>
+<%= labelled_form_for([@sla_level_term], html: { multipart: false, id: 'sla-level-term-form', class: 'tabular', remote: request.xhr? }) do |f| %>
   <%= error_messages_for f.object %>
   <div class="box">
       <% if sla_level_term.safe_attribute?('sla_level_id') %>

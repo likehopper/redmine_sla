@@ -90,9 +90,11 @@ class SlaTypesController < ApplicationController
   def update
     @sla_type.safe_attributes = params[:sla_type]
     if @sla_type.save
-      flash[:notice] = l(:notice_successful_update)
       respond_to do |format|
         format.html do
+          flash[:notice] = l("sla_label.sla_type.notice_successful_update",
+            :id => view_context.link_to("##{@sla_type.id}", sla_type_path(@sla_type), :title => @sla_type.name)
+          )          
           redirect_back_or_default sla_types_path
         end
         format.api  {render_api_ok}

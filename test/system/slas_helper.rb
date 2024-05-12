@@ -16,23 +16,22 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../application_system_test_case', __FILE__)
+# require File.expand_path('../../../application_system_test_case', __FILE__)
 
-class SlasSystemTest < ApplicationSystemTestCase
+# class SlasSystemTest < ApplicationSystemTestCase
+module SlasHelperSystemTest
 
-  include Redmine::I18n
+  #include Redmine::I18n
 
-  test "create_sla" do
-
-    log_user('admin', 'admin')
+  def create_sla(sla_name)
     visit '/sla/slas/new'
     within('form#sla-form') do
-      fill_in 'sla_name', :with => 'new Sla'
+      fill_in 'sla_name', :with => sla_name
       find('input[name=commit]').click
     end
 
     # find created issue
-    sla = Sla.find_by_name("new Sla")
+    sla = Sla.find_by_name(sla_name)
     assert_kind_of Sla, sla
 
     # check redirection
@@ -41,30 +40,39 @@ class SlasSystemTest < ApplicationSystemTestCase
       :text => l("sla_label.sla.notice_successful_create", :id => "##{sla.id}" )
     assert_equal slas_path, current_path
 
+    # TODO : vérifier SlaStatus#show
+    # visit "/sla/statuses/#{sla_status.id}"
+    # compate sla_status attributs
+
     # check issue attributes
-    assert_equal 'new Sla', sla.name
+    assert_equal sla_name, sla.name
   end
 
-  test "update sla name" do
+  def update_sla
     sla = Sla.generate!
-    log_user('admin', 'admin')
     visit "/sla/slas/#{sla.id}"
-    page.first(:link, 'Edit').click
+    page.first(:link, l('sla_label.sla.edit')).click
     within('form#sla-form') do
       fill_in 'Name', :with => 'mod Sla'
     end
-    page.first(:button, l('sla_label.sla.edit')).click
-    assert page.has_css?('#flash_notice')
+    page.first(:button, l('sla_label.sla.save')).click
+    #assert page.has_css?('#flash_notice')
+    find 'div#flash_notice',
+      :visible => true,
+      :text => l("sla_label.sla.notice_successful_update", :id => "##{sla.id}" )    
     assert_equal 'mod Sla', sla.reload.name
+    # TODO : teste in Sla#index after filtering
   end
 
-  test "removing sla shows confirm dialog" do
+  def destroy_sla
     sla = Sla.generate!
-    log_user('admin', 'admin')
     visit "/sla/slas/#{sla.id}"
-    page.accept_confirm /Are you sure/ do
-      first('#content a.icon-del').click
-    end
+    page.first(:link, l('sla_label.sla.delete')).click
+    page.accept_confirm /Are you sure/
+    assert page.has_css?('#flash_notice'),
+      :visible => true,
+      :text => l(:notice_successful_delete)
+      # TODO : teste in Sla#index after filtering
   end
 
 end

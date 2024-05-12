@@ -54,3 +54,19 @@ sla_info_level_08:
   sla_id: 6
   sla_calendar_id: 7
   name: Managed Services SPE - Incident HNO
+
+# TMA HO GTI/GTR on tracker_bug_request with Sla Custom Field for Priority
+sla_tma_level_09:
+  id: 9
+  sla_id: 7
+  sla_calendar_id: 1
+  name: TMA - Bug HO with Sla Priority
+  custom_field_id: 1
+
+# TMA HO GTI only on tracker_support_request with Sla Custom Field for Priority
+sla_tma_level_10:
+  id: 10
+  sla_id: 8
+  sla_calendar_id: 1
+  name: TMA - Support HO with Sla Priority
+  custom_field_id: 1

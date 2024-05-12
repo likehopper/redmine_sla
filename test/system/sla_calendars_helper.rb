@@ -16,23 +16,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../application_system_test_case', __FILE__)
+module SlaCalendarsHelperSystemTest
 
-class SlaCalendarsSystemTest < ApplicationSystemTestCase
-
-  include Redmine::I18n
-
-  test "create_sla_calendar" do
-
-    log_user('admin', 'admin')
+  def create_sla_calendar(sla_calendar_name)
     visit '/sla/calendars/new'
-    within('form#sla_calendar-form') do
-      fill_in 'sla_calendar_name', :with => 'new SLA Calendar'
+    within('form#sla-calendar-form') do
+      fill_in 'sla_calendar_name', :with => sla_calendar_name
       find('input[name=commit]').click
     end
 
     # find created issue
-    sla_calendar = SlaCalendar.find_by_name("new SLA Calendar")
+    sla_calendar = SlaCalendar.find_by_name(sla_calendar_name)
     assert_kind_of SlaCalendar, sla_calendar
 
     # check redirection
@@ -41,30 +35,39 @@ class SlaCalendarsSystemTest < ApplicationSystemTestCase
       :text => l("sla_label.sla_calendar.notice_successful_create", :id => "##{sla_calendar.id}" )
     assert_equal sla_calendars_path, current_path
 
+    # TODO : vérifier SlaCalendar#show
+    # visit "/sla/calendares/#{sla_calendar.id}"
+    # compate sla_calendar attributs
+
     # check issue attributes
-    assert_equal 'new SLA Calendar', sla_calendar.name
+    assert_equal sla_calendar_name, sla_calendar.name
   end
 
-  test "update sla_calendar name" do
+  def update_sla_calendar
     sla_calendar = SlaCalendar.generate!
-    log_user('admin', 'admin')
     visit "/sla/calendars/#{sla_calendar.id}"
-    page.first(:link, 'Edit').click
-    within('form#sla_calendar-form') do
+    page.first(:link, l('sla_label.sla_calendar.edit')).click
+    within('form#sla-calendar-form') do
       fill_in 'Name', :with => 'mod SLA Calendar'
     end
-    page.first(:button, l('sla_label.sla_calendar.edit')).click
-    assert page.has_css?('#flash_notice')
+    page.first(:button, l('sla_label.sla_calendar.save')).click
+    # assert page.has_css?('#flash_notice')
+    find 'div#flash_notice',
+      :visible => true,
+      :text => l("sla_label.sla_calendar.notice_successful_update", :id => "##{sla_calendar.id}" )    
     assert_equal 'mod SLA Calendar', sla_calendar.reload.name
+    # TODO : teste in SlaCalendar#index after filtering
   end
 
-  test "removing sla_calendar shows confirm dialog" do
+  def destroy_sla_calendar
     sla_calendar = SlaCalendar.generate!
-    log_user('admin', 'admin')
     visit "/sla/calendars/#{sla_calendar.id}"
-    page.accept_confirm /Are you sure/ do
-      first('#content a.icon-del').click
-    end
+    page.first(:link, l('sla_label.sla_calendar.delete')).click
+    page.accept_confirm /Are you sure/
+    assert page.has_css?('#flash_notice'),
+      :visible => true,
+      :text => l(:notice_successful_delete)
+    # TODO : teste in SlaCalendar#index after filtering
   end
 
 end
