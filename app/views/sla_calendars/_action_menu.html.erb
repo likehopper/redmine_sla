@@ -1,12 +1,13 @@
 <div class="contextual">
   <% if User.current.admin? -%>
     <%= link_to l('sla_label.sla_calendar.plural'), sla_calendars_path, class: 'icon icon-cancel' -%>
-    <%= link_to l(:button_edit), edit_sla_calendar_path(@sla_calendar), title: l(:button_edit),
-      :class => 'icon icon-edit', :accesskey => accesskey(:edit) if @sla_calendar.editable? %>
-    <%= link_to l(:button_delete), sla_calendar_path(@sla_calendar),
-      :data => {:confirm => l(:text_are_you_sure)}, title: l(:button_delete),
-      :method => :delete,
-      :class => 'icon icon-del' if @sla_calendar.deletable? %>
+    <%= link_to l('sla_label.sla_calendar.edit'), edit_sla_calendar_path(@sla_calendar),
+          title: l('sla_label.sla_calendar.edit'), class: 'icon icon-edit',
+          :accesskey => accesskey(:edit) if @sla_calendar.editable? %>
+    <%= link_to l('sla_label.sla_calendar.delete'), sla_calendar_path(@sla_calendar),
+          data: {:confirm => l(:text_are_you_sure)}, :method => :delete,
+          title: l('sla_label.sla_calendar.delete'), class: 'icon icon-del',
+          :accesskey => accesskey(:delete) if @sla_calendar.deletable? %>
   <% else -%>
     <%= link_to l(:button_back), :back, :class => 'button', :title => l(:button_back) -%>
   <% end -%>

@@ -16,23 +16,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../application_system_test_case', __FILE__)
+module SlaTypesHelperSystemTest
 
-class SlaTypesSystemTest < ApplicationSystemTestCase
-
-  include Redmine::I18n
-
-  test "create_sla_type" do
-
-    log_user('admin', 'admin')
+  def create_sla_type(sla_type_name)
     visit '/sla/types/new'
-    within('form#sla_type-form') do
-      fill_in 'sla_type_name', :with => 'new SlaType'
+    within('form#sla-type-form') do
+      fill_in 'sla_type_name', :with => sla_type_name
       find('input[name=commit]').click
     end
 
     # find created issue
-    sla_type = SlaType.find_by_name("new SlaType")
+    sla_type = SlaType.find_by_name(sla_type_name)
     assert_kind_of SlaType, sla_type
 
     # check redirection
@@ -41,30 +35,39 @@ class SlaTypesSystemTest < ApplicationSystemTestCase
       :text => l("sla_label.sla_type.notice_successful_create", :id => "##{sla_type.id}" )
     assert_equal sla_types_path, current_path
 
+    # TODO : vérifier SlaTypes#show
+    # visit "/sla/type/#{sla_types.id}"
+    # compate sla_types attributs
+
     # check issue attributes
-    assert_equal 'new SlaType', sla_type.name
+    assert_equal sla_type_name, sla_type.name
   end
 
-  test "update sla_type name" do
+  def update_sla_type
     sla_type = SlaType.generate!
-    log_user('admin', 'admin')
     visit "/sla/types/#{sla_type.id}"
-    page.first(:link, 'Edit').click
-    within('form#sla_type-form') do
-      fill_in 'Name', :with => 'mod SlaType'
+    page.first(:link, l('sla_label.sla.edit')).click
+    within('form#sla-type-form') do
+      fill_in 'Name', :with => 'mod SLA Type'
     end
-    page.first(:button, l('sla_label.sla_type.edit')).click
-    assert page.has_css?('#flash_notice')
-    assert_equal 'mod SlaType', sla_type.reload.name
+    page.first(:button, l('sla_label.sla_type.save')).click
+    # assert page.has_css?('#flash_notice')
+    find 'div#flash_notice',
+      :visible => true,
+      :text => l("sla_label.sla_type.notice_successful_update", :id => "##{sla_type.id}" )
+    assert_equal 'mod SLA Type', sla_type.reload.name
+    # TODO : teste in SlaType#index after filtering
   end
 
-  test "removing sla_type shows confirm dialog" do
+  def destroy_sla_type
     sla_type = SlaType.generate!
-    log_user('admin', 'admin')
     visit "/sla/types/#{sla_type.id}"
-    page.accept_confirm /Are you sure/ do
-      first('#content a.icon-del').click
-    end
+    page.first(:link, l('sla_label.sla_type.delete')).click
+    page.accept_confirm /Are you sure/
+    assert page.has_css?('#flash_notice'),
+      :visible => true,
+      :text => l(:notice_successful_delete)
+    # TODO : teste in SlaType#index after filtering
   end
 
 end

@@ -1,0 +1,87 @@
+---
+SlaPriorityScf:
+  id: 1
+  type: IssueCustomField
+  name: SlaPriorityScf
+  field_format: enumeration
+  regexp: ""
+  is_required: true
+  is_for_all: false
+  is_filter: true
+  position: 1
+  searchable: true
+  default_value: 2
+  editable: true
+  visible: true
+  multiple: false
+  format_store: "---\nurl_pattern: ''\nedit_tag_style: ''"
+  description: "For SLA Priority with Custom Field"
+IsNotRequired:
+  id: 2
+  type: IssueCustomField
+  name: IsNotRequired
+  field_format: enumeration
+  regexp: ""
+  is_required: false
+  is_for_all: false
+  is_filter: true
+  position: 2
+  searchable: true
+  default_value: 6
+  editable: true
+  visible: true
+  multiple: false
+  format_store: "---\nurl_pattern: ''\nedit_tag_style: ''"
+  description: "Not for SLA Priority with Custom Field because is not required !"
+IsMultiple:
+  id: 3
+  type: IssueCustomField
+  name: IsMultiple
+  field_format: enumeration
+  regexp: ""
+  is_required: true
+  is_for_all: false
+  is_filter: true
+  position: 3
+  searchable: true
+  default_value: 9
+  editable: true
+  visible: true
+  multiple: true
+  format_store: "---\nurl_pattern: ''\nedit_tag_style: ''"
+  description: "Not for SLA Priority with Custom Field because is multiple !"
+IsSimpleList:
+  id: 4
+  type: IssueCustomField
+  name: IsSimpleList
+  field_format: list
+  possible_values: "---\n- Item1\n- Item2\n- Item3"
+  regexp: ""
+  is_required: true
+  is_for_all: false
+  is_filter: true
+  position: 4
+  searchable: true
+  default_value: Item2
+  editable: true
+  visible: true
+  multiple: false
+  format_store: "---\nurl_pattern: ''\nedit_tag_style: ''"
+  description: "Not for SLA Priority with Custom Field because is a simple list !"
+IsForProject:
+  id: 5
+  type: ProjectCustomField
+  name: IsForProject
+  field_format: enumeration
+  regexp: ""
+  is_required: true
+  is_for_all: false
+  is_filter: true
+  position: 1
+  searchable: true
+  default_value: 12
+  editable: true
+  visible: true
+  multiple: false
+  format_store: "---\nurl_pattern: ''\nedit_tag_style: ''"
+  description: "For SLA Priority with Custom Field" 

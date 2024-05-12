@@ -18,15 +18,15 @@
 
 require File.expand_path('../../test_helper', __FILE__)
 
-class SlaCacheTest < ActiveSupport::TestCase
+class SlaCacheSpentTest < ActiveSupport::TestCase
   
   setup do
   end
 
-  test "#SlaCaches purge" do
-    SlaCache.purge()
-    assert SlaCache.count(:all).zero?
+  test "#SlaCacheSpents purge" do
+    SlaCacheSpent.purge()
+    assert SlaCacheSpent.count(:all).zero?
   end
-
+  
 end
 

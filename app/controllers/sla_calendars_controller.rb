@@ -89,9 +89,11 @@ class SlaCalendarsController < ApplicationController
   def update
     @sla_calendar.safe_attributes = params[:sla_calendar]
     if @sla_calendar.save && @sla_calendar.update(sla_calendar_params) && sla_schedules_overlapless
-      flash[:notice] = l(:notice_successful_update)
       respond_to do |format|
         format.html do
+          flash[:notice] = l("sla_label.sla_calendar.notice_successful_update",
+            :id => view_context.link_to("##{@sla_calendar.id}", sla_calendar_path(@sla_calendar), :title => @sla_calendar.name)
+          )
           redirect_back_or_default sla_calendars_path
         end
         format.api  {render_api_ok}

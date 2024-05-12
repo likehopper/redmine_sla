@@ -163,6 +163,7 @@ en:
       delete: Delete SLA
       miss: Miss SLA
       notice_successful_create: "SLA %{id} created."
+      notice_successful_update: "SLA %{id} updated."
 
     # SlaType
     sla_type:
@@ -178,6 +179,7 @@ en:
       delete: Delete SLA Type
       miss: Miss SLA Type
       notice_successful_create: "SLA Type %{id} created."
+      notice_successful_update: "SLA Type %{id} updated."
 
     # SlaStatus
     sla_status:
@@ -192,6 +194,8 @@ en:
       save: Save SLA Status
       delete: Delete SLA Statuses
       miss: Miss SLA Statuses
+      notice_successful_create: "SLA Statuses %{id} created."
+      notice_successful_update: "SLA Statuses %{id} updated."
 
     # SlaHoliday
     sla_holiday:
@@ -206,6 +210,8 @@ en:
       save: Save SLA Holiday
       delete: Delete SLA Holiday
       miss: Miss SLA Holiday
+      notice_successful_create: "SLA Holiday %{id} created."
+      notice_successful_update: "SLA Holiday %{id} updated."
 
     # SlaCalendar
     sla_calendar:
@@ -221,6 +227,7 @@ en:
       delete: Delete SLA Calendar
       miss: Miss SLA Calendar
       notice_successful_create: "SLA Calendar %{id} created."
+      notice_successful_update: "SLA Calendar %{id} updated."
 
     # SlaSchedule
     sla_schedule:
@@ -267,6 +274,8 @@ en:
       delete: Delete SLA Level
       purge: Purge all SLA Terms of the SLA Level
       miss: Miss SLA Level
+      notice_successful_create: "SLA Level %{id} created."
+      notice_successful_update: "SLA Level %{id} updated."
 
     # SlaLevelTerm
     sla_level_term:
