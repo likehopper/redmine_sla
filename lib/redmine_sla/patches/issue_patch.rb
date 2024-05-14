@@ -67,17 +67,21 @@ module RedmineSla
         }
       end
       
-      def self.included(base) # :nodoc:
-        base.extend(ClassMethods)
-        base.send(:include, InstanceMethods)
-        # Same as typing in the class
-        base.class_eval do
-          unloadable
-          # TODO: After the update, if a criterion changes (tracker / priority) then we recalculate!!!
-          after_save :sla_cache_update
-          #after_destroy :sla_cache_destroy # made in database by FOREIGN KEY (issue_id) REFERENCES issues(id) ON DELETE CASCADE
-        end
-      end
+      # Now, sla_cache and sla_cache_spent only call via psql functions
+      # and sla_cache is updated if the ticket was updated more than a minute ago
+      # and sla_cache_spent is updated if the sla_cache_spent was not updated more than a minute ago 
+      # def self.included(base) # :nodoc:
+      #   base.extend(ClassMethods)
+      #   base.send(:include, InstanceMethods)
+      #   # Same as typing in the class
+      #   base.class_eval do
+      #     unloadable
+      #     # TODO: After the update, if a criterion changes (tracker / priority) then we recalculate!!!
+      #     after_save :sla_cache_update
+      #     #after_destroy :sla_cache_destroy # made in database by FOREIGN KEY (issue_id) REFERENCES issues(id) ON DELETE CASCADE
+      #   end
+      # end
+
     end
 
     module ClassMethods
@@ -85,24 +89,24 @@ module RedmineSla
 
     module InstanceMethods
 
-      def sla_cache_update
-        sla_level_changed = false
-        # if tracker changed then must change sla_level in sla_cache
-        if ( self.tracker_id != self.tracker_id_before_last_save ) then
-          sla_level_changed = true
-        end
-        # if priority changed then must change sla_level in sla_cache
-        if ( self.priority_id != self.priority_id_before_last_save ) then
-          sla_level_changed = true
-        end
-        # if a change require then clear cache for issue
-        if ( sla_level_changed ) then
-          SlaCache.destroy_by_issue_id(self.id)
-        end
-        # The update is useless since called by view
-        #SlaCache.new.refresh_by_issue_id(self.id) 
-        return true
-      end
+      # def sla_cache_update
+      #   sla_level_changed = false
+      #   # if tracker changed then must change sla_level in sla_cache
+      #   if ( self.tracker_id != self.tracker_id_before_last_save ) then
+      #     sla_level_changed = true
+      #   end
+      #   # if priority changed then must change sla_level in sla_cache
+      #   if ( self.priority_id != self.priority_id_before_last_save ) then
+      #     sla_level_changed = true
+      #   end
+      #   # if a change require then clear cache for issue
+      #   if ( sla_level_changed ) then
+      #     SlaCache.destroy_by_issue_id(self.id)
+      #   end
+      #   # The update is useless since called by view
+      #   #SlaCache.new.refresh_by_issue_id(self.id) 
+      #   return true
+      # end
 
     end
 
