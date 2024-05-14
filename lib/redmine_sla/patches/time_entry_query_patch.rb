@@ -72,7 +72,6 @@ module RedmineSla
 
     end
 
-
     module InstanceMethods
 
       def available_filters_with_sla_time_entry
@@ -87,7 +86,7 @@ module RedmineSla
                               :name => l("sla_label.sla_level.singular"),
                               :type => :list,
                               :values => values
-          ) unless available_filters.key?('slas.sla_level_id')
+          ) unless available_filters_without_sla_time_entry.key?('slas.sla_level_id')
 
           # SLA LEVEL : Column
           time_entry_get_sla_level = QueryColumn.new(
