@@ -68,13 +68,13 @@ class SlaLevelTest < ActiveSupport::TestCase
           #  next
           #end          
           #sla_type_term_issue = sla_level_term[:term]
-          sla_term = issue.get_sla_term_expected(sla_type_id)
+          sla_term = issue.get_sla_term(sla_type_id)
           # TODO : SlaLog : no sla_level
           next if ( sla_term.nil? )
 
           #sla_cache_spent = SlaCacheSpent.find_or_new(sla_cache.id,sla_type_id)
           #sla_type_spent_issue = sla_cache_spent[:spent]
-          sla_spent = issue.get_sla_term_spent(sla_type_id)
+          sla_spent = issue.get_sla_spent(sla_type_id)
           # TODO : SlaLog : si valeur nulle
           next if ( sla_spent.nil? )
 
@@ -96,14 +96,6 @@ class SlaLevelTest < ActiveSupport::TestCase
 
     assert true
 
-  end
-  
-  test "#SlaLevelTest TMA/GTR" do
-    assert SlaCache.count(:all).zero?
-  end
-
-  def test_truth
-    assert true
   end
 
 end

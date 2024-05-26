@@ -25,39 +25,32 @@ class SlaCacheSpent < ActiveRecord::Base
   belongs_to :project
   belongs_to :issue
 
-  #has_one :issue, through: :sla_cache
-  #has_one :project, through: :sla_cache
-
   include Redmine::SafeAttributes
   #safe_attributes *%w[sla_cache_id sla_type_id updated_on spent]
   safe_attributes *%w[]
 
-  default_scope {
-    joins(:sla_type,:issue,:project)
-  #  .order(start_date: :desc) 
-  }
+  default_scope { joins(:sla_type,:issue,:project) }
 
-  scope :visible, lambda {|*args|
-    user = args.shift || User.current
-    joins(:sla_type,:issue,:project)
-      where(Issue.visible_condition(user, *args))
-  }
+  scope :visible, ->(*args) { where(SlaCacheSpent.visible_condition(args.shift || User.current, *args)) }
 
-  def self.visible_condition(user, options = {})
-    '1=1'
+  # Selection limitations for users based on access issues
+  def self.visible_condition(user=User.current, options = {})
+    Issue.visible_condition(user, options = {})
   end
 
-  # def issue
-  #   sla_cache.issue if sla_cache
-  # end
+  # For index and refresh
+  def visible?(user=User.current)
+    user.allowed_to?(:view_sla, self.project) && self.issue.visible?
+  end
 
-  # def project
-  #  issue.project if issue
-  # end  
+  # For create and update
+  def editable?(user=nil)
+    false
+  end
 
-  def visible?(user = nil)
-    user ||= User.current
-    user.allowed_to?(:manage_sla, nil, global: true)
+  # For destroy and purge
+  def deletable?(user=User.current)
+    user.allowed_to?(:manage_sla, self.project) && self.issue.visible?
   end
   
   def self.find_by_issue_and_type_id(issue,sla_type_id)
@@ -66,28 +59,19 @@ class SlaCacheSpent < ActiveRecord::Base
   end
 
   # Class method for refresh cache
+  def self.refresh_by_issue_id(issue_id)
+    SlaType.all.each do |sla_type|
+      ActiveRecord::Base.connection.execute("SELECT sla_get_spent(#{issue_id},#{sla_type.id}) ; ")
+    end
+  end  
+
+  # Class method for refresh cache
   def refresh
     ActiveRecord::Base.connection.execute("SELECT sla_get_spent(#{self.sla_cache.issue_id},#{self.sla_type.id}) ; ")
   end
 
   def self.purge()
     return ActiveRecord::Base.connection.select_value("TRUNCATE sla_cache_spents CASCADE ; ")
-  end  
-
-  # Class method for update cache
-  def self.update_by_issue_id(issue_id)
-    SlaType.all.each { |sla_type|
-      ActiveRecord::Base.connection.execute("SELECT sla_get_spent(#{issue_id},#{sla_type.id}) ; ")
-    }
-  end
-
-  def editable?(user = nil)
-    false
-  end
-
-  def deletable?(user = nil)
-    user ||= User.current
-    user.allowed_to?(:manage_sla, nil, global: true)
   end  
     
 end

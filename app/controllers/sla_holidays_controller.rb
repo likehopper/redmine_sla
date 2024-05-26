@@ -21,6 +21,7 @@ class SlaHolidaysController < ApplicationController
   unloadable
 
   accept_api_auth :index, :create, :show, :update, :destroy
+  
   before_action :require_admin
   before_action :authorize_global
 
@@ -102,12 +103,10 @@ class SlaHolidaysController < ApplicationController
   end
 
   def destroy
-    #@sla_holidays.each(&:destroy)
     @sla_holidays.each do |sla_holiday|
       begin
         sla_holiday.reload.destroy
-      rescue ::ActiveRecord::RecordNotFound # raised by #reload if sla_holiday no longer exists
-        # nothing to do, sla_holiday was already deleted (eg. by a parent)
+      rescue ::ActiveRecord::RecordNotFound
       end
     end
     respond_to do |format|

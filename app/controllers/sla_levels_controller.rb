@@ -21,6 +21,7 @@ class SlaLevelsController < ApplicationController
   unloadable
 
   accept_api_auth :index, :create, :show, :update, :destroy
+  
   before_action :require_admin, except: [:show]
   before_action :authorize_global
 
@@ -29,8 +30,12 @@ class SlaLevelsController < ApplicationController
 
   helper :sla_levels
   helper :context_menus
+
   helper :queries
   include QueriesHelper
+
+  helper Queries::SlaLevelsQueriesHelper
+  include Queries::SlaLevelsQueriesHelper 
 
   def index
     retrieve_query(Queries::SlaLevelQuery) 
@@ -123,8 +128,7 @@ class SlaLevelsController < ApplicationController
     @sla_levels.each do |sla_level|
       begin
         sla_level.reload.destroy
-      rescue ::ActiveRecord::RecordNotFound # raised by #reload if sla_level no longer exists
-        # nothing to do, sla_level was already deleted (eg. by a parent)
+      rescue ::ActiveRecord::RecordNotFound
       end
     end
     respond_to do |format|
@@ -173,9 +177,7 @@ class SlaLevelsController < ApplicationController
 
   def find_sla_levels
     @sla_levels = SlaLevel.visible.where(id: (params[:id] || params[:ids])).to_a
-    #@sla_level = @sla_levels.first if @sla_levels.count == 1
     raise ActiveRecord::RecordNotFound if @sla_levels.empty?
-    #raise Unauthorized unless @sla_levels.all?(&:visible?)
   rescue ActiveRecord::RecordNotFound
     render_404
   end

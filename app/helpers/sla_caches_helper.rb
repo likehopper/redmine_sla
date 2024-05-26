@@ -18,4 +18,24 @@
 
 module SlaCachesHelper
 
+  def _sla_caches_path(project, issue, *args)
+    if project
+      project_sla_caches_path(project, *args)
+    else
+      sla_caches_path(*args)
+    end
+  end
+
+  def render_api_includes(sla_cache, api)
+    api.array :sla_cache_spents do
+      sla_cache.sla_cache_spents.each do |sla_cache_spent|
+        api.sla_cache_spent(
+          :id => sla_cache_spent.id,
+          :sla_type => sla_cache_spent.sla_type,
+          :spent => sla_cache_spent.spent
+        )
+      end
+    end if include_in_api_response?('sla_cache_spents')
+  end
+
 end

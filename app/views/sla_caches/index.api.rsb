@@ -1,11 +1,11 @@
 api.array :sla_caches, api_meta(:total_count => @entity_count, :offset => @offset, :limit => @limit) do
-  @entities.each do |entity|
-    api.entity do
-      api.id entity.id
-      api.issue_id entity.issue_id
-      api.sla_level_id entity.sla_level_id
-      api.start_date entity.start_date
-      api.updated_on entity.updated_on
+  @entities.each do |sla_cache|
+    api.sla_cache do
+      api.id sla_cache.id
+      api.issue_id sla_cache.issue_id
+      api.sla_level_id sla_cache.sla_level_id
+      api.start_date sla_cache.start_date
+      render_api_includes(sla_cache, api)
     end
   end
 end

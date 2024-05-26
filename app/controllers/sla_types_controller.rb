@@ -21,6 +21,7 @@ class SlaTypesController < ApplicationController
   unloadable
 
   accept_api_auth :index, :create, :show, :update, :destroy
+  
   before_action :require_admin
   before_action :authorize_global
 
@@ -108,14 +109,10 @@ class SlaTypesController < ApplicationController
   end
 
   def destroy
-    #@sla_types.each(&:destroy)
-    #flash[:notice] = l(:notice_successful_delete)
-    #redirect_back_or_default sla_types_path
     @sla_types.each do |sla_type|
       begin
         sla_type.reload.destroy
-      rescue ::ActiveRecord::RecordNotFound # raised by #reload if sla_type no longer exists
-        # nothing to do, sla_type was already deleted (eg. by a parent)
+      rescue ::ActiveRecord::RecordNotFound
       end
     end
     respond_to do |format|
@@ -174,12 +171,35 @@ class SlaTypesController < ApplicationController
   # Dynamic creation of the new SlaType
   def post_create
     sla_type = @sla_type
+    RedmineSla::Patches::TimeEntryPatch::define_method("get_sla_respect_#{sla_type.id}") do 
+      self.issue.get_sla_respect(sla_type.id)
+    end
     RedmineSla::Patches::IssuePatch::define_method("get_sla_respect_#{sla_type.id}") do 
       self.get_sla_respect(sla_type.id)
     end
-    RedmineSla::Patches::TimeEntryPatch::define_method("get_sla_respect_#{sla_type.id}") do 
-      issue.get_sla_respect(sla_type.id)
+    SlaCache::define_method("get_sla_respect_#{sla_type.id}") do 
+      self.issue.get_sla_respect(sla_type.id)
+    end    
+    SlaCache::define_method("get_sla_remain_#{sla_type.id}") do 
+      self.issue.get_sla_remain(sla_type.id)
     end
+    SlaCache::define_method("get_sla_spent_#{sla_type.id}") do 
+      self.issue.get_sla_spent(sla_type.id)
+    end
+    SlaCache::define_method("get_sla_term_#{sla_type.id}") do 
+      self.issue.get_sla_term(sla_type.id)
+    end
+  end
+
+  # Dynamic creation of the new SlaType
+  def post_destroy
+    sla_type = @sla_type
+    RedmineSla::Patches::TimeEntryPatch::class_eval { remove_method "get_sla_respect_#{sla_type.id}" }
+    RedmineSla::Patches::IssuePatch::class_eval { remove_method "get_sla_respect_#{sla_type.id}" }
+    SlaCache::class_eval { remove_method "get_sla_respect_#{sla_type.id}" }
+    SlaCache::class_eval { remove_method "get_sla_remain_#{sla_type.id}" }
+    SlaCache::class_eval { remove_method "get_sla_spent_#{sla_type.id}" }
+    SlaCache::class_eval { remove_method "get_sla_term_#{sla_type.id}" }
   end
 
 end

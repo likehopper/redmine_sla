@@ -48,9 +48,9 @@ module RedmineSla
               LEFT JOIN custom_values ON ( sla_levels.custom_field_id = custom_values.custom_field_id AND custom_values.customized_id = issues.id )
               LEFT JOIN sla_cache_spents ON ( sla_caches.id = sla_cache_spents.sla_cache_id AND sla_cache_spents.sla_type_id = #{sla_type_id} )
               LEFT JOIN sla_level_terms ON ( sla_caches.sla_level_id = sla_level_terms.sla_level_id AND sla_level_terms.sla_type_id = #{sla_type_id}
-                AND sla_level_terms.sla_priority_id LIKE ( CASE
-                WHEN sla_levels.custom_field_id IS NULL THEN CAST(issues.priority_id AS TEXT)
-                ELSE custom_values.value END
+              AND sla_level_terms.sla_priority_id = ( CASE
+                WHEN sla_levels.custom_field_id IS NULL THEN issues.priority_id
+                ELSE CAST(custom_values.value AS BIGINT) END
                 )
               )
               WHERE sla_issues.id = issues.id
@@ -83,7 +83,7 @@ module RedmineSla
           # SLA LEVEL : Filter
           values = SlaLevel.joins(:sla_project_trackers).where("sla_project_trackers.project_id = ?", project.id).select("sla_levels.id, sla_levels.name").distinct.pluck(:name,:id)
           add_available_filter('slas.sla_level_id',
-                              :name => l(:field_sla_level),
+                              :name => l("sla_label.sla_level.singular"),
                               :type => :list,
                               :values => values,
           ) unless available_filters_without_sla_issue.has_key?('slas.sla_level_id')          
@@ -126,25 +126,25 @@ module RedmineSla
                 :caption => "⏰ "+l(:label_sla_respect)+" "+sla_type.name, #+" (Issue)",
                 :groupable => true,
                 :sortable => "(
-                  SELECT DISTINCT CASE
-                    WHEN sla_caches.sla_level_id IS NULL THEN 0
+                    SELECT DISTINCT CASE
+                    WHEN sla_level_terms.term IS NULL THEN 0
                     WHEN ( ( NOT ( sla_level_terms.term < sla_cache_spents.spent ) ) IS NOT TRUE ) THEN 1
                     ELSE 2 END AS sla_respect
                   FROM issues AS sla_issues
                   LEFT JOIN sla_caches ON ( sla_issues.id = sla_caches.issue_id )
                   LEFT JOIN sla_levels ON ( sla_caches.sla_level_id = sla_levels.id )
-                  LEFT JOIN custom_values ON ( sla_levels.custom_field_id = custom_values.custom_field_id AND custom_values.customized_id = issues.id )
+                  LEFT JOIN custom_values ON ( sla_levels.custom_field_id = custom_values.custom_field_id AND custom_values.customized_id = sla_issues.id )
                   LEFT JOIN sla_cache_spents ON ( sla_caches.id = sla_cache_spents.sla_cache_id AND sla_cache_spents.sla_type_id = #{sla_type.id} )
                   LEFT JOIN sla_level_terms ON ( sla_caches.sla_level_id = sla_level_terms.sla_level_id AND sla_level_terms.sla_type_id = #{sla_type.id}
-                    AND sla_level_terms.sla_priority_id LIKE ( CASE
-                    WHEN sla_levels.custom_field_id IS NULL THEN CAST(issues.priority_id AS TEXT)
-                    ELSE custom_values.value END
+                    AND sla_level_terms.sla_priority_id = ( CASE
+                    WHEN sla_levels.custom_field_id IS NULL THEN sla_issues.priority_id
+                    ELSE CAST(custom_values.value AS BIGINT) END
                     )
                   )
                   WHERE sla_issues.id = issues.id
                 )",
               )
-              def issue_get_sla_level.group_by_statement
+              def issue_get_sla_respect.group_by_statement
                 self.sortable
               end
               self.available_columns << issue_get_sla_respect

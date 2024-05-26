@@ -1,8 +1,0 @@
-api.array :sla_issues, api_meta(:total_count => @entity_count, :offset => @offset, :limit => @limit) do
-  @entities.each do |entity|
-    api.entity do
-      api.project_id entity.project_id
-      api.issue_id entity.issue_id
-    end
-  end
-end

@@ -50,20 +50,28 @@ Redmine::Plugin.register :redmine_sla do
   )
 
   # Add entry in administration menu
-  menu :admin_menu, :sla,
+  menu :admin_menu, :redmine_sla,
     { controller: 'slas', action: 'index'},
-    caption: :sla_label_global_settings, html: { class: 'icon redmine-sla' }, public: true
+    html: { class: 'icon redmine-sla' },
+    caption: :sla_label_global_settings,
+    public: false
+    
+  # Add entry in project menu
+  menu :project_menu, :redmine_sla,
+    { controller: 'sla_caches', action: 'index' },
+    :caption => :sla_label_abbreviation,
+    :param => :project_id
 
   # Project Permission Definition
   project_module :sla do
     permission :view_sla, {
-      :issue => :index,
-      :sla_calendars => :show,
-      :sla_levels => :show
+      sla_calendars: [ :show ],
+      sla_levels: [ :show ],
+      sla_caches: [ :index, :show, :refresh, :context_menu ],
     }, :require => :member
     permission :manage_sla, {
-      projects: :settings,
-      sla_project_trackers: [ :new, :create, :edit, :update, :edit, :destroy ]
+      sla_caches: [ :index, :show, :refresh, :destroy, :purge, :context_menu ],
+      sla_project_trackers: [ :new, :create, :edit, :update, :edit, :destroy ],
     }, :require => :member
   end
        
@@ -89,7 +97,7 @@ RedmineApp::Application.config.after_initialize do
     IssueCustomField.send(:include, RedmineSla::Patches::IssueCustomFieldPatch)
   end
 
-  # Only to display SlaPriority or SlapriorityScf in sla/level_terms#index
+  # Only to display SlaLevel in issues#index & time_entries#index
   unless QueriesHelper.included_modules.include? RedmineSla::Patches::QueriesHelperPatch
     QueriesHelper.send(:include, RedmineSla::Patches::QueriesHelperPatch)
   end
@@ -97,12 +105,10 @@ RedmineApp::Application.config.after_initialize do
   if (ActiveRecord::Base.connection.tables.include?('queries') rescue false) &&
     # Adds methods on Redmine's Issues to Display/Filter/Sort 
     unless IssueQuery.included_modules.include? RedmineSla::Patches::IssueQueryPatch
-      #IssueQuery.included_modules.exclude?(RedmineSla::Patches::IssueQueryPatch)
       IssueQuery.send(:include, RedmineSla::Patches::IssueQueryPatch)
     end
     # Adds methods on Redmine's TimeEntry to Display/Filter/Sort
     unless TimeEntryQuery.included_modules.include? RedmineSla::Patches::TimeEntryQueryPatch
-      #TimeEntryQuery.included_modules.exclude?(RedmineSla::Patches::TimeEntryQueryPatch)
       TimeEntryQuery.send(:include, RedmineSla::Patches::TimeEntryQueryPatch)
     end
   end

@@ -27,10 +27,7 @@ class SlaCalendarHoliday < ActiveRecord::Base
 
   scope :visible, ->(*args) { where(SlaCalendarHoliday.visible_condition(args.shift || User.current, *args)) }
 
-  default_scope {
-    joins(:sla_calendar,:sla_holiday)
-    #.order("sla_calendars.name ASC,sla_holidays.date DESC")
-  }
+  default_scope { joins(:sla_calendar,:sla_holiday) }
 
   validates_presence_of :sla_calendar
   validates_presence_of :sla_holiday
@@ -40,39 +37,31 @@ class SlaCalendarHoliday < ActiveRecord::Base
 
   validates_uniqueness_of :sla_calendar,
     :scope => [ :sla_holiday ],
-    :message => l('sla_label.sla_calendar_holiday.exists')
+    :message => l("sla_label.sla_calendar_holiday.exists")
   
   validates :match, inclusion: [true, false]
   validates :match, exclusion: [nil]
 
   safe_attributes *%w[sla_calendar_id sla_holiday_id match]
 
+  # No selection limitations
   def self.visible_condition(user, options = {})
     '1=1'
   end
 
-  def editable_by?(user)
-    editable?(user)
-  end
-
-  def visible?(user = nil)
-    user ||= User.current
+  # For index and show
+  def visible?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 
-  def editable?(user = nil)
-    user ||= User.current
+  # For create and update
+  def editable?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 
-  def deletable?(user = nil)
-    user ||= User.current
+  # For destroy
+  def deletable?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
-  end
-
-  def self.human_attribute_name(*args)
-    Rails.logger.warn "======>>> SlaCalendarHoliday->human_attribute_name(#{args[0].to_s}) <<<====== "
-    super
   end
 
 end

@@ -1,17 +1,18 @@
 <ul>
   <li><%= context_menu_link l(:button_refresh),
     refresh_sla_caches_path(ids: @sla_cache_ids, back_url: @back),
-    class: 'icon icon-sla_cache_refresh', disabled: !@can[:show]
-  %></li>
-  <% if @sla_cache_ids.count == 1 %>
+    class: 'icon icon-sla_cache_refresh', disabled: !@can[:refresh]
+  -%></li>
+  <% if @sla_cache_ids.count == 1 && @can[:show] %>
   <li><%= context_menu_link l(:button_show),
     sla_cache_spents_path(set_filter: 1, f: ['issue_id'], op: { 'issue_id' => '=' }, v: { 'issue_id' => [@sla_cache.issue_id] }),
-    class: 'icon icon-magnifier', disabled: !@can[:show] %></li>
+    class: 'icon icon-magnifier'  
+  -%></li>
   <% end %>  
   <li><%= context_menu_link l(:button_delete),
             sla_caches_path(ids: @sla_cache_ids, back_url: @back),
             method: :delete, class: 'icon icon-del', disabled: !@can[:delete],
             data: { confirm: l('sla_label.sla_cache.count',count: @sla_cache_ids.count)+"\n"+l(:text_are_you_sure) }
-  %></li>
-  <%= call_hook(:view_sla_caches_context_menu_end, { sla_cache: @sla_cache, sla_caches: @sla_caches, can: @can, back: @back }) %>
+  -%></li>
+  <%= call_hook(:view_sla_caches_context_menu_end, { sla_cache: @sla_cache, sla_caches: @sla_caches, can: @can, back: @back }) -%>
 </ul>

@@ -4,7 +4,7 @@
     <%= link_to l('sla_label.sla_level.new'), new_sla_level_path, class: 'icon icon-add' if User.current.allowed_to?(:manage_sla, nil, global: true) %>
   </div>
   <div class="title-sla-settings title-sla_level">
-    <%= title l('sla_label.sla_level.plural') %>
+    <%= title l('sla_label.sla_level.index') %>
   </div>
   <%= form_tag(sla_levels_path, method: :get, id: 'query_form') do %>
     <%= render partial: 'queries/query_form' %>

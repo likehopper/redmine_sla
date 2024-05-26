@@ -40,6 +40,14 @@ class SlaAllSystemTest < ApplicationSystemTestCase
     create_sla_calendar('new SLA Calendar')
   end
   
+  test "all contextual menu as admin" do
+    log_user('admin', 'admin')
+    contextual_menu_sla_calendar
+    contextual_menu_sla_status
+    contextual_menu_sla_type
+    contextual_menu_sla
+  end
+
   test "all update as admin" do    
     log_user('admin', 'admin')
     update_sla

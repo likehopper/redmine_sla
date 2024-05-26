@@ -20,8 +20,8 @@ require File.expand_path('../../test_helper', __FILE__)
 
 class SlaCacheTest < ActiveSupport::TestCase
 
-  test "the truth" do
-    assert true
+  test "#SlaCacheTest Count" do
+    assert_not SlaCache.count(:all).zero?
   end
 
 end

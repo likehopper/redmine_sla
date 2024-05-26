@@ -1,14 +1,16 @@
     api.sla_cache do
       api.id @sla_cache.id
+      api.project_id @sla_cache.project_id
       api.issue_id @sla_cache.issue_id
+      api.tracker_id @sla_cache.tracker_id
       api.sla_level @sla_cache.sla_level
       api.start_date @sla_cache.start_date
-      api.updated_on @sla_cache..updated_on
+      api.created_on @sla_cache.created_on
+      api.updated_on @sla_cache.updated_on
       api.array :sla_cache_spents do
         @sla_cache_spents.each do |sla_cache_spent|
           api.sla_cache_spent :id => sla_cache_spent.id do
             api.sla_type sla_cache_spent.sla_type
-            api.updated_on sla_cache_spent.updated_on
             api.spent sla_cache_spent.spent
           end
         end

@@ -18,6 +18,47 @@
 
 module SlaStatusesHelperSystemTest
 
+  def contextual_menu_sla_status
+    sla_status = SlaStatus.find(1)
+
+    visit '/sla/statuses/'
+    assert_text l('sla_label.sla_status.index')
+    element = find('tr#entity_id_1')
+    element.right_click
+    assert_selector 'div#context-menu', visible: true
+    assert_selector 'div#context-menu a', text: 'Show'
+    find('div#context-menu a', text: l(:button_show)).click
+    assert_current_path sla_status_path(sla_status)
+    assert_text l('sla_label.sla_status.show')
+    assert_text sla_status.sla_type.name
+
+    visit '/sla/statuses/'
+    assert_text l('sla_label.sla_status.index')
+    element = find('tr#entity_id_1')
+    element.right_click
+    assert_selector 'div#context-menu', visible: true
+    assert_selector 'div#context-menu a', text: l(:button_edit)
+    find('div#context-menu a', text: l(:button_edit)).click
+    assert_current_path edit_sla_status_path(sla_status)
+    assert_text l('sla_label.sla_status.edit')
+    assert_select 'sla_status_sla_type_id' do
+      assert_select 'sla_status[sla_type_id]', text: sla_status.sla_type.name
+    end
+
+    visit '/sla/statuses/'
+    assert_text l('sla_label.sla_status.index')
+    element = find('tr#entity_id_1')
+    element.right_click
+    assert_selector 'div#context-menu', visible: true
+    assert_selector 'div#context-menu a', text: l(:button_delete)
+    accept_confirm do
+      find('div#context-menu a', text: l(:button_delete)).click
+    end
+    assert_current_path sla_statuses_path()
+    assert_text l(:notice_successful_delete)
+    
+  end   
+
   def create_sla_status(sla_type_name,issue_status_name)
     visit '/sla/statuses/new'
     within('form#sla-status-form') do

@@ -26,9 +26,8 @@ class SlaHoliday < ActiveRecord::Base
 
   # TODO : permit group by year functionnal
   # TODO : permit order by name/date functionnal
-  default_scope {
-    # order(date: :desc)
-  }
+  
+  default_scope { }
 
   validates_presence_of :name
   validates_presence_of :date
@@ -37,29 +36,27 @@ class SlaHoliday < ActiveRecord::Base
 
   safe_attributes *%w[name date]
 
+  # No selection limitations
   def self.visible_condition(user, options = {})
     '1=1'
   end
 
-  def editable_by?(user)
-    editable?(user)
-  end
-
-  def visible?(user = nil)
-    user ||= User.current
+  # For index and show
+  def visible?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 
-  def editable?(user = nil)
-    user ||= User.current
+  # For create and update
+  def editable?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 
-  def deletable?(user = nil)
-    user ||= User.current
+  # For destroy
+  def deletable?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 
+  # Print text for link objects
   def to_s
     name.to_s
   end

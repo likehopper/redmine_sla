@@ -12,7 +12,8 @@ class CreateSlaCacheSpents < ActiveRecord::Migration[5.2]
           t.belongs_to :issue, :null => false, foreign_key: { name: 'sla_cache_spents_issues_fkey', on_delete: :cascade }
           t.belongs_to :sla_type, :null => false, foreign_key: { name: 'sla_cache_spents_sla_types_fkey', on_delete: :cascade }
           t.integer :spent, :null => false
-          t.datetime :updated_on, :null => false
+          t.datetime :created_on, :null => false, default: -> { 'CURRENT_TIMESTAMP' }
+          t.datetime :updated_on, :null => false, default: -> { 'CURRENT_TIMESTAMP' }
         end
         say "Created table sla_cache_spents"
 
@@ -21,7 +22,7 @@ class CreateSlaCacheSpents < ActiveRecord::Migration[5.2]
         say "Created index on table sla_cache_spents"
         
         add_index :sla_cache_spents, [:sla_cache_id, :sla_type_id], :unique => true, name: 'sla_cache_spents_sla_caches_sla_types_ukey', \
-          comment: "This index is an important constraint for update the cache on conflict instead insert"
+          comment: "This index is an important constraint for update the sla cache spent on conflict instead insert"
         say "Created unique index on table sla_cache_spents"
 
         execute "ALTER TABLE sla_cache_spents ADD CONSTRAINT sla_cache_spents_sla_caches_sla_types_ukey UNIQUE USING INDEX sla_cache_spents_sla_caches_sla_types_ukey;"

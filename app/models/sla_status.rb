@@ -27,10 +27,7 @@ class SlaStatus < ActiveRecord::Base
 
   scope :visible, ->(*args) { where(SlaStatus.visible_condition(args.shift || User.current, *args)) }
 
-  default_scope {
-    joins(:sla_type,:status)
-    #.order("sla_types.name ASC,issue_statuses.position ASC")
-  }
+  default_scope { joins(:sla_type,:status) }
 
   validates_presence_of :sla_type
   validates_presence_of :status
@@ -42,32 +39,24 @@ class SlaStatus < ActiveRecord::Base
 
   safe_attributes *%w[sla_type_id status_id]
 
+  # No selection limitations
   def self.visible_condition(user, options = {})
     '1=1'
   end
 
-  def editable_by?(user)
-    editable?(user)
-  end
-
-  def visible?(user = nil)
-    user ||= User.current
+  # For index and show
+  def visible?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 
-  def editable?(user = nil)
-    user ||= User.current
+  # For create and update
+  def editable?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 
-  def deletable?(user = nil)
-    user ||= User.current
+  # For destroy
+  def deletable?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
-  end
-
-  def self.human_attribute_name(*args)
-    Rails.logger.warn "==>> SlaStatus->human_attribute_name(#{args[0].to_s}) <<<====== "
-    super
   end
 
 end
