@@ -1,11 +1,15 @@
 <div class="contextual">
-  <%= link_to l('sla_label.sla.plural'), slas_path, class: 'icon icon-cancel' %>
-  <%= link_to l('sla_label.sla.edit'), edit_sla_path(@sla),
-        title: l('sla_label.sla.edit'), class: 'icon icon-edit',
-        :accesskey => accesskey(:edit) if @sla.editable? %>
-  <%= link_to l('sla_label.sla.delete'), sla_path(@sla),
-        data: {confirm: l(:text_are_you_sure)}, method: :delete,
-        title: l('sla_label.sla.delete'), class: 'icon icon-del',
-        :accesskey => accesskey(:delete) if @sla.deletable? %>
+<%= link_to l(:button_back), :back,
+      :title => l(:button_back), class: 'icon icon-cancel',
+      :accesskey => accesskey(:previous) %>
+<%= link_to l('sla_label.sla.index'), slas_path,
+    class: 'icon icon-sla' if @sla.visible? %>
+<%= link_to l('sla_label.sla.edit'), edit_sla_path(@sla),
+      title: l('sla_label.sla.edit'), class: 'icon icon-edit',
+      :accesskey => accesskey(:edit) if @sla.editable? %>
+<%= link_to l('sla_label.sla.delete'), sla_path(@sla),
+      data: {confirm: l(:text_are_you_sure)}, method: :delete,
+      title: l('sla_label.sla.delete'), class: 'icon icon-del',
+      :accesskey => accesskey(:delete) if @sla.deletable? %>
 </div>
   

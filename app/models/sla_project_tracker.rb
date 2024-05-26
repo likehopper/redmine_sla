@@ -28,6 +28,9 @@ class SlaProjectTracker < ActiveRecord::Base
   has_many :sla_level_terms, through: :sla_levels
   has_many :sla_types, through: :sla_level_terms
 
+  after_save :sla_cache_update
+  after_destroy :sla_cache_destroy
+
   include Redmine::SafeAttributes
 
   default_scope { joins(:tracker).order("trackers.name ASC") }  
@@ -56,5 +59,19 @@ class SlaProjectTracker < ActiveRecord::Base
   scope :in_project, ->(project_id) { where(project_id: project_id) }
   scope :for_tracker_id, lambda { |tracker_id| where(:tracker_id => tracker_id) }  
   scope :for_sla_id, lambda { |sla_id| where(:sla_id => sla_id) }  
+
+private
+
+  def sla_cache_update
+    # At any change, we update sla_cache affected by the old values
+    SlaCache.where(project_id: self.project_id_before_last_save, tracker_id: self.tracker_id_before_last_save).find_each do |sla_cache|
+      sla_cache.refresh
+    end
+  end
+
+  def sla_cache_destroy
+    # if sla_project_tracker destroyed then must destroy sla_cache
+    SlaCache.where(project_id: self.project_id, tracker_id: self.tracker_id).destroy_all
+  end
 
 end

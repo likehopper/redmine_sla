@@ -29,15 +29,7 @@ class SlaLevelTerm < ActiveRecord::Base
 
   scope :visible, ->(*args) { where(SlaLevelTerm.visible_condition(args.shift || User.current, *args)) }
 
-  default_scope {
-      # select("sla_levels.*, sla_level_terms.*, sla_types.*, enumerations.*")
-      #select("( CASE WHEN enumerations.id IS NULL THEN ELSE enumerations))")
-      #joins(:sla_level,:sla_type,:priority)
-      joins(:sla_level,:sla_type)
-      #.joins("LEFT JOIN enumerations ON ( ( CASE WHEN sla_level_terms.sla_priority_id~E'^\\\\d+$' THEN sla_level_terms.sla_priority_id::INTEGER ELSE 0 END ) = enumerations.id ) )")
-      #.joins("LEFT JOIN custom_values ON sla_level_terms.custom_field_id = custom_values.custom_field_id")
-      # .order("sla_levels.name ASC, sla_types.name ASC, enumerations.position ASC") 
-  }
+  default_scope { joins(:sla_level,:sla_type) }
 
   validates_presence_of :sla_level
   validates_presence_of :sla_type
@@ -67,26 +59,23 @@ class SlaLevelTerm < ActiveRecord::Base
     end
   end 
 
+  # No selection limitations
   def self.visible_condition(user, options = {})
     '1=1'
   end
 
-  def editable_by?(user)
-    editable?(user)
-  end
-
-  def visible?(user = nil)
-    user ||= User.current
+  # For index and show
+  def visible?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 
-  def editable?(user = nil)
-    user ||= User.current
-    user.allowed_to?(:manage_sla, nil, global: true)
+  # For create and update
+  def editable?(user=nil)
+    false
   end
 
-  def deletable?(user = nil)
-    user ||= User.current
+  # For destroy
+  def deletable?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 

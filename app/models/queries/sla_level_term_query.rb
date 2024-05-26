@@ -21,11 +21,13 @@ class Queries::SlaLevelTermQuery < Query
   unloadable
   
   self.queried_class = SlaLevelTerm
+  self.view_permission = :view_sla
 
   def initialize_available_filters
     add_available_filter 'sla_level_id', :type => :list, :values => lambda {all_sla_level_values}
     add_available_filter 'sla_type_id', type: :list, :values => lambda {all_sla_type_values}
-    add_available_filter 'sla_priority_id', :type => :list, :values => SlaPriority.all.collect{|s|[s.name,s.id]}
+    add_available_filter 'priority_id', :type => :list_with_history, :values => IssuePriority.all.collect{|s| [s.name, s.id.to_s]}
+    add_custom_fields_filters(SlaCustomField.sorted)
     add_available_filter 'term', type: :integer    
   end
 
@@ -41,8 +43,9 @@ class Queries::SlaLevelTermQuery < Query
       INNER JOIN sla_level_terms AS sub_sla_level_terms ON ( sub_sla_levels.id = sub_sla_level_terms.sla_level_id )
       LEFT JOIN enumerations AS sub_enumerations ON ( sub_sla_level_terms.sla_priority_id = sub_enumerations.id )
       LEFT JOIN custom_field_enumerations AS sub_custom_field_enumerations ON ( sub_sla_level_terms.custom_field_enumeration_id = sub_custom_field_enumerations.id )
-      WHERE sla_level_terms.sla_priority_id = sub_sla_level_terms.sla_priority_id
-    )", :default_order => :asc, :groupable => true)
+      WHERE sla_level_terms.id = sub_sla_level_terms.id
+    )", :default_order => :asc, :groupable => false)
+    # WHERE sla_level_terms.sla_priority_id = sub_sla_level_terms.sla_priority_id
     @available_columns << QueryColumn.new(:term, :sortable => "#{SlaLevelTerm.table_name}.term", :default_order => nil, :groupable => false)
     @available_columns
   end
@@ -50,10 +53,6 @@ class Queries::SlaLevelTermQuery < Query
   def initialize(attributes=nil, *args)
     super attributes
     self.filters ||= {
-    #  "sla_level_id" => {:operator => "*", :values => []},
-    #  "sla_type_id" => {:operator => "*", :values => []},
-    #  "priority_id" => {:operator => "*", :values => []},
-    #  "term" => {:operator => "*", :values => []}
     }
   end
 
@@ -108,6 +107,30 @@ class Queries::SlaLevelTermQuery < Query
       values << [name.to_s,id.to_s]
     }
     @all_sla_type_values = values
+  end
+
+  def sql_for_custom_field(field, operator, value, custom_field_id)
+    filter = @available_filters[field]
+    return nil unless filter
+
+    if filter[:field].format.target_class && filter[:field].format.target_class <= User
+      if value.delete('me')
+        value.push User.current.id.to_s
+      end
+    end
+    not_in = nil
+    if operator == '!'
+      # Makes ! operator work for custom fields with multiple values
+      operator = '='
+      not_in = 'NOT'
+    end
+    where = sql_for_field(field, operator, value, 'sla_level_terms', 'custom_field_enumeration_id', false)
+    if /[<>]/.match?(operator)
+      where = "(#{where}) AND #{db_table}.#{db_field} IS NULL"
+    end
+    "#{not_in} EXISTS (" \
+      "SELECT sla_level_terms_sub.id FROM sla_level_terms sla_level_terms_sub" \
+      " WHERE sla_level_terms.id = sla_level_terms_sub.id AND #{where} ) "
   end
 
 end

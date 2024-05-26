@@ -36,10 +36,7 @@ class SlaLevel < ActiveRecord::Base
 
   scope :visible, ->(*args) { where(SlaLevel.visible_condition(args.shift || User.current, *args)) }
 
-  default_scope {
-    joins(:sla,:sla_calendar).left_joins(:custom_field)
-    # order(name: :asc)
-  }
+  default_scope { joins(:sla,:sla_calendar).left_joins(:custom_field) }
   
   validates_presence_of :name
   validates_presence_of :sla
@@ -58,26 +55,25 @@ class SlaLevel < ActiveRecord::Base
     SlaLevelTerm.where(sla_level_id: self.id).destroy_all if attribute_changed?(:custom_field_id)
   end
 
+  # No selection limitations
   def self.visible_condition(user, options = {})
     '1=1'
   end
 
-  def editable_by?(user)
-    editable?(user)
-  end
-
-  def visible?(user = nil)
-    user ||= User.current
+  # For index and show
+  def visible?(user=User.current)
+    # TODO : permissions : user.allowed_to?(:view_sla, self.project, global: true) ???
+    # TODO : permissions : only calendar of sla_project_trackers if ! project.nil?    
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 
-  def editable?(user = nil)
-    user ||= User.current
+  # For create and update
+  def editable?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 
-  def deletable?(user = nil)
-    user ||= User.current
+  # For destroy
+  def deletable?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 

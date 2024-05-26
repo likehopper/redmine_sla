@@ -33,7 +33,9 @@ namespace :redmine do
         Rails.logger.info "rake redmine:plugins:redmine_sla:update settings #{settings}"
 
         # AW : TODO : filtrer sur projet actifs avec module activé
-        Project.all.each do |project|
+        Project.has_module(:sla).each do |project|
+
+          puts "##{project.id} - #{project.name}"
 
           # IF project close THEN pass
           if ( project.status != 1 ) then
@@ -46,18 +48,25 @@ namespace :redmine do
           # IF project without sla THEN pass
           if ( ! project.module_enabled?(:sla) ) then
             # Clear cache
-            SlaCache.where(issue_id: project.issues.map(&:id)).destroy_all
-            Rails.logger.info "rake redmine:plugins:redmine_sla:update Project n°#{project.id.to_s} [#{project.identifier}] CLEAR CACHE & PASS PROJECT WITHOUT SLA..."
+            # SlaCache.where(issue_id: project.issues.map(&:id)).destroy_all
+            SlaCache.where(project_id: project.id).destroy_all
+            #Rails.logger.info "rake redmine:plugins:redmine_sla:update Project n°#{project.id.to_s} [#{project.identifier}] CLEAR CACHE & PASS PROJECT WITHOUT SLA..."
             next
           end
 
           Rails.logger.info "rake redmine:plugins:redmine_sla:update Project ##{project.id.to_s} = #{project.identifier} "
            
           project.issues.where(tracker_id: SlaProjectTracker.where(project_id: project.id).map(&:tracker_id)).each do |issue|
+
+            puts "\t##{issue.id} - #{issue.subject}"
+
+            SlaType.all.each { |sla_type|
+              issue.get_sla_spent(sla_type.id)
+            }
               
-            Rails.logger.info "rake redmine:plugins:redmine_sla:update Issue n°#{issue.id.to_s} [ tracker_id = #{issue.tracker_id.to_s} ] [ status_id = #{issue.status_id.to_s} ] TODO #{issue.subject}  "
-            SlaCacheSpent.update_by_issue_id(issue.id)
-            Rails.logger.info "rake redmine:plugins:redmine_sla:update Issue n°#{issue.id.to_s} CACHE UPDATE"
+            # Rails.logger.info "rake redmine:plugins:redmine_sla:update Issue n°#{issue.id.to_s} [ tracker_id = #{issue.tracker_id.to_s} ] [ status_id = #{issue.status_id.to_s} ] TODO #{issue.subject}  "
+            # SlaCacheSpent.update_by_issue_id(issue.id)
+            # Rails.logger.info "rake redmine:plugins:redmine_sla:update Issue n°#{issue.id.to_s} CACHE UPDATE"
 
           end
 

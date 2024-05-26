@@ -23,6 +23,45 @@ module SlasHelperSystemTest
 
   #include Redmine::I18n
 
+  def contextual_menu_sla
+    sla = Sla.find(1)
+
+    visit '/sla/slas/'
+    assert_text l('sla_label.sla.index')
+    element = find('tr#entity_id_1')
+    element.right_click
+    assert_selector 'div#context-menu', visible: true
+    assert_selector 'div#context-menu a', text: l(:button_show)
+    find('div#context-menu a', text: l(:button_show)).click
+    assert_current_path sla_path(sla)
+    assert_text l('sla_label.sla.show')
+    assert_text sla.name
+
+    visit '/sla/slas/'
+    assert_text l('sla_label.sla.index')
+    element = find('tr#entity_id_1')
+    element.right_click
+    assert_selector 'div#context-menu', visible: true
+    assert_selector 'div#context-menu a', text: l(:button_edit)
+    find('div#context-menu a', text: l(:button_edit)).click
+    assert_current_path edit_sla_path(sla)
+    assert_text l('sla_label.sla.edit')
+    assert_field 'sla_name', with: sla.name
+
+    visit '/sla/slas/'
+    assert_text l('sla_label.sla.index')
+    element = find('tr#entity_id_1')
+    element.right_click
+    assert_selector 'div#context-menu', visible: true
+    assert_selector 'div#context-menu a', text: l(:button_delete)
+    accept_confirm do
+      find('div#context-menu a', text: l(:button_delete)).click
+    end
+    assert_current_path slas_path()
+    assert_text l(:notice_successful_delete)
+
+  end 
+
   def create_sla(sla_name)
     visit '/sla/slas/new'
     within('form#sla-form') do

@@ -18,6 +18,15 @@
 
 module SlaCalendarsHelper
 
+  # Generates a link to a sla_calendar
+  # Examples:
+  #
+  #   link_to_sla_calendar(sla_calendar) # => link to the specified project overview
+  #
+  def link_to_sla_calendar(sla_calendar)
+    link_to sla_calendar.name, sla_calendar_url(sla_calendar, {:only_path => true})
+  end  
+
   def link_to_remove_fields(name, f)
     f.hidden_field(:_destroy) + link_to_function(name, "remove_fields(this)")
   end

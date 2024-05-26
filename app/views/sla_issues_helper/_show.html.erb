@@ -23,11 +23,11 @@ if User.current.allowed_to?(:view_sla, @project, :global => true)
 <%
     SlaType.all.each { |sla_type|
 
-      sla_term = issue.get_sla_term_expected(sla_type.id)
+      sla_term = issue.get_sla_term(sla_type.id)
       # TODO : SlaLog : no sla_level
       next if ( sla_term.nil? )
 
-      sla_spent = issue.get_sla_term_spent(sla_type.id)
+      sla_spent = issue.get_sla_spent(sla_type.id)
       # TODO : SlaLog : no sla_cache_term > no priority ?
       next if ( sla_spent.nil? )
         

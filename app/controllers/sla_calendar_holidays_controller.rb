@@ -29,8 +29,12 @@ class SlaCalendarHolidaysController < ApplicationController
 
   helper :sla_calendar_holidays
   helper :context_menus
+
   helper :queries
   include QueriesHelper
+
+  helper Queries::SlaCalendarHolidaysQueriesHelper
+  include Queries::SlaCalendarHolidaysQueriesHelper  
 
   def index
     retrieve_query(Queries::SlaCalendarHolidayQuery) 
@@ -103,14 +107,10 @@ class SlaCalendarHolidaysController < ApplicationController
   end
 
   def destroy
-    #@sla_calendar_holidays.each(&:destroy)
-    #flash[:notice] = l(:notice_successful_delete)
-    #redirect_back_or_default sla_calendar_holidays_path
     @sla_calendar_holidays.each do |sla_calendar_holiday|
       begin
         sla_calendar_holiday.reload.destroy
-      rescue ::ActiveRecord::RecordNotFound # raised by #reload if sla_calendar_holiday no longer exists
-        # nothing to do, sla_calendar_holiday was already deleted (eg. by a parent)
+      rescue ::ActiveRecord::RecordNotFound
       end
     end
     respond_to do |format|

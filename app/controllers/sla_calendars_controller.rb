@@ -21,7 +21,9 @@ class SlaCalendarsController < ApplicationController
   unloadable
 
   accept_api_auth :index, :create, :show, :update, :destroy
+
   before_action :require_admin, except: [:show]
+  before_action :authorize_global
 
   before_action :find_sla_calendar, only: [:show, :edit, :update]
   before_action :find_sla_calendars, only: [:context_menu, :destroy]
@@ -110,8 +112,7 @@ class SlaCalendarsController < ApplicationController
     @sla_calendars.each do |sla_calendar|
       begin
         sla_calendar.reload.destroy
-      rescue ::ActiveRecord::RecordNotFound # raised by #reload if sla_calendar no longer exists
-        # nothing to do, sla_calendar was already deleted (eg. by a parent)
+      rescue ::ActiveRecord::RecordNotFound
       end
     end
     respond_to do |format|
@@ -161,7 +162,6 @@ class SlaCalendarsController < ApplicationController
   def find_sla_calendars
     @sla_calendars = SlaCalendar.visible.where(id: (params[:id]||params[:ids])).to_a
     raise ActiveRecord::RecordNotFound if @sla_calendars.empty?
-    #raise Unauthorized unless @sla_calendars.all?(&:visible?)
   rescue ActiveRecord::RecordNotFound
     render_404
   end

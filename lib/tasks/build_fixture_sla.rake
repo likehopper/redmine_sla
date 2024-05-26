@@ -529,6 +529,80 @@ namespace :redmine do
 
         end
 
+######################################
+
+            # A last project with no sa no issue
+            project_id += 1
+            project_identifier = "another-project-without-sla"
+            project_new = {
+                "id" => project_id,
+                "name" => project_identifier,
+                "identifier" => project_identifier,
+                "description" => "Automatic generation of a project",
+                "created_on" => "2024-05-01 11:11:11 CET",
+                "updated_on" => "2021-05-01 11:11:11 CET",
+                "is_public" => false,
+                "lft" => project_lft,
+                "rgt" => project_rgt,
+            }
+            projects[project_identifier] = project_new
+            project_lft += 2
+            project_rgt += 2
+
+            Rails.logger.info "#{taskname} ADD project = #{projects}"
+
+            # members module activation for user manager
+            member_id += 1
+            member_identifier = project_identifier+"_members_"+member_id.to_s.rjust(4,"0")
+            member_new = {
+                "id" => member_id,
+                "project_id" => project_id, 
+                "user_id" => 2, # user manager
+                "created_on" => "2024-05-01 11:11:11 CET",
+                "mail_notification" => false,
+            }
+            members[member_identifier] = member_new
+            # member_roles module activation for role manager
+            member_role_id += 1
+            member_role_identifier = project_identifier+"_members_role_"+member_id.to_s.rjust(4,"0")
+            member_role_new = {
+                "id" => member_role_id,
+                "member_id" => member_id,
+                "role_id" => 1, # role manager
+            }
+            member_roles[member_role_identifier] = member_role_new   
+
+            # issue_tracking module activation for tests
+            enabled_module_id += 1
+            enabled_module_identifier = "enabled_module_"+enabled_module_id.to_s.rjust(4,"0")
+            enabled_module_new = {
+                "project_id" => project_id, 
+                "name" => "issue_tracking",
+            }
+            enabled_modules[enabled_module_identifier] = enabled_module_new
+            # time_entry module activation for tests
+            enabled_module_id += 1
+            enabled_module_identifier = "enabled_module_"+enabled_module_id.to_s.rjust(4,"0")
+            enabled_module_new = {
+                "project_id" => project_id, 
+                "name" => "time_tracking",
+            }
+            enabled_modules[enabled_module_identifier] = enabled_module_new
+
+            # Activation of all trackers for testing
+            trackers.each do |tracker| 
+              projects_trackers_id += 1
+              projects_trackers_identifier = "projects_trackers_"+projects_trackers_id.to_s.rjust(4,"0")
+              projects_trackers_new = {
+                  "project_id" => project_id, 
+                  "tracker_id" => tracker[1]["id"],
+              }              
+              projects_trackers[projects_trackers_identifier] =  projects_trackers_new
+            end
+
+########################""
+
+
         File.write( file_out_yml, fixtures.to_yaml )
 
         # Write issues files in yaml with array issues

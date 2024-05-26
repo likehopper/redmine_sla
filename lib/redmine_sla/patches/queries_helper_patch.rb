@@ -35,15 +35,23 @@ module RedmineSla
     module InstanceMethods
 
       def column_value_with_custom_sla_priority_id(column, item, value, options={})
+
         content =
-          case column.name
-          when :sla_priority_id
-            SlaPriority.create(item.sla_level.custom_field_id).find_by_priority_id(value).name 
-          else
-            # If it's not the sla_priority_id field, then call the old method ! 
-            column_value_without_custom_sla_priority_id(column, item, value)
+          if ( item.is_a?(Issue) || item.is_a?(TimeEntry) ) && ( ! value.nil? )
+            case column.name
+              when :get_sla_level
+                link_to item.get_sla_level.name, sla_level_url(item.get_sla_level, {:only_path => true}) if ! item.get_sla_level.nil?
+              when /^issue.get_sla_respect/, /^get_sla_respect/
+                content_tag('span', '', :title => value, :class => "icon #{value ? 'icon-ok' : 'icon-not-ok' }")
+                # link_to_sla_level(item.get_sla_level) if ! item.get_sla_level.nil?
+            end
           end
+
+        # If it's not the sla_priority_id field, then call the old method !
+        content.nil? ? column_value_without_custom_sla_priority_id(column, item, value) : content
+
       end
+
     end
 
   end

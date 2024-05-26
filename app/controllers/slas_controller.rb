@@ -20,9 +20,13 @@ class SlasController < ApplicationController
 
   unloadable
 
+  # It's possible to view and manage SLA via API
   accept_api_auth :index, :create, :show, :update, :destroy
+  
+  # It's mandatory to be an administrator to view and manage SLA
   before_action :require_admin
-  before_action :authorize_global
+  # It's not required at the moment
+  # before_action :authorize_global
 
   before_action :find_sla, only: [:show, :edit, :update]
   before_action :find_slas, only: [:context_menu, :destroy]
@@ -49,8 +53,9 @@ class SlasController < ApplicationController
   def show
     respond_to do |format|
       format.html do
-        end
-      format.api
+      end
+      format.api do
+      end
     end
   end  
 
@@ -101,7 +106,7 @@ class SlasController < ApplicationController
     else
       respond_to do |format|
         format.html {render :action => 'edit'}
-        format.api  {render_validation_errors(@sla)}
+        format.api {render_validation_errors(@sla)}
       end
     end
 
@@ -112,8 +117,7 @@ class SlasController < ApplicationController
     @slas.each do |sla|
       begin
         sla.reload.destroy
-      rescue ::ActiveRecord::RecordNotFound # raised by #reload if sla no longer exists
-        # nothing to do, sla was already deleted (eg. by a parent)
+      rescue ::ActiveRecord::RecordNotFound
       end
     end
     respond_to do |format|

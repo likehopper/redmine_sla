@@ -18,6 +18,45 @@
 
 module SlaTypesHelperSystemTest
 
+  def contextual_menu_sla_type
+    sla_type = SlaType.find(1)
+
+    visit '/sla/types/'
+    assert_text l('sla_label.sla_type.index')
+    element = find('tr#entity_id_1')
+    element.right_click
+    assert_selector 'div#context-menu', visible: true
+    assert_selector 'div#context-menu a', text: 'Show'
+    find('div#context-menu a', text: l(:button_show)).click
+    assert_current_path sla_type_path(sla_type)
+    assert_text l('sla_label.sla_type.show')
+    assert_text sla_type.name
+
+    visit '/sla/types/'
+    assert_text l('sla_label.sla_type.index')
+    element = find('tr#entity_id_1')
+    element.right_click
+    assert_selector 'div#context-menu', visible: true
+    assert_selector 'div#context-menu a', text: l(:button_edit)
+    find('div#context-menu a', text: l(:button_edit)).click
+    assert_current_path edit_sla_type_path(sla_type)
+    assert_text l('sla_label.sla_type.edit')
+    assert_field 'sla_type_name', with: sla_type.name
+
+    visit '/sla/types/'
+    assert_text l('sla_label.sla_type.index')
+    element = find('tr#entity_id_1')
+    element.right_click
+    assert_selector 'div#context-menu', visible: true
+    assert_selector 'div#context-menu a', text: l(:button_delete)
+    accept_confirm do
+      find('div#context-menu a', text: l(:button_delete)).click
+    end
+    assert_current_path sla_types_path()
+    assert_text l(:notice_successful_delete)
+    
+  end   
+
   def create_sla_type(sla_type_name)
     visit '/sla/types/new'
     within('form#sla-type-form') do

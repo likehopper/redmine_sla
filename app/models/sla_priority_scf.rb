@@ -45,12 +45,4 @@ class SlaPriorityScf < SlaPriority
     @scf.enumerations.active { |id,name| self.create_value(id,name) }
   end
 
-  private
-
-  # TODO : identify source priority
-  # def label / to_s / to_sym
-  #   priority_name = "[CustomField] "+priority_id
-  #   priority_name = "[IssuePriority] "+priority_name
-  # end
-
 end

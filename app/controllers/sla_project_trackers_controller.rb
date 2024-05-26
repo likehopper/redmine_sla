@@ -22,6 +22,8 @@ class SlaProjectTrackersController < ApplicationController
 
   accept_api_auth :index
 
+  before_action :authorize_global
+
   before_action :find_project_tracker, :only => [:update, :edit, :destroy]
   before_action :find_project, :only => [ :index, :create, :edit, :update, :destroy]
 
@@ -50,7 +52,6 @@ class SlaProjectTrackersController < ApplicationController
   def create
     @sla_project_tracker = SlaProjectTracker.new
     @sla_project_tracker.safe_attributes = params[:sla_project_tracker]
-    #@project = Project.find(params[:project_id])
     @sla_project_tracker.project = @project
     if @sla_project_tracker.save
       flash[:notice] = l(:notice_successful_create)
@@ -62,10 +63,10 @@ class SlaProjectTrackersController < ApplicationController
 
   def update
     @sla_project_tracker.safe_attributes = params[:sla_project_tracker]
-    #@project = Project.find(params[:project_id])
     @sla_project_tracker.project = @project
     if @sla_project_tracker.save
       flash[:notice] = l(:notice_successful_update)
+      flash[:warning] = l('label_sla_warning',changes: 'update') if @sla_project_tracker.previous_changes.any?
       redirect_to_project
     else
       render :action => 'edit'
@@ -75,6 +76,7 @@ class SlaProjectTrackersController < ApplicationController
   def destroy
     @sla_project_tracker.destroy
     flash[:notice] = l(:notice_successful_delete)
+    flash[:warning] = l('label_sla_warning',changes: 'destroy')
     redirect_to_project
   end
 

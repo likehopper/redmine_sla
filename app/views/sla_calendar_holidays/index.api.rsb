@@ -1,10 +1,10 @@
 api.array :sla_calendar_holidays, api_meta(:total_count => @entity_count, :offset => @offset, :limit => @limit) do
-  @entities.each do |entity|
-    api.entity do
-      api.id entity.id
-      api.sla_calendar_id entity.sla_calendar_id
-      api.sla_holiday_id entity.sla_holiday_id
-      api.match entity.match
+  @entities.each do |sla_calendar_holiday|
+    api.sla_calendar_holiday do
+      api.id sla_calendar_holiday.id
+      api.sla_calendar_id sla_calendar_holiday.sla_calendar_id
+      api.sla_holiday_id sla_calendar_holiday.sla_holiday_id
+      api.match sla_calendar_holiday.match
     end
   end
 end

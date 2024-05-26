@@ -1,5 +1,9 @@
 <div class="contextual">
-  <%= link_to l('sla_label.sla_type.plural'), sla_types_path, class: 'icon icon-cancel' %>
+  <%= link_to l(:button_back), :back,
+      :title => l(:button_back), class: 'icon icon-cancel',
+      :accesskey => accesskey(:previous) %>
+  <%= link_to l('sla_label.sla_type.index'), sla_types_path,
+        class: 'icon icon-sla_type' if @sla_type.visible? %>
   <%= link_to l('sla_label.sla_type.edit'), edit_sla_type_path(@sla_type),
         title: l('sla_label.sla_type.edit'), class: 'icon icon-edit',
         :accesskey => accesskey(:edit) if @sla_type.editable? %>

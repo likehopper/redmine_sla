@@ -18,4 +18,13 @@
 
 module SlaLevelsHelper
 
+  # Generates a link to a sla_level
+  # Examples:
+  #
+  #   link_to_sla_level(sla_level) # => link to the specified project overview
+  #
+  def link_to_sla_level(sla_level)
+    link_to sla_level.name, sla_level_url(sla_level, {:only_path => true})
+  end
+
 end

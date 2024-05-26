@@ -157,7 +157,9 @@ en:
         zero: None SLA
         one: One SLA
         other: "%{count} SLA"
+      index: List SLA
       new: New SLA
+      show: Show SLA
       edit: Edit SLA
       save: Save SLA
       delete: Delete SLA
@@ -173,7 +175,9 @@ en:
         zero: None SLA Type
         one: One SLA Types
         other: "%{count} SLA Types"
+      index: List SLA Types
       new: New SLA Type
+      show: Show SLA Type
       edit: Edit SLA Type
       save: Save SLA Type
       delete: Delete SLA Type
@@ -189,6 +193,8 @@ en:
         zero: None SLA Status
         one: One SLA Status
         other: "%{count} SLA Statuses"
+      index: List SLA Status
+      show: Show SLA Status
       new: New SLA Status
       edit: Edit SLA Status
       save: Save SLA Status
@@ -205,7 +211,9 @@ en:
         zero: None SLA Holiday
         one: One SLA Holiday
         other: "%{count} SLA Holidays"
+      index: List SLA Holidays
       new: New SLA Holiday
+      show: Show SLA Holiday
       edit: Edit SLA Holiday
       save: Save SLA Holiday
       delete: Delete SLA Holiday
@@ -221,7 +229,9 @@ en:
         zero: None SLA Calendar
         one: One SLA Calendar
         other: "%{count} SLA Calendars"
+      index: List SLA Calendars
       new: New SLA Calendar
+      show: Show SLA Calendar
       edit: Edit SLA Calendar
       save: Save SLA Calendar
       delete: Delete SLA Calendar
@@ -237,7 +247,9 @@ en:
         zero: None SLA Schedule
         one: One SLA Schedule
         other: "%{count} SLA Schedules"
+      index: List SLA Schedule
       new: New SLA Schedule
+      show: Show SLA Schedule
       edit: Edit SLA Schedule
       save: Save SLA Schedule
       delete: Del SLA Schedule
@@ -254,7 +266,9 @@ en:
         zero: None SLA Calendar's Holiday
         one: One SLA Calendar's Holidays
         other: "%{count} SLA Calendars' Holidays"
+      index: List SLA Calendar's Holidays
       new: New SLA Calendar's Holidays
+      show: Show SLA Calendar's Holidays
       edit: Edit SLA Calendar's Holidays
       save: Save SLA Calendar's Holidays
       delete: Delete SLA Calendar's Holidays
@@ -268,7 +282,9 @@ en:
         zero: None SLA Level
         one: One SLA Level
         other: "%{count} SLA Levels"
+      index: List SLA Level
       new: Add SLA Level
+      show: Show SLA Level
       edit: Edit SLA Level
       save: Save SLA Level
       delete: Delete SLA Level
@@ -285,7 +301,9 @@ en:
         zero: None SLA Term
         one: One SLA Term
         other: "%{count} SLA Terms"
+      index: List SLA Term
       new: Add SLA Term
+      show: Show SLA Term
       edit: Edit SLA Term
       save: Save SLA Term
       delete: Delete SLA Term
@@ -311,6 +329,7 @@ en:
         zero: None SLA Cache
         one: One SLA Cache
         other: "%{count} SLA Caches"
+      index: List SLA Cache
       show: Show SLA Cache
       delete: Destroy SLA Cache
       purge: Purge SLA Cache
@@ -326,6 +345,7 @@ en:
         zero: None SLA Cache spent
         one: One SLA Cache spent
         other: "%{count} SLA Cache spents"
+      index: List SLA Cache spent
       show: Show SLA Cache spent
       delete: Delete SLA Cache spent
       purge: Purge SLA Cache spent
@@ -335,11 +355,12 @@ en:
   # Others  
   label_sla_title_horaire_am: Schedule AM
   label_sla_title_horaire_pm: Schedule PM
-  label_sla_gti: GTI
-  label_sla_gtr: GTR
-  label_sla_respect: respect
-  label_sla_gti_respect: GTI respect
-  label_sla_gtr_respect: GTR respect
+  label_sla_notice: SLA are all stored in a <a href="%{url}">cache</a>. SLA are generated when values ​​are displayed in issues.
+  label_sla_warning: The changes (%{changes}) involved an update of the SLA!
+  label_sla_term: Term
+  label_sla_spent: Spent
+  label_sla_remain: Remain
+  label_sla_respect: Respect
   label_sla_am_from: From
   label_sla_am_to: to
   label_sla_pm_from: From

@@ -21,6 +21,7 @@ class SlaStatusesController < ApplicationController
   unloadable
 
   accept_api_auth :index, :create, :show, :update, :destroy
+  
   before_action :require_admin
   before_action :authorize_global
 
@@ -29,8 +30,12 @@ class SlaStatusesController < ApplicationController
 
   helper :sla_statuses
   helper :context_menus
+
   helper :queries
   include QueriesHelper
+
+  helper Queries::SlaStatusesQueriesHelper
+  include Queries::SlaStatusesQueriesHelper  
 
   def index
     retrieve_query(Queries::SlaStatusQuery) 
@@ -107,14 +112,10 @@ class SlaStatusesController < ApplicationController
   end
 
   def destroy
-    #@sla_statuses.each(&:destroy)
-    #flash[:notice] = l(:notice_successful_delete)
-    #redirect_back_or_default sla_statuses_path
     @sla_statuses.each do |sla_status|
       begin
         sla_status.reload.destroy
-      rescue ::ActiveRecord::RecordNotFound # raised by #reload if sla_status no longer exists
-        # nothing to do, sla_status was already deleted (eg. by a parent)
+      rescue ::ActiveRecord::RecordNotFound
       end
     end
     respond_to do |format|

@@ -1,10 +1,13 @@
 
 # SLAs project configuration ( activation of SLAs by trackers : sla_project_trackers )
 resources :projects do
-  resources :sla_caches, path: "slas", :only => [ :index, :show] do
-    collection do
-      get 'context_menu'
+  resources :sla_caches, path: "slas", :only => [ :index, :show, :destroy ] do
+    member do
+      get 'refresh'
     end
+    collection do
+      get 'context_menu', 'purge'
+    end    
   end
   resources :sla_project_trackers, path: "/settings/slas", :only => [ :index, :new, :create, :update, :edit, :destroy]
 end
@@ -74,7 +77,7 @@ end
 # context_menu : bulk_destroy
 match 'sla/levels', :controller => 'sla_levels', :action => 'destroy', :via => :delete
 
-resources :sla_level_terms, path: "sla/level_terms" do
+resources :sla_level_terms, path: "sla/level_terms", except: [:new, :create, :edit, :update] do
   collection do
     get 'context_menu'
   end  

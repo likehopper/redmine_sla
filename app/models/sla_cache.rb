@@ -21,34 +21,38 @@ class SlaCache < ActiveRecord::Base
   unloadable
   
   belongs_to :sla_level
-  belongs_to :issue
   belongs_to :project
-
+  belongs_to :issue
+  
   has_many :sla_cache_spents
- 
-  include Redmine::SafeAttributes
-  safe_attributes *%w[]
-
-  default_scope {
-    joins(:sla_level,:issue,:project)
-  #  .order(start_date: :desc) 
-  }
-
-  scope :visible, lambda {|*args|
-    user = args.shift || User.current
-    joins(:sla_level,:issue,:project).
-      where(Issue.visible_condition(user, *args))
-  }
 
   validates_uniqueness_of :issue
 
-  def self.visible_condition(user, options = {})
-    '1=1'
+  include Redmine::SafeAttributes
+  safe_attributes *%w[]
+
+  default_scope { joins(:sla_level,:issue,:project) }
+
+  scope :visible, ->(*args) { where(SlaCache.visible_condition(args.shift || User.current, *args)) }
+
+  # Selection limitations for users based on access issues
+  def self.visible_condition(user=User.current, options = {})
+    Issue.visible_condition(user, options = {})
   end
 
-  def visible?(user = nil)
-    user ||= User.current
-    user.allowed_to?(:manage_sla, nil, global: true)
+  # For index and refresh
+  def visible?(user=User.current)
+    user.allowed_to?(:view_sla, self.project) && self.issue.visible?
+  end
+
+  # For create and update
+  def editable?(user=nil)
+    false
+  end
+
+  # For destroy and purge
+  def deletable?(user=User.current)
+    user.allowed_to?(:manage_sla, self.project) && self.issue.visible?
   end
 
   def self.find_by_issue_id(issue_id)
@@ -59,32 +63,41 @@ class SlaCache < ActiveRecord::Base
   # Class method for refresh cache
   def refresh
     # First, delete the entry in the sla_cache
-    SlaCache.where(issue: self.issue_id).destroy_all
+    # SlaCache.where(issue: self.issue_id).destroy_all
     # Let's recalculate the sla_cache
-    ActiveRecord::Base.connection.execute("SELECT sla_get_level(#{self.issue_id}) ; ")
+    ActiveRecord::Base.connection.execute("SELECT sla_get_level(#{self.issue_id},true) ; ")
     # Then, let's recalculate the sla_cache_spents !
-    SlaCacheSpent.update_by_issue_id(self.issue_id)
+    SlaCacheSpent.refresh_by_issue_id(self.issue_id)
   end  
 
-  def self.purge
-    return ActiveRecord::Base.connection.execute("TRUNCATE sla_caches CASCADE ; ")
+  def self.purge(project)
+    if ( project.nil? )
+      ActiveRecord::Base.connection.execute("TRUNCATE sla_caches CASCADE ; ")
+    else
+      SlaCache.where(project: project.id).destroy_all
+    end
   end
     
   def self.destroy_by_issue_id(issue_id)
-    return SlaCache.where(issue: issue_id).destroy_all
+    SlaCache.where(issue: issue_id).destroy_all
   end              
 
-  def editable?(user = nil)
-    false
+  # For SlaCacheQuery#GroupBy
+  if ActiveRecord::Base.connection.table_exists? 'sla_types'
+    SlaType.all.each { |sla_type|
+      define_method("get_sla_respect_#{sla_type.id}") do 
+        self.issue.get_sla_respect(sla_type.id)
+      end
+      define_method("get_sla_remain_#{sla_type.id}") do 
+        self.issue.get_sla_remain(sla_type.id)
+      end
+      define_method("get_sla_spent_#{sla_type.id}") do 
+        self.issue.get_sla_spent(sla_type.id)
+      end
+      define_method("get_sla_term_#{sla_type.id}") do 
+        self.issue.get_sla_term(sla_type.id)
+      end
+    }
   end
-
-  def deletable?(user = nil)
-    user ||= User.current
-    user.allowed_to?(:manage_sla, nil, global: true)
-  end
-
-  #def to_s()
-  #  issue.to_s.length > 47 ? "#{issue.to_s.first(47)}..." : issue.to_s
-  #end
     
 end

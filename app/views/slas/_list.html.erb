@@ -6,10 +6,10 @@
         <tr>
           <th class="checkbox hide-when-print">
             <%= check_box_tag 'check_all', '', false, class: 'toggle-selection',
-            title: "#{l(:button_check_all)}/#{l(:button_uncheck_all)}" %>
+            title: "#{l(:button_check_all)}/#{l(:button_uncheck_all)}" -%>
           </th>
           <% @query.inline_columns.each do |column| %>
-            <%= column_header(@query, column) %>
+            <%= column_header(@query, column) -%>
           <% end %>
           <th></th>
         </tr>
@@ -37,19 +37,19 @@
               <%= content_tag('td', column_content(column, entity), class: column.css_classes) %>
             <% end %>
             <td class="buttons">
-              <%= link_to l(:button_show), sla_path(entity),
-                           title: l(:button_show),
-                           class: 'icon-only icon-magnifier' %>
-              <% if entity.editable_by?(User.current) %>
-              <%= link_to l(:button_edit), edit_sla_path(entity),
-                           title: l(:button_edit),
-                           class: 'icon-only icon-edit' %>
-              <%= link_to l(:button_delete), sla_path(entity),
-                           data: {confirm: l(:text_are_you_sure)},
-                           method: :delete,
-                           title: l(:button_delete),
-                           class: 'icon-only icon-del' %>
-              <% end %>
+              <%= if entity.visible? 
+                    link_to l(:button_show), sla_path(entity),
+                            title: l(:button_show), class: 'icon-only icon-magnifier'
+                  end -%>
+              <%= if entity.editable?
+                    link_to l(:button_edit), edit_sla_path(entity),
+                            title: l(:button_edit), class: 'icon-only icon-edit'
+                  end -%>
+              <%= if entity.deletable?
+                    link_to l(:button_delete), sla_path(entity),
+                            data: {confirm: l(:text_are_you_sure)}, method: :delete,
+                            title: l(:button_delete), class: 'icon-only icon-del'
+                  end -%>
             </td>
           </tr>
           <% @query.block_columns.each do |column| %>

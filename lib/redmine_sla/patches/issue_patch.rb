@@ -37,28 +37,40 @@ module RedmineSla
       end
 
       # The expected SLA's delay
-      def get_sla_term_expected(sla_type_id)
+      def get_sla_term(sla_type_id)
         sla_level_term = SlaLevelTerm.find_by_issue_and_type_id(self,sla_type_id)
-        sla_level_term.term if ! sla_level_term.nil?
+        sla_level_term.term if ! sla_level_term.nil? 
       end
 
       # The effective SLA's delay
-      def get_sla_term_spent(sla_type_id)
+      def get_sla_spent(sla_type_id)
         sla_cache_spent = SlaCacheSpent.find_by_issue_and_type_id(self,sla_type_id)
-        sla_cache_spent.spent if ! sla_cache_spent.nil?
+        sla_cache_spent.spent if ! sla_cache_spent.nil? && ! self.get_sla_term(sla_type_id).nil?
       end
 
       # Use in IssueQueryPatch for diplay respect in list column level
-      def get_sla_respect(sla_type_id)
-        sla_term = self.get_sla_term_expected(sla_type_id)
+      def get_sla_remain(sla_type_id)
+        sla_term = self.get_sla_term(sla_type_id)
         # TODO : SlaLog : no sla_level
 
-        sla_spent = self.get_sla_term_spent(sla_type_id)
+        sla_spent = self.get_sla_spent(sla_type_id)
+        # TODO : SlaLog : si valeur nulle
+
+        ( sla_term - sla_spent ) if sla_term && sla_spent
+      end      
+
+      # Use in IssueQueryPatch for diplay respect in list column level
+      def get_sla_respect(sla_type_id)
+        sla_term = self.get_sla_term(sla_type_id)
+        # TODO : SlaLog : no sla_level
+
+        sla_spent = self.get_sla_spent(sla_type_id)
         # TODO : SlaLog : si valeur nulle
 
         ( ! ( sla_term < sla_spent ) ) if sla_term && sla_spent
       end
 
+      # For SlaCacheQuery#GRoupBy
       if ActiveRecord::Base.connection.table_exists? 'sla_types'
         SlaType.all.each { |sla_type|
           define_method("get_sla_respect_#{sla_type.id}") do 
@@ -67,20 +79,16 @@ module RedmineSla
         }
       end
       
-      # Now, sla_cache and sla_cache_spent only call via psql functions
-      # and sla_cache is updated if the ticket was updated more than a minute ago
-      # and sla_cache_spent is updated if the sla_cache_spent was not updated more than a minute ago 
-      # def self.included(base) # :nodoc:
-      #   base.extend(ClassMethods)
-      #   base.send(:include, InstanceMethods)
-      #   # Same as typing in the class
-      #   base.class_eval do
-      #     unloadable
-      #     # TODO: After the update, if a criterion changes (tracker / priority) then we recalculate!!!
-      #     after_save :sla_cache_update
-      #     #after_destroy :sla_cache_destroy # made in database by FOREIGN KEY (issue_id) REFERENCES issues(id) ON DELETE CASCADE
-      #   end
-      # end
+      # Trigger for update sla_cache if necessary
+      def self.included(base)
+        base.extend(ClassMethods)
+        base.send(:include, InstanceMethods)
+        base.class_eval do
+          unloadable
+          # After issue update, if project or tracker changed then refresh sla_cache !!!
+          after_save :sla_cache_update
+        end
+      end
 
     end
 
@@ -88,26 +96,13 @@ module RedmineSla
     end
 
     module InstanceMethods
-
-      # def sla_cache_update
-      #   sla_level_changed = false
-      #   # if tracker changed then must change sla_level in sla_cache
-      #   if ( self.tracker_id != self.tracker_id_before_last_save ) then
-      #     sla_level_changed = true
-      #   end
-      #   # if priority changed then must change sla_level in sla_cache
-      #   if ( self.priority_id != self.priority_id_before_last_save ) then
-      #     sla_level_changed = true
-      #   end
-      #   # if a change require then clear cache for issue
-      #   if ( sla_level_changed ) then
-      #     SlaCache.destroy_by_issue_id(self.id)
-      #   end
-      #   # The update is useless since called by view
-      #   #SlaCache.new.refresh_by_issue_id(self.id) 
-      #   return true
-      # end
-
+      def sla_cache_update
+        # if project or tracker changed then must refresh sla_cache
+        unless ( self.project_id == self.project_id_before_last_save && self.tracker_id == self.tracker_id_before_last_save )
+          SlaCache.find(self.id).refresh
+        end
+      rescue ActiveRecord::RecordNotFound
+      end
     end
 
   end

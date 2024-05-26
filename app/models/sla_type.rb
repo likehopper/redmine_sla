@@ -30,9 +30,7 @@ class SlaType < ActiveRecord::Base
 
   scope :visible, ->(*args) { where(SlaType.visible_condition(args.shift || User.current, *args)) }
 
-  default_scope { 
-    # order(name: :asc)
-  }  
+  default_scope { }  
 
   validates_presence_of :name
   
@@ -40,37 +38,29 @@ class SlaType < ActiveRecord::Base
 
   safe_attributes *%w[name]
 
+  # No selection limitations
   def self.visible_condition(user, options = {})
     '1=1'
   end
 
-  def editable_by?(user)
-    editable?(user)
-  end
-
-  def visible?(user = nil)
-    user ||= User.current
+  # For index and show
+  def visible?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 
-  def editable?(user = nil)
-    user ||= User.current
+  # For create and update
+  def editable?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 
-  def deletable?(user = nil)
-    user ||= User.current
+  # For destroy
+  def deletable?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
-  end
-
-  def self.human_attribute_name(*args)
-    Rails.logger.warn "==>> SlaType->human_attribute_name(#{args[0].to_s}) <<<====== "
-    super
   end
 
   # Print text for link objects
   def to_s
-    name.to_s
-  end  
-
+    self.name
+  end
+  
 end

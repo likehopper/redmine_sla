@@ -18,6 +18,45 @@
 
 module SlaCalendarsHelperSystemTest
 
+  def contextual_menu_sla_calendar
+    sla_calendar = SlaCalendar.find(1)
+
+    visit '/sla/calendars/'
+    assert_text l('sla_label.sla_calendar.index')
+    element = find('tr#entity_id_1')
+    element.right_click
+    assert_selector 'div#context-menu', visible: true
+    assert_selector 'div#context-menu a', text: 'Show'
+    find('div#context-menu a', text: l(:button_show)).click
+    assert_current_path sla_calendar_path(sla_calendar)
+    assert_text l('sla_label.sla_calendar.show')
+    assert_text sla_calendar.name
+
+    visit '/sla/calendars/'
+    assert_text l('sla_label.sla_calendar.index')
+    element = find('tr#entity_id_1')
+    element.right_click
+    assert_selector 'div#context-menu', visible: true
+    assert_selector 'div#context-menu a', text: l(:button_edit)
+    find('div#context-menu a', text: l(:button_edit)).click
+    assert_current_path edit_sla_calendar_path(sla_calendar)
+    assert_text l('sla_label.sla_calendar.edit')
+    assert_field 'sla_calendar_name', with: sla_calendar.name
+
+    visit '/sla/calendars/'
+    assert_text l('sla_label.sla_calendar.index')
+    element = find('tr#entity_id_1')
+    element.right_click
+    assert_selector 'div#context-menu', visible: true
+    assert_selector 'div#context-menu a', text: l(:button_delete)
+    accept_confirm do
+      find('div#context-menu a', text: l(:button_delete)).click
+    end
+    assert_current_path sla_calendars_path()
+    assert_text l(:notice_successful_delete)
+    
+  end 
+
   def create_sla_calendar(sla_calendar_name)
     visit '/sla/calendars/new'
     within('form#sla-calendar-form') do
@@ -54,7 +93,7 @@ module SlaCalendarsHelperSystemTest
     # assert page.has_css?('#flash_notice')
     find 'div#flash_notice',
       :visible => true,
-      :text => l("sla_label.sla_calendar.notice_successful_update", :id => "##{sla_calendar.id}" )    
+      :text => l('sla_label.sla_calendar.notice_successful_update', :id => "##{sla_calendar.id}" )    
     assert_equal 'mod SLA Calendar', sla_calendar.reload.name
     # TODO : teste in SlaCalendar#index after filtering
   end

@@ -38,14 +38,16 @@ class SlaHolidaysControllerTest < Redmine::ControllerTest
 
   test "should get 302 on show as anonymous" do
     with_settings :default_language => "en" do
-      get(:show, :params => {:id => 1})
+      get :show,
+        :params => {:id => 1}
       assert_response 302
     end
   end
 
   test "should get 302 on edit as anonymous" do
     with_settings :default_language => "en" do
-      get(:edit, :params => {:id => 1})
+      get :edit,
+        :params => {:id => 1}
       assert_response 302
     end
   end
@@ -55,7 +57,8 @@ class SlaHolidaysControllerTest < Redmine::ControllerTest
   test "should get success on index as admin" do
     @request.session[:user_id] = 1
     with_settings :default_language => "en" do
-      get :index
+      get :index,
+        params: { sort: 'date' }
       assert_response :success
       # links to visible issues
       assert_select 'a[href="/sla/holidays/1"]', :title => "Show"
@@ -67,7 +70,8 @@ class SlaHolidaysControllerTest < Redmine::ControllerTest
   test "should return success on get show as admin" do
     @request.session[:user_id] = 1
     with_settings :default_language => "en" do
-      get(:show, :params => {:id => 1})
+      get :show,
+        :params => {:id => 1}
       assert_response :success
     end
   end
@@ -75,7 +79,8 @@ class SlaHolidaysControllerTest < Redmine::ControllerTest
   test "should return success on get edit as admin" do
     @request.session[:user_id] = 1
     with_settings :default_language => "en" do
-      get(:edit, :params => {:id => 1})
+      get :edit,
+        :params => {:id => 1}
       assert_response :success
     end
   end
@@ -93,7 +98,8 @@ class SlaHolidaysControllerTest < Redmine::ControllerTest
   test "should return 403 on get show as manager" do
     @request.session[:user_id] = 2
     with_settings :default_language => "en" do
-      get(:show, :params => {:id => 1})
+      get :show,
+        :params => {:id => 1}
       assert_response 403
     end
   end
@@ -101,7 +107,8 @@ class SlaHolidaysControllerTest < Redmine::ControllerTest
   test "should return 403 on get edit as manager" do
     @request.session[:user_id] = 2
     with_settings :default_language => "en" do
-      get(:edit, :params => {:id => 1})
+      get :edit,
+        :params => {:id => 1}
       assert_response 403
     end
   end
@@ -119,7 +126,8 @@ class SlaHolidaysControllerTest < Redmine::ControllerTest
   test "should return 403 on get show as developper" do
     @request.session[:user_id] = 3
     with_settings :default_language => "en" do
-      get(:show, :params => {:id => 1})
+      get :show,
+        :params => {:id => 1}
       assert_response 403
     end
   end
@@ -127,7 +135,8 @@ class SlaHolidaysControllerTest < Redmine::ControllerTest
   test "should return 403 on get edit as developper" do
     @request.session[:user_id] = 3
     with_settings :default_language => "en" do
-      get(:edit, :params => {:id => 1})
+      get :edit,
+        :params => {:id => 1}
       assert_response 403
     end
   end
@@ -145,7 +154,8 @@ class SlaHolidaysControllerTest < Redmine::ControllerTest
   test "should return 403 on get show as sysadmin" do
     @request.session[:user_id] = 4
     with_settings :default_language => "en" do
-      get(:show, :params => {:id => 1})
+      get :show,
+        :params => {:id => 1}
       assert_response 403
     end
   end
@@ -153,7 +163,8 @@ class SlaHolidaysControllerTest < Redmine::ControllerTest
   test "should return 403 on get edit as sysadmin" do
     @request.session[:user_id] = 4
     with_settings :default_language => "en" do
-      get(:edit, :params => {:id => 1})
+      get :edit,
+        :params => {:id => 1}
       assert_response 403
     end
   end
@@ -179,7 +190,8 @@ class SlaHolidaysControllerTest < Redmine::ControllerTest
   test "should return 403 on get edit as reporter" do
     @request.session[:user_id] = 5
     with_settings :default_language => "en" do
-      get(:edit, :params => {:id => 1})
+      get :edit,
+        :params => {:id => 1}
       assert_response 403
     end
   end
@@ -197,7 +209,8 @@ class SlaHolidaysControllerTest < Redmine::ControllerTest
   test "should return 403 on get show as other" do
     @request.session[:user_id] = 6
     with_settings :default_language => "en" do
-      get(:show, :params => {:id => 1})
+      get :show,
+        :params => {:id => 1}
       assert_response 403
     end
   end
@@ -205,7 +218,8 @@ class SlaHolidaysControllerTest < Redmine::ControllerTest
   test "should return 403 on get edit as other" do
     @request.session[:user_id] = 6
     with_settings :default_language => "en" do
-      get(:edit, :params => {:id => 1})
+      get :edit,
+        :params => {:id => 1}
       assert_response 403
     end
   end
