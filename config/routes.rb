@@ -1,7 +1,7 @@
 
 # SLAs project configuration ( activation of SLAs by trackers : sla_project_trackers )
 resources :projects do
-  resources :sla_caches, path: "issues/slas", :only => [ :index, :show] do
+  resources :sla_caches, path: "slas", :only => [ :index, :show] do
     collection do
       get 'context_menu'
     end
