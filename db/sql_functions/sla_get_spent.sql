@@ -12,6 +12,7 @@ $BODY$
   DECLARE v_current_timestamp TIMESTAMP WITHOUT TIME ZONE ;
   DECLARE v_sla_cache sla_caches ;
   DECLARE v_sla_spent sla_cache_spents ;
+  DECLARE v_sla_level_terms sla_level_terms ;
 BEGIN
 
   RAISE DEBUG 
@@ -30,11 +31,31 @@ BEGIN
   RAISE DEBUG
     'sla_get_spent	v_current_timestamp = %', v_current_timestamp ;
 
+  -- Retrieve sla_cache with sla_level
   v_sla_cache := sla_get_level( p_issue_id ) ;
 
+  -- If no sla_cache found, then there is no sla_level
   IF ( v_sla_cache IS NULL ) THEN
     RETURN NULL ;
-  END IF ;  
+  END IF ;
+
+  -- Retrive sla_level_term with sla_type
+  SELECT
+    *
+  INTO
+    v_sla_level_terms
+  FROM
+    "sla_level_terms"
+  WHERE
+    "sla_level_terms"."sla_level_id" = v_sla_cache."sla_level_id"
+  AND
+    "sla_level_terms"."sla_type_id" = p_sla_type_id
+  LIMIT 1 ;
+  
+  -- If no sla_level_term found for this sla_type, then no calculation needed
+  IF ( v_sla_level_terms IS NULL ) THEN
+      RETURN NULL;
+  END IF ;
 	
 	SELECT
     "sla_cache_spents"."id" AS "id",
@@ -43,6 +64,7 @@ BEGIN
     "sla_cache_spents"."issue_id" AS "issue_id",
     "sla_cache_spents"."sla_type_id" AS "sla_type_id",
     "sla_cache_spents"."spent" AS "spent",
+    "sla_cache_spents"."updated_on" AS "created_on",
     "sla_cache_spents"."updated_on" AS "updated_on"
 	INTO	
     v_sla_spent
@@ -75,7 +97,7 @@ BEGIN
 		issues 
 	WHERE
 		id = p_issue_id
-  ;  
+  ;
 
   -- No update needed, if done after closing date
   IF ( v_sla_spent."updated_on" > v_issue_closed_on ) THEN
@@ -84,7 +106,7 @@ BEGIN
     WHERE "sla_cache_spents"."sla_cache_id" = v_sla_spent."sla_cache_id"
     AND "sla_cache_spents"."sla_type_id" = v_sla_spent."sla_type_id" ;
 		RETURN v_sla_spent ;
-	END IF ;  
+	END IF ;
 	
 	-- Calculate since it wasn't done
 	SELECT DISTINCT
@@ -94,6 +116,7 @@ BEGIN
     p_issue_id AS "issue_id",
     p_sla_type_id AS "sla_type_id",
     COUNT(*) AS "spent",
+    v_current_timestamp AS "created_on",
     v_current_timestamp AS "updated_on"
 	INTO
 		v_sla_spent
@@ -147,6 +170,7 @@ BEGIN
     "issue_id",
     "sla_type_id",
     "spent",
+    "created_on",
     "updated_on"
   ) VALUES (
     v_sla_spent."sla_cache_id",
@@ -154,12 +178,13 @@ BEGIN
     v_sla_spent."issue_id",
     v_sla_spent."sla_type_id",
     v_sla_spent."spent",
+    v_sla_spent."created_on",
     v_sla_spent."updated_on"
   )
   -- if data already exists, then do an update
 	ON CONFLICT ON CONSTRAINT "sla_cache_spents_sla_caches_sla_types_ukey" DO UPDATE SET
-      "updated_on" = v_sla_spent."updated_on",
-      "spent" = "sla_cache_spents"."spent" + v_sla_spent."spent"
+    "updated_on" = v_sla_spent."updated_on",
+    "spent" = "sla_cache_spents"."spent" + v_sla_spent."spent"
   RETURNING id INTO v_sla_spent."id" ;
 
   RAISE DEBUG

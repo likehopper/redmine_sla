@@ -38,8 +38,8 @@ class Queries::SlaHolidayQuery < Query
   def initialize(attributes=nil, *args)
     super attributes
     self.filters ||= {
-    #  "name" => {:operator => "*", :values => []},
-    #  "date" => {:operator => "*", :values => []} 
+      # TODO : filter not apply on first time
+      "date" => { :operator => "y", :values => [] } 
     }
   end
 
@@ -66,6 +66,10 @@ class Queries::SlaHolidayQuery < Query
     raise StatementInvalid.new(e.message)
   end
 
+  def default_sort_criteria
+    [['date', 'desc']]
+  end
+  
   # For Query Class
   def base_scope
     self.queried_class.visible.where(statement)

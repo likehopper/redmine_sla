@@ -18,4 +18,12 @@
 
 module SlaCacheSpentsHelper
 
+  def _sla_cache_spents_path(project, issue, *args)
+    if project
+      project_sla_cache_spents_path(project, *args)
+    else
+      sla_cache_spents_path(*args)
+    end
+  end
+
 end

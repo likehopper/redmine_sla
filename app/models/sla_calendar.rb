@@ -26,13 +26,10 @@ class SlaCalendar < ActiveRecord::Base
   include Redmine::SafeAttributes
 
   accepts_nested_attributes_for :sla_schedules, allow_destroy: true, :reject_if => proc { |attributes| attributes.any? {|k,v| v.blank?} } # :any_blank
-  #accepts_nested_attributes_for :sla_calendar_holidays, allow_destroy: true, reject_if: :all_blank
 
   scope :visible, ->(*args) { where(SlaCalendar.visible_condition(args.shift || User.current, *args)) }
   
-  default_scope {
-    # order(name: :asc)
-  } 
+  default_scope { } 
 
   validates_presence_of :name
   
@@ -40,27 +37,23 @@ class SlaCalendar < ActiveRecord::Base
 
   safe_attributes *%w[name]
 
+  # No selection limitations
   def self.visible_condition(user, options = {})
-    Rails.logger.warn "==>> models / sla_calendar->visible_condition() <<<====== "
     '1=1'
   end
 
-  def editable_by?(user)
-    editable?(user)
-  end
-
-  def visible?(user = nil)
-    user ||= User.current
+  # For index and show
+  def visible?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 
-  def editable?(user = nil)
-    user ||= User.current
+  # For create and update
+  def editable?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 
-  def deletable?(user = nil)
-    user ||= User.current
+  # For destroy
+  def deletable?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 

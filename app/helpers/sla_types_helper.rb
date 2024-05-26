@@ -18,4 +18,13 @@
 
 module SlaTypesHelper
 
+  # Generates a link to a sla_type
+  # Examples:
+  #
+  #   link_to_sla_type(sla_type) # => link to the specified project overview
+  #
+  def link_to_sla_type(sla_type)
+    link_to sla_type.name, sla_type_url(sla_type, {:only_path => true})
+  end
+
 end

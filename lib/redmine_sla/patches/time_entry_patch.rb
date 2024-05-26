@@ -28,18 +28,26 @@ module RedmineSla
         issue.get_sla_level
       end
 
-      def get_sla_cache
-        issue.get_sla_cache
-      end
+      # def get_sla_cache
+      #   issue.get_sla_cache
+      # end
 
-      def get_sla_respect(sla_type_id)
-        issue.get_sla_respect(sla_type_id)
-      end
+      # def get_sla_term(sla_type_id)
+      #   issue.get_sla_respect(sla_type_id)
+      # end
+      
+      # def get_sla_spent(sla_type_id)
+      #   issue.get_sla_respect(sla_type_id)
+      # end
+
+      # def get_sla_respect(sla_type_id)
+      #   issue.get_sla_respect(sla_type_id)
+      # end
       
       if ActiveRecord::Base.connection.table_exists? 'sla_types'
-        SlaType.all.each { |sla_type|
+        SlaType.all.each { |sla_type|       
           define_method("get_sla_respect_#{sla_type.id}") do 
-            self.get_sla_respect(sla_type.id)
+            self.issue.get_sla_respect(sla_type.id)
           end
         }
       end

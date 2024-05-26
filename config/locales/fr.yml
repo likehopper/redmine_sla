@@ -157,7 +157,9 @@ fr:
         zero: Aucun SLA
         one: Un SLA
         other: "%{count} SLA"
+      index: Listes les SLA
       new: Ajouter un SLA
+      show: Voir un SLA
       edit: Editer un SLA
       save: Enregistrer un SLA
       delete: Supprimer un SLA
@@ -173,7 +175,9 @@ fr:
         zero: Aucun Type de SLA
         one: Un Type de SLA
         other: "%{count} Types de SLA"
+      index: Lister les Types de SLA
       new: Ajouter un Type de SLA
+      show: Voir un Type de SLA
       edit: Editer un Type de SLA
       save: Enregistrer un Type de SLA
       delete: Supprimer un Type de SLA
@@ -189,7 +193,9 @@ fr:
         zero: Aucun Statut de SLA
         one: Un Statut de SLA
         other: "%{count} Statuts de SLA"
+      index: Lister les Statuts de SLA
       new: Ajouter un Statut de SLA
+      show: Voir un Statut de SLA
       edit: Editer un Statut de SLA
       save: Enregistrer un Statut de SLA
       delete: Supprimer un Statut de SLA
@@ -205,7 +211,9 @@ fr:
         zero: Aucun Jour férié de SLA
         one: Un Jour férié de SLA
         other: "%{count} Jours fériés de SLA"
+      index: Lister les Jours fériés de SLA
       new: Ajouter un Jour férié de SLA
+      show: Voir un Jour férié de SLA
       edit: Editer un Jour férié de SLA
       save: Enregistrer un Jour férié de SLA
       delete: Supprimer un Jour férié de SLA
@@ -221,7 +229,9 @@ fr:
         zero: Aucun Calendrier de SLA
         one: Un Calendrier de SLA
         other: "%{count} Calendriers de SLA"
+      index: Lister les Calendriers de SLA
       new: Ajouter un Calendrier de SLA
+      show: Voir un Calendrier de SLA
       edit: Editer un Calendrier de SLA
       save: Enregistrer un Calendrier de SLA
       delete: Supprimer un Calendrier de SLA
@@ -237,7 +247,9 @@ fr:
         zero: Aucun Horaire de SLA
         one: Un Horaire de SLA
         other: "%{count} Horaires de SLA"
+      index: Lister les Horaires de SLA
       new: Ajouter un Horaire de SLA
+      show: Voir un Horaire de SLA
       edit: Editer un Horaire de SLA
       save: Enregistrer un Horaire de SLA
       delete: Supprimer un Horaire de SLA
@@ -254,7 +266,9 @@ fr:
         zero: Aucun Jour férié d'un calendrier de SLA
         one: Un Jour férié d'un calendrier de SLA
         other: "%{count} Jours fériés des calendriers de SLA"      
+      index: Lister kes Jours fériés d'un calendrier de SLA
       new: Ajouter des Jours fériés d'un calendrier de SLA
+      show: Voir des Jours fériés d'un calendrier de SLA
       edit: Editer des Jours fériés d'un calendrier de SLA
       save: Enregistrer des Jours fériés d'un calendrier de SLA
       delete: Supprimer des Jours fériés d'un calendrier de SLA
@@ -268,7 +282,9 @@ fr:
         zero: Aucun Niveau de SLA
         one: Un Niveau de SLA
         other: "%{count} Niveaux de SLA"      
+      index: Lister les Niveaux de SLA
       new: Ajouter un Niveau de SLA
+      show: Voir un Niveau de SLA
       edit: Editer un Niveau de SLA
       save: Enregistrer un Niveau de SLA
       delete: Supprimer un Niveau de SLA
@@ -285,7 +301,9 @@ fr:
         zero: Aucun Engagement de SLA
         one: Un Engagement de SLA
         other: "%{count} Engagements de SLA"      
+      index: Lister les Engagements de SLA
       new: Ajouter un Engagement de SLA
+      show: Voir un Engagement de SLA
       edit: Editer un Engagement de SLA
       save: Enregistrer un Engagement de SLA
       delete: Supprimer un Engagement de SLA
@@ -311,7 +329,8 @@ fr:
         zero: Pas de Cache SLA
         one: Un Cache de SLA
         other: "%{count} Caches de SLA"
-      show: Voir un cache de SLA
+      index: Lister les Caches de SLA
+      show: Voir un Cache de SLA
       delete: Supprimer de Cache de SLA
       purge: Purge de Cache de SLA
       miss: Cache de SLA manquant
@@ -326,6 +345,7 @@ fr:
         zero: Pas de délai du cache SLA
         one: Un délai du cache de SLA
         other: "%{count} délais du cache de SLA"
+      index: Lister les délais des caches de SLA
       show: Voir un délai du cache de SLA
       delete: Supprimer de délai du cache de SLA
       purge: Purge de délai du cache de SLA
@@ -335,11 +355,12 @@ fr:
   # Autres
   label_sla_title_horaire_am: Horaires AM
   label_sla_title_horaire_pm: Horaires PM
-  label_sla_gti: GTI
-  label_sla_gtr: GTR
+  label_sla_notice: Les SLA sont tous stockés dans un <a href="%{url}">cache</a>. Les SLA sont générés à l'affichage des valeurs dans les demandes.
+  label_sla_warning: Les changements (%{changes}) ont impliqués une mise à jour des SLA !
+  label_sla_term: Délais
+  label_sla_spent: Temps
+  label_sla_remain: Restant
   label_sla_respect: Respect
-  label_sla_gti_respect: Respect des GTI
-  label_sla_gtr_respect: Respect des GTR
   label_sla_am_from: De
   label_sla_am_to: à
   label_sla_pm_from: De

@@ -21,6 +21,7 @@ class SlaLevelTermsController < ApplicationController
   unloadable
 
   accept_api_auth :index, :create, :show, :update, :destroy
+  
   before_action :require_admin
   before_action :authorize_global
 
@@ -29,11 +30,18 @@ class SlaLevelTermsController < ApplicationController
 
   helper :sla_level_terms
   helper :context_menus
+
   helper :queries
   include QueriesHelper
 
+  helper Queries::SlaLevelTermsQueriesHelper
+  include Queries::SlaLevelTermsQueriesHelper 
+
   def index
-    retrieve_query(Queries::SlaLevelTermQuery) 
+    use_session = !request.format.csv?
+    retrieve_default_query(use_session) 
+    retrieve_query(Queries::SlaLevelTermQuery,use_session) 
+
     @entity_count = @query.sla_level_terms.count
     @entity_pages = Paginator.new @entity_count, per_page_option, params['page']
     @entities = @query.sla_level_terms(offset: @entity_pages.offset, limit: @entity_pages.per_page) 
@@ -55,8 +63,11 @@ class SlaLevelTermsController < ApplicationController
   end  
 
   def new
-    @sla_level_term = SlaLevelTerm.new
-    @sla_level_term.safe_attributes = params[:sla_level_term]
+    raise Unauthorized
+  end
+
+  def edit
+    raise Unauthorized
   end
 
   def create
@@ -105,8 +116,7 @@ class SlaLevelTermsController < ApplicationController
     @sla_level_terms.each do |sla_level_term|
       begin
         sla_level_term.reload.destroy
-      rescue ::ActiveRecord::RecordNotFound # raised by #reload if sla_level_term no longer exists
-        # nothing to do, sla_level_term was already deleted (eg. by a parent)
+      rescue ::ActiveRecord::RecordNotFound
       end
     end
     respond_to do |format|
@@ -159,6 +169,38 @@ class SlaLevelTermsController < ApplicationController
     #raise Unauthorized unless @sla_level_terms.all?(&:visible?)
   rescue ActiveRecord::RecordNotFound
     render_404
+  end
+
+  def retrieve_default_query(use_session)
+    return if params[:query_id].present?
+    return if api_request?
+    return if params[:set_filter]
+
+    if params[:without_default].present?
+      params[:set_filter] = 1
+      return
+    end
+    if !params[:set_filter] && use_session && session[:sla_level_term_query]
+      query_id = session[:sla_level_term_query].values_at(:id)
+      return if Queries::SlaLevelTermQuery.where(id: query_id).exists?
+    end
+    if default_query = Queries::SlaLevelTermQuery.default()
+      params[:query_id] = default_query.id
+    end
+  end  
+
+  # Returns the SlaLevelTermQuery scope for index and report actions
+  def sla_level_term_scope(options={})
+    @query.results_scope(options)
+  end
+
+  def retrieve_sla_level_term_query
+    retrieve_query(SlaCacheQuery, false, :defaults => @default_columns_names)
+  end
+
+  def query_error(exception)
+    session.delete(:sla_level_term_query)
+    super
   end
 
 end

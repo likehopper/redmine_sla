@@ -1,12 +1,12 @@
 api.array :sla_schedules, api_meta(:total_count => @entity_count, :offset => @offset, :limit => @limit) do
-  @entities.each do |entity|
-    api.entity do
-      api.id entity.id
-      api.sla_calendar_id entity.sla_calendar_id
-      api.dow entity.dow
-      api.start_time entity.start_time.strftime('%H:%M')
-      api.end_time entity.end_time.strftime('%H:%M')
-      api.match entity.match
+  @entities.each do |sla_schedule|
+    api.sla_schedule do
+      api.id sla_schedule.id
+      api.sla_calendar_id sla_schedule.sla_calendar_id
+      api.dow sla_schedule.dow
+      api.start_time sla_schedule.start_time.strftime('%H:%M')
+      api.end_time sla_schedule.end_time.strftime('%H:%M')
+      api.match sla_schedule.match
     end
   end
 end

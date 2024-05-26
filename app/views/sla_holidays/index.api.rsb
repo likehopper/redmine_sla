@@ -1,9 +1,9 @@
 api.array :sla_holidays, api_meta(:total_count => @entity_count, :offset => @offset, :limit => @limit) do
-  @entities.each do |entity|
-    api.entity do
-      api.id entity.id
-      api.name entity.name
-      api.date entity.date
+  @entities.each do |sla_holiday|
+    api.sla_holiday do
+      api.id sla_holiday.id
+      api.name sla_holiday.name
+      api.date sla_holiday.date
     end
   end
 end

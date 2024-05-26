@@ -1,11 +1,11 @@
 api.array :sla_level_terms, api_meta(:total_count => @entity_count, :offset => @offset, :limit => @limit) do
-  @entities.each do |entity|
-    api.entity do
-      api.id entity.id
-      api.sla_level_id entity.sla_level_id
-      api.sla_type_id entity.sla_type_id
-      api.sla_priority_id entity.sla_priority_id
-      api.term entity.term
+  @entities.each do |sla_level_term|
+    api.sla_level_term do
+      api.id sla_level_term.id
+      api.sla_level_id sla_level_term.sla_level_id
+      api.sla_type_id sla_level_term.sla_type_id
+      api.sla_priority_id sla_level_term.sla_priority_id
+      api.term sla_level_term.term
     end
   end
 end

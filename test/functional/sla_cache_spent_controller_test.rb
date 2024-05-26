@@ -153,8 +153,8 @@ class SlaCacheSpentsControllerTest < Redmine::ControllerTest
     @request.session[:user_id] = 1
     with_settings :default_language => "en" do
       delete :destroy, :params => { id: 1 }
-      assert_response 404
-      assert_response :missing
+      assert_response :redirect
+      assert_redirected_to sla_cache_spents_path    
     end
   end
 
@@ -171,8 +171,8 @@ class SlaCacheSpentsControllerTest < Redmine::ControllerTest
     @request.session[:user_id] = 1
     with_settings :default_language => "en" do
       get :refresh, params: { id: 1 }
-      assert_response 404
-      assert_response :missing      
+      assert_response :redirect
+      assert_redirected_to sla_cache_spents_path      
     end
   end    
 

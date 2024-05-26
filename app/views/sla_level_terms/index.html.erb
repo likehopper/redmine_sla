@@ -1,10 +1,7 @@
 <% html_title(l(:sla_label_global_settings)) %>
 <div class="content"> 
-  <div class="contextual">
-    <%= link_to l('sla_label.sla_level_term.new'), new_sla_level_term_path, class: 'icon icon-add' if User.current.allowed_to?(:manage_sla, nil, global: true) %>
-  </div>
   <div class="title-sla-settings title-sla_level_term">
-    <%= title l('sla_label.sla_level_term.plural') %>
+    <%= title l('sla_label.sla_level_term.index') %>
   </div>
   <%= form_tag(sla_level_terms_path, method: :get, id: 'query_form') do %>
     <%= render partial: 'queries/query_form' %>

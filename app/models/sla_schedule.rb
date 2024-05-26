@@ -26,12 +26,7 @@ class SlaSchedule < ActiveRecord::Base
 
   scope :visible, ->(*args) { where(SlaSchedule.visible_condition(args.shift || User.current, *args)) }
 
-  #default_scope { joins(:sla_calendar).order(dow: :asc, start_time: :asc) }  
-  default_scope {
-      select("sla_schedules.*").
-      joins(:sla_calendar)
-      #order(dow: :asc, start_time: :asc)
-  }
+  default_scope { select("sla_schedules.*").joins(:sla_calendar) }
 
   # It is important not to convert times based on time zone !
   # ( cf. https://api.rubyonrails.org/classes/ActiveRecord/Timestamp.html )
@@ -64,29 +59,28 @@ class SlaSchedule < ActiveRecord::Base
     self.end_time = self.end_time.strftime("%H:%M:59")
   end  
 
+  # No selection limitations
   def self.visible_condition(user, options = {})
     '1=1'
   end
 
-  def editable_by?(user)
-    editable?(user)
-  end
-
-  def visible?(user = nil)
-    user ||= User.current
+  # For index and show
+  def visible?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 
-  def editable?(user = nil)
-    user ||= User.current
+  # For create and update
+  def editable?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 
-  def deletable?(user = nil)
-    user ||= User.current
+  # For destroy
+  def deletable?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 
+  private
+  
   def sla_schedules_inconsistency
     # Format datas
     @start_time = self.start_time.strftime("%H:%M")

@@ -133,10 +133,6 @@ roles_003:
   users_visibility: all
   permissions: |
     ---
-    - :edit_project
-    - :manage_members
-    - :manage_versions
-    - :manage_categories
     - :view_issues
     - :add_issues
     - :edit_issues
@@ -149,7 +145,6 @@ roles_003:
     - :log_time
     - :view_time_entries
     - :view_news
-    - :manage_news
     - :comment_news
     - :view_documents
     - :add_documents
@@ -157,12 +152,8 @@ roles_003:
     - :delete_documents
     - :view_wiki_pages
     - :view_wiki_edits
-    - :edit_wiki_pages
-    - :delete_wiki_pages
     - :view_messages
-    - :add_messages
     - :view_message_watchers
-    - :manage_boards
     - :view_files
     - :manage_files
     - :browse_repository

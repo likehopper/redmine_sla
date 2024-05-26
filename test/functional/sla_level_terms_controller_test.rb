@@ -59,7 +59,8 @@ class SlaLevelTermsControllerTest < Redmine::ControllerTest
       assert_response :success
       # links to visible issues
       assert_select 'a[href="/sla/level_terms/1"]', :title => "Show"
-      assert_select 'a[href="/sla/level_terms/1/edit"]', :title => "Edit"
+      # assert_select 'a[href="/sla/level_terms/1/edit"]', :title => "Edit"
+      assert_select_not 'a', { href: "/sla/level_terms/1/edit", title: "Edit" }, "Le lien 'Edit' ne doit pas être présent"
       assert_select 'a[href="/sla/level_terms/1"]', :title => "Delete", :method => "delete"
     end
   end
@@ -76,7 +77,7 @@ class SlaLevelTermsControllerTest < Redmine::ControllerTest
     @request.session[:user_id] = 1
     with_settings :default_language => "en" do
       get(:edit, :params => {:id => 1})
-      assert_response :success
+      assert_response :forbidden
     end
   end
 

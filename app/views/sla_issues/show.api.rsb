@@ -1,4 +1,0 @@
-    api.sla_issue do
-      api.project_id @project_id
-      api.issue_id @issue_id
-    end

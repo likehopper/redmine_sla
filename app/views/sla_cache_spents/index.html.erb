@@ -1,13 +1,13 @@
 <% html_title(l(:sla_label_global_settings)) %>
 <div class="content"> 
   <div class="contextual">
-    <%= link_to l('sla_label.sla_cache_spent.purge'), purge_sla_cache_spents_path,
+    <%= link_to l('sla_label.sla_cache_spent.purge'), ( @project.nil? ? purge_sla_cache_spents_path : purge_project_sla_cache_spents_path(@project) ),
           title: l('sla_label.sla_cache_spent.purge'), class: 'icon icon-del',
           :data => {:confirm => l(:text_are_you_sure)} if User.current.admin?
-    %>
+    -%>
   </div>
   <div class="title-sla-settings title-sla_cache_spent">
-    <%= title l('sla_label.sla_cache_spent.plural') %>
+    <%= title l('sla_label.sla_cache_spent.index') %>
   </div>
   <%= form_tag(sla_cache_spents_path, method: :get, id: 'query_form') do %>
     <%= render partial: 'queries/query_form' %>
@@ -22,6 +22,39 @@
     <% end %>
   <% end %>
 </div>
+
+<% other_formats_links do |f| %>
+  <%= f.link_to_with_query_parameters 'CSV', {}, :onclick => "showModal('csv-export-options', '330px'); return false;" %>
+<% end %>
+
+<div id="csv-export-options" style="display:none;">
+  <h3 class="title"><%= l(:label_export_options, :export_format => 'CSV') %></h3>
+  <%= form_tag(_sla_cache_spents_path(@project, nil, :format => 'csv'), :method => :get, :id => 'csv-export-form') do %>
+  <%= query_as_hidden_field_tags @query %>
+  <%= hidden_field_tag('query_name', @query.name) %>
+  <p>
+    <label><%= radio_button_tag 'c[]', '', true %> <%= l(:description_selected_columns) %></label><br />
+    <label><%= radio_button_tag 'c[]', 'all_inline' %> <%= l(:description_all_columns) %></label>
+  </p>
+  <% if @query.available_block_columns.any? %>
+    <fieldset id="csv-export-block-columns">
+      <legend>
+        <%= toggle_checkboxes_link('#csv-export-block-columns input[type=checkbox]') %>
+      </legend>
+      <% @query.available_block_columns.each do |column| %>
+        <label><%= check_box_tag 'c[]', column.name, @query.has_column?(:column), :id => nil %> <%= column.caption %></label>
+      <% end %>
+    </fieldset>
+  <% end %>
+  <%= export_csv_encoding_select_tag %>
+  <%= export_csv_separator_select_tag %>
+  <p class="buttons">
+    <%= submit_tag l(:button_export), :name => nil, :onclick => "hideModal(this);", :data => { :disable_with => false } %>
+    <%= link_to_function l(:button_cancel), "hideModal(this);" %>
+  </p>
+  <% end %>
+</div>
+
 <% content_for :sidebar do %>
   <%= render partial: 'slas/sidebar' %>
 <% end %>

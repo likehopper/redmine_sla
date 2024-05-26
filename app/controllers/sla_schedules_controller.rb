@@ -23,6 +23,7 @@ class SlaSchedulesController < ApplicationController
   unloadable
 
   accept_api_auth :index, :create, :show, :update, :destroy
+  
   before_action :require_admin
   before_action :authorize_global
 
@@ -113,8 +114,7 @@ class SlaSchedulesController < ApplicationController
     @sla_schedules.each do |sla_schedule|
       begin
         sla_schedule.reload.destroy
-      rescue ::ActiveRecord::RecordNotFound # raised by #reload if sla_schedule no longer exists
-        # nothing to do, sla_schedule was already deleted (eg. by a parent)
+      rescue ::ActiveRecord::RecordNotFound
       end
     end
     respond_to do |format|

@@ -17,7 +17,10 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../test/test_helper')
+require File.expand_path(File.dirname(__FILE__) + '/assertion_helpers')
 require File.expand_path(File.dirname(__FILE__) + '/object_helpers')
+
+include AssertionHelpers
 include ObjectHelpers
 
 def plugin_fixtures
@@ -65,4 +68,13 @@ def plugin_fixtures
 
 end
 
+def execute_update_sla_task
+  # Rechercher et exécuter la tâche Rake
+  Rake::Task['redmine:plugins:redmine_sla:update_sla'].invoke
+end
+
 plugin_fixtures
+
+execute_update_sla_task
+
+

@@ -1,10 +1,10 @@
 api.array :sla_statuses, api_meta(:total_count => @entity_count, :offset => @offset, :limit => @limit) do
-  @entities.each do |entity|
-    api.entity do
-      api.id entity.id
-      api.project entity.project
-      api.tracker entity.tracker
-      api.sla entity.sla
+  @entities.each do |sla_statuse|
+    api.sla_statuse do
+      api.id sla_statuse.id
+      api.project sla_statuse.project
+      api.tracker sla_statuse.tracker
+      api.sla sla_statuse.sla
     end
   end
 end
