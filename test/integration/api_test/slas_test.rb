@@ -24,19 +24,13 @@ class Redmine::ApiTest::SlasTest < Redmine::ApiTest::Base
   # Sla#index in XML
 
   test "GET /sla/slas.xml should return slas" do
-    sla = Sla.first
+    sla = Sla.generate!
+    count = Sla.count
     ['admin'].each { |user|
       get "/sla/slas.xml",
         :headers=>credentials(user)
       assert_response :success
-      assert_equal 'application/xml', @response.media_type
-      assert_select 'slas' do
-        assert_select '[total_count=?]', 8
-      end    
-      assert_select 'slas>sla:first-child' do
-        assert_select '>id', :integer => sla.id
-        assert_select '>name', :text => sla.name
-      end
+      assert_sla_index_xml(sla,count)
     }
   end
 
@@ -56,21 +50,13 @@ class Redmine::ApiTest::SlasTest < Redmine::ApiTest::Base
   # Sla#index in JSON
 
   test "GET /sla/slas.json should return slas" do
-    sla = Sla.first
+    sla = Sla.generate!
+    count = Sla.count
     ['admin'].each { |user|
       get "/sla/slas.json",
         :headers => credentials(user)
       assert_response :success
-      assert_equal 'application/json', @response.media_type
-      json = ActiveSupport::JSON.decode(response.body)
-      assert_kind_of Hash, json
-      assert_kind_of Array, json['slas']
-      assert_kind_of Hash, json['slas'].first
-      assert json['slas'].first.has_key?('id')
-      assert json['slas'].first.has_key?('name')
-      assert_equal(sla.id, json['slas'].first['id'])
-      assert_equal(sla.name, json['slas'].first['name'])
-      assert_equal(8, json['total_count'])
+      assert_sla_index_json(sla,count)
     }
   end
 
@@ -90,14 +76,13 @@ class Redmine::ApiTest::SlasTest < Redmine::ApiTest::Base
   # Sla#show in XML
 
   test "GET /sla/slas/:id.xml should return the sla" do
-    sla = Sla.first
+    sla = Sla.generate!
+    count = Sla.count
     ['admin'].each { |user|
       get "/sla/slas/#{sla.id}.xml",
         :headers=>credentials(user)
       assert_response :success
-      assert_equal 'application/xml', @response.media_type
-      assert_select 'sla>id', :integer => sla.id
-      assert_select 'sla>name', :text => sla.name
+      assert_sla_show_xml(sla)
     }
   end
 
@@ -117,17 +102,13 @@ class Redmine::ApiTest::SlasTest < Redmine::ApiTest::Base
   # Sla#show in JSON
 
   test "GET /sla/slas/:id.json should return the sla" do
-    sla = Sla.first
+    sla = Sla.generate!
+    count = Sla.count
     ['admin'].each { |user|
       get "/sla/slas/#{sla.id}.json",
         :headers => credentials(user)
       assert_response :success
-      assert_equal 'application/json', @response.media_type
-      json = ActiveSupport::JSON.decode(response.body)
-      assert_kind_of Hash, json
-      assert_kind_of Hash, json['sla']
-      assert_equal sla.id, json['sla']['id']
-      assert_equal sla.name, json['sla']['name']
+      assert_sla_show_json(sla)
     }
   end
 
@@ -271,5 +252,48 @@ class Redmine::ApiTest::SlasTest < Redmine::ApiTest::Base
     delete "/sla/slas/#{sla_id}.xml"
     assert_response :unauthorized
   end    
+
+  private
+
+  def assert_sla_show_xml(sla)
+    assert_response :success
+    assert_equal 'application/xml', @response.media_type
+    assert_select 'sla>id', :integer => sla.id
+    assert_select 'sla>name', :text => sla.name
+  end
+
+  def assert_sla_index_xml(sla,count)
+    assert_equal 'application/xml', @response.media_type
+    assert_select 'slas' do
+      assert_select '[total_count=?]', count
+    end    
+    assert_select 'slas>sla:last-child' do
+      assert_select '>id', :integer => sla.id
+      assert_select '>name', :text => sla.name
+    end
+  end
+
+  def assert_sla_show_json(sla)
+    assert_equal 'application/json', @response.media_type
+    json = ActiveSupport::JSON.decode(response.body)
+    assert_kind_of Hash, json
+    assert_kind_of Hash, json['sla']
+    assert_equal sla.id, json['sla']['id']
+    assert_equal sla.name, json['sla']['name']
+  end
+
+  def assert_sla_index_json(sla,count)
+    assert_equal 'application/json', @response.media_type
+    json = ActiveSupport::JSON.decode(response.body)
+    assert_kind_of Hash, json
+    assert_kind_of Array, json['slas']
+    assert_kind_of Hash, json['slas'].last
+    assert json['slas'].last.has_key?('id')
+    assert json['slas'].last.has_key?('name')
+    assert_equal(sla.id, json['slas'].last['id'])
+    assert_equal(sla.name, json['slas'].last['name'])
+    assert_equal(count, json['total_count'])
+  end
+
 
 end
