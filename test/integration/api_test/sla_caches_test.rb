@@ -592,8 +592,8 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
   end    
 
 
-  # +purge ???
-  # +refresh ???
+  # TODO : Sla Caches Test +purge
+  # TODO : Sla Caches Test +refresh
 
   private
 
