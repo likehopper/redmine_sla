@@ -106,10 +106,9 @@ class SlasController < ApplicationController
     else
       respond_to do |format|
         format.html {render :action => 'edit'}
-        format.api {render_validation_errors(@sla)}
+        format.api  {render_validation_errors(@sla)}
       end
     end
-
   end
 
   def destroy

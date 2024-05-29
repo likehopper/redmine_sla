@@ -23,7 +23,7 @@ class Redmine::ApiTest::SlasTest < Redmine::ApiTest::Base
 
   # Sla#index in XML
 
-  test "GET /sla/slas.xml should return slas" do
+  test "GET /sla/slas.xml should success for admin" do
     sla = Sla.generate!
     count = Sla.count
     ['admin'].each { |user|
@@ -34,7 +34,7 @@ class Redmine::ApiTest::SlasTest < Redmine::ApiTest::Base
     }
   end
 
-  test "GET /sla/slas.xml should forbidden the sla" do
+  test "GET /sla/slas.xml should forbidden for other users" do
     ['manager','developer','sysadmin','reporter','other'].each { |user|
       get "/sla/slas.xml",
         :headers=>credentials(user)
@@ -42,14 +42,14 @@ class Redmine::ApiTest::SlasTest < Redmine::ApiTest::Base
     }
   end
 
-  test "GET /sla/slas.xml should forbidden the sla withtout credentials" do
+  test "GET /sla/slas.xml should forbidden withtout credentials" do
       get "/sla/slas.xml"
       assert_response :unauthorized
   end    
 
   # Sla#index in JSON
 
-  test "GET /sla/slas.json should return slas" do
+  test "GET /sla/slas.json should success for admin" do
     sla = Sla.generate!
     count = Sla.count
     ['admin'].each { |user|
@@ -60,7 +60,7 @@ class Redmine::ApiTest::SlasTest < Redmine::ApiTest::Base
     }
   end
 
-  test "GET /sla/slas.json should forbidden the sla" do
+  test "GET /sla/slas.json should forbidden for other users" do
     ['manager','developer','sysadmin','reporter','other'].each { |user|
       get "/sla/slas.json",
         :headers => credentials(user)
@@ -68,16 +68,15 @@ class Redmine::ApiTest::SlasTest < Redmine::ApiTest::Base
     }
   end  
 
-  test "GET /sla/slas.json should forbidden the sla withtout credentials" do
+  test "GET /sla/slas.json should forbidden withtout credentials" do
       get "/sla/slas.json"
       assert_response :unauthorized
   end   
 
   # Sla#show in XML
 
-  test "GET /sla/slas/:id.xml should return the sla" do
-    sla = Sla.generate!
-    count = Sla.count
+  test "GET /sla/slas/:id.xml should success for admin" do
+    sla = Sla.first
     ['admin'].each { |user|
       get "/sla/slas/#{sla.id}.xml",
         :headers=>credentials(user)
@@ -86,24 +85,25 @@ class Redmine::ApiTest::SlasTest < Redmine::ApiTest::Base
     }
   end
 
-  test "GET /sla/slas/:id.xml should forbidden the sla" do
+  test "GET /sla/slas/:id.xml should forbidden for other users" do
+    sla = Sla.first
     ['manager','developer','sysadmin','reporter','other'].each { |user|
-      get "/sla/slas/1.xml",
+      get "/sla/slas/#{sla.id}.xml",
         :headers=>credentials(user)
       assert_response :forbidden
     }
   end
 
-  test "GET /sla/slas/:id.xml should forbidden the sla withtout credentials" do
-    get('/sla/slas/1.xml')
+  test "GET /sla/slas/:id.xml should forbidden withtout credentials" do
+    sla = Sla.first
+    get "/sla/slas/#{sla.id}.xml'"
     assert_response :unauthorized
   end   
 
   # Sla#show in JSON
 
-  test "GET /sla/slas/:id.json should return the sla" do
-    sla = Sla.generate!
-    count = Sla.count
+  test "GET /sla/slas/:id.json should success for admin" do
+    sla = Sla.first
     ['admin'].each { |user|
       get "/sla/slas/#{sla.id}.json",
         :headers => credentials(user)
@@ -112,7 +112,7 @@ class Redmine::ApiTest::SlasTest < Redmine::ApiTest::Base
     }
   end
 
-  test "GET /sla/slas/:id.json should forbidden the sla" do
+  test "GET /sla/slas/:id.json should forbidden for other users" do
     sla = Sla.first
     ['manager','developer','sysadmin','reporter','other'].each { |user|
       get "/sla/slas/#{sla.id}.json",
@@ -121,7 +121,7 @@ class Redmine::ApiTest::SlasTest < Redmine::ApiTest::Base
     }
   end
  
-  test "GET /sla/slas/:id.json should forbidden the sla withtout credentials" do
+  test "GET /sla/slas/:id.json should forbidden withtout credentials" do
     sla = Sla.first
     get "/sla/slas/#{sla.id}.json"
     assert_response :unauthorized
@@ -141,7 +141,7 @@ class Redmine::ApiTest::SlasTest < Redmine::ApiTest::Base
   end
 
   test "POST /sla/slas.xml with invalid parameters should return errors" do
-    sla = Sla.find(1)
+    sla = Sla.first
     assert_no_difference('Sla.count') do
       post "/sla/slas.xml",
         :params => {:sla => {:name => sla.name}},
@@ -179,45 +179,58 @@ class Redmine::ApiTest::SlasTest < Redmine::ApiTest::Base
 
   # Sla#update in XML
 
+  test "PUT /sla/slas/:id.xml with blank parameters should unprocessable_entity for admin" do
+    sla = Sla.first
+    assert_no_difference('Sla.count') do
+      put "/sla/slas/#{sla.id}.xml",
+        :params => {:sla => {:name => ''}},
+        :headers => credentials('admin')
+    end
+    assert_response :unprocessable_entity
+    assert_equal 'application/xml', @response.media_type
+    assert_select 'errors', :text => "Name cannot be blank"
+  end  
+
+  test "PUT /sla/slas/:id.xml with invalid parameters should unprocessable_entity for admin" do
+    sla = Sla.first
+    sla_last = Sla.last
+    assert_no_difference('Sla.count') do
+      put "/sla/slas/#{sla.id}.xml",
+        :params => {:sla => {:name => sla_last.name}},
+        :headers => credentials('admin')
+    end
+    assert_response :unprocessable_entity
+    assert_equal 'application/xml', @response.media_type
+    assert_select 'errors', :text => "Name has already been taken"
+  end
+
   test "PUT /sla/slas/:id.xml with valid parameters should update the sla" do
+    sla = Sla.first
     assert_no_difference 'Sla.count' do
-      sla_id = Sla.first.id
-      put "/sla/slas/#{sla_id}.xml",
+      put "/sla/slas/#{sla.id}.xml",
         :params => {:sla => {:name => 'API update'}},
         :headers => credentials('admin')
     end
     assert_response :no_content
     assert_equal '', @response.body
     assert_nil @response.media_type
-    sla = Sla.find(1)
+    sla = Sla.find(sla.id)
     assert_equal 'API update', sla.name
   end
 
-  test "PUT /sla/slas/:id.xml with invalid parameters should return errors" do
-    sla_id = Sla.first.id
-    assert_no_difference('Project.count') do
-      put "/sla/slas/#{sla_id}.xml",
-        :params => {:sla => {:name => ''}},
-        :headers => credentials('admin')
-    end
-    assert_response :unprocessable_entity
-    assert_equal 'application/xml', @response.media_type
-    assert_select 'errors error', :text => "Name cannot be blank"
-  end
-
-  test "PUT /sla/slas/:id.xml should forbidden the sla for others users" do
-    sla_id = Sla.first.id
+  test "PUT /sla/slas/:id.xml should forbidden for other users" do
+    sla = Sla.first
     ['manager','developer','sysadmin','reporter','other'].each { |user|
-      put "/sla/slas/#{sla_id}.xml",
+      put "/sla/slas/#{sla.id}.xml",
         :params => {:sla => {:name => 'API Test'}},
         :headers=>credentials(user)
       assert_response :forbidden
     }
   end
  
-  test "PUT /sla/slas/:id.xml should unauthorized the sla withtout credentials" do
-    sla_id = Sla.first.id
-    put "/sla/slas/#{sla_id}.xml",
+  test "PUT /sla/slas/:id.xml should unauthorized withtout credentials" do
+    sla = Sla.first
+    put "/sla/slas/#{sla.id}.xml",
       :params => {:sla => {:name => 'API Test'}}
     assert_response :unauthorized
   end  
@@ -236,7 +249,7 @@ class Redmine::ApiTest::SlasTest < Redmine::ApiTest::Base
     assert_nil Sla.find_by(id: sla_id)
   end
 
-  test "DELETE /sla/slas/:id.xml should forbidden the sla for others users" do
+  test "DELETE /sla/slas/:id.xml should forbidden the sla for other users" do
     sla = Sla.generate!
     sla_id = sla.id
     ['manager','developer','sysadmin','reporter','other'].each { |user|
@@ -256,7 +269,6 @@ class Redmine::ApiTest::SlasTest < Redmine::ApiTest::Base
   private
 
   def assert_sla_show_xml(sla)
-    assert_response :success
     assert_equal 'application/xml', @response.media_type
     assert_select 'sla>id', :integer => sla.id
     assert_select 'sla>name', :text => sla.name
