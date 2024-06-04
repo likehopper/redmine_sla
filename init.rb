@@ -65,13 +65,13 @@ Redmine::Plugin.register :redmine_sla do
   # Project Permission Definition
   project_module :sla do
     permission :view_sla, {
-      sla_calendars: [ :show ],
       sla_levels: [ :show ],
+      sla_calendars: [ :show ],
       sla_caches: [ :index, :show, :refresh, :context_menu ],
     }, :require => :member
     permission :manage_sla, {
+      sla_project_trackers: [ :index, :new, :create, :edit, :update, :destroy, :context_menu ],
       sla_caches: [ :index, :show, :refresh, :destroy, :purge, :context_menu ],
-      sla_project_trackers: [ :new, :create, :edit, :update, :edit, :destroy ],
     }, :require => :member
   end
        

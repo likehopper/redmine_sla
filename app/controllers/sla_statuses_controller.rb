@@ -25,8 +25,8 @@ class SlaStatusesController < ApplicationController
   before_action :require_admin
   before_action :authorize_global
 
-  before_action :find_sla_status, only: [:show, :edit, :update]
-  before_action :find_sla_statuses, only: [:context_menu, :destroy]
+  before_action :find_sla_status, only: [ :show, :edit, :update ]
+  before_action :find_sla_statuses, only: [ :destroy, :context_menu ]
 
   helper :sla_statuses
   helper :context_menus
@@ -51,13 +51,13 @@ class SlaStatusesController < ApplicationController
     end    
   end
   
-  def show
-    respond_to do |format|
-      format.html do
-        end
-      format.api
-    end
-  end  
+  # def show
+  #   respond_to do |format|
+  #     format.html do
+  #       end
+  #     format.api
+  #   end
+  # end  
 
   def new
     @sla_status = SlaStatus.new
@@ -77,15 +77,13 @@ class SlaStatusesController < ApplicationController
         end
         format.api do
           render :action => 'show', :status => :created,
-          :location => sla_status_url(@sla_status)
+            :location => sla_status_url(@sla_status)
         end
       end
     else
       respond_to do |format|
-        format.html do
-          render :action => 'new'
-        end
-        format.api {render_validation_errors(@sla_status)}
+        format.html { render :action => 'new' }
+        format.api { render_validation_errors(@sla_status) }
       end
     end
 
@@ -101,12 +99,12 @@ class SlaStatusesController < ApplicationController
           )          
           redirect_back_or_default sla_statuses_path
         end
-        format.api  {render_api_ok}
+        format.api { render_api_ok }
       end
     else
       respond_to do |format|
-        format.html {render :action => 'edit'}
-        format.api  {render_validation_errors(@sla_status)}
+        format.html { render :action => 'edit' }
+        format.api { render_validation_errors(@sla_status) }
       end
     end
   end
@@ -123,7 +121,7 @@ class SlaStatusesController < ApplicationController
         flash[:notice] = l(:notice_successful_delete)
         redirect_back_or_default sla_statuses_path
       end
-      format.api {render_api_ok}
+      format.api { render_api_ok }
     end        
   end
 
@@ -158,14 +156,17 @@ class SlaStatusesController < ApplicationController
 
   def find_sla_status
     @sla_status = SlaStatus.find(params[:id])
+    raise Unauthorized unless @sla_status.visible?
+    raise ActiveRecord::RecordNotFound if @sla_status.nil?
   rescue ActiveRecord::RecordNotFound
     render_404
   end
 
   def find_sla_statuses
-    @sla_statuses = SlaStatus.visible.where(id: (params[:id]||params[:ids])).to_a
+    params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]] 
+    @sla_statuses = SlaStatus.find(params[:ids]).to_a  
+    raise Unauthorized unless @sla_statuses.all?(&:visible?)
     raise ActiveRecord::RecordNotFound if @sla_statuses.empty?
-    #raise Unauthorized unless @sla_statuses.all?(&:visible?)
   rescue ActiveRecord::RecordNotFound
     render_404
   end

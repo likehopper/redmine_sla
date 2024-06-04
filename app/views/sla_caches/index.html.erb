@@ -56,6 +56,4 @@
   <% end %>
 </div>
 
-<% content_for :sidebar do %>
-  <%= render partial: 'slas/sidebar' if @project.nil? %>
-<% end %>
+<%= render partial: 'slas/sidebar' if @project.nil? %>

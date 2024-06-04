@@ -26,20 +26,20 @@ class Redmine::ApiTest::SlaTypesTest < Redmine::ApiTest::Base
   test "GET /sla/types.xml should success for admin" do
     sla_type = SlaType.first
     count = SlaType.count
-    ['admin'].each { |user|
+    ['admin'].each do |user|
       get "/sla/types.xml",
         :headers=>credentials(user)
       assert_response :success
       assert_sla_types_index_xml(sla_type,count)
-    }
+    end
   end
 
   test "GET /sla/types.xml should forbidden for other users" do
-    ['manager','developer','sysadmin','reporter','other'].each { |user|
+    ['manager','developer','sysadmin','reporter','other'].each do |user|
       get "/sla/types.xml",
         :headers=>credentials(user)
       assert_response :forbidden
-    }
+    end
   end
 
   test "GET /sla/types.xml should unauthorized withtout credentials" do
@@ -52,20 +52,20 @@ class Redmine::ApiTest::SlaTypesTest < Redmine::ApiTest::Base
   test "GET /sla/types.json should success for admin" do
     sla_type = SlaType.first
     count = SlaType.count
-    ['admin'].each { |user|
+    ['admin'].each do |user|
       get "/sla/types.json",
         :headers => credentials(user)
       assert_response :success
       assert_sla_types_index_json(sla_type,count)
-    }
+    end
   end
 
   test "GET /sla/types.json should forbidden for other users" do
-    ['manager','developer','sysadmin','reporter','other'].each { |user|
+    ['manager','developer','sysadmin','reporter','other'].each do |user|
       get "/sla/types.json",
         :headers => credentials(user)
       assert_response :forbidden
-    }
+    end
   end  
 
   test "GET /sla/types.json should unauthorized withtout credentials" do
@@ -77,21 +77,21 @@ class Redmine::ApiTest::SlaTypesTest < Redmine::ApiTest::Base
 
   test "GET /sla/types/:id.xml should success for admin" do
     sla_type = SlaType.first
-    ['admin'].each { |user|
+    ['admin'].each do |user|
       get "/sla/types/#{sla_type.id}.xml",
         :headers=>credentials(user)
       assert_response :success
       assert_sla_type_show_xml(sla_type)
-    }
+    end
   end
 
   test "GET /sla/types/:id.xml should forbidden for other users" do
     sla_type = SlaType.first
-    ['manager','developer','sysadmin','reporter','other'].each { |user|
+    ['manager','developer','sysadmin','reporter','other'].each do |user|
       get "/sla/types/#{sla_type.id}.xml",
         :headers=>credentials(user)
       assert_response :forbidden
-    }
+    end
   end
 
   test "GET /sla/types/:id.xml should unauthorized withtout credentials" do
@@ -104,21 +104,21 @@ class Redmine::ApiTest::SlaTypesTest < Redmine::ApiTest::Base
 
   test "GET /sla/types/:id.json should success for admin" do
     sla_type = SlaType.first
-    ['admin'].each { |user|
+    ['admin'].each do |user|
       get "/sla/types/#{sla_type.id}.json",
         :headers => credentials(user)
       assert_response :success
       assert_sla_type_show_json(sla_type)
-    }
+    end
   end
 
   test "GET /sla/types/:id.json should forbidden for ohter users" do
     sla_type = SlaType.first
-    ['manager','developer','sysadmin','reporter','other'].each { |user|
+    ['manager','developer','sysadmin','reporter','other'].each do |user|
       get "/sla/types/#{sla_type.id}.json",
         :headers=>credentials(user)
       assert_response :forbidden
-    }
+    end
   end
  
   test "GET /sla/types/:id.json should forbidden withtout credentials" do
@@ -163,12 +163,12 @@ class Redmine::ApiTest::SlaTypesTest < Redmine::ApiTest::Base
   end
 
   test "POST /sla/types.xml should forbidden for other users" do
-    ['manager','developer','sysadmin','reporter','other'].each { |user|
+    ['manager','developer','sysadmin','reporter','other'].each do |user|
       post "/sla/types.xml",
         :params => {:sla_type => {:name => 'API Test'}},
         :headers=>credentials(user)
       assert_response :forbidden
-    }
+    end
   end
  
   test "POST /sla/types.xml should unauthorized withtout credentials" do
@@ -220,12 +220,12 @@ class Redmine::ApiTest::SlaTypesTest < Redmine::ApiTest::Base
 
   test "PUT /sla/types/:id.xml should forbidden for other users" do
     sla_type = SlaType.first
-    ['manager','developer','sysadmin','reporter','other'].each { |user|
+    ['manager','developer','sysadmin','reporter','other'].each do |user|
       put "/sla/types/#{sla_type.id}.xml",
         :params => {:sla_type => {:name => 'API Test'}},
         :headers=>credentials(user)
       assert_response :forbidden
-    }
+    end
   end
  
   test "PUT /sla/types/:id.xml should unauthorized withtout credentials" do
@@ -252,11 +252,11 @@ class Redmine::ApiTest::SlaTypesTest < Redmine::ApiTest::Base
   test "DELETE /sla/types/:id.xml should forbidden for other users" do
     sla_type = SlaType.generate!
     sla_type_id = sla_type.id
-    ['manager','developer','sysadmin','reporter','other'].each { |user|
+    ['manager','developer','sysadmin','reporter','other'].each do |user|
       delete "/sla/types/#{sla_type_id}.xml",
         :headers=>credentials(user)
       assert_response :forbidden
-    }
+    end
   end
  
   test "DELETE /sla/types/:id.json should unauthorized withtout credentials" do

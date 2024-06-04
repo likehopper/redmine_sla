@@ -20,10 +20,6 @@ require File.expand_path('../../test_helper', __FILE__)
 
 class SlaStatusTest < ActiveSupport::TestCase
 
-  test "the truth" do
-    assert true
-  end
-
   test "should not save SlaStatus without status_id, sla_type_id" do
     sla_status = SlaStatus.new
     assert_not sla_status.save, "Saved the SlaStatus without status_id, sla_type_id"

@@ -25,8 +25,8 @@ class SlaTypesController < ApplicationController
   before_action :require_admin
   before_action :authorize_global
 
-  before_action :find_sla_type, only: [:show, :edit, :update]
-  before_action :find_sla_types, only: [:context_menu, :destroy]
+  before_action :find_sla_type, only: [ :show, :edit, :update ]
+  before_action :find_sla_types, only: [ :destroy, :context_menu ]
 
   helper :sla_types
   helper :context_menus
@@ -47,13 +47,13 @@ class SlaTypesController < ApplicationController
     end    
   end
 
-  def show
-    respond_to do |format|
-      format.html do
-        end
-      format.api
-    end
-  end  
+  # def show
+  #   respond_to do |format|
+  #     format.html do
+  #       end
+  #     format.api
+  #   end
+  # end  
 
   def new
     @sla_type = SlaType.new
@@ -75,15 +75,13 @@ class SlaTypesController < ApplicationController
         end
         format.api do
           render :action => 'show', :status => :created,
-          :location => sla_type_url(@sla_type)
+            :location => sla_type_url(@sla_type)
         end
       end
     else
       respond_to do |format|
-        format.html do
-          render :action => 'new'
-        end
-        format.api {render_validation_errors(@sla_type)}
+        format.html do render :action => 'new' end
+        format.api do render_validation_errors(@sla_type) end
       end
     end
   end
@@ -98,12 +96,12 @@ class SlaTypesController < ApplicationController
           )          
           redirect_back_or_default sla_types_path
         end
-        format.api  {render_api_ok}
+        format.api { render_api_ok }
       end
     else
       respond_to do |format|
-        format.html {render :action => 'edit'}
-        format.api  {render_validation_errors(@sla_type)}
+        format.html { render :action => 'edit' }
+        format.api { render_validation_errors(@sla_type) }
       end
     end
   end
@@ -120,7 +118,7 @@ class SlaTypesController < ApplicationController
         flash[:notice] = l(:notice_successful_delete)
         redirect_back_or_default sla_types_path
       end
-      format.api {render_api_ok}
+      format.api { render_api_ok }
     end    
   end
 
@@ -155,15 +153,18 @@ class SlaTypesController < ApplicationController
 
   def find_sla_type
     @sla_type = SlaType.find(params[:id])
+    raise Unauthorized unless @sla_type.visible?
+    raise ActiveRecord::RecordNotFound if @sla_type.nil?
   rescue ActiveRecord::RecordNotFound
     render_404
   end
 
   def find_sla_types
-    @sla_types = SlaType.visible.where(id: (params[:id] || params[:ids])).to_a
-    #@sla_type = @sla_types.first if @sla_types.count == 1
+    params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]] 
+    @sla_types = SlaType.find(params[:ids]).to_a
+    @sla_type = @sla_types.first if @sla_types.count == 1
+    raise Unauthorized unless @sla_types.all?(&:visible?)
     raise ActiveRecord::RecordNotFound if @sla_types.empty?
-    #raise Unauthorized unless @sla_types.all?(&:visible?)
   rescue ActiveRecord::RecordNotFound
     render_404
   end

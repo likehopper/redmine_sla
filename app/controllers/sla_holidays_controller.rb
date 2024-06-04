@@ -25,8 +25,8 @@ class SlaHolidaysController < ApplicationController
   before_action :require_admin
   before_action :authorize_global
 
-  before_action :find_sla_holiday, only: [:show, :edit, :update]
-  before_action :find_sla_holidays, only: [:context_menu, :destroy]
+  before_action :find_sla_holiday, only: [ :show, :edit, :update ]
+  before_action :find_sla_holidays, only: [ :destroy, :context_menu ]
 
   helper :sla_holidays
   helper :context_menus
@@ -47,13 +47,12 @@ class SlaHolidaysController < ApplicationController
     end    
   end
 
-  def show
-    respond_to do |format|
-      format.html do
-        end
-      format.api
-    end
-  end
+  # def show
+  #   respond_to do |format|
+  #     format.html
+  #     format.api
+  #   end
+  # end
 
   def new
     @sla_holiday = SlaHoliday.new
@@ -71,15 +70,13 @@ class SlaHolidaysController < ApplicationController
         end
         format.api do
           render :action => 'show', :status => :created,
-          :location => sla_holiday_url(@sla_holiday)
+            :location => sla_holiday_url(@sla_holiday)
         end
       end
     else
       respond_to do |format|
-        format.html do
-          render :action => 'new'
-        end
-        format.api {render_validation_errors(@sla_holiday)}
+        format.html { render :action => 'new' }
+        format.api { render_validation_errors(@sla_holiday) }
       end
     end
   end
@@ -87,17 +84,17 @@ class SlaHolidaysController < ApplicationController
   def update
     @sla_holiday.safe_attributes = params[:sla_holiday]
     if @sla_holiday.save
-      flash[:notice] = l(:notice_successful_update)
       respond_to do |format|
         format.html do
+          flash[:notice] = l(:notice_successful_update)
           redirect_back_or_default sla_holidays_path
         end
-        format.api {render_api_ok}
+        format.api { render_api_ok }
       end
     else
       respond_to do |format|
-        format.html {render :action => 'edit'}
-        format.api  {render_validation_errors(@sla_holiday)}
+        format.html { render :action => 'edit' }
+        format.api { render_validation_errors(@sla_holiday) }
       end
     end
   end
@@ -114,7 +111,7 @@ class SlaHolidaysController < ApplicationController
         flash[:notice] = l(:notice_successful_delete)
         redirect_back_or_default sla_holidays_path
       end
-      format.api {render_api_ok}
+      format.api { render_api_ok }
     end
   end
 

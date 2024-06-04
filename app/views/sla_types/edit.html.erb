@@ -8,6 +8,4 @@
   </div>  
   <%= render partial: 'form', locals: { sla_type: @sla_type } %>
 </div>
-<% content_for :sidebar do %>
-  <%= render partial: 'slas/sidebar' %>
-<% end %>
+<%= render partial: 'slas/sidebar' -%>

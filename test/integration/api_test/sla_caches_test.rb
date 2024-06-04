@@ -33,12 +33,12 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
   test "GET /sla/caches.xml should return sla_caches manage by project" do
     ['admin','manager'].each do |user|
       sla_cache = SlaCache.where(project: 1).order(:id).first # project-sla-tests-tma
-      get "/projects/project-sla-tests-tma/slas.xml?issue.status_id=*&order=id",
+      get "/projects/project-sla-tests-tma/sla/caches.xml?issue.status_id=*&order=id",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_xml(sla_cache,issues_in_tma)
       sla_cache = SlaCache.where(project: 2).order(:id).first # project-sla-tests-std
-      get "/projects/project-sla-tests-std/slas.xml?issue.status_id=*&order=id",
+      get "/projects/project-sla-tests-std/sla/caches.xml?issue.status_id=*&order=id",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_xml(sla_cache,issues_in_std)
@@ -58,12 +58,12 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
   test "GET /sla/caches.json should return manage by project" do
     ['admin','manager'].each { |user|
       sla_cache = SlaCache.where(project: 1).order(:id).first # project-sla-tests-tma
-      get "/projects/project-sla-tests-tma/slas.json?issue.status_id=*&order=id",
+      get "/projects/project-sla-tests-tma/sla/caches.json?issue.status_id=*&order=id",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_json(sla_cache,issues_in_tma)
       sla_cache = SlaCache.where(project: 2).order(:id).first # project-sla-tests-std
-      get "/projects/project-sla-tests-std/slas.json?issue.status_id=*&order=id",
+      get "/projects/project-sla-tests-std/sla/caches.json?issue.status_id=*&order=id",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_json(sla_cache,issues_in_std)  
@@ -104,7 +104,7 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
     ['developer'].each do |user|
       # TODO : issue auquel il a accès trier par ordre id asc ???
       sla_cache = SlaCache.where(project: 1).order(:id).first # project-sla-tests-tma
-      get "/projects/project-sla-tests-tma/slas.xml?issue.status_id=*&order=id",
+      get "/projects/project-sla-tests-tma/sla/caches.xml?issue.status_id=*&order=id",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_xml(sla_cache,issues_in_tma)
@@ -112,7 +112,7 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
         headers: credentials(user)
       assert_response :success     
       assert_sla_cache_index_xml(sla_cache,issues_in_tma)
-      get "/projects/project-sla-tests-std/slas.xml?issue.status_id=*",
+      get "/projects/project-sla-tests-std/sla/caches.xml?issue.status_id=*",
         headers: credentials(user)
       assert_response :forbidden
       get "/sla/caches.xml?issue.status_id=*&project_id=2", # project-sla-tests-std
@@ -124,7 +124,7 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
   test "GET /sla/caches.json should return sla_caches partial for developer" do
     ['developer'].each do |user|
       sla_cache = SlaCache.where(project: 1).order(:id).first # project-sla-tests-tma
-      get "/projects/project-sla-tests-tma/slas.json?issue.status_id=*&order=id",
+      get "/projects/project-sla-tests-tma/sla/caches.json?issue.status_id=*&order=id",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_json(sla_cache,issues_in_tma)
@@ -132,7 +132,7 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_json(sla_cache,issues_in_tma)      
-      get "/projects/project-sla-tests-std/slas.json?issue.status_id=*",
+      get "/projects/project-sla-tests-std/sla/caches.json?issue.status_id=*",
         headers: credentials(user)
       assert_response :forbidden
       get "/sla/caches.json?issue.status_id=*&project_id=2", # project-sla-tests-std
@@ -144,7 +144,7 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
   test "GET /sla/caches.xml should return sla_caches partial for sysadmin" do
     ['sysadmin'].each do |user|
       sla_cache = SlaCache.order(:id).find_by(project: 2) # project-sla-tests-std
-      get "/projects/project-sla-tests-std/slas.xml?issue.status_id=*&order=id",
+      get "/projects/project-sla-tests-std/sla/caches.xml?issue.status_id=*&order=id",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_xml(sla_cache,issues_in_std)
@@ -152,7 +152,7 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_xml(sla_cache,issues_in_std)
-      get "/projects/project-sla-tests-tma/slas.xml?issue.status_id=*",
+      get "/projects/project-sla-tests-tma/sla/caches.xml?issue.status_id=*",
         headers: credentials(user)
       assert_response :forbidden
       get "/sla/caches.xml?issue.status_id=*&project_id=1", # project-sla-tests-tma
@@ -164,7 +164,7 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
   test "GET /sla/caches.json should return sla_caches partial for sysadmin" do
     ['sysadmin'].each do |user|
       sla_cache = SlaCache.where(project: 2).order(:id).first # project-sla-tests-std
-      get "/projects/project-sla-tests-std/slas.json?issue.status_id=*", # project-sla-tests-std
+      get "/projects/project-sla-tests-std/sla/caches.json?issue.status_id=*", # project-sla-tests-std
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_json(sla_cache,issues_in_std)
@@ -172,7 +172,7 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_json(sla_cache,issues_in_std)
-      get "/projects/project-sla-tests-tma/slas.json?issue.status_id=*", # project-sla-tests-tma
+      get "/projects/project-sla-tests-tma/sla/caches.json?issue.status_id=*", # project-sla-tests-tma
         headers: credentials(user)
       assert_response :forbidden
       get "/sla/caches.json?issue.status_id=*&project_id=1", # project-sla-tests-tma
@@ -212,26 +212,25 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
 
   test "GET /sla/caches/:id.xml should return the sla cache tma/dev" do
     sla_cache = SlaCache.where(project: 1).order(:id).first # project-sla-tests-tma
-    ['admin'].each do |user|
+    ['admin','manager','developer'].each do |user|
       get "/sla/caches/#{sla_cache.id}.xml",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_show_xml(sla_cache)
     end    
-    ['manager','developer','sysadmin'].each do |user|
+    ['sysadmin'].each do |user|
       get "/sla/caches/#{sla_cache.id}.xml",
         headers: credentials(user)
-      assert_response :success
-      assert_sla_cache_show_xml(sla_cache)
+      assert_response :forbidden
     end
     ['admin','manager','developer'].each do |user|
-      get "/projects/project-sla-tests-tma/slas/#{sla_cache.id}.xml",
+      get "/projects/project-sla-tests-tma/sla/caches/#{sla_cache.id}.xml",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_show_xml(sla_cache)
     end
     ['sysadmin'].each do |user|
-      get "/projects/project-sla-tests-tma/slas/#{sla_cache.id}.xml",
+      get "/projects/project-sla-tests-tma/sla/caches/#{sla_cache.id}.xml",
         headers: credentials(user)
       assert_response :forbidden
     end
@@ -239,26 +238,25 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
 
   test "GET /sla/caches/:id.json should return the sla cache for developer" do
     sla_cache = SlaCache.where(project: 1).order(:id).first # project-sla-tests-tma
-    ['admin'].each do |user|
+    ['admin','manager','developer'].each do |user|
       get "/sla/caches/#{sla_cache.id}.json",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_show_json(sla_cache)
     end    
-    ['manager','developer','sysadmin'].each do |user|
+    ['sysadmin'].each do |user|
       get "/sla/caches/#{sla_cache.id}.json",
         headers: credentials(user)
-      assert_response :success
-      assert_sla_cache_show_json(sla_cache)
+      assert_response :forbidden
     end
     ['admin','manager','developer'].each do |user|
-      get "/projects/project-sla-tests-tma/slas/#{sla_cache.id}.json",
+      get "/projects/project-sla-tests-tma/sla/caches/#{sla_cache.id}.json",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_show_json(sla_cache)
     end
     ['sysadmin'].each do |user|
-      get "/projects/project-sla-tests-tma/slas/#{sla_cache.id}.json",
+      get "/projects/project-sla-tests-tma/sla/caches/#{sla_cache.id}.json",
         headers: credentials(user)
       assert_response :forbidden
     end
@@ -266,26 +264,25 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
 
   test "GET /sla/caches/:id.xml should return the sla cache std/sys" do
     sla_cache = SlaCache.where(project: 2).order(:id).first # project-sla-tests-std
-    ['admin'].each do |user|
+    ['admin','manager','sysadmin'].each do |user|
       get "/sla/caches/#{sla_cache.id}.xml",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_show_xml(sla_cache)
     end    
-    ['manager','developer','sysadmin'].each do |user|
+    ['developer'].each do |user|
       get "/sla/caches/#{sla_cache.id}.xml",
         headers: credentials(user)
-        assert_response :success
-        assert_sla_cache_show_xml(sla_cache)
+        assert_response :forbidden
     end
     ['admin','manager','sysadmin'].each do |user|
-      get "/projects/project-sla-tests-std/slas/#{sla_cache.id}.xml",
+      get "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}.xml",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_show_xml(sla_cache)
     end
     ['developer'].each do |user|
-      get "/projects/project-sla-tests-std/slas/#{sla_cache.id}.xml",
+      get "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}.xml",
         headers: credentials(user)
       assert_response :forbidden
     end
@@ -293,32 +290,25 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
 
   test "GET /sla/caches/:id.json should return the sla cache std/sys" do
     sla_cache = SlaCache.where(project: 2).order(:id).first # project-sla-tests-std
-    ['admin'].each do |user|
-      get "/sla/caches/#{sla_cache.id}.json",
-        headers: credentials(user)
-      assert_response :success
-      assert_sla_cache_show_json(sla_cache)
-    end    
-    ['manager','developer','sysadmin'].each do |user|
-      get "/sla/caches/#{sla_cache.id}.json",
-        headers: credentials(user)
-      assert_response :success
-      assert_sla_cache_show_json(sla_cache)
-    end
     ['admin','manager','sysadmin'].each do |user|
-      get "/projects/project-sla-tests-std/slas/#{sla_cache.id}.json",
+      get "/sla/caches/#{sla_cache.id}.json",
         headers: credentials(user)
       assert_response :success
-      assert_equal 'application/json', @response.media_type
-      json = ActiveSupport::JSON.decode(response.body)
-      assert_kind_of Hash, json
-      assert_kind_of Hash, json['sla_cache']
-      assert_equal sla_cache.id, json['sla_cache']['id']
-      assert_equal sla_cache.issue_id, json['sla_cache']['issue_id']
-      assert_equal sla_cache.sla_level_id, json['sla_cache']['sla_level']['id']
+      assert_sla_cache_show_json(sla_cache)
     end
     ['developer'].each do |user|
-      get "/projects/project-sla-tests-std/slas/#{sla_cache.id}.json",
+      get "/sla/caches/#{sla_cache.id}.json",
+        headers: credentials(user)
+      assert_response :forbidden
+    end
+    ['admin','manager','sysadmin'].each do |user|
+      get "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}.json",
+        headers: credentials(user)
+      assert_response :success
+      assert_sla_cache_show_json(sla_cache)
+    end
+    ['developer'].each do |user|
+      get "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}.json",
         headers: credentials(user)
       assert_response :forbidden
     end
@@ -327,7 +317,7 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
   test "GET /sla/caches/:id.xml should forbidden the sla cache for others" do
     sla_cache = SlaCache.where(project: 1).order(:id).first # project-sla-tests-tma
     ['reporter','other'].each do |user|
-      get "/projects/project-sla-tests-tma/slas/#{sla_cache.id}.xml",
+      get "/projects/project-sla-tests-tma/sla/caches/#{sla_cache.id}.xml",
         headers: credentials(user)
       assert_response :forbidden      
       get "/sla/caches/#{sla_cache.id}.xml",
@@ -336,7 +326,7 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
     end
     sla_cache = SlaCache.where(project: 2).order(:id).first # project-sla-tests-std
     ['reporter','other'].each do |user|
-      get "/projects/project-sla-tests-std/slas/#{sla_cache.id}.xml",
+      get "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}.xml",
         headers: credentials(user)
       assert_response :forbidden     
       get "/sla/caches/#{sla_cache.id}.xml",
@@ -348,7 +338,7 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
   test "GET /sla/caches/:id.json should forbidden the sla cache for others" do
     sla_cache = SlaCache.where(project: 1).order(:id).first # project-sla-tests-tma
     ['reporter','other'].each do |user|
-      get "/projects/project-sla-tests-tma/slas/#{sla_cache.id}.json",
+      get "/projects/project-sla-tests-tma/sla/caches/#{sla_cache.id}.json",
         headers: credentials(user)
       assert_response :forbidden      
       get "/sla/caches/#{sla_cache.id}.json",
@@ -357,7 +347,7 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
     end
     sla_cache = SlaCache.where(project: 2).order(:id).first # project-sla-tests-std
     ['reporter','other'].each do |user|
-      get "/projects/project-sla-tests-std/slas/#{sla_cache.id}.json",
+      get "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}.json",
         headers: credentials(user)
       assert_response :forbidden     
       get "/sla/caches/#{sla_cache.id}.json",
@@ -368,13 +358,13 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
 
   test "GET /sla/caches/:id.xml should unauthorized the sla cache withtout credentials" do
     sla_cache = SlaCache.where(project: 1).order(:id).first # project-sla-tests-tma
-    get "/projects/project-sla-tests-tma/slas/#{sla_cache.id}.xml"
+    get "/projects/project-sla-tests-tma/sla/caches/#{sla_cache.id}.xml"
     assert_response :unauthorized
     sla = SlaCache.first
     get "/sla/caches/#{sla_cache.id}.xml"
     assert_response :unauthorized    
     sla_cache = SlaCache.where(project: 2).order(:id).first # project-sla-tests-tma
-    get "/projects/project-sla-tests-std/slas/#{sla_cache.id}.xml"
+    get "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}.xml"
     assert_response :unauthorized
     sla = SlaCache.first
     get "/sla/caches/#{sla_cache.id}.xml"
@@ -383,13 +373,13 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
 
   test "GET /sla/caches/:id.json should unauthorized the sla cache withtout credentials" do
     sla_cache = SlaCache.where(project: 1).order(:id).first # project-sla-tests-tma
-    get "/projects/project-sla-tests-tma/slas/#{sla_cache.id}.json"
+    get "/projects/project-sla-tests-tma/sla/caches/#{sla_cache.id}.json"
     assert_response :unauthorized
     sla = SlaCache.first
     get "/sla/caches/#{sla_cache.id}.json"
     assert_response :unauthorized    
     sla_cache = SlaCache.where(project: 2).order(:id).first # project-sla-tests-tma
-    get "/projects/project-sla-tests-std/slas/#{sla_cache.id}.json"
+    get "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}.json"
     assert_response :unauthorized
     sla = SlaCache.first
     get "/sla/caches/#{sla_cache.id}.json"
@@ -401,11 +391,11 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
   test "GET /sla/caches/:id/refresh.json should return success on the sla cache for admin" do
     ['admin'].each do |user|
       sla_cache = SlaCache.find_by(project: 1) # project-sla-tests-tma
-      get "/projects/project-sla-tests-tma/slas/#{sla_cache.id}/refresh.json",
+      get "/projects/project-sla-tests-tma/sla/caches/#{sla_cache.id}/refresh.json",
         headers: credentials(user)
       assert_response :success
       sla_cache = SlaCache.find_by(project: 2) # project-sla-tests-std
-      get "/projects/project-sla-tests-std/slas/#{sla_cache.id}/refresh.json",
+      get "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}/refresh.json",
         headers: credentials(user)
       assert_response :success            
       sla_cache = SlaCache.first
@@ -418,11 +408,11 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
   test "GET /sla/caches/:id/refresh.json should return success on the sla cache for manager" do
     ['manager'].each do |user|
       sla_cache = SlaCache.find_by(project: 1) # project-sla-tests-tma
-      get "/projects/project-sla-tests-tma/slas/#{sla_cache.id}/refresh.json",
+      get "/projects/project-sla-tests-tma/sla/caches/#{sla_cache.id}/refresh.json",
         headers: credentials(user)
       assert_response :success
       sla_cache = SlaCache.find_by(project: 2) # project-sla-tests-std
-      get "/projects/project-sla-tests-std/slas/#{sla_cache.id}/refresh.json",
+      get "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}/refresh.json",
         headers: credentials(user)
       assert_response :success            
       sla_cache = SlaCache.first
@@ -435,11 +425,11 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
   test "GET /sla/caches/:id/refresh.json should return forbidden on sla cache for developer" do
     ['developer'].each do |user|
       sla_cache = SlaCache.find_by(project: 1) # project-sla-tests-tma
-      get "/projects/project-sla-tests-tma/slas/#{sla_cache.id}/refresh.json",
+      get "/projects/project-sla-tests-tma/sla/caches/#{sla_cache.id}/refresh.json",
         headers: credentials(user)
       assert_response :success
       sla_cache = SlaCache.find_by(project: 2) # project-sla-tests-std
-      get "/projects/project-sla-tests-std/slas/#{sla_cache.id}/refresh.json",
+      get "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}/refresh.json",
         headers: credentials(user)
       assert_response :forbidden
       sla_cache = SlaCache.find_by(project: 1) # project-sla-tests-tma
@@ -456,11 +446,11 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
   test "GET /sla/caches/:id/refresh.json should return forbidden on sla cache for sysadmin" do
     ['sysadmin'].each do |user|
       sla_cache = SlaCache.find_by(project: 1) # project-sla-tests-tma
-      get "/projects/project-sla-tests-std/slas/#{sla_cache.id}/refresh.json",
+      get "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}/refresh.json",
         headers: credentials(user)
       assert_response :forbidden
       sla_cache = SlaCache.find_by(project: 2) # project-sla-tests-std
-      get "/projects/project-sla-tests-std/slas/#{sla_cache.id}/refresh.json",
+      get "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}/refresh.json",
         headers: credentials(user)
       assert_response :success
       sla_cache = SlaCache.find_by(project: 1) # project-sla-tests-tma
@@ -524,7 +514,7 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
   test "DELETE /sla/caches/:id.xml should success the sla cache for admin" do
     ['admin'].each do |user|
       sla_cache_id = SlaCache.find_by(project: 1).id # project-sla-tests-tma
-      delete "/projects/project-sla-tests-tma/slas/#{sla_cache_id}.xml",
+      delete "/projects/project-sla-tests-tma/sla/caches/#{sla_cache_id}.xml",
         headers: credentials(user)
       assert_response :success
       renew_issue(sla_cache_id)
@@ -533,7 +523,7 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
       assert_response :success
       renew_issue(sla_cache_id)
       sla_cache_id = SlaCache.find_by(project: 2).id # project-sla-tests-std
-      delete "/projects/project-sla-tests-std/slas/#{sla_cache_id}.xml",
+      delete "/projects/project-sla-tests-std/sla/caches/#{sla_cache_id}.xml",
         headers: credentials(user)
       assert_response :success
       renew_issue(sla_cache_id)         
@@ -547,7 +537,7 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
   test "DELETE /sla/caches/:id.xml should success the sla cache for manager" do
     ['manager'].each do |user|
       sla_cache_id = SlaCache.find_by(project: 1).id # project-sla-tests-tma
-      delete "/projects/project-sla-tests-tma/slas/#{sla_cache_id}.xml",
+      delete "/projects/project-sla-tests-tma/sla/caches/#{sla_cache_id}.xml",
         headers: credentials(user)
       assert_response :success
       renew_issue(sla_cache_id)      
@@ -556,7 +546,7 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
       assert_response :success
       renew_issue(sla_cache_id)
       sla_cache_id = SlaCache.find_by(project: 2).id # project-sla-tests-std
-      delete "/projects/project-sla-tests-std/slas/#{sla_cache_id}.xml",
+      delete "/projects/project-sla-tests-std/sla/caches/#{sla_cache_id}.xml",
         headers: credentials(user)
       assert_response :success
       renew_issue(sla_cache_id)      

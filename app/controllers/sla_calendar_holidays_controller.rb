@@ -24,8 +24,8 @@ class SlaCalendarHolidaysController < ApplicationController
   before_action :require_admin
   before_action :authorize_global
 
-  before_action :find_sla_calendar_holiday, only: [:show, :edit, :update]
-  before_action :find_sla_calendar_holidays, only: [:context_menu, :destroy]
+  before_action :find_sla_calendar_holiday, only: [ :show, :edit, :update ]
+  before_action :find_sla_calendar_holidays, only: [ :destroy, :context_menu ]
 
   helper :sla_calendar_holidays
   helper :context_menus
@@ -42,21 +42,17 @@ class SlaCalendarHolidaysController < ApplicationController
     @entity_pages = Paginator.new @entity_count, per_page_option, params['page']
     @entities = @query.sla_calendar_holidays(offset: @entity_pages.offset, limit: @entity_pages.per_page) 
     respond_to do |format|
-      format.html do
-      end
-      format.api do
-        @offset, @limit = api_offset_and_limit
-      end
+      format.html do end
+      format.api do @offset, @limit = api_offset_and_limit end
     end    
   end
 
-  def show
-    respond_to do |format|
-      format.html do
-        end
-      format.api
-    end
-  end
+  # def show
+  #   respond_to do |format|
+  #     format.html
+  #     format.api
+  #   end
+  # end
 
   def new
     @sla_calendar_holiday = SlaCalendarHoliday.new
@@ -74,15 +70,13 @@ class SlaCalendarHolidaysController < ApplicationController
         end
         format.api do
           render :action => 'show', :status => :created,
-          :location => sla_calendar_holiday_url(@sla_calendar_holiday)
+            :location => sla_calendar_holiday_url(@sla_calendar_holiday)
         end
       end
     else
       respond_to do |format|
-        format.html do
-          render :action => 'new'
-        end
-        format.api {render_validation_errors(@sla_calendar_holiday)}
+        format.html { render :action => 'new' }
+        format.api { render_validation_errors(@sla_calendar_holiday) }
       end
     end
 
@@ -91,17 +85,17 @@ class SlaCalendarHolidaysController < ApplicationController
   def update
     @sla_calendar_holiday.safe_attributes = params[:sla_calendar_holiday]
     if @sla_calendar_holiday.save
-      flash[:notice] = l(:notice_successful_update)
       respond_to do |format|
         format.html do
+          flash[:notice] = l(:notice_successful_update)
           redirect_back_or_default sla_calendar_holidays_path
         end
-        format.api  {render_api_ok}
+        format.api { render_api_ok }
       end
     else
       respond_to do |format|
-        format.html {render :action => 'edit'}
-        format.api  {render_validation_errors(@sla_calendar_holiday)}
+        format.html { render :action => 'edit' }
+        format.api { render_validation_errors(@sla_calendar_holiday) }
       end
     end
   end
@@ -118,7 +112,7 @@ class SlaCalendarHolidaysController < ApplicationController
         flash[:notice] = l(:notice_successful_delete)
         redirect_back_or_default sla_calendar_holidays_path
       end
-      format.api {render_api_ok}
+      format.api { render_api_ok }
     end        
   end
 
