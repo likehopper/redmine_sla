@@ -31,10 +31,6 @@ class SlaTest < ActiveSupport::TestCase
     User.current = nil
   end
 
-  test "the truth" do
-    assert true
-  end
-
   test "Just initialize" do
     sla = Sla.new
     assert_nil sla.name

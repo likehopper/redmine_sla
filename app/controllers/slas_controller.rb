@@ -25,11 +25,10 @@ class SlasController < ApplicationController
   
   # It's mandatory to be an administrator to view and manage SLA
   before_action :require_admin
-  # It's not required at the moment
-  # before_action :authorize_global
+  before_action :authorize_global
 
-  before_action :find_sla, only: [:show, :edit, :update]
-  before_action :find_slas, only: [:context_menu, :destroy]
+  before_action :find_sla, only: [ :show, :edit, :update ]
+  before_action :find_slas, only: [ :destroy, :context_menu ]
 
   helper :slas
   helper :context_menus
@@ -50,14 +49,14 @@ class SlasController < ApplicationController
     end
   end
 
-  def show
-    respond_to do |format|
-      format.html do
-      end
-      format.api do
-      end
-    end
-  end  
+  # def show
+  #   respond_to do |format|
+  #     format.html do
+  #     end
+  #     format.api do
+  #     end
+  #   end
+  # end  
 
   def new
     @sla = Sla.new
@@ -77,15 +76,13 @@ class SlasController < ApplicationController
         end
         format.api do
           render :action => 'show', :status => :created,
-          :location => sla_url(@sla)
+            :location => sla_url(@sla)
         end
       end
     else
       respond_to do |format|
-        format.html do
-          render :action => 'new'
-        end
-        format.api {render_validation_errors(@sla)}
+        format.html { render :action => 'new' }
+        format.api { render_validation_errors(@sla) }
       end
     end
 
@@ -101,12 +98,12 @@ class SlasController < ApplicationController
           )
           redirect_back_or_default slas_path
         end
-        format.api  {render_api_ok}
+        format.api { render_api_ok }
       end
     else
       respond_to do |format|
-        format.html {render :action => 'edit'}
-        format.api  {render_validation_errors(@sla)}
+        format.html { render :action => 'edit' }
+        format.api { render_validation_errors(@sla) }
       end
     end
   end
@@ -124,7 +121,7 @@ class SlasController < ApplicationController
         flash[:notice] = l(:notice_successful_delete)
         redirect_back_or_default slas_path
       end
-      format.api {render_api_ok}
+      format.api { render_api_ok }
     end
   end
 
@@ -159,6 +156,8 @@ class SlasController < ApplicationController
 
   def find_sla
     @sla = Sla.find(params[:id])
+    raise Unauthorized unless @sla.visible?
+    raise ActiveRecord::RecordNotFound if @sla.nil?
   rescue ActiveRecord::RecordNotFound
     render_404
   end
@@ -167,8 +166,8 @@ class SlasController < ApplicationController
     params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]] 
     @slas = Sla.find(params[:ids])
     @sla = @slas.first if @slas.count == 1
-    raise ActiveRecord::RecordNotFound if @slas.empty?
     raise Unauthorized unless @slas.all?(&:visible?)
+    raise ActiveRecord::RecordNotFound if @slas.empty?
   rescue ActiveRecord::RecordNotFound
     render_404
   end

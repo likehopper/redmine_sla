@@ -20,13 +20,13 @@ module RedmineSla
   module Patches
     # Project's configuration
     module ProjectsHelperPatch
-      # Overload project's configuration tabs                                                                                                                                                                                  
+      # Overload project's configuration tabs
       def project_settings_tabs
         tabs = super
         # Permissions check
         if User.current.allowed_to?(:manage_sla, @project)
           # Create new tab for project's configuration
-          tabs << { name: 'slas',
+          tabs << { name: 'sla',
                     action: :manage_sla,
                     partial: 'sla_project_trackers/show',
                     label: :sla_label_project_settings }

@@ -16,6 +16,36 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-module SlaProjectTrackersHelper   
+module SlaProjectTrackersHelper
+
+  def _sla_project_trackers_path(project=nil, *args)
+    #options = args.extract_options!
+    Rails.logger.debug "Arguments: back_url = #{back_url}"
+    #Rails.logger.debug "Arguments: options = #{options.inspect}"
+    if project
+    #  if options.empty? && options[:tab].nil?
+        Rails.logger.debug "Arguments: project_sla_project_trackers_path"
+        project_sla_project_trackers_path(project, *args)
+    #  else
+    #    Rails.logger.debug "Arguments: settings_project_path"
+    #    settings_project_path(project, *args)
+    #  end
+    else
+      Rails.logger.debug "Arguments: sla_project_trackers_path"
+      sla_project_trackers_path(*args)
+    end
+  end
+
+  def _sla_project_tracker_path(project=nil, *args)
+    project.nil? ? sla_project_tracker_path(*args) : project_sla_project_tracker_path(project, *args)
+  end
+
+  def _new_sla_project_tracker_path(project=nil, *args)
+    project.nil? ? new_sla_project_tracker_path(*args) : new_project_sla_project_tracker_path(project, *args)
+  end
+
+  def _edit_sla_project_tracker_path(project=nil, *args)
+    project.nil? ? edit_sla_project_tracker_path(*args) : edit_project_sla_project_tracker_path(project, *args)
+  end
 
 end

@@ -3,10 +3,17 @@
   <%= link_to l('sla_label.sla_project_tracker.new'), new_project_sla_project_tracker_path(@project), class: 'icon icon-add' %>
 </div>
 <h3><%= l('sla_label.sla_project_tracker.plural') %></h3>
-<% if @sla_project_trackers %>
+<% if @sla_project_trackers.count > 0 %>
+  <%= form_tag({}, data: {cm_url: context_menu_sla_project_trackers_path}) do %>
+  <%= hidden_field_tag 'project_id', @project, id: nil %>
+  <%= hidden_field_tag 'back_url', settings_project_path(@project,tab: :sla), id: nil %>
   <table class="list">
     <thead>
       <tr>
+        <th class="checkbox hide-when-print">
+          <%= check_box_tag 'check_all', '', false, class: 'toggle-selection',
+          title: "#{l(:button_check_all)}/#{l(:button_uncheck_all)}" -%>
+        </th>
         <th><%= l(:label_tracker) %></th>
         <th><%= l(:field_sla) %></th>
         <th></th>
@@ -14,17 +21,18 @@
     </thead>
     <tbody>
       <% @sla_project_trackers.each do |sla_project_tracker| %>
-        <tr class="sla-project-tracker <%= cycle 'odd', 'even' %>">
+        <tr class="sla-project-tracker <%= cycle 'odd', 'even' %> hascontextmenu">
+          <td class="checkbox hide-when-print"><%= check_box_tag('ids[]', sla_project_tracker.id, false, id: nil) %></td>
           <td class="tracker"><%= sla_project_tracker.tracker.name  %></td>
           <td class="sla"><%= sla_project_tracker.sla.name  %></td>
           <td class="buttons">
             <% if User.current.admin? || User.current.allowed_to?(:manage_sla, @project) %>
               <%= link_to l(:button_edit),
-                          edit_project_sla_project_tracker_path(@project, sla_project_tracker.id),
+                          edit_project_sla_project_tracker_path(@project, sla_project_tracker),
                           title: l(:button_edit),
                           class: 'icon-only icon-edit' %>
               <%= link_to l(:button_delete),
-                          project_sla_project_tracker_path(@project, sla_project_tracker.id),
+                          project_sla_project_tracker_path(@project, sla_project_tracker, tab: :sla),
                           data: {confirm: l(:text_are_you_sure)},
                           method: :delete,
                           title: l(:button_delete),
@@ -35,6 +43,8 @@
       <% end %>
     </tbody>
   </table>
+  <% end %>
+  <%= context_menu %>
 <% else %>
   <p class="nodata"><%= l(:label_no_data) %></p>
 <% end %>

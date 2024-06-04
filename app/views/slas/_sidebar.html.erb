@@ -1,4 +1,5 @@
 <% if User.current.admin? %>
+<% content_for :sidebar do %>
   <h3><%= l(:sla_label_global_settings) %></h3>
   <ul>
     <%= 
@@ -42,6 +43,11 @@
       class: 'icon icon-sla_level_term'))
   %>
   <%= 
+  content_tag(:li, link_to(l('sla_label.sla_project_tracker.plural'), sla_project_trackers_path,
+    title: l(:sla_label_global_settings)+" : "+l('sla_label.sla_project_tracker.plural'),
+    class: 'icon icon-sla_project_tracker'))
+  %>
+  <%= 
   content_tag(:li, link_to(l('sla_label.sla_cache.plural'), sla_caches_path,
     title: l(:sla_label_global_settings)+" : "+l('sla_label.sla_cache.plural'),
     class: 'icon icon-sla_cache'))
@@ -54,4 +60,5 @@
   </ul>
   <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
   <span class="redmine_sla_footer"><a href="https://www.flaticon.com/authors/freepik" title="icons">Icons created by Freepik - Flaticon</a></span>
+<% end %>
 <% end %>

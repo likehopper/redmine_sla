@@ -26,7 +26,7 @@ class SlaLevelsController < ApplicationController
   before_action :authorize_global
 
   before_action :find_sla_level, only: [:show, :edit, :update, :nested]
-  before_action :find_sla_levels, only: [:context_menu, :destroy]
+  before_action :find_sla_levels, only: [ :destroy, :context_menu ]
 
   helper :sla_levels
   helper :context_menus
@@ -51,13 +51,13 @@ class SlaLevelsController < ApplicationController
     end    
   end
 
-  def show
-    respond_to do |format|
-      format.html do
-        end
-      format.api
-    end
-  end
+  # def show
+  #   respond_to do |format|
+  #     format.html do
+  #       end
+  #     format.api
+  #   end
+  # end
 
   def new
     @sla_level = SlaLevel.new
@@ -74,17 +74,14 @@ class SlaLevelsController < ApplicationController
           redirect_back_or_default sla_levels_path
         end
         format.api do
-          # TODO : not necessary ?
           render :action => 'show', :status => :created,
-          :location => sla_level_url(@sla_level)
+            :location => sla_level_url(@sla_level)
         end
       end
     else
       respond_to do |format|
-        format.html do
-          render :action => 'new'
-        end
-        format.api {render_validation_errors(@sla_level)}
+        format.html { render :action => 'new' }
+        format.api { render_validation_errors(@sla_level) }
       end
     end
   end
@@ -98,10 +95,12 @@ class SlaLevelsController < ApplicationController
       flash[:warning] = l('sla_label.sla_level.purge')
     end    
     if @sla_level.save
-      flash[:notice] = l(:notice_successful_update)
       respond_to do |format|
-        format.html {redirect_back_or_default sla_levels_path}
-        format.api  {render_api_ok}
+        format.html do 
+          flash[:notice] = l(:notice_successful_update)
+          redirect_back_or_default sla_levels_path
+        end
+        format.api { render_api_ok }
       end
     else
       respond_to do |format|
@@ -112,7 +111,7 @@ class SlaLevelsController < ApplicationController
             render :action => 'nested'
           end
         end 
-        format.api  {render_validation_errors(@sla_level)}
+        format.api { render_validation_errors(@sla_level) }
       end
     end
   end
@@ -136,7 +135,7 @@ class SlaLevelsController < ApplicationController
         flash[:notice] = l(:notice_successful_delete)
         redirect_back_or_default sla_levels_path
       end
-      format.api {render_api_ok}
+      format.api { render_api_ok }
     end
   end
 

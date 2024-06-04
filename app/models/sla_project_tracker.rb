@@ -33,7 +33,7 @@ class SlaProjectTracker < ActiveRecord::Base
 
   include Redmine::SafeAttributes
 
-  default_scope { joins(:tracker).order("trackers.name ASC") }  
+  default_scope { joins(:tracker) }  
 
   validates_presence_of :project
   validates_presence_of :tracker
@@ -49,16 +49,45 @@ class SlaProjectTracker < ActiveRecord::Base
 
   safe_attributes *%w[project_id tracker_id sla_id]
 
-  scope :visible, lambda {|*args|
-    user = args.shift || User.current
-    base = Project.allowed_to_condition(user, :view_sla, *args)
-    eager_load(:project)
-  }
+  # scope :visible, lambda {|*args|
+  #   user = args.shift || User.current
+  #   base = Project.allowed_to_condition(user, :manage_sla, *args)
+  #   eager_load(:project)
+  # }
+
+  default_scope { joins(:sla,:tracker,:project) }
 
   # define a scope to search by project
   scope :in_project, ->(project_id) { where(project_id: project_id) }
-  scope :for_tracker_id, lambda { |tracker_id| where(:tracker_id => tracker_id) }  
-  scope :for_sla_id, lambda { |sla_id| where(:sla_id => sla_id) }  
+  # scope :for_tracker_id, lambda { |tracker_id| where(:tracker_id => tracker_id) }  
+  # scope :for_sla_id, lambda { |sla_id| where(:sla_id => sla_id) }  
+
+  scope :visible, ->(*args) { where(SlaProjectTracker.visible_condition(args.shift || User.current, *args)) }
+
+  # Selection limitations for users based on access issues
+  def self.visible_condition(user=User.current, options = {})
+    Project.allowed_to_condition(user,:manage_sla,options)
+  end
+
+  # For index and refresh
+  def visible?(user=User.current)
+    !user.nil? && user.allowed_to?(:manage_sla, project)
+  end
+
+  # For index and show
+  def visible?(user=User.current)
+    user.allowed_to?(:manage_sla, nil, global: true)
+  end
+
+  # For create and update
+  def editable?(user=User.current)
+    user.allowed_to?(:manage_sla, nil, global: true)
+  end
+
+  # For destroy
+  def deletable?(user=User.current)
+    user.allowed_to?(:manage_sla, nil, global: true)
+  end
 
 private
 

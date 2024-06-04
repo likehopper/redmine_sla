@@ -1,4 +1,4 @@
-    api.sla_type do
-      api.id @sla_type.id
-      api.name @sla_type.name
-    end
+api.sla_type do
+  api.id @sla_type.id
+  api.name @sla_type.name
+end

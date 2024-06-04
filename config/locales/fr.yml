@@ -315,11 +315,13 @@ fr:
     sla_project_tracker:
       singular: Tracker de projet de SLA
       plural: Trackers de projet de SLA
+      index: Lister les Trackers de projet de SLA
       new: Ajouter un Tracker de projet de SLA
       edit: Editer un Tracker de projet de SLA
       delete: Supprimer un Tracker de projet de SLA
       save: Enregistrer un Tracker de projet de SLA
       exists: Ce tracker existe déjà
+      miss_project: Aucun projet disponible
 
     # SlaCache
     sla_cache:

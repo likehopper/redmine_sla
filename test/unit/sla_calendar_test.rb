@@ -20,10 +20,6 @@ require File.expand_path('../../test_helper', __FILE__)
 
 class SlaCalendarTest < ActiveSupport::TestCase
 
-  test "the truth" do
-    assert true
-  end
-
   test "Just initialize" do
     sla_calendar = SlaCalendar.new
     assert_nil sla_calendar.name

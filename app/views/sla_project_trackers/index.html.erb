@@ -1,0 +1,23 @@
+<% html_title(l(:sla_label_global_settings)) %>
+<div class="content"> 
+  <div class="contextual">
+    <%= link_to l('sla_label.sla_project_tracker.new'), _new_sla_project_tracker_path(@project), class: 'icon icon-add' if User.current.allowed_to?(:manage_sla, nil, global: true) %>
+  </div>
+  <div class="title-sla-settings title-sla_project_tracker">
+    <%= title l('sla_label.sla_project_tracker.index') %>
+  </div>
+  <%= form_tag(_sla_project_trackers_path(@project), method: :get, id: 'query_form') do %>
+    <%= render partial: 'queries/query_form' %>
+  <% end %>
+  <% if @query.valid? %>
+    <% if @entities.empty? %>
+      <p class="nodata"><%= l(:label_no_data) %></p>
+    <% else %>
+      <%= render_query_totals(@query) %>
+      <%= render partial: 'list', locals: { entities: @entities }%>
+      <span class="pagination"><%= pagination_links_full @entity_pages, @entity_count %></span>
+    <% end %>
+  <% end %>
+</div>
+<%= render partial: 'slas/sidebar' if @project.nil? -%>
+<% Rails.logger.debug "Arguments: @project = #{@project}" %>
