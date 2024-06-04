@@ -20,10 +20,6 @@ require File.expand_path('../../test_helper', __FILE__)
 
 class SlaTypeTest < ActiveSupport::TestCase
 
-  test "the truth" do
-    assert true
-  end
-
   test "should not save SlaType without name" do
     sla_type = SlaType.new
     assert_not sla_type.save, "Saved the SlaType without name"

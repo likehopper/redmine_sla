@@ -19,9 +19,25 @@
 module ObjectHelpers
 
   # Generates an unsaved Sla
+  def Tracker.generate(attributes={})
+    tracker = Tracker.new()
+    tracker.name = attributes.key?(:name) ? attributes[:name] : "Tracker #{Time.now.strftime("%Y-%m-%d %H:%M:%S")} #{rand(10..99)}"
+    tracker.default_status_id = IssueStatus.find_by(name: 'New').id
+    yield tracker if block_given?
+    tracker
+  end
+
+  # Generates a saved Sla
+  def Tracker.generate!(attributes={}, &block)
+    tracker = Tracker.generate(attributes, &block)
+    tracker.save!
+    tracker.reload
+  end
+
+  # Generates an unsaved Sla
   def Sla.generate(attributes={})
     sla = Sla.new()
-    sla.name = "Generated SLA #{rand}" if sla.name.blank?
+    sla.name = attributes.key?(:name) ? attributes[:name] : "Sla #{Time.now.strftime("%Y-%m-%d %H:%M:%S")} #{rand(10..99)}"
     yield sla if block_given?
     sla
   end
@@ -64,10 +80,27 @@ module ObjectHelpers
     sla_status.reload
   end
 
+  # Generates an unsaved SlaProjectTracker
+  def SlaProjectTracker.generate(attributes={})
+    sla_project_tracker = SlaProjectTracker.new()
+    sla_project_tracker.project_id = attributes.key?(:project_id) ? attributes[:project_id].to_i : 1
+    sla_project_tracker.tracker_id = attributes.key?(:tracker_id) ? attributes[:tracker_id].to_i : Tracker.generate!.id
+    sla_project_tracker.sla_id = attributes.key?(:sla_id) ? attributes[:sla_id].to_i : Sla.generate!.id
+    yield sla_project_tracker if block_given?
+    sla_project_tracker
+  end
+
+  # Generates a saved SlaProjectTracker
+  def SlaProjectTracker.generate!(attributes={}, &block)
+    sla_project_tracker = SlaProjectTracker.generate(attributes, &block)
+    sla_project_tracker.save!
+    sla_project_tracker.reload
+  end
+
   # Generates an unsaved SlaCalendar
   def SlaCalendar.generate(attributes={})
     sla_calendar = SlaCalendar.new()
-    sla_calendar.name = "Generated SLA Calendar #{rand}" if sla_calendar.name.blank?
+    sla_calendar.name = attributes.key?(:name) ? attributes[:name] : "SlaCalendar #{Time.now.strftime("%Y-%m-%d %H:%M:%S")} #{rand(10..99)}"
     yield sla_calendar if block_given?
     sla_calendar
   end

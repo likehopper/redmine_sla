@@ -1,0 +1,15 @@
+<ul>
+  <% if @sla_project_tracker_ids.count == 1 %>
+  <% Rails.logger.debug "Arguments: context_menu @project = #{@project}" %> 
+    <% if @project.nil? %> 
+    <li><%= context_menu_link l(:button_show), settings_project_path(@sla_project_tracker.project,tab: :sla, back_url: @back), class: 'icon icon-magnifier', disabled: !@can[:show] -%></li>
+    <% end %>
+    <li><%= context_menu_link l(:button_edit), _edit_sla_project_tracker_path(@project,@sla_project_tracker, back_url: @back), class: 'icon icon-edit', disabled: !@can[:edit] -%></li>
+  <% end %>
+  <li><%= context_menu_link l(:button_delete),
+            sla_project_trackers_path(ids: @sla_project_tracker_ids, back_url: @back),
+            method: :delete, class: 'icon icon-del', disabled: !@can[:delete],
+            data: { confirm: l('sla_label.sla_project_tracker.count',count: @sla_project_tracker_ids.count)+"\n"+l(:text_are_you_sure) }
+  -%></li>
+  <%= call_hook(:view_sla_project_trackers_context_menu_end, { sla_project_tracker: @sla_project_tracker, sla_project_trackers: @sla_project_trackers, can: @can, back: @back }) -%>
+</ul>

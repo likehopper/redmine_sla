@@ -81,21 +81,9 @@ class SlaCachesController < ApplicationController
 
   def show
     respond_to do |format|
-      format.html do
-        redirect_back_or_default sla_caches_path        
-      end
-      format.api do
-        @sla_cache_spents = @sla_cache.sla_cache_spents.to_a
-      end
+      format.html { redirect_back_or_default sla_caches_path }
+      format.api { @sla_cache_spents = @sla_cache.sla_cache_spents.to_a }
     end
-  end
-
-  def new
-    raise Unauthorized
-  end
-
-  def edit
-    raise Unauthorized
   end
 
   def refresh
@@ -111,7 +99,7 @@ class SlaCachesController < ApplicationController
         flash[:notice] = l(:notice_successful_refresh)
         redirect_to_referer_or ( @project.nil? ? sla_caches_path : project_sla_caches_path(@project) )
       end
-      format.api {render_api_ok}
+      format.api { render_api_ok }
     end    
   end
 
@@ -121,8 +109,8 @@ class SlaCachesController < ApplicationController
       format.html do
         flash[:notice] = l(:notice_successful_purge)
         redirect_to_referer_or ( @project.nil? ? sla_caches_path : project_sla_caches_path(@project) )
-        end
-      format.api {render_api_ok}
+      end
+      format.api { render_api_ok }
     end    
   end
 
@@ -138,7 +126,7 @@ class SlaCachesController < ApplicationController
         flash[:notice] = l(:notice_successful_delete)
         redirect_to_referer_or ( @project.nil? ? sla_caches_path : project_sla_caches_path(@project) )
       end
-      format.api {render_api_ok}
+      format.api { render_api_ok }
     end
   end
 
@@ -173,17 +161,18 @@ private
 
   def find_sla_cache
     @sla_cache = SlaCache.find(params[:id])
+    raise Unauthorized unless @sla_cache.visible?
+    raise ActiveRecord::RecordNotFound if @sla_cache.nil?
   rescue ActiveRecord::RecordNotFound
     render_404
   end
 
   def find_sla_caches
-    Rails.logger.debug "==>> sla_caches params[:ids] = #{params[:ids]}"
     params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]] 
-    @sla_caches = SlaCache.find(params[:ids])
+    @sla_caches = SlaCache.find(params[:ids]).to_a
     @sla_cache = @sla_caches.first if @sla_caches.count == 1
-    raise ActiveRecord::RecordNotFound if @sla_caches.empty?
     raise Unauthorized unless @sla_caches.all?(&:visible?)
+    raise ActiveRecord::RecordNotFound if @sla_caches.empty?
   rescue ActiveRecord::RecordNotFound
     render_404
   end

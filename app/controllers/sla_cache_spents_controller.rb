@@ -79,21 +79,9 @@ class SlaCacheSpentsController < ApplicationController
 
   def show
     respond_to do |format|
-      format.html do
-        redirect_back_or_default sla_cache_spents_path
-      end      
-      format.api do
-        @sla_cache_spent.reload.refresh
-      end
+      format.html { redirect_back_or_default sla_cache_spents_path }
+      format.api { @sla_cache_spent.reload.refresh }
     end
-  end
-
-  def new
-    raise Unauthorized
-  end
-
-  def edit
-    raise Unauthorized
   end
 
   def refresh
@@ -107,8 +95,8 @@ class SlaCacheSpentsController < ApplicationController
       format.html do
         flash[:notice] = l(:notice_successful_refresh)
         redirect_back_or_default sla_cache_spents_path
-        end
-      format.api {render_api_ok}
+      end
+      format.api { render_api_ok }
     end    
   end
 
@@ -118,8 +106,8 @@ class SlaCacheSpentsController < ApplicationController
       format.html do
         flash[:notice] = l(:notice_successful_purge)
         redirect_back_or_default sla_cache_spents_path
-        end
-      format.api {render_api_ok}
+      end
+      format.api { render_api_ok }
     end    
   end
   
@@ -135,7 +123,7 @@ class SlaCacheSpentsController < ApplicationController
         flash[:notice] = l(:notice_successful_delete)
         redirect_back_or_default sla_cache_spents_path
       end
-      format.api {render_api_ok}
+      format.api { render_api_ok }
     end
   end
 
@@ -169,16 +157,18 @@ private
 
   def find_sla_cache_spent
     @sla_cache_spent = SlaCacheSpent.find(params[:id])
+    raise Unauthorized unless @sla_cache_spent.visible?
+    raise ActiveRecord::RecordNotFound if @sla_cache_spent.nil?
   rescue ActiveRecord::RecordNotFound
     render_404
   end
 
   def find_sla_cache_spents
     params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]] 
-    @sla_cache_spents = SlaCacheSpent.find(params[:ids])
+    @sla_cache_spents = SlaCacheSpent.find(params[:ids]).to_a
     @sla_cache_spent = @sla_cache_spents.first if @sla_cache_spents.count == 1
-    raise ActiveRecord::RecordNotFound if @sla_cache_spents.empty?
     raise Unauthorized unless @sla_cache_spents.all?(&:visible?)
+    raise ActiveRecord::RecordNotFound if @sla_cache_spents.empty?
   rescue ActiveRecord::RecordNotFound
     render_404
   end
@@ -200,7 +190,7 @@ private
       params[:query_id] = default_query.id
     end
   end  
-
+    
   # Returns the SlaCache scope for index and report actions
   def sla_cache_spent_scope(options={})
     @query.results_scope(options)

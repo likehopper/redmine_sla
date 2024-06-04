@@ -18,7 +18,7 @@
 
 module SlaCachesHelper
 
-  def _sla_caches_path(project, issue, *args)
+  def _sla_caches_path(project, *args)
     if project
       project_sla_caches_path(project, *args)
     else

@@ -315,11 +315,13 @@ en:
     sla_project_tracker:
       plural: SLA projects' trackers
       singular: SLA project's trackers
+      index: List SLA project's trackers
       new: New SLA project's trackers
       edit: Edit SLA project's trackers
       save: Save SLA project's trackers
       delete: Delete SLA project's trackers
       exists: This tracker alredy exists
+      miss_project: No projects available
 
     # SlaCache
     sla_cache:

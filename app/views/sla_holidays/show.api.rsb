@@ -1,5 +1,5 @@
-    api.sla_holiday do
-      api.id @sla_holiday.id
-      api.name @sla_holiday.name
-      api.date @sla_holiday.date
-    end
+api.sla_holiday do
+  api.id @sla_holiday.id
+  api.name @sla_holiday.name
+  api.date @sla_holiday.date
+end

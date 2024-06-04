@@ -8,6 +8,4 @@
   </div>  
   <%= render partial: 'form', locals: { sla_calendar_holiday: @sla_calendar_holiday } %>
 </div>
-<% content_for :sidebar do %>
-  <%= render partial: 'slas/sidebar' %>
-<% end %>
+<%= render partial: 'slas/sidebar' -%>

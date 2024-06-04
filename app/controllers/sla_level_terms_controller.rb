@@ -25,8 +25,8 @@ class SlaLevelTermsController < ApplicationController
   before_action :require_admin
   before_action :authorize_global
 
-  before_action :find_sla_level_term, only: [:show, :edit, :update]
-  before_action :find_sla_level_terms, only: [:context_menu, :destroy]
+  before_action :find_sla_level_term, only: [ :show, :edit, :update ]
+  before_action :find_sla_level_terms, only: [ :destroy, :context_menu ]
 
   helper :sla_level_terms
   helper :context_menus
@@ -54,13 +54,13 @@ class SlaLevelTermsController < ApplicationController
     end    
   end
 
-  def show
-    respond_to do |format|
-      format.html do
-        end
-      format.api
-    end
-  end  
+  # def show
+  #   respond_to do |format|
+  #     format.html do
+  #       end
+  #     format.api
+  #   end
+  # end  
 
   def new
     raise Unauthorized
@@ -81,15 +81,13 @@ class SlaLevelTermsController < ApplicationController
         end
         format.api do
           render :action => 'show', :status => :created,
-          :location => sla_level_term_url(@sla_level_term)
+            :location => sla_level_term_url(@sla_level_term)
         end
       end
     else
       respond_to do |format|
-        format.html do
-          render :action => 'new'
-        end
-        format.api {render_validation_errors(@sla_level_term)}
+        format.html { render :action => 'new' }
+        format.api { render_validation_errors(@sla_level_term) }
       end
     end
   end
@@ -97,17 +95,17 @@ class SlaLevelTermsController < ApplicationController
   def update
     @sla_level_term.safe_attributes = params[:sla_level_term]
     if @sla_level_term.save
-      flash[:notice] = l(:notice_successful_update)
       respond_to do |format|
         format.html do
+          flash[:notice] = l(:notice_successful_update)
           redirect_back_or_default sla_level_terms_path
         end
-        format.api  {render_api_ok}
+        format.api { render_api_ok }
       end
     else
       respond_to do |format|
-        format.html {render :action => 'edit'}
-        format.api  {render_validation_errors(@sla_level_term)}
+        format.html { render :action => 'edit' }
+        format.api { render_validation_errors(@sla_level_term) }
       end
     end
   end
@@ -124,7 +122,7 @@ class SlaLevelTermsController < ApplicationController
         flash[:notice] = l(:notice_successful_delete)
         redirect_back_or_default sla_level_terms_path
       end
-      format.api {render_api_ok}
+      format.api { render_api_ok }
     end       
   end
  

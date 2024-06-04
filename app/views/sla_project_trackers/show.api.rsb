@@ -1,0 +1,6 @@
+api.sla_project_tracker do
+  api.id @sla_project_tracker.id
+  api.project @sla_project_tracker.project
+  api.tracker @sla_project_tracker.tracker
+  api.sla @sla_project_tracker.sla
+end
