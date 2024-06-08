@@ -82,7 +82,7 @@ class SlaCachesController < ApplicationController
   def show
     respond_to do |format|
       format.html { redirect_back_or_default sla_caches_path }
-      format.api { @sla_cache_spents = @sla_cache.sla_cache_spents.to_a }
+      format.api { }
     end
   end
 

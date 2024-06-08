@@ -90,7 +90,7 @@ class SlaLevelTerm < ActiveRecord::Base
     return result if result.nil?
     sla_level_id, custom_field_id = result.values_at(:id, :custom_field_id) 
     sla_priority_id = SlaPriority.create_by_issue(issue)
-    self.find_by( sla_level_id: sla_level_id, sla_type_id: sla_type_id, sla_priority_id: sla_priority_id.id.to_s ) if ! sla_priority_id.nil?
+    self.find_by( sla_level_id: sla_level_id, sla_type_id: sla_type_id, sla_priority_id: sla_priority_id.id ) if ! sla_priority_id.nil?
   end
 
 end

@@ -301,7 +301,7 @@ class Queries::SlaCacheQuery < Query
   def base_scope
     # self.queried_class.visible.where(statement)
     self.queried_class.visible.
-      joins(:project).
+    joins(:project,:issue).
       where(statement)
   end
 
@@ -312,6 +312,17 @@ class Queries::SlaCacheQuery < Query
     base_scope.
       order(order_option).
       joins(joins_for_order_statement(order_option.join(',')))
+  end
+
+  def sql_for_sla_level_id_field(field, operator, value)
+    sql_for_field("sla_level_id", operator, value, SlaCache.table_name, "sla_level_id")
+  end  
+
+  def sql_for_issue_id_field(field, operator, value)
+    self.class.queried_class = Issue
+    sql_for_field("issue_id", operator, value, Issue.table_name, "id")
+  ensure
+    self.class.queried_class = SlaCache
   end
 
   def sql_for_issue_tracker_id_field(field, operator, value)
@@ -344,7 +355,6 @@ class Queries::SlaCacheQuery < Query
   end
 
 
-  # TODO: not yes in use
   def all_sla_level_values
     return @all_sla_level_values if @all_sla_level_values
 
