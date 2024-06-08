@@ -63,7 +63,7 @@ class SlaCacheSpentsController < ApplicationController
       format.api do
         @entity_count = scope.count
         @offset, @limit = api_offset_and_limit
-        @entities = scope.offset(@offset).limit(@limit).preload(:sla_cache_spents => :sla_cache_spent).to_a
+        @entities = scope.offset(@offset).limit(@limit).to_a
       end
       format.atom do
         entities = scope.limit(Setting.feeds_limit.to_i).reorder("#{SlaCacheSpent.table_name}.updated_on DESC").to_a
@@ -75,6 +75,8 @@ class SlaCacheSpentsController < ApplicationController
         send_data(query_to_csv(@entities, @query, params), :type => 'text/csv; header=present', :filename => "#{filename_for_export(@query, 'timelog')}.csv")
       end    
     end      
+  rescue ActiveRecord::RecordNotFound
+    render_404
   end
 
   def show
@@ -89,6 +91,7 @@ class SlaCacheSpentsController < ApplicationController
       begin
         sla_cache_spent.reload.refresh
       rescue ::ActiveRecord::RecordNotFound
+        error = l(:label_sla_msgerror)
       end
     end  
     respond_to do |format|

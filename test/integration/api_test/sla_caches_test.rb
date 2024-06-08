@@ -33,12 +33,12 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
   test "GET /sla/caches.xml should return sla_caches manage by project" do
     ['admin','manager'].each do |user|
       sla_cache = SlaCache.where(project: 1).order(:id).first # project-sla-tests-tma
-      get "/projects/project-sla-tests-tma/sla/caches.xml?issue.status_id=*&order=id",
+      get "/projects/project-sla-tests-tma/sla/caches.xml?issue.status_id=*&sort=issue",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_xml(sla_cache,issues_in_tma)
       sla_cache = SlaCache.where(project: 2).order(:id).first # project-sla-tests-std
-      get "/projects/project-sla-tests-std/sla/caches.xml?issue.status_id=*&order=id",
+      get "/projects/project-sla-tests-std/sla/caches.xml?issue.status_id=*&order=issue",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_xml(sla_cache,issues_in_std)
@@ -48,22 +48,121 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
   test "GET /sla/caches.xml should return sla_caches full" do
     sla_cache = SlaCache.order(:id).first
     ['admin','manager'].each do |user|
-      get "/sla/caches.xml?issue.status_id=*&sort=id",
+      get "/sla/caches.xml?issue.status_id=*&sort=issue",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_xml(sla_cache,issues_for_dev+issues_for_sys)  
     end
   end
 
+  test "GET /sla/caches.xml should return sla_caches start_date first" do
+    sla_cache = SlaCache.where("sla_caches.start_date BETWEEN '2021-01-01' AND '2021-12-31'").order(:id).first
+    sla_cache_count = SlaCache.where("sla_caches.start_date BETWEEN '2021-01-01' AND '2021-12-31'").count
+    uri = URI("/sla/caches.xml")
+    uri.query = URI.encode_www_form("issue.status_id"=>"*", "start_date"=>"><2021-01-01|2021-12-31")
+    # uri = URI.encode("/sla/caches.xml?issue.status_id=*&start_date=><2021-01-01|2021-12-31")
+    ['admin','manager'].each do |user|
+      get uri.to_s,
+        headers: credentials(user)
+      assert_response :success
+      assert_sla_cache_index_xml(sla_cache,sla_cache_count)  
+    end
+  end
+
+  test "GET /sla/caches.xml should return sla_caches date_start none" do
+    uri = URI("/sla/caches.xml")
+    uri.query = URI.encode_www_form("issue.status_id"=>"*", "start_date"=>"><2022-01-01|2022-12-31")
+    # uri = URI.encode("/sla/caches.xml?issue.status_id=*&start_date=><2022-01-01|2022-12-31")
+    ['admin','manager'].each do |user|
+      get uri.to_s,
+        headers: credentials(user)
+      assert_response :success
+      assert_equal 'application/xml', @response.media_type
+      assert_select 'sla_caches' do
+        assert_select '[total_count=?]', 0
+      end
+    end
+  end  
+
+  test "GET /sla/caches.xml should return sla_caches issue first" do
+    sla_cache = SlaCache.order(:id).first
+    ['admin','manager'].each do |user|
+      get "/sla/caches.xml?issue.status_id=*&issue_id=#{sla_cache.id}",
+        headers: credentials(user)
+      assert_response :success
+      assert_sla_cache_index_xml(sla_cache,1)  
+    end
+  end
+
+  test "GET /sla/caches.xml should return sla_caches issue none" do
+    sla_cache = SlaCache.order(:id).first
+    ['admin','manager'].each do |user|
+      get "/sla/caches.xml?issue_id=#{sla_cache.id}",
+        headers: credentials(user)
+      assert_response :success
+      assert_equal 'application/xml', @response.media_type
+      assert_select 'sla_caches' do
+        assert_select '[total_count=?]', 0
+      end
+    end
+  end
+
+  test "GET /sla/caches.xml should return sla_caches issue.tracker_id first" do
+    sla_cache = SlaCache.where("issues.tracker_id=1").order(:id).first
+    sla_cache_count = SlaCache.where("issues.tracker_id=1").count
+    ['admin','manager'].each do |user|
+      get "/sla/caches.xml?issue.status_id=*&issue.tracker_id=1&sort=issue_id",
+        headers: credentials(user)
+      assert_response :success
+      assert_sla_cache_index_xml(sla_cache,sla_cache_count)  
+    end
+  end
+
+  test "GET /sla/caches.xml should return sla_caches issue.tracker_id none" do
+    ['admin','manager'].each do |user|
+      get "/sla/caches.xml?issue.tracker_id=1",
+        headers: credentials(user)
+      assert_response :success
+      assert_equal 'application/xml', @response.media_type
+      assert_select 'sla_caches' do
+        assert_select '[total_count=?]', 0
+      end
+    end
+  end    
+
+  test "GET /sla/caches.xml should return sla_caches sla_level_id first" do
+    sla_cache = SlaCache.where(sla_level_id: 1).order(:id).first
+    sla_cache_count = SlaCache.order(:id).where(sla_level_id: 1).count
+    ['admin','manager'].each do |user|
+      get "/sla/caches.xml?issue.status_id=*&sla_level_id=#{sla_cache.sla_level_id}",
+        headers: credentials(user)
+      assert_response :success
+      assert_sla_cache_index_xml(sla_cache,sla_cache_count)  
+    end
+  end
+
+  test "GET /sla/caches.xml should return sla_caches sla_level_id none" do
+    sla_cache = SlaCache.where(sla_level_id: 1).first
+    ['admin','manager'].each do |user|
+      get "/sla/caches.xml?sla_level_id=#{sla_cache.sla_level_id}",
+        headers: credentials(user)
+      assert_response :success
+      assert_equal 'application/xml', @response.media_type
+      assert_select 'sla_caches' do
+        assert_select '[total_count=?]', 0
+      end
+    end
+  end 
+
   test "GET /sla/caches.json should return manage by project" do
     ['admin','manager'].each { |user|
       sla_cache = SlaCache.where(project: 1).order(:id).first # project-sla-tests-tma
-      get "/projects/project-sla-tests-tma/sla/caches.json?issue.status_id=*&order=id",
+      get "/projects/project-sla-tests-tma/sla/caches.json?issue.status_id=*&sort=issue",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_json(sla_cache,issues_in_tma)
       sla_cache = SlaCache.where(project: 2).order(:id).first # project-sla-tests-std
-      get "/projects/project-sla-tests-std/sla/caches.json?issue.status_id=*&order=id",
+      get "/projects/project-sla-tests-std/sla/caches.json?issue.status_id=*&sort=issue",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_json(sla_cache,issues_in_std)  
@@ -73,27 +172,27 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
   test "GET /sla/caches.json should return sla_caches full" do
     sla_cache = SlaCache.order(:id).first
     ['admin'].each { |user|
-      get "/sla/caches.json?issue.status_id=*&sort=id",
+      get "/sla/caches.json?issue.status_id=*&sort=issue",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_json(sla_cache,issues_for_dev+issues_for_sys)
     }
     ['manager'].each { |user|
-      get "/sla/caches.json?issue.status_id=*&sort=id",
+      get "/sla/caches.json?issue.status_id=*&sort=issue",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_json(sla_cache,issues_for_dev+issues_for_sys)
     }
     sla_cache = SlaCache.where(project: 1).order(:id).first # project-sla-tests-tma
     ['developer'].each { |user|
-      get "/sla/caches.json?issue.status_id=*&sort=id",
+      get "/sla/caches.json?issue.status_id=*&sort=issue",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_json(sla_cache,issues_for_dev)
     }    
     sla_cache = SlaCache.where(project: 2).order(:id).first # project-sla-tests-tma
     ['sysadmin'].each { |user|
-      get "/sla/caches.json?issue.status_id=*&sort=id",
+      get "/sla/caches.json?issue.status_id=*&sort=issue",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_json(sla_cache,issues_for_sys)
@@ -104,7 +203,7 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
     ['developer'].each do |user|
       # TODO : issue auquel il a accès trier par ordre id asc ???
       sla_cache = SlaCache.where(project: 1).order(:id).first # project-sla-tests-tma
-      get "/projects/project-sla-tests-tma/sla/caches.xml?issue.status_id=*&order=id",
+      get "/projects/project-sla-tests-tma/sla/caches.xml?issue.status_id=*&sort=issue",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_xml(sla_cache,issues_in_tma)
@@ -124,7 +223,7 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
   test "GET /sla/caches.json should return sla_caches partial for developer" do
     ['developer'].each do |user|
       sla_cache = SlaCache.where(project: 1).order(:id).first # project-sla-tests-tma
-      get "/projects/project-sla-tests-tma/sla/caches.json?issue.status_id=*&order=id",
+      get "/projects/project-sla-tests-tma/sla/caches.json?issue.status_id=*&sort=issue",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_json(sla_cache,issues_in_tma)
@@ -144,7 +243,7 @@ class Redmine::ApiTest::SlaCachesTest < Redmine::ApiTest::Base
   test "GET /sla/caches.xml should return sla_caches partial for sysadmin" do
     ['sysadmin'].each do |user|
       sla_cache = SlaCache.order(:id).find_by(project: 2) # project-sla-tests-std
-      get "/projects/project-sla-tests-std/sla/caches.xml?issue.status_id=*&order=id",
+      get "/projects/project-sla-tests-std/sla/caches.xml?issue.status_id=*&sort=issue",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_index_xml(sla_cache,issues_in_std)

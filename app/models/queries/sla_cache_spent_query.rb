@@ -26,6 +26,7 @@ class Queries::SlaCacheSpentQuery < Query
   def initialize_available_filters
     add_available_filter 'project_id', type: :list, :name => :project, values: lambda {project_values}
     add_available_filter 'issue_id', type: :integer, :name => :issue
+    add_available_filter 'sla_level_id', :type => :list, :values => lambda {all_sla_level_values}
     add_available_filter 'sla_type_id', type: :list, values: lambda {all_sla_type_values}
     add_available_filter 'created_on', :type => :date_past if User.current.admin?
     add_available_filter 'updated_on', :type => :date_past
@@ -39,6 +40,7 @@ class Queries::SlaCacheSpentQuery < Query
     @available_columns = []
     @available_columns << QueryColumn.new(:project, :sortable => "#{Project.table_name}.name", :default_order => nil, :groupable => true)
     @available_columns << QueryColumn.new(:issue, :sortable => "#{Issue.table_name}.id", :default_order => :desc, :groupable => true)
+    @available_columns << QueryColumn.new(:sla_level, :sortable => "#{SlaLevel.table_name}.name", :default_order => nil, :groupable => true )
     @available_columns << QueryColumn.new(:sla_type, :sortable => "#{SlaType.table_name}.name", :default_order => nil, :groupable => true )
     @available_columns << QueryColumn.new(:spent, :sortable => "#{SlaCacheSpent.table_name}.spent", :default_order => nil, :groupable => false )
     @available_columns << QueryColumn.new(:created_on, :sortable => "#{SlaCache.table_name}.created_on", :default_order => nil, :groupable => false ) if User.current.admin?
@@ -98,7 +100,7 @@ class Queries::SlaCacheSpentQuery < Query
    # For Query Class
    def base_scope
     self.queried_class.visible.
-    joins(:project).
+    joins(:sla_cache,:project,:issue).
     where(statement)
   end
 
@@ -110,6 +112,21 @@ class Queries::SlaCacheSpentQuery < Query
       order(order_option).
       joins(joins_for_order_statement(order_option.join(',')))
   end
+
+  def sql_for_sla_level_id_field(field, operator, value)
+    sql_for_field("sla_level_id", operator, value, SlaCache.table_name, "sla_level_id")
+  end 
+
+  def sql_for_sla_type_id_field(field, operator, value)
+    sql_for_field("sla_type_id", operator, value, SlaCacheSpent.table_name, "sla_type_id")
+  end 
+
+  def sql_for_issue_id_field(field, operator, value)
+    self.class.queried_class = Issue
+    sql_for_field("issue_id", operator, value, Issue.table_name, "id")
+  ensure
+    self.class.queried_class = SlaCacheSpent
+  end  
 
   def sql_for_issue_tracker_id_field(field, operator, value)
     self.class.queried_class = Issue
@@ -141,7 +158,6 @@ class Queries::SlaCacheSpentQuery < Query
     joins.any? ? joins.join(' ') : nil
   end
 
-  # TODO: not yes in use
   def all_sla_cache_spent_values
     return @all_sla_cache_spent_values if @all_sla_cache_spent_values
 
@@ -152,7 +168,6 @@ class Queries::SlaCacheSpentQuery < Query
     @all_sla_cache_spent_values = values
   end
 
-  # TODO: not yes in use
   def all_sla_type_values
     return @all_sla_type_values if @all_sla_type_values
 
@@ -162,5 +177,15 @@ class Queries::SlaCacheSpentQuery < Query
     }
     @all_sla_type_values = values
   end
+
+  def all_sla_level_values
+    return @all_sla_level_values if @all_sla_level_values
+
+    values ||= []
+    SlaLevel.pluck(:name,:id).map { |name,id|
+      values << [name.to_s,id.to_s]
+    }
+    @all_sla_level_values = values
+  end  
 
 end
