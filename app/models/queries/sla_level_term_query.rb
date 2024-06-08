@@ -87,7 +87,6 @@ class Queries::SlaLevelTermQuery < Query
     self.queried_class.visible.where(statement)
   end  
 
-  # TODO: not yes in use
   def all_sla_level_values
     return @all_sla_level_values if @all_sla_level_values
 
@@ -98,7 +97,6 @@ class Queries::SlaLevelTermQuery < Query
     @all_sla_level_values = values
   end
 
-  # TODO: not yes in use
   def all_sla_type_values
     return @all_sla_type_values if @all_sla_type_values
 

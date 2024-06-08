@@ -32,7 +32,6 @@ namespace :redmine do
         settings = Setting.plugin_redmine_sla
         Rails.logger.info "rake redmine:plugins:redmine_sla:update settings #{settings}"
 
-        # AW : TODO : filtrer sur projet actifs avec module activé
         Project.has_module(:sla).each do |project|
 
           puts "##{project.id} - #{project.name}"
