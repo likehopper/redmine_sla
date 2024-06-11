@@ -25,12 +25,15 @@ class SlaCacheSpent < ActiveRecord::Base
   belongs_to :project
   belongs_to :issue
 
+  has_one :sla_level, through: :sla_cache
+
   include Redmine::SafeAttributes
   #safe_attributes *%w[sla_cache_id sla_type_id updated_on spent]
   safe_attributes *%w[]
 
   # Join order is important
-  default_scope { joins(:project,:issue,:sla_cache) }
+  # default_scope { joins(:project,:issue,sla_cache: :sla_level) }
+  default_scope { joins(:project,:issue,:sla_cache,:sla_type) }
 
   scope :visible, ->(*args) { where(SlaCacheSpent.visible_condition(args.shift || User.current, *args)) }
 
