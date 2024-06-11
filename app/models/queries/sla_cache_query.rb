@@ -221,10 +221,6 @@ class Queries::SlaCacheQuery < Query
   end
 
   def sql_for_slas_sla_remain_field(field,operator,value,sla_type_id)
-    Rails.logger.debug "==>> sla_level_term field=#{field}"
-    Rails.logger.debug "==>> sla_level_term operator=#{operator}"
-    Rails.logger.debug "==>> sla_level_term value=#{value}"
-    Rails.logger.debug "==>> sla_level_term sla_type_id=#{sla_type_id}"
     condition =
       if ( operator == "!*" )
         "sla_level_terms.term IS NULL"
@@ -235,7 +231,6 @@ class Queries::SlaCacheQuery < Query
       else
         "( sla_level_terms.term - sla_cache_spents.spent ) #{operator} #{value[0]} "
       end
-    Rails.logger.debug "==>> sla_level_term condition=#{condition}"
     selection = "
       SELECT DISTINCT issues.id
       FROM issues AS sla_issues
@@ -314,9 +309,9 @@ class Queries::SlaCacheQuery < Query
       joins(joins_for_order_statement(order_option.join(',')))
   end
 
-  def sql_for_sla_level_id_field(field, operator, value)
-    sql_for_field("sla_level_id", operator, value, SlaCache.table_name, "sla_level_id")
-  end  
+  # def sql_for_sla_level_id_field(field, operator, value)
+  #   sql_for_field("sla_level_id", operator, value, SlaCache.table_name, "sla_level_id")
+  # end  
 
   def sql_for_issue_id_field(field, operator, value)
     self.class.queried_class = Issue

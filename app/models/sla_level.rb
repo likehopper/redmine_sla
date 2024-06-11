@@ -26,9 +26,9 @@ class SlaLevel < ActiveRecord::Base
 
   has_many :sla_level_terms
   has_many :sla_caches
-
+  has_many :sla_cache_spents, through: :sla_caches
   has_many :sla_project_trackers, through: :sla
-
+  
   accepts_nested_attributes_for :sla_level_terms, allow_destroy: true
   validate :sla_level_terms_greater_than_or_equal_to_zero
 
