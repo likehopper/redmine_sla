@@ -18,7 +18,7 @@
 
 module ObjectHelpers
 
-  # Generates an unsaved Sla
+  # Generates an unsaved Tracker
   def Tracker.generate(attributes={})
     tracker = Tracker.new()
     tracker.name = attributes.key?(:name) ? attributes[:name] : "Tracker #{Time.now.strftime("%Y%m%d %H:%M:%S")}.#{(Time.now.usec/100.0).round.to_s.rjust(4,'0')}"
@@ -27,7 +27,7 @@ module ObjectHelpers
     tracker
   end
 
-  # Generates a saved Sla
+  # Generates a saved Tracker
   def Tracker.generate!(attributes={}, &block)
     tracker = Tracker.generate(attributes, &block)
     tracker.save!
