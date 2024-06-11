@@ -309,9 +309,9 @@ class Queries::SlaCacheQuery < Query
       joins(joins_for_order_statement(order_option.join(',')))
   end
 
-  # def sql_for_sla_level_id_field(field, operator, value)
-  #   sql_for_field("sla_level_id", operator, value, SlaCache.table_name, "sla_level_id")
-  # end  
+  def sql_for_sla_level_id_field(field, operator, value)
+    sql_for_field("sla_level_id", operator, value, SlaCache.table_name, "sla_level_id")
+  end  
 
   def sql_for_issue_id_field(field, operator, value)
     self.class.queried_class = Issue
