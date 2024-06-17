@@ -34,6 +34,7 @@ class Queries::SlaScheduleQuery < Query
   def available_columns
     return @available_columns if @available_columns
     @available_columns = []
+    @available_columns << QueryColumn.new(:id, :sortable => "#{SlaSchedule.table_name}.id", :default_order => nil, :groupable => false )
     @available_columns << QueryColumn.new(:sla_calendar, :sortable => "#{SlaCalendar.table_name}.name", :default_order => :asc, :groupable => true)
     @available_columns << QueryColumn.new(:dow, :sortable => "#{SlaSchedule.table_name}.dow", :default_order => nil, :groupable => true )
     # TODO : type time need to override query class ;(
