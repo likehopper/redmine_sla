@@ -3,4 +3,5 @@ api.sla_level do
   api.name @sla_level.name
   api.sla @sla_level.sla
   api.sla_calendar @sla_level.sla_calendar
+  api.custom_field @sla_level.custom_field
 end
