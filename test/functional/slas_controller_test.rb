@@ -29,68 +29,60 @@ class SlasControllerTest < Redmine::ControllerTest
 
   ### As anonymous ###
 
-  test "should Redirect on get index as anonymous" do
+  test "should redirect on get index as anonymous" do
     with_settings :default_language => "en" do
       get :index
-      assert_response 302
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}
     end
   end
 
-  test "should Redirect on get new as anonymous" do
+  test "should redirect on get new as anonymous" do
     with_settings :default_language => "en" do
       get :new
-      assert_response 302
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}
     end
   end  
 
-  test "should Redirect on post create as anonymous" do
+  test "should redirect on post create as anonymous" do
     with_settings :default_language => "en" do
       post(:create, :params => {:name => "SLA test"})
-      assert_response 302
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}
     end
   end
 
-  test "should Redirect on get show as anonymous" do
+  test "should redirect on get show as anonymous" do
     with_settings :default_language => "en" do
       get(:show, :params => {:id => 1})
-      assert_response 302
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}
     end
   end
 
-  test "should Redirect on get edit as anonymous" do
+  test "should redirect on get edit as anonymous" do
     with_settings :default_language => "en" do
       get(:edit, :params => {:id => 1})
-      assert_response 302
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}
     end
   end
 
-  test "should Redirect on patch update as anonymous" do
+  test "should redirect on patch update as anonymous" do
     with_settings :default_language => "en" do
       put :update, params: { id: 1, sla: { name: "SLA test change" } }
-      assert_response 302
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}
       patch :update, params: { id: 1, sla: { name: "SLA test change" } }
-      assert_response 302
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}   
     end
   end 
 
-  test "should Redirect on delete destroy as anonymous" do
+  test "should redirect on delete destroy as anonymous" do
     with_settings :default_language => "en" do
       delete(:destroy, :params => {:id => 1})
-      assert_response 302
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}
     end
@@ -98,7 +90,7 @@ class SlasControllerTest < Redmine::ControllerTest
 
   ### As admin #1 ###
 
-  test "should Success on get index as admin" do
+  test "should success on get index as admin" do
     @request.session[:user_id] = 1
     with_settings :default_language => "en" do
       get :index
@@ -110,7 +102,7 @@ class SlasControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should Success on get new as admin" do
+  test "should success on get new as admin" do
     @request.session[:user_id] = 1
     with_settings :default_language => "en" do
       get :new
@@ -118,7 +110,7 @@ class SlasControllerTest < Redmine::ControllerTest
     end
   end  
 
-  test "should Success on post create as admin" do
+  test "should success on post create as admin" do
     @request.session[:user_id] = 1
     with_settings :default_language => "en" do
       post(:create, :params => { sla: { :name => "SLA test" } } )
@@ -127,7 +119,7 @@ class SlasControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should Success on get show as admin" do
+  test "should success on get show as admin" do
     @request.session[:user_id] = 1
     with_settings :default_language => "en" do
       get(:show, :params => {:id => 1})
@@ -139,7 +131,7 @@ class SlasControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should Success on get edit as admin" do
+  test "should success on get edit as admin" do
     @request.session[:user_id] = 1
     with_settings :default_language => "en" do
       get(:edit, :params => {:id => 1})
@@ -147,7 +139,7 @@ class SlasControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should Success on patch update as admin" do
+  test "should success on patch update as admin" do
     @request.session[:user_id] = 1
     with_settings :default_language => "en" do
       put :update, params: { id: 1, sla: { name: "SLA test change" } }
@@ -159,7 +151,7 @@ class SlasControllerTest < Redmine::ControllerTest
     end
   end  
 
-  test "should Redirect on delete destroy as admin" do
+  test "should redirect on delete destroy as admin" do
     @request.session[:user_id] = 1
     with_settings :default_language => "en" do
       delete(:destroy, :params => {:id => 1})
@@ -170,340 +162,300 @@ class SlasControllerTest < Redmine::ControllerTest
 
   ### As manager #2 ###
 
-  test "should Forbidden on get index as manager" do
+  test "should forbidden on get index as manager" do
     @request.session[:user_id] = 2
     with_settings :default_language => "en" do
       get :index
-      assert_response 403
       assert_response :forbidden
     end
   end
 
-  test "should Forbidden on get new as manager" do
+  test "should forbidden on get new as manager" do
     @request.session[:user_id] = 2
     with_settings :default_language => "en" do
       get :new
-      assert_response 403
       assert_response :forbidden
     end
   end  
 
-  test "should Forbidden on post create as manager" do
+  test "should forbidden on post create as manager" do
     @request.session[:user_id] = 2
     with_settings :default_language => "en" do
       post(:create, :params => { sla: { :name => "SLA test" } } )
-      assert_response 403
       assert_response :forbidden
     end
   end
 
-  test "should Forbidden on get show as manager" do
+  test "should forbidden on get show as manager" do
     @request.session[:user_id] = 2
     with_settings :default_language => "en" do
       get(:show, :params => {:id => 1})
-      assert_response 403
       assert_response :forbidden
     end
   end
 
-  test "should Forbidden on get edit as manager" do
+  test "should forbidden on get edit as manager" do
     @request.session[:user_id] = 2
     with_settings :default_language => "en" do
       get(:edit, :params => {:id => 1})
-      assert_response 403
       assert_response :forbidden
     end
   end
     
-  test "should Forbidden on patch update as manager" do
+  test "should forbidden on patch update as manager" do
     @request.session[:user_id] = 2
     with_settings :default_language => "en" do
       put :update, params: { id: 1, sla: { name: "SLA test change" } }
-      assert_response 403
       assert_response :forbidden
       patch :update, params: { id: 1, sla: { name: "SLA test change" } }
-      assert_response 403
       assert_response :forbidden      
     end
   end
   
-  test "should Forbidden on get delete destroy as manager" do
+  test "should forbidden on get delete destroy as manager" do
     @request.session[:user_id] = 2
     with_settings :default_language => "en" do
       delete(:destroy, :params => {:id => 1})
-      assert_response 403
       assert_response :forbidden
     end
   end
 
   ### As developper #3 ###
 
-  test "should Forbidden on get index as developper" do
+  test "should forbidden on get index as developper" do
     @request.session[:user_id] = 3
     with_settings :default_language => "en" do
       get :index
-      assert_response 403
       assert_response :forbidden
     end
   end
 
-  test "should Forbidden on get new as developper" do
+  test "should forbidden on get new as developper" do
     @request.session[:user_id] = 3
     with_settings :default_language => "en" do
       get :new
-      assert_response 403
       assert_response :forbidden
     end
   end  
 
-  test "should Forbidden on post create as developper" do
+  test "should forbidden on post create as developper" do
     @request.session[:user_id] = 3
     with_settings :default_language => "en" do
       post(:create, :params => { sla: { :name => "SLA test" } } )
-      assert_response 403
       assert_response :forbidden
     end
   end
 
-  test "should Forbidden on get show as developper" do
+  test "should forbidden on get show as developper" do
     @request.session[:user_id] = 3
     with_settings :default_language => "en" do
       get(:show, :params => {:id => 1})
-      assert_response 403
       assert_response :forbidden
     end
   end
 
-  test "should Forbidden on get edit as developper" do
+  test "should forbidden on get edit as developper" do
     @request.session[:user_id] = 3
     with_settings :default_language => "en" do
       get(:edit, :params => {:id => 1})
-      assert_response 403
       assert_response :forbidden
     end
   end
  
-  test "should Forbidden on patch update as developper" do
+  test "should forbidden on patch update as developper" do
     @request.session[:user_id] = 3
     with_settings :default_language => "en" do
       put :update, params: { id: 1, sla: { name: "SLA test change" } }
-      assert_response 403
       assert_response :forbidden
       patch :update, params: { id: 1, sla: { name: "SLA test change" } }
-      assert_response 403
       assert_response :forbidden      
     end
   end
 
-  test "should Forbidden on get delete destroy as developper" do
+  test "should forbidden on get delete destroy as developper" do
     @request.session[:user_id] = 3
     with_settings :default_language => "en" do
       delete(:destroy, :params => {:id => 1})
-      assert_response 403
       assert_response :forbidden
     end
   end
 
   ### As sysadmin #4 ###
 
-  test "should Forbidden on get index as sysadmin" do
+  test "should forbidden on get index as sysadmin" do
     @request.session[:user_id] = 4
     with_settings :default_language => "en" do
       get :index
-      assert_response 403
       assert_response :forbidden
     end
   end
 
-  test "should Forbidden on get new as sysadmin" do
+  test "should forbidden on get new as sysadmin" do
     @request.session[:user_id] = 4
     with_settings :default_language => "en" do
       get :new
-      assert_response 403
       assert_response :forbidden
     end
   end
 
-  test "should Forbidden on post create as sysadmin" do
+  test "should forbidden on post create as sysadmin" do
     @request.session[:user_id] = 4
     with_settings :default_language => "en" do
       post(:create, :params => { sla: { :name => "SLA test" } } )
-      assert_response 403
       assert_response :forbidden
     end
   end  
 
-  test "should Forbidden on get show as sysadmin" do
+  test "should forbidden on get show as sysadmin" do
     @request.session[:user_id] = 4
     with_settings :default_language => "en" do
       get(:show, :params => {:id => 1})
-      assert_response 403
       assert_response :forbidden
     end
   end
 
-  test "should Forbidden on get edit as sysadmin" do
+  test "should forbidden on get edit as sysadmin" do
     @request.session[:user_id] = 4
     with_settings :default_language => "en" do
       get(:edit, :params => {:id => 1})
-      assert_response 403
       assert_response :forbidden
     end
   end
 
-  test "should Forbidden on patch update as sysadmin" do
+  test "should forbidden on patch update as sysadmin" do
     @request.session[:user_id] = 4
     with_settings :default_language => "en" do
       put :update, params: { id: 1, sla: { name: "SLA test change" } }
-      assert_response 403
       assert_response :forbidden
       patch :update, params: { id: 1, sla: { name: "SLA test change" } }
-      assert_response 403
       assert_response :forbidden      
     end
   end
 
-  test "should Forbidden on get delete destroy as sysadmin" do
+  test "should forbidden on get delete destroy as sysadmin" do
     @request.session[:user_id] = 4
     with_settings :default_language => "en" do
       delete(:destroy, :params => {:id => 1})
-      assert_response 403
       assert_response :forbidden
     end
   end  
 
   ### As reporter #5 ###
 
-  test "should Forbidden on get index as reporter" do
+  test "should forbidden on get index as reporter" do
     @request.session[:user_id] = 5
     with_settings :default_language => "en" do
       get :index
-      assert_response 403
       assert_response :forbidden
     end
   end
 
-  test "should Forbidden on get new as reporter" do
+  test "should forbidden on get new as reporter" do
     @request.session[:user_id] = 5
     with_settings :default_language => "en" do
       get :new
-      assert_response 403
       assert_response :forbidden
     end
   end  
 
-  test "should Forbidden on post create as reporter" do
+  test "should forbidden on post create as reporter" do
     @request.session[:user_id] = 5
     with_settings :default_language => "en" do
       post(:create, :params => { sla: { :name => "SLA test" } } )
-      assert_response 403
       assert_response :forbidden
     end
   end  
 
-  test "should Forbidden on get show as reporter" do
+  test "should forbidden on get show as reporter" do
     @request.session[:user_id] = 5
     with_settings :default_language => "en" do
       get(:show, :params => {:id => 1})
-      assert_response 403
       assert_response :forbidden
     end
   end
 
-  test "should Forbidden on get edit as reporter" do
+  test "should forbidden on get edit as reporter" do
     @request.session[:user_id] = 5
     with_settings :default_language => "en" do
       get(:edit, :params => {:id => 1})
-      assert_response 403
       assert_response :forbidden
     end
   end
 
-  test "should Forbidden on patch update as reporter" do
+  test "should forbidden on patch update as reporter" do
     @request.session[:user_id] = 5
     with_settings :default_language => "en" do
       put :update, params: { id: 1, sla: { name: "SLA test change" } }
-      assert_response 403
       assert_response :forbidden
       patch :update, params: { id: 1, sla: { name: "SLA test change" } }
-      assert_response 403
       assert_response :forbidden      
     end
   end  
 
-  test "should Forbidden on get delete destroy as reporter" do
+  test "should forbidden on get delete destroy as reporter" do
     @request.session[:user_id] = 5
     with_settings :default_language => "en" do
       delete(:destroy, :params => {:id => 1})
-      assert_response 403
       assert_response :forbidden
     end
   end
 
   ### As other #6 ###
 
-  test "should Forbidden on get index as other" do
+  test "should forbidden on get index as other" do
     @request.session[:user_id] = 6
     with_settings :default_language => "en" do
       get :index
-      assert_response 403
       assert_response :forbidden
     end
   end
 
-  test "should Forbidden on get new as other" do
+  test "should forbidden on get new as other" do
     @request.session[:user_id] = 6
     with_settings :default_language => "en" do
       get :new
-      assert_response 403
       assert_response :forbidden
     end
   end
 
-  test "should Forbidden on post create as other" do
+  test "should forbidden on post create as other" do
     @request.session[:user_id] = 6
     with_settings :default_language => "en" do
       post(:create, :params => { sla: { :name => "SLA test" } } )
-      assert_response 403
       assert_response :forbidden
     end
   end  
 
-  test "should Forbidden on get show as other" do
+  test "should forbidden on get show as other" do
     @request.session[:user_id] = 6
     with_settings :default_language => "en" do
       get(:show, :params => {:id => 1})
-      assert_response 403
       assert_response :forbidden
     end
   end
 
-  test "should Forbidden on get edit as other" do
+  test "should forbidden on get edit as other" do
     @request.session[:user_id] = 6
     with_settings :default_language => "en" do
       get(:edit, :params => {:id => 1})
-      assert_response 403
       assert_response :forbidden
     end
   end
 
-  test "should Forbidden on patch update as other" do
+  test "should forbidden on patch update as other" do
     @request.session[:user_id] = 6
     with_settings :default_language => "en" do
       put :update, params: { id: 1, sla: { name: "SLA test change" } }
-      assert_response 403
       assert_response :forbidden
       patch :update, params: { id: 1, sla: { name: "SLA test change" } }
-      assert_response 403
       assert_response :forbidden      
     end
   end  
 
-  test "should Forbidden on get delete destroy as other" do
+  test "should forbidden on get delete destroy as other" do
     @request.session[:user_id] = 6
     with_settings :default_language => "en" do
       delete(:destroy, :params => {:id => 1})
-      assert_response 403
       assert_response :forbidden
     end
   end  

@@ -32,7 +32,6 @@ class SlaTypesControllerTest < Redmine::ControllerTest
   test "should get 302 on get index as anonymous" do
     with_settings :default_language => "en" do
       get :index
-      assert_response 302
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}
     end
@@ -41,7 +40,6 @@ class SlaTypesControllerTest < Redmine::ControllerTest
   test "should get 302 on get new as anonymous" do
     with_settings :default_language => "en" do
       get :new
-      assert_response 302
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}
     end
@@ -50,7 +48,6 @@ class SlaTypesControllerTest < Redmine::ControllerTest
   test "should get 302 on post create as anonymous" do
     with_settings :default_language => "en" do
       post(:create, :params => {:name => "SLA Type test"})
-      assert_response 302
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}
     end
@@ -59,7 +56,6 @@ class SlaTypesControllerTest < Redmine::ControllerTest
   test "should get 302 on get edit as anonymous" do
     with_settings :default_language => "en" do
       get(:edit, :params => {:id => 1})
-      assert_response 302
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}
     end
@@ -68,11 +64,9 @@ class SlaTypesControllerTest < Redmine::ControllerTest
   test "should return 403 on patch update as anonymous" do
     with_settings :default_language => "en" do
       put :update, params: { id: 1, sla: { name: "SLA Type test change" } }
-      assert_response 302
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}
       patch :update, params: { id: 1, sla: { name: "SLA Type test change" } }
-      assert_response 302
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}   
     end
@@ -81,7 +75,6 @@ class SlaTypesControllerTest < Redmine::ControllerTest
   test "should get 302 on delete destroy as anonymous" do
     with_settings :default_language => "en" do
       delete(:destroy, :params => {:id => 1})
-      assert_response 302
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}
     end
