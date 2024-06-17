@@ -51,12 +51,12 @@ class Redmine::ApiTest::SlaTypesTest < Redmine::ApiTest::Base
 
   test "GET /sla/types.json should success for admin" do
     sla_type = SlaType.first
-    count = SlaType.count
+    sla_type_count = SlaType.count
     ['admin'].each do |user|
       get "/sla/types.json",
         :headers => credentials(user)
       assert_response :success
-      assert_sla_types_index_json(sla_type,count)
+      assert_sla_types_index_json(sla_type,sla_type_count)
     end
   end
 
@@ -132,19 +132,19 @@ class Redmine::ApiTest::SlaTypesTest < Redmine::ApiTest::Base
   test "POST /sla/types.xml with blank parameters should unprocessable_entity for admin" do
     assert_no_difference('SlaType.count') do
       post "/sla/types.xml",
-        :params => {:sla_type => {:name => ''}},
+        :params => {:sla_type => {name: '' }},
         :headers => credentials('admin')
     end
     assert_response :unprocessable_entity
     assert_equal 'application/xml', @response.media_type
-    assert_select 'errors error', :text => "Name cannot be blank"
+    assert_select 'errors error', :text => "Name cannot be blank"    
   end
 
   test "POST /sla/types.xml with invalid parameters should unprocessable_entity for admin" do
     sla_type = SlaType.first
     assert_no_difference('SlaType.count') do
       post "/sla/types.xml",
-        :params => {:sla_type => {:name => sla_type.name}},
+        :params => {:sla_type => {name: sla_type.name}},
         :headers => credentials('admin')
     end
     assert_response :unprocessable_entity
@@ -155,7 +155,7 @@ class Redmine::ApiTest::SlaTypesTest < Redmine::ApiTest::Base
   test "POST /sla/types.xml with valid parameters should success for admin" do
     assert_difference('SlaType.count',1) do
       post "/sla/types.xml",
-        :params => {:sla_type => {:name => 'API Test'}},
+        :params => {:sla_type => {name: 'API Test'}},
         :headers => credentials('admin')
     end
     assert_response :success
@@ -165,15 +165,15 @@ class Redmine::ApiTest::SlaTypesTest < Redmine::ApiTest::Base
   test "POST /sla/types.xml should forbidden for other users" do
     ['manager','developer','sysadmin','reporter','other'].each do |user|
       post "/sla/types.xml",
-        :params => {:sla_type => {:name => 'API Test'}},
-        :headers=>credentials(user)
+        :params => {:sla_type => {name: 'API Test'}},
+        :headers => credentials(user)
       assert_response :forbidden
     end
   end
  
   test "POST /sla/types.xml should unauthorized withtout credentials" do
     post "/sla/types.xml",
-      :params => {:sla_type => {:name => 'API Test'}}
+      :params => {:sla_type => {name: 'API Test'}}
     assert_response :unauthorized
   end      
 
@@ -183,7 +183,7 @@ class Redmine::ApiTest::SlaTypesTest < Redmine::ApiTest::Base
     sla_type = SlaType.first
     assert_no_difference('SlaType.count') do
       put "/sla/types/#{sla_type.id}.xml",
-        :params => {:sla_type => {:name => ''}},
+        :params => {:sla_type => {name: ''}},
         :headers => credentials('admin')
     end
     assert_response :unprocessable_entity
@@ -196,7 +196,7 @@ class Redmine::ApiTest::SlaTypesTest < Redmine::ApiTest::Base
     sla_type_last = SlaType.last
     assert_no_difference('SlaType.count') do
       put "/sla/types/#{sla_type.id}.xml",
-        :params => {:sla_type => {:name => sla_type_last.name}},
+        :params => {:sla_type => {name: sla_type_last.name}},
         :headers => credentials('admin')
     end
     assert_response :unprocessable_entity
@@ -208,7 +208,7 @@ class Redmine::ApiTest::SlaTypesTest < Redmine::ApiTest::Base
     sla_type = SlaType.first
     assert_no_difference 'SlaType.count' do
       put "/sla/types/#{sla_type.id}.xml",
-        :params => {:sla_type => {:name => 'API update'}},
+        :params => {:sla_type => {name: 'API update'}},
         :headers => credentials('admin')
     end
     assert_response :no_content
@@ -222,7 +222,7 @@ class Redmine::ApiTest::SlaTypesTest < Redmine::ApiTest::Base
     sla_type = SlaType.first
     ['manager','developer','sysadmin','reporter','other'].each do |user|
       put "/sla/types/#{sla_type.id}.xml",
-        :params => {:sla_type => {:name => 'API Test'}},
+        :params => {:sla_type => {name: 'API Test'}},
         :headers=>credentials(user)
       assert_response :forbidden
     end
@@ -231,7 +231,7 @@ class Redmine::ApiTest::SlaTypesTest < Redmine::ApiTest::Base
   test "PUT /sla/types/:id.xml should unauthorized withtout credentials" do
     sla_type = SlaType.first
     put "/sla/types/#{sla_type.id}.xml",
-      :params => {:sla_type => {:name => 'API Test'}}
+      :params => {:sla_type => {name: 'API Test'}}
     assert_response :unauthorized
   end  
 
