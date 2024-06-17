@@ -32,7 +32,6 @@ class SlaCachesControllerTest < Redmine::ControllerTest
   test "should redirect on get index as anonymous" do
     with_settings :default_language => "en" do
       get :index
-      assert_response 302
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}
     end
@@ -44,7 +43,7 @@ class SlaCachesControllerTest < Redmine::ControllerTest
     end
   end  
 
-  test "should Redirect on post create as anonymous" do
+  test "should redirect on post create as anonymous" do
     assert_raises ActionController::UrlGenerationError do
       post :create, :params => { sla_cache: { } }
     end
@@ -54,7 +53,6 @@ class SlaCachesControllerTest < Redmine::ControllerTest
     sla_cache = SlaCache.first
     with_settings :default_language => "en" do
       get :show, :params => { id: sla_cache.id }
-      assert_response 302
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}
     end
@@ -81,7 +79,6 @@ class SlaCachesControllerTest < Redmine::ControllerTest
     sla_cache = SlaCache.first
     with_settings :default_language => "en" do
       delete :destroy, :params => { id: sla_cache.id }
-      assert_response 302
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}
     end
@@ -90,7 +87,6 @@ class SlaCachesControllerTest < Redmine::ControllerTest
   test "should redirect on get purge as anonymous" do
     with_settings :default_language => "en" do
       get :purge
-      assert_response 302
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}
     end
@@ -99,7 +95,6 @@ class SlaCachesControllerTest < Redmine::ControllerTest
   test "should redirect on get refresh as anonymous" do
     with_settings :default_language => "en" do
       get :refresh
-      assert_response 302
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}
     end
@@ -115,21 +110,21 @@ class SlaCachesControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should Success on get new as admin" do
+  test "should success on get new as admin" do
     @request.session[:user_id] = 1
     assert_raises ActionController::UrlGenerationError do
       get :new
     end
   end  
 
-  test "should Success on post create as admin" do
+  test "should success on post create as admin" do
     @request.session[:user_id] = 1
     assert_raises ActionController::UrlGenerationError do
       post :create, :params => { sla_cache: { } }
     end
   end
 
-  test "should Success on get show as admin" do
+  test "should success on get show as admin" do
     sla_cache = SlaCache.first
     @request.session[:user_id] = 1
     assert_raises ActionController::UrlGenerationError do
@@ -137,7 +132,7 @@ class SlaCachesControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should Success on get edit as admin" do
+  test "should success on get edit as admin" do
     sla_cache = SlaCache.first
     @request.session[:user_id] = 1
     assert_raises ActionController::UrlGenerationError do
@@ -145,7 +140,7 @@ class SlaCachesControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should Success on patch update as admin" do
+  test "should success on patch update as admin" do
     sla_cache = SlaCache.first
     @request.session[:user_id] = 1
     assert_raises ActionController::UrlGenerationError do
@@ -250,12 +245,11 @@ class SlaCachesControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should Forbidden on get purge as manager" do
+  test "should forbidden on get purge as manager" do
     sla_cache = SlaCache.first
     @request.session[:user_id] = 2
     with_settings :default_language => "en" do
       get :purge, params: { id: sla_cache.id }
-      assert_response 403
       assert_response :forbidden      
     end
   end  
@@ -324,27 +318,25 @@ class SlaCachesControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should Forbidden on get delete destroy as developper" do
+  test "should forbidden on get delete destroy as developper" do
     sla_cache = SlaCache.where(project: 1).order(:id).first # project-sla-tests-tma
     @request.session[:user_id] = 3
     with_settings :default_language => "en" do
       delete :destroy, :params => { id: sla_cache.id }
-      assert_response 403
       assert_response :forbidden
     end
   end
 
-  test "should Forbidden on get purge as developper" do
+  test "should forbidden on get purge as developper" do
     sla_cache = SlaCache.where(project: 1).order(:id).first # project-sla-tests-tma
     @request.session[:user_id] = 3
     with_settings :default_language => "en" do
       get :purge, params: { id: sla_cache.id }
-      assert_response 403
       assert_response :forbidden      
     end
   end  
   
-  test "should Forbidden on get refresh as developper" do
+  test "should forbidden on get refresh as developper" do
     sla_cache = SlaCache.where(project: 1).order(:id).first # project-sla-tests-tma
     @request.session[:user_id] = 3
     with_settings :default_language => "en" do
@@ -372,7 +364,7 @@ class SlaCachesControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should Forbidden on get show as sysadmin" do
+  test "should forbidden on get show as sysadmin" do
     sla_cache = SlaCache.where(project: 2).order(:id).first # project-sla-tests-std
     @request.session[:user_id] = 4
     with_settings :default_language => "en" do
@@ -401,22 +393,20 @@ class SlaCachesControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should Forbidden on get delete destroy as sysadmin" do
+  test "should forbidden on get delete destroy as sysadmin" do
     sla_cache = SlaCache.where(project: 2).order(:id).first # project-sla-tests-std
     @request.session[:user_id] = 4
     with_settings :default_language => "en" do
       delete :destroy, :params => { id: sla_cache.id }
-      assert_response 403
       assert_response :forbidden
     end
   end  
 
-  test "should Forbidden on get purge as sysadmin" do
+  test "should forbidden on get purge as sysadmin" do
     sla_cache = SlaCache.where(project: 2).order(:id).first # project-sla-tests-std
     @request.session[:user_id] = 4
     with_settings :default_language => "en" do
       get :purge, params: { id: sla_cache.id }
-      assert_response 403
       assert_response :forbidden      
     end
   end  
@@ -433,11 +423,10 @@ class SlaCachesControllerTest < Redmine::ControllerTest
 
   ### As reporter #5 ###
 
-  test "should Forbidden on get index as reporter" do
+  test "should forbidden on get index as reporter" do
     @request.session[:user_id] = 5
     with_settings :default_language => "en" do
       get :index
-      assert_response 403
       assert_response :forbidden
     end
   end
@@ -449,12 +438,11 @@ class SlaCachesControllerTest < Redmine::ControllerTest
     end
   end  
 
-  test "should Forbidden on get show as reporter" do
+  test "should forbidden on get show as reporter" do
     sla_cache = SlaCache.first
     @request.session[:user_id] = 5
     with_settings :default_language => "en" do
       get :show, :params => { id: sla_cache.id }
-      assert_response 403
       assert_response :forbidden
     end
   end
@@ -478,43 +466,39 @@ class SlaCachesControllerTest < Redmine::ControllerTest
     end
   end  
 
-  test "should Forbidden on get delete destroy as reporter" do
+  test "should forbidden on get delete destroy as reporter" do
     sla_cache = SlaCache.first
     @request.session[:user_id] = 5
     with_settings :default_language => "en" do
       delete :destroy, :params => { id: sla_cache.id }
-      assert_response 403
       assert_response :forbidden
     end
   end
 
-  test "should Forbidden on get purge as reporter" do
+  test "should forbidden on get purge as reporter" do
     sla_cache = SlaCache.first
     @request.session[:user_id] = 5
     with_settings :default_language => "en" do
       get :purge, params: { id: sla_cache.id }
-      assert_response 403
       assert_response :forbidden      
     end
   end  
   
-  test "should Forbidden on get refresh as reporter" do
+  test "should forbidden on get refresh as reporter" do
     sla_cache = SlaCache.first
     @request.session[:user_id] = 5
     with_settings :default_language => "en" do
       get :refresh, params: { id: sla_cache.id } 
-      assert_response 403
       assert_response :forbidden     
     end
   end
 
   ### As other #6 ###
 
-  test "should Forbidden on get index as other" do
+  test "should forbidden on get index as other" do
     @request.session[:user_id] = 6
     with_settings :default_language => "en" do
       get :index
-      assert_response 403
       assert_response :forbidden
     end
   end
@@ -526,12 +510,11 @@ class SlaCachesControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should Forbidden on get show as other" do
+  test "should forbidden on get show as other" do
     sla_cache = SlaCache.first
     @request.session[:user_id] = 6
     with_settings :default_language => "en" do
       get :show, :params => { id: sla_cache.id }
-      assert_response 403
       assert_response :forbidden
     end
   end
@@ -555,32 +538,29 @@ class SlaCachesControllerTest < Redmine::ControllerTest
     end
   end  
 
-  test "should Forbidden on get delete destroy as other" do
+  test "should forbidden on get delete destroy as other" do
     sla_cache = SlaCache.first
     @request.session[:user_id] = 6
     with_settings :default_language => "en" do
       delete :destroy, :params => { id: sla_cache.id }
-      assert_response 403
       assert_response :forbidden
     end
   end
   
-  test "should Forbidden on get purge as other" do
+  test "should forbidden on get purge as other" do
     sla_cache = SlaCache.first
     @request.session[:user_id] = 6
     with_settings :default_language => "en" do
       get :purge, params: { id: sla_cache.id }
-      assert_response 403
       assert_response :forbidden      
     end
   end  
   
-  test "should Forbidden on get refresh as other" do
+  test "should forbidden on get refresh as other" do
     sla_cache = SlaCache.first
     @request.session[:user_id] = 6
     with_settings :default_language => "en" do
       get :refresh, params: { id: sla_cache.id } 
-      assert_response 403
       assert_response :forbidden
     end
   end

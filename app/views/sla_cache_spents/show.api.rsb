@@ -1,5 +1,7 @@
     api.sla_cache_spent do
       api.id @sla_cache_spent.id
+      api.issue_id @sla_cache_spent.issue_id
+      api.project_id @sla_cache_spent.project_id
       api.sla_cache @sla_cache_spent.sla_cache
       api.sla_type @sla_cache_spent.sla_type
       api.created_on @sla_cache_spent.created_on
