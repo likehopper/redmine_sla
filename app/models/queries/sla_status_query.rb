@@ -30,6 +30,7 @@ class Queries::SlaStatusQuery < Query
   def available_columns
     return @available_columns if @available_columns
     @available_columns = []
+    @available_columns << QueryColumn.new(:id, :sortable => "#{SlaStatus.table_name}.id", :default_order => :asc, :groupable => false )
     @available_columns << QueryColumn.new(:sla_type, :sortable => "#{SlaType.table_name}.name", :default_order => :asc, :groupable => true )
     @available_columns << QueryColumn.new(:status, :sortable => "#{IssueStatus.table_name}.position", :default_order => :asc, :groupable => false )
     @available_columns

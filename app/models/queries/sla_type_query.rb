@@ -29,6 +29,7 @@ class Queries::SlaTypeQuery < Query
   def available_columns
     return @available_columns if @available_columns
     @available_columns = []
+    @available_columns << QueryColumn.new(:id, :sortable => "#{SlaType.table_name}.id", :default_order => :asc, :groupable => false )
     @available_columns << QueryColumn.new(:name, :sortable => "#{SlaType.table_name}.name", :default_order => :asc, :groupable => false )
     @available_columns
   end

@@ -29,6 +29,7 @@ class Queries::SlaQuery < Query
   def available_columns
     return @available_columns if @available_columns
     @available_columns = []
+    @available_columns << QueryColumn.new(:id, :sortable => "#{Sla.table_name}.id", :default_order => :asc, :groupable => false )
     @available_columns << QueryColumn.new(:name, :sortable => "#{Sla.table_name}.name", :default_order => :asc, :groupable => false )
     @available_columns
   end

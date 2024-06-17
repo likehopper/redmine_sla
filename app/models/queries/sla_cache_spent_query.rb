@@ -38,6 +38,7 @@ class Queries::SlaCacheSpentQuery < Query
   def available_columns
     return @available_columns if @available_columns
     @available_columns = []
+    @available_columns << QueryColumn.new(:id, :sortable => "#{SlaCacheSpent.table_name}.id", :default_order => nil, :groupable => false )
     @available_columns << QueryColumn.new(:project, :sortable => "#{Project.table_name}.name", :default_order => nil, :groupable => true)
     @available_columns << QueryColumn.new(:issue, :sortable => "#{Issue.table_name}.id", :default_order => :desc, :groupable => true)
     sla_level_columns = QueryColumn.new(:sla_level, :sortable => "( SELECT DISTINCT #{SlaLevel.table_name}.name FROM #{SlaLevel.table_name} WHERE ( #{SlaCache.table_name}.sla_level_id = #{SlaLevel.table_name}.id ) )", :default_order => nil, :groupable => true )

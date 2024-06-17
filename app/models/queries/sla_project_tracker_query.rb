@@ -32,6 +32,7 @@ class Queries::SlaProjectTrackerQuery < Query
   def available_columns
     return @available_columns if @available_columns
     @available_columns = []
+    @available_columns << QueryColumn.new(:id, :sortable => "#{SlaProjectTracker.table_name}.id", :default_order => :asc, :groupable => false )
     @available_columns << QueryColumn.new(:project, :sortable => "#{Project.table_name}.name", :default_order => :asc, :groupable => (project.nil??true:false) )
     @available_columns << QueryColumn.new(:tracker, :sortable => "#{Tracker.table_name}.position", :default_order => :asc, :groupable => true)
     @available_columns << QueryColumn.new(:sla, :sortable => "#{Sla.table_name}.name", :default_order => :asc, :groupable => true)

@@ -34,6 +34,7 @@ class Queries::SlaLevelTermQuery < Query
   def available_columns
     return @available_columns if @available_columns
     @available_columns = []
+    @available_columns << QueryColumn.new(:id, :sortable => "#{SlaLevelTerm.table_name}.id", :default_order => :asc, :groupable => false)
     @available_columns << QueryColumn.new(:sla_level, :sortable => "#{SlaLevel.table_name}.name", :default_order => :asc, :groupable => true)
     @available_columns << QueryColumn.new(:sla_type, :sortable => "#{SlaType.table_name}.name", :default_order => :asc, :groupable => true)
     # TODO : display enumerations' text in columns/groups
