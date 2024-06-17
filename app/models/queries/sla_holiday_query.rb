@@ -30,6 +30,7 @@ class Queries::SlaHolidayQuery < Query
   def available_columns
     return @available_columns if @available_columns
     @available_columns = []
+    @available_columns << QueryColumn.new(:id, :sortable => "#{SlaHoliday.table_name}.id", :default_order => nil, :groupable => false)
     @available_columns << QueryColumn.new(:name, :sortable => "#{SlaHoliday.table_name}.name", :default_order => nil, :groupable => true)
     @available_columns << QueryColumn.new(:date, :sortable => "#{SlaHoliday.table_name}.date", :default_order => :desc, :groupable => false)
     @available_columns

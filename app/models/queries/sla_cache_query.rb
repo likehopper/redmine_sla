@@ -67,7 +67,8 @@ class Queries::SlaCacheQuery < Query
   def available_columns
     return @available_columns if @available_columns
     @available_columns = []
-    @available_columns << QueryColumn.new(:project, :sortable => "#{Project.table_name}.name", :default_order => nil, :groupable => (project.nil??true:false) )
+    @available_columns << QueryColumn.new(:id, :sortable => "#{SlaCache.table_name}.id", :default_order => nil, :groupable => false )
+    available_columns << QueryColumn.new(:project, :sortable => "#{Project.table_name}.name", :default_order => nil, :groupable => (project.nil??true:false) )
     @available_columns << QueryColumn.new(:issue, :sortable => "#{Issue.table_name}.id", :default_order => :desc, :groupable => false)
     @available_columns << QueryColumn.new(:sla_level, :sortable => "#{SlaLevel.table_name}.name", :default_order => nil, :groupable => true )
     @available_columns << QueryColumn.new(:start_date, :sortable => "#{SlaCache.table_name}.start_date", :default_order => nil, :groupable => false )

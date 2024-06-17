@@ -39,6 +39,7 @@ fr:
     sla_cache_spent: &sla_cache_spent Délai du cache de SLA
     custom_field: &custom_field SLA Champs personnalisés
 
+  field_id: id
   field_sla: *sla
   field_slas: *slas
   field_name: *name
