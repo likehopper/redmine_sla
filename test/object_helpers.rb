@@ -97,6 +97,22 @@ module ObjectHelpers
     sla_project_tracker.reload
   end
 
+  # Generates an unsaved SlaHoliday
+  def SlaHoliday.generate(attributes={})
+    sla_holiday = SlaHoliday.new()
+    sla_holiday.date = attributes.key?(:date) ? attributes[:date] : Date.today+rand(1..9999)
+    sla_holiday.name = attributes.key?(:name) ? attributes[:name] : "SlaHoliday #{Time.now.strftime("%Y-%m-%d %H:%M:%S")}.#{(Time.now.usec/100.0).round.to_s.rjust(4,'0')}"
+    yield sla_holiday if block_given?
+    sla_holiday
+  end
+
+  # Generates a saved SlaHoliday
+  def SlaHoliday.generate!(attributes={}, &block)
+    sla_holiday = SlaHoliday.generate(attributes, &block)
+    sla_holiday.save!
+    sla_holiday.reload
+  end
+
   # Generates an unsaved SlaCalendar
   def SlaCalendar.generate(attributes={})
     sla_calendar = SlaCalendar.new()
