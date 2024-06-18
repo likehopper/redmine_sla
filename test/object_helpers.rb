@@ -97,6 +97,24 @@ module ObjectHelpers
     sla_project_tracker.reload
   end
 
+  # Generates an unsaved SlaLevel
+  def SlaLevel.generate(attributes={})
+    sla_level = SlaLevel.new()
+    sla_level.name = attributes.key?(:name) ? attributes[:name] : "SlaLevel #{Time.now.strftime("%Y-%m-%d %H:%M:%S")}.#{(Time.now.usec/100.0).round.to_s.rjust(4,'0')}"
+    sla_level.sla_id = attributes.key?(:sla_id) ? attributes[:sla_id] : Sla.generate!.id
+    sla_level.sla_calendar_id = attributes.key?(:sla_calendar_id) ? attributes[:sla_calendar_id] : SlaCalendar.generate!.id
+    sla_level.custom_field_id = attributes.key?(:custom_field_id) ? attributes[:custom_field_id] : nil
+    yield sla_level if block_given?
+    sla_level
+  end
+
+  # Generates a saved SlaLevel
+  def SlaLevel.generate!(attributes={}, &block)
+    sla_level = SlaLevel.generate(attributes, &block)
+    sla_level.save!
+    sla_level.reload
+  end  
+
   # Generates an unsaved SlaHoliday
   def SlaHoliday.generate(attributes={})
     sla_holiday = SlaHoliday.new()
