@@ -86,7 +86,9 @@ class SlaHolidaysController < ApplicationController
     if @sla_holiday.save
       respond_to do |format|
         format.html do
-          flash[:notice] = l(:notice_successful_update)
+          flash[:notice] = l("sla_label.sla_holiday.notice_successful_update",
+            :id => view_context.link_to("##{@sla_holiday.id}", sla_holiday_path(@sla_holiday), :title => @sla_holiday.name)
+          )
           redirect_back_or_default sla_holidays_path
         end
         format.api { render_api_ok }
