@@ -21,6 +21,7 @@ require_relative "../application_system_test_case"
 require_relative "slas_helper"
 require_relative "sla_types_helper"
 require_relative "sla_statuses_helper"
+require_relative "sla_holidays_helper"
 require_relative "sla_calendars_helper"
 
 class SlaAllSystemTest < ApplicationSystemTestCase
@@ -30,6 +31,7 @@ class SlaAllSystemTest < ApplicationSystemTestCase
   include SlasHelperSystemTest
   include SlaTypesHelperSystemTest
   include SlaStatusesHelperSystemTest
+  include SlaHolidaysHelperSystemTest
   include SlaCalendarsHelperSystemTest
 
   test "full create storyline as admin" do
@@ -37,12 +39,14 @@ class SlaAllSystemTest < ApplicationSystemTestCase
     create_sla('new Sla')
     create_sla_type('new SLA Type')
     create_sla_status('new SLA Type','New')
+    create_sla_calendar('new SLA Holiday')
     create_sla_calendar('new SLA Calendar')
   end
   
   test "all contextual menu as admin" do
     log_user('admin', 'admin')
     contextual_menu_sla_calendar
+    contextual_menu_sla_holiday
     contextual_menu_sla_status
     contextual_menu_sla_type
     contextual_menu_sla
@@ -53,12 +57,14 @@ class SlaAllSystemTest < ApplicationSystemTestCase
     update_sla
     update_sla_type
     update_sla_status
-    update_sla_calendar  
+    update_sla_holiday
+    update_sla_calendar
   end
 
   test "all destroy as admin" do
     log_user('admin', 'admin')
     destroy_sla_calendar
+    destroy_sla_holiday
     destroy_sla_status
     destroy_sla_type
     destroy_sla
