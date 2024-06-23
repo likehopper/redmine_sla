@@ -65,7 +65,9 @@ class SlaHolidaysController < ApplicationController
     if @sla_holiday.save
       respond_to do |format|
         format.html do
-          flash[:notice] = l(:notice_successful_create)
+          flash[:notice] = l("sla_label.sla_holiday.notice_successful_create",
+            :id => view_context.link_to("##{@sla_holiday.id}", sla_holiday_path(@sla_holiday), :title => @sla_holiday.name)
+          )
           redirect_back_or_default sla_holidays_path
         end
         format.api do
@@ -148,14 +150,18 @@ class SlaHolidaysController < ApplicationController
 
   def find_sla_holiday
     @sla_holiday = SlaHoliday.find(params[:id])
+    raise Unauthorized unless @sla_holiday.visible?
+    raise ActiveRecord::RecordNotFound if @sla_holiday.nil?
   rescue ActiveRecord::RecordNotFound
     render_404
   end
 
   def find_sla_holidays
-    @sla_holidays = SlaHoliday.visible.where(id: (params[:id]||params[:ids])).to_a
+    params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]] 
+    @sla_holidays = SlaHoliday.find(params[:ids]).to_a
+    @sla_holiday = @sla_holidays.first if @sla_holidays.count == 1
+    raise Unauthorized unless @sla_holidays.all?(&:visible?)
     raise ActiveRecord::RecordNotFound if @sla_holidays.empty?
-    #raise Unauthorized unless @sla_holidays.all?(&:visible?)
   rescue ActiveRecord::RecordNotFound
     render_404
   end
