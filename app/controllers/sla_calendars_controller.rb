@@ -32,6 +32,7 @@ class SlaCalendarsController < ApplicationController
 
   helper :sla_calendars
   helper :context_menus
+
   helper :queries
   include QueriesHelper
 
@@ -149,12 +150,17 @@ class SlaCalendarsController < ApplicationController
 
   def find_sla_calendar
     @sla_calendar = SlaCalendar.find(params[:id])
+    raise Unauthorized unless @sla_calendar.visible?
+    raise ActiveRecord::RecordNotFound if @sla_calendar.nil?
   rescue ActiveRecord::RecordNotFound
     render_404
   end
 
   def find_sla_calendars
-    @sla_calendars = SlaCalendar.visible.where(id: (params[:id]||params[:ids])).to_a
+    params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]] 
+    @sla_calendars = SlaCalendar.find(params[:ids]).to_a
+    @sla_calendar = @sla_calendars.first if @sla_calendars.count == 1
+    raise Unauthorized unless @sla_calendars.all?(&:visible?)
     raise ActiveRecord::RecordNotFound if @sla_calendars.empty?
   rescue ActiveRecord::RecordNotFound
     render_404
