@@ -57,10 +57,11 @@ module SlaHolidaysHelperSystemTest
     
   end 
 
-  def create_sla_holiday(sla_holiday_name)
+  def create_sla_holiday(sla_holiday_name,sla_holiday_date)
     visit '/sla/holidays/new'
     within('form#sla-holiday-form') do
       fill_in 'sla_holiday_name', :with => sla_holiday_name
+      fill_in 'sla_holiday_date', :with => sla_holiday_date
       find('input[name=commit]').click
     end
 

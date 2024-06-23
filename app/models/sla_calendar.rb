@@ -44,7 +44,7 @@ class SlaCalendar < ActiveRecord::Base
 
   # For index and show
   def visible?(user=User.current)
-    user.allowed_to?(:manage_sla, nil, global: true)
+    user.allowed_to?(:view_sla, nil, global: true)
   end
 
   # For create and update
