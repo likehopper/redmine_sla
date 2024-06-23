@@ -39,12 +39,16 @@
             <td class="buttons">
               <%= if entity.visible?
                     link_to l(:button_show), sla_level_term_path(entity),
-                            title: l(:button_show), class: 'icon-only icon-magnifier'
+                          title: l(:button_show), class: 'icon-only icon-magnifier'
+                  end -%>
+              <%= if entity.visible?
+                    link_to l('sla_label.sla_level_term.edit'), sla_terms_sla_level_path(entity.sla_level),
+                          title: l('sla_label.sla_level_term.edit'), class: 'icon-only icon-sla_level_term'
                   end -%>
               <%= if entity.deletable?
                     link_to l(:button_delete), sla_level_term_path(entity),
-                            data: {confirm: l(:text_are_you_sure)}, method: :delete,
-                           title: l(:button_delete), class: 'icon-only icon-del'
+                          data: {confirm: l(:text_are_you_sure)}, method: :delete,
+                          title: l(:button_delete), class: 'icon-only icon-del'
                   end -%>
             </td>
           </tr>

@@ -79,7 +79,7 @@ class SlaLevelTerm < ActiveRecord::Base
     user.allowed_to?(:manage_sla, nil, global: true)
   end
 
-  # Find a contractual term through 3 parameters ( sla_level, sla_type and sla_priority_id ) for SlaLevel#show & SlaLevel#nested
+  # Find a contractual term through 3 parameters ( sla_level, sla_type and sla_priority_id ) for SlaLevel#show & SlaLevel#sla_terms
   def self.find_by_level_type_priority( sla_level_id, sla_type_id, sla_priority_id )
     self.find_by( sla_level_id: sla_level_id, sla_type_id: sla_type_id, sla_priority_id: sla_priority_id ) if ! sla_priority_id.nil?
   end

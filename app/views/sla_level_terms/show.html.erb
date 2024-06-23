@@ -1,8 +1,8 @@
 <% html_title(l(:sla_label_global_settings)) %>
 <div class="content"> 
   <div class="contextual">
-    <%= link_to l('sla_label.sla_level_term.plural'), sla_level_terms_path, class: 'icon icon-cancel' %>
-  </div>
+    <%= render :partial => 'action_menu' %>
+  </div>  
   <div class="title-sla-settings title-sla_level_term">
     <%= title l('sla_label.sla_level_term.show') %>
   </div>

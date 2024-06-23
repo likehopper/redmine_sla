@@ -1,0 +1,15 @@
+<div class="contextual">
+  <%= link_to l(:button_back), :back,
+      :title => l(:button_back), class: 'icon icon-cancel',
+      :accesskey => accesskey(:previous) -%>
+  <% if User.current.admin? -%>  
+    <%= link_to l('sla_label.sla_level_term.edit'), sla_terms_sla_level_path(@sla_level_term.sla_level),
+          title: l('sla_label.sla_level_term.edit'),
+          class: 'icon icon-sla_level_term' -%>  
+    <%= link_to l('sla_label.sla_level_term.delete'), sla_level_term_path(@sla_level_term),
+          data: {:confirm => l(:text_are_you_sure)}, :method => :delete,
+          title: l('sla_label.sla_level_term.delete'), class: 'icon icon-del',
+          :accesskey => accesskey(:delete) -%>
+  <% end -%>
+</div>
+  

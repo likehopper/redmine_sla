@@ -80,41 +80,6 @@ module ObjectHelpers
     sla_status.reload
   end
 
-  # Generates an unsaved SlaProjectTracker
-  def SlaProjectTracker.generate(attributes={})
-    sla_project_tracker = SlaProjectTracker.new()
-    sla_project_tracker.project_id = attributes.key?(:project_id) ? attributes[:project_id].to_i : 1
-    sla_project_tracker.tracker_id = attributes.key?(:tracker_id) ? attributes[:tracker_id].to_i : Tracker.generate!.id
-    sla_project_tracker.sla_id = attributes.key?(:sla_id) ? attributes[:sla_id].to_i : Sla.generate!.id
-    yield sla_project_tracker if block_given?
-    sla_project_tracker
-  end
-
-  # Generates a saved SlaProjectTracker
-  def SlaProjectTracker.generate!(attributes={}, &block)
-    sla_project_tracker = SlaProjectTracker.generate(attributes, &block)
-    sla_project_tracker.save!
-    sla_project_tracker.reload
-  end
-
-  # Generates an unsaved SlaLevel
-  def SlaLevel.generate(attributes={})
-    sla_level = SlaLevel.new()
-    sla_level.name = attributes.key?(:name) ? attributes[:name] : "SlaLevel #{Time.now.strftime("%Y-%m-%d %H:%M:%S")}.#{(Time.now.usec/100.0).round.to_s.rjust(4,'0')}"
-    sla_level.sla_id = attributes.key?(:sla_id) ? attributes[:sla_id] : Sla.generate!.id
-    sla_level.sla_calendar_id = attributes.key?(:sla_calendar_id) ? attributes[:sla_calendar_id] : SlaCalendar.generate!.id
-    sla_level.custom_field_id = attributes.key?(:custom_field_id) ? attributes[:custom_field_id] : nil
-    yield sla_level if block_given?
-    sla_level
-  end
-
-  # Generates a saved SlaLevel
-  def SlaLevel.generate!(attributes={}, &block)
-    sla_level = SlaLevel.generate(attributes, &block)
-    sla_level.save!
-    sla_level.reload
-  end  
-
   # Generates an unsaved SlaHoliday
   def SlaHoliday.generate(attributes={})
     sla_holiday = SlaHoliday.new()
@@ -145,5 +110,58 @@ module ObjectHelpers
     sla_calendar.save!
     sla_calendar.reload
   end
+
+  # Generates an unsaved SlaLevel
+  def SlaLevel.generate(attributes={})
+    sla_level = SlaLevel.new()
+    sla_level.name = attributes.key?(:name) ? attributes[:name] : "SlaLevel #{Time.now.strftime("%Y-%m-%d %H:%M:%S")}.#{(Time.now.usec/100.0).round.to_s.rjust(4,'0')}"
+    sla_level.sla_id = attributes.key?(:sla_id) ? attributes[:sla_id] : Sla.generate!.id
+    sla_level.sla_calendar_id = attributes.key?(:sla_calendar_id) ? attributes[:sla_calendar_id] : SlaCalendar.generate!.id
+    sla_level.custom_field_id = attributes.key?(:custom_field_id) ? attributes[:custom_field_id] : nil
+    yield sla_level if block_given?
+    sla_level
+  end
+
+  # Generates a saved SlaLevel
+  def SlaLevel.generate!(attributes={}, &block)
+    sla_level = SlaLevel.generate(attributes, &block)
+    sla_level.save!
+    sla_level.reload
+  end
+
+  # Generates an unsaved SlaLevelTerm
+  def SlaLevelTerm.generate(attributes={})
+    sla_level_term = SlaLevelTerm.new()
+    sla_level_term.sla_level_id = attributes.key?(:sla_level_id) ? attributes[:sla_level_id] : SlaLevel.generate!.id
+    sla_level_term.sla_type_id = attributes.key?(:sla_type_id) ? attributes[:sla_type_id] : SlaType.generate!.id
+    sla_level_term.sla_priority_id = attributes.key?(:sla_priority_id) ? attributes[:sla_priority_id] : 2
+    sla_level_term.term = attributes.key?(:term) ? attributes[:term] : 90
+    yield sla_level_term if block_given?
+    sla_level_term
+  end
+
+  # Generates a saved SlaLevelTerm
+  def SlaLevelTerm.generate!(attributes={}, &block)
+    sla_level_term = SlaLevelTerm.generate(attributes, &block)
+    sla_level_term.save!
+    sla_level_term.reload
+  end    
+
+  # Generates an unsaved SlaProjectTracker
+  def SlaProjectTracker.generate(attributes={})
+    sla_project_tracker = SlaProjectTracker.new()
+    sla_project_tracker.project_id = attributes.key?(:project_id) ? attributes[:project_id].to_i : 1
+    sla_project_tracker.tracker_id = attributes.key?(:tracker_id) ? attributes[:tracker_id].to_i : Tracker.generate!.id
+    sla_project_tracker.sla_id = attributes.key?(:sla_id) ? attributes[:sla_id].to_i : Sla.generate!.id
+    yield sla_project_tracker if block_given?
+    sla_project_tracker
+  end
+
+  # Generates a saved SlaProjectTracker
+  def SlaProjectTracker.generate!(attributes={}, &block)
+    sla_project_tracker = SlaProjectTracker.generate(attributes, &block)
+    sla_project_tracker.save!
+    sla_project_tracker.reload
+  end  
 
 end
