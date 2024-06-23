@@ -76,7 +76,9 @@ class SlaLevelTermsController < ApplicationController
     if @sla_level_term.save
       respond_to do |format|
         format.html do
-          flash[:notice] = l(:notice_successful_create)
+          flash[:notice] = l("sla_label.sla_level_term.notice_successful_create",
+            :id => view_context.link_to("##{@sla_level_term.id}", sla_level_term_path(@sla_level_term), :title => @sla_level_term.name)
+          )
           redirect_back_or_default sla_level_terms_path
         end
         format.api do
@@ -97,7 +99,9 @@ class SlaLevelTermsController < ApplicationController
     if @sla_level_term.save
       respond_to do |format|
         format.html do
-          flash[:notice] = l(:notice_successful_update)
+          flash[:notice] = l("sla_label.sla_level_term.notice_successful_update",
+            :id => view_context.link_to("##{@sla_level_term.id}", sla_level_term_path(@sla_level_term), :title => @sla_level_term.name)
+          )
           redirect_back_or_default sla_level_terms_path
         end
         format.api { render_api_ok }
@@ -157,14 +161,18 @@ class SlaLevelTermsController < ApplicationController
 
   def find_sla_level_term
     @sla_level_term = SlaLevelTerm.find(params[:id])
+    raise Unauthorized unless @sla_level_term.visible?
+    raise ActiveRecord::RecordNotFound if @sla_level_term.nil?
   rescue ActiveRecord::RecordNotFound
     render_404
   end
 
   def find_sla_level_terms
-    @sla_level_terms = SlaLevelTerm.visible.where(id: (params[:id]||params[:ids])).to_a
+    params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]] 
+    @sla_level_terms = SlaLevelTerm.find(params[:ids]).to_a
+    @sla_level_term = @sla_level_terms.first if @sla_level_terms.count == 1
+    raise Unauthorized unless @sla_level_terms.all?(&:visible?)
     raise ActiveRecord::RecordNotFound if @sla_level_terms.empty?
-    #raise Unauthorized unless @sla_level_terms.all?(&:visible?)
   rescue ActiveRecord::RecordNotFound
     render_404
   end

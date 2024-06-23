@@ -38,7 +38,7 @@
             <% end %>
             <td class="buttons">
               <%= if entity.editable?
-                    link_to l(:button_add), nested_sla_level_path(entity),
+                    link_to l(:button_add), sla_terms_sla_level_path(entity),
                             title: l('sla_label.sla_level_term.edit'),
                             class: 'icon-only icon-sla_level_term'
                   end -%>

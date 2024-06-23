@@ -29,7 +29,7 @@ class SlaSchedulesController < ApplicationController
 
   before_action :find_sla_schedule, only: [ :show, :edit, :update ]
   before_action :find_sla_schedules, only: [ :destroy, :context_menu ]
-  #before_action :setup_sla_calendar
+  #before_action :setup_sla_schedules
 
   helper :sla_schedules
   helper :context_menus
@@ -153,23 +153,27 @@ class SlaSchedulesController < ApplicationController
   
   private
 
-  def find_sla_schedule
-    @sla_schedule = SlaSchedule.find(params[:id])
+  def find_sla_schedules
+    @sla_schedules = SlaSchedules.find(params[:id])
+    raise Unauthorized unless @sla_schedules.visible?
+    raise ActiveRecord::RecordNotFound if @sla_schedules.nil?
   rescue ActiveRecord::RecordNotFound
     render_404
   end
 
-  def find_sla_schedules
-    @sla_schedules = SlaSchedule.visible.where(id: (params[:id]||params[:ids])).to_a
-    raise ActiveRecord::RecordNotFound if @sla_schedules.empty?
-    #raise Unauthorized unless @sla_schedules.all?(&:visible?)
+  def find_sla_scheduless
+    params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]] 
+    @sla_scheduless = SlaSchedules.find(params[:ids]).to_a
+    @sla_schedules = @sla_scheduless.first if @sla_scheduless.count == 1
+    raise Unauthorized unless @sla_scheduless.all?(&:visible?)
+    raise ActiveRecord::RecordNotFound if @sla_scheduless.empty?
   rescue ActiveRecord::RecordNotFound
     render_404
   end
 
   # https://dev.to/pezza/dynamic-nested-forms-with-turbo-3786
-  #def setup_sla_calendar
-  #  @sla_calendar = SlaCalendar.new(sla_schedules: [SlaSchedule.new])
+  #def setup_sla_schedules
+  #  @sla_schedules = SlaSchedules.new(sla_schedules: [SlaSchedule.new])
   #end
 
 end

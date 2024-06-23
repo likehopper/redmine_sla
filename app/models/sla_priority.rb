@@ -31,7 +31,7 @@ class SlaPriority
     end
   end
 
-  # Use in management ( cf. nested & show in view/sla_levels )
+  # Use in management ( cf. #sla_terms & #show in view/sla_levels )
   def self.create(custom_field_id)
     if custom_field_id.nil? 
       SlaPriority.new

@@ -78,18 +78,17 @@ match 'sla/schedules', :controller => 'sla_schedules', :action => 'destroy', :vi
 # SLA Global settings - Sla Levels
 resources :sla_levels, path: "sla/levels" do
   member do
-    get 'nested'
+    get 'sla_terms'
   end
   collection do
     get 'context_menu'
   end
-  resources :sla_level_terms, path: "sla/level_terms", shallow: true
 end
 # context_menu : bulk_destroy
 match 'sla/levels', :controller => 'sla_levels', :action => 'destroy', :via => :delete
 
 # SLA Global settings - Sla Level Terms
-resources :sla_level_terms, path: "sla/level_terms", except: [:new, :create, :edit, :update] do
+resources :sla_level_terms, path: "sla/level_terms", only: [:index, :show, :destroy] do # except: [:new, :create, :edit, :update] do
   collection do
     get 'context_menu'
   end  

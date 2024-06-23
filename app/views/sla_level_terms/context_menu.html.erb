@@ -1,12 +1,15 @@
 <ul>
   <% if @sla_level_term_ids.count == 1 %>
     <li><%= context_menu_link l(:button_show), sla_level_term_path(@sla_level_term), class: 'icon icon-magnifier', disabled: !@can[:show] %></li>
-    <li><%= context_menu_link l(:button_edit), edit_sla_level_term_path(@sla_level_term), class: 'icon icon-edit', disabled: !@can[:edit] %></li>
+    <li><%= context_menu_link l('sla_label.sla_level_term.edit'), sla_terms_sla_level_path(@sla_level_term.sla_level),
+          title: l('sla_label.sla_level_term.edit'),
+          class: 'icon icon-sla_level_term'
+    -%></li>
   <% end %>
   <li><%= context_menu_link l(:button_delete),
             sla_level_terms_path(id: @sla_level_term_ids, back_url: @back),
             method: :delete, class: 'icon icon-del', disabled: !@can[:delete],
             data: { confirm: l('sla_label.sla_level_term.count',count: @sla_level_term_ids.count)+"\n"+l(:text_are_you_sure) }
-  %></li>
-  <%= call_hook(:view_sla_level_terms_context_menu_end, { sla_level_term: @sla_level_term, sla_level_terms: @sla_level_terms, can: @can, back: @back, project: @project }) %>
+  -%></li>
+  <%= call_hook(:view_sla_level_terms_context_menu_end, { sla_level_term: @sla_level_term, sla_level_terms: @sla_level_terms, can: @can, back: @back, project: @project }) -%>
 </ul>

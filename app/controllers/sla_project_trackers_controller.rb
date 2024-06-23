@@ -123,9 +123,9 @@ class SlaProjectTrackersController < ApplicationController
       format.html do
         flash[:notice] = l(:notice_successful_delete)
         flash[:warning] = l('label_sla_warning',changes: 'destroy')
-        Rails.logger.debug "Arguments: controller @project = #{@project}"
-        Rails.logger.debug "Arguments: controller back_url = #{back_url}"
-        Rails.logger.debug "Arguments: controller @back = #{@back}"
+        #Rails.logger.debug "Arguments: controller @project = #{@project}"
+        #Rails.logger.debug "Arguments: controller back_url = #{back_url}"
+        #Rails.logger.debug "Arguments: controller @back = #{@back}"
         redirect_back_or_default ( @project.nil? ? sla_project_trackers_path : settings_project_path(@project,tab: :sla) )
         # redirect_to
       end
