@@ -28,11 +28,11 @@ class SlaLevel < ActiveRecord::Base
   has_many :sla_caches
   has_many :sla_cache_spents, through: :sla_caches
   has_many :sla_project_trackers, through: :sla
-  
-  accepts_nested_attributes_for :sla_level_terms, allow_destroy: true
-  validate :sla_level_terms_greater_than_or_equal_to_zero
 
   include Redmine::SafeAttributes
+
+  accepts_nested_attributes_for :sla_level_terms, allow_destroy: true
+  validate :sla_level_terms_greater_than_or_equal_to_zero
 
   scope :visible, ->(*args) { where(SlaLevel.visible_condition(args.shift || User.current, *args)) }
 
@@ -46,8 +46,8 @@ class SlaLevel < ActiveRecord::Base
   validates_associated :sla_calendar
 
   validates_uniqueness_of :name, :case_sensitive => false
-
   validates_uniqueness_of :sla, :scope => [ :sla_calendar ]
+
   safe_attributes *%w[name sla_id sla_calendar_id custom_field_id]
 
   before_save do
@@ -64,7 +64,7 @@ class SlaLevel < ActiveRecord::Base
   def visible?(user=User.current)
     # TODO : permissions : user.allowed_to?(:view_sla, self.project, global: true) ???
     # TODO : permissions : only calendar of sla_project_trackers if ! project.nil?    
-    user.allowed_to?(:manage_sla, nil, global: true)
+    user.allowed_to?(:view_sla, nil, global: true)
   end
 
   # For create and update

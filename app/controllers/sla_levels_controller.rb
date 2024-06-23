@@ -25,8 +25,10 @@ class SlaLevelsController < ApplicationController
   before_action :require_admin, except: [:show]
   before_action :authorize_global
 
-  before_action :find_sla_level, only: [:show, :edit, :update, :nested]
+  before_action :find_sla_level, only: [:show, :edit, :update, :sla_terms]
   before_action :find_sla_levels, only: [ :destroy, :context_menu ]
+
+  before_action :authorize_global
 
   helper :sla_levels
   helper :context_menus
@@ -70,7 +72,9 @@ class SlaLevelsController < ApplicationController
     if @sla_level.save
       respond_to do |format|
         format.html do
-          flash[:notice] = l(:notice_successful_create)
+          flash[:notice] = l("sla_label.sla_level.notice_successful_create",
+            :id => view_context.link_to("##{@sla_level.id}", sla_level_path(@sla_level), :title => @sla_level.name)
+          )
           redirect_back_or_default sla_levels_path
         end
         format.api do
@@ -97,7 +101,9 @@ class SlaLevelsController < ApplicationController
     if @sla_level.save
       respond_to do |format|
         format.html do 
-          flash[:notice] = l(:notice_successful_update)
+          flash[:notice] = l("sla_label.sla_level.notice_successful_update",
+            :id => view_context.link_to("##{@sla_level.id}", sla_level_path(@sla_level), :title => @sla_level.name)
+          )
           redirect_back_or_default sla_levels_path
         end
         format.api { render_api_ok }
@@ -108,7 +114,7 @@ class SlaLevelsController < ApplicationController
           if params[:sla_level][:sla_level_terms_attributes].nil?
             render :action => 'edit'
           else
-            render :action => 'nested'
+            render :action => 'sla_terms'
           end
         end 
         format.api { render_validation_errors(@sla_level) }
@@ -116,7 +122,7 @@ class SlaLevelsController < ApplicationController
     end
   end
 
-  def nested
+  def sla_terms
     respond_to do |format|
       format.html do
       end
@@ -170,27 +176,37 @@ class SlaLevelsController < ApplicationController
 
   def find_sla_level
     @sla_level = SlaLevel.find(params[:id])
+    raise Unauthorized unless @sla_level.visible?
+    raise ActiveRecord::RecordNotFound if @sla_level.nil?
   rescue ActiveRecord::RecordNotFound
     render_404
   end
 
   def find_sla_levels
-    @sla_levels = SlaLevel.visible.where(id: (params[:id] || params[:ids])).to_a
+    params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]] 
+    @sla_levels = SlaLevel.find(params[:ids]).to_a
+    @sla_level = @sla_levels.first if @sla_levels.count == 1
+    raise Unauthorized unless @sla_levels.all?(&:visible?)
     raise ActiveRecord::RecordNotFound if @sla_levels.empty?
   rescue ActiveRecord::RecordNotFound
     render_404
   end
 
   def sla_level_params
-    params[:sla_level][:sla_level_terms_attributes].transform_values! do |value|
-      if value[:term].empty?
-        value[:_destroy] = true
-        value.delete(:term)
-      else
-        value[:_destroy] = false
+    sla_level_terms = []
+    params[:sla_level][:sla_level_terms_attributes].each do |sla_type_id,sla_priorities|
+      sla_priorities.each do |sla_priority_id,sla_terms|
+        sla_level_terms << {
+          id: sla_terms[:id],
+          sla_level_id: @sla_level.id,
+          sla_type_id: sla_type_id,
+          sla_priority_id: sla_priority_id,
+          term: ( sla_terms[:term].empty? ? nil : sla_terms[:term] ),
+          _destroy: sla_terms[:term].empty?
+        }.compact
       end
-      value
     end
+    params[:sla_level][:sla_level_terms_attributes] = sla_level_terms
     params.require(:sla_level).permit(sla_level_terms_attributes: SlaLevelTerm.attribute_names.map(&:to_sym).push(:_destroy) )
   end
   
