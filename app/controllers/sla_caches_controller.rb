@@ -72,7 +72,7 @@ class SlaCachesController < ApplicationController
       format.csv do
         # Export all entities
         @entities = scope.to_a
-        send_data(query_to_csv(@entities, @query, params), :type => 'text/csv; header=present', :filename => "#{filename_for_export(@query, 'timelog')}.csv")
+        send_data(query_to_csv(@entities, @query, params), :type => 'text/csv; header=present', :filename => "#{filename_for_export(@query, 'sla_caches')}.csv")
       end
     end      
   rescue ActiveRecord::RecordNotFound
