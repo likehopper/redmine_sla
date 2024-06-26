@@ -153,18 +153,18 @@ class SlaSchedulesController < ApplicationController
   
   private
 
-  def find_sla_schedules
-    @sla_schedules = SlaSchedules.find(params[:id])
-    raise Unauthorized unless @sla_schedules.visible?
-    raise ActiveRecord::RecordNotFound if @sla_schedules.nil?
+  def find_sla_schedule
+    @sla_schedule = SlaSchedule.find(params[:id])
+    raise Unauthorized unless @sla_schedule.visible?
+    raise ActiveRecord::RecordNotFound if @sla_schedule.nil?
   rescue ActiveRecord::RecordNotFound
     render_404
   end
 
   def find_sla_schedules
     params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]] 
-    @sla_schedules = SlaSchedules.find(params[:ids]).to_a
-    @sla_schedules = @sla_schedules.first if @sla_schedules.count == 1
+    @sla_schedules = SlaSchedule.find(params[:ids]).to_a
+    @sla_schedule = @sla_schedules.first if @sla_schedules.count == 1
     raise Unauthorized unless @sla_schedules.all?(&:visible?)
     raise ActiveRecord::RecordNotFound if @sla_schedules.empty?
   rescue ActiveRecord::RecordNotFound
