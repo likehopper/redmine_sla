@@ -18,12 +18,13 @@
 
 module SlaCalendarsHelper
 
-  # Generates a link to a sla_calendar
-  # Examples:
-  #
-  #   link_to_sla_calendar(sla_calendar) # => link to the specified project overview
-  #
-  def link_to_sla_calendar(sla_calendar)
+  # Generates a link to a sla_calendar with id
+  def link_to_sla_calendar_id(sla_calendar)
+    link_to sla_calendar.id, sla_calendar_url(sla_calendar, {:only_path => true})
+  end
+
+  # Generates a link to a sla_calendar with name
+  def link_to_sla_calendar_name(sla_calendar)
     link_to sla_calendar.name, sla_calendar_url(sla_calendar, {:only_path => true})
   end  
 

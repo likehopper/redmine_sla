@@ -25,13 +25,16 @@ module Queries::SlaCalendarHolidaysQueriesHelper
   def column_value(column, item, value)
     if item.is_a?(SlaCalendarHoliday)
       case column.name
+      when :id
+        link_to_sla_calendar_holiday_id(item)        
       when :sla_calendar
-        link_to_sla_calendar(item.sla_calendar)
+        link_to_sla_calendar_name(item.sla_calendar)
       when :sla_holiday
-        link_to_sla_holiday(item.sla_holiday) 
+        link_to_sla_holiday_name(item.sla_holiday) 
       else
         super
       end
     end
   end
+  
 end

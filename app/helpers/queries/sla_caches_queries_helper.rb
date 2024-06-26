@@ -24,8 +24,10 @@ module Queries::SlaCachesQueriesHelper
   def column_value(column, item, value)
     if item.is_a?(SlaCache)
       case column.name
+      when :id
+        item.id
       when :sla_level
-        link_to_sla_level(item.sla_level)
+        link_to_sla_level_name(item.sla_level)
       when /^issue.get_sla_respect/, /^get_sla_respect/
         if ! value.nil?
           content_tag('span', '', :title => value, :class => "icon #{value ? 'icon-ok' : 'icon-not-ok' }")
@@ -35,4 +37,5 @@ module Queries::SlaCachesQueriesHelper
       end
     end
   end
+  
 end

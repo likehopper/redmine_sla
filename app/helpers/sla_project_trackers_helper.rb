@@ -18,6 +18,12 @@
 
 module SlaProjectTrackersHelper
 
+  # Generates a link to a sla_project_tracker with id
+  def link_to_sla_project_tracker_id(sla_project_tracker)
+    link_to sla_project_tracker.id, _sla_project_trackers_path(sla_project_tracker.project)
+    # link_to sla_project_tracker.id, settings_project_path(sla_project_tracker.project,tab: :sla)
+  end  
+
   def _sla_project_trackers_path(project=nil, *args)
     #options = args.extract_options!
     Rails.logger.debug "Arguments: back_url = #{back_url}"

@@ -36,6 +36,9 @@ class SlaCalendarsController < ApplicationController
   helper :queries
   include QueriesHelper
 
+  helper Queries::SlaCalendarsQueriesHelper
+  include Queries::SlaCalendarsQueriesHelper   
+
   def index
     retrieve_query(Queries::SlaCalendarQuery) 
     @entity_count = @query.sla_calendars.count

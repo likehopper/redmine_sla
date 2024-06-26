@@ -17,21 +17,19 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-module Queries::SlaStatusesQueriesHelper
+module Queries::SlaHolidaysQueriesHelper
   include ApplicationHelper
-  include SlaTypesHelper
+  include SlaHolidaysHelper
 
   def column_value(column, item, value)
-    if item.is_a?(SlaStatus)
+    if item.is_a?(SlaHoliday)
       case column.name
       when :id
-        link_to_sla_status_id(item)        
-      when :sla_type
-        link_to_sla_type_name(item.sla_type)
+        link_to_sla_holiday_id(item)
       else
         super
       end
     end
   end
-
+  
 end
