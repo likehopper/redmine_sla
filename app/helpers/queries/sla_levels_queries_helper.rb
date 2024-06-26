@@ -25,13 +25,16 @@ module Queries::SlaLevelsQueriesHelper
   def column_value(column, item, value)
     if item.is_a?(SlaLevel)
       case column.name
+      when :id
+        link_to_sla_level_id(item)        
       when :sla
-        link_to_sla(item.sla)        
+        link_to_sla_name(item.sla)        
       when :sla_calendar
-        link_to_sla_calendar(item.sla_calendar)
+        link_to_sla_calendar_name(item.sla_calendar)
       else
         super
       end
     end
   end
+  
 end

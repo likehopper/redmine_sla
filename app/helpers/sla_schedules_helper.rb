@@ -18,4 +18,9 @@
 
 module SlaSchedulesHelper
 
+  # Generates a link to a sla_schedule
+  def link_to_sla_schedule_id(sla_schedule)
+    link_to sla_schedule.id, sla_schedule_url(sla_schedule, {:only_path => true})
+  end
+
 end

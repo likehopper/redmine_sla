@@ -32,8 +32,12 @@ class SlasController < ApplicationController
 
   helper :slas
   helper :context_menus
+
   helper :queries
   include QueriesHelper
+
+  helper Queries::SlasQueriesHelper
+  include Queries::SlasQueriesHelper  
 
   def index
     retrieve_query(Queries::SlaQuery) 

@@ -18,12 +18,13 @@
 
 module SlaHolidaysHelper
 
-  # Generates a link to a sla_holiday
-  # Examples:
-  #
-  #   link_to_sla_holiday(sla_holiday) # => link to the specified project overview
-  #
-  def link_to_sla_holiday(sla_holiday)
+  # Generates a link to a sla_holiday with name
+  def link_to_sla_holiday_id(sla_holiday)
+    link_to sla_holiday.id, sla_holiday_url(sla_holiday, {:only_path => true})
+  end
+
+  # Generates a link to a sla_holiday with name
+  def link_to_sla_holiday_name(sla_holiday)
     link_to sla_holiday.name, sla_holiday_url(sla_holiday, {:only_path => true})
   end  
 

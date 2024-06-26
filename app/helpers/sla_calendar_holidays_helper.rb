@@ -18,4 +18,9 @@
 
 module SlaCalendarHolidaysHelper
 
+    # Generates a link to a sla_calendar_holidaywith id
+  def link_to_sla_calendar_holiday_id(sla_calendar_holiday)
+    link_to sla_calendar_holiday.id, sla_calendar_holiday_url(sla_calendar_holiday, {:only_path => true})
+  end
+
 end

@@ -18,4 +18,9 @@
 
 module SlaLevelTermsHelper
 
+  # Generates a link to a sla_level_term with id
+  def link_to_sla_level_term_id(sla_level_term)
+    link_to sla_level_term.id, sla_level_term_url(sla_level_term, {:only_path => true})
+  end
+
 end
