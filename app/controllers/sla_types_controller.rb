@@ -30,8 +30,12 @@ class SlaTypesController < ApplicationController
 
   helper :sla_types
   helper :context_menus
+
   helper :queries
   include QueriesHelper
+
+  helper Queries::SlaTypesQueriesHelper
+  include Queries::SlaTypesQueriesHelper   
 
   def index
     retrieve_query(Queries::SlaTypeQuery) 

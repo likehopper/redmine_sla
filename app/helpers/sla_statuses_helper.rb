@@ -18,4 +18,9 @@
 
 module SlaStatusesHelper
 
+  # Generates a link to a sla_status with id
+  def link_to_sla_status_id(sla_status)
+    link_to sla_status.id, sla_status_url(sla_status, {:only_path => true})
+  end
+
 end

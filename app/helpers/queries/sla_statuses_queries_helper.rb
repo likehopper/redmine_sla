@@ -24,11 +24,14 @@ module Queries::SlaStatusesQueriesHelper
   def column_value(column, item, value)
     if item.is_a?(SlaStatus)
       case column.name
+      when :id
+        link_to_sla_status_id(item)        
       when :sla_type
-        link_to_sla_type(item.sla_type)
+        link_to_sla_type_name(item.sla_type)
       else
         super
       end
     end
   end
+
 end

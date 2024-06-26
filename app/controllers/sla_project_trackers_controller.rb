@@ -33,11 +33,13 @@ class SlaProjectTrackersController < ApplicationController
   rescue_from Query::QueryError, :with => :query_error
 
   helper :sla_project_trackers
+  helper :context_menus
 
   helper :queries
   include QueriesHelper
 
-  helper :context_menus
+  helper Queries::SlaProjectTrackersQueriesHelper
+  include Queries::SlaProjectTrackersQueriesHelper  
 
   def index
     use_session = !request.format.csv?

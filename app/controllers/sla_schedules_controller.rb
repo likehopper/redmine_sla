@@ -33,8 +33,12 @@ class SlaSchedulesController < ApplicationController
 
   helper :sla_schedules
   helper :context_menus
+
   helper :queries
   include QueriesHelper
+
+  helper Queries::SlaSchedulesQueriesHelper
+  include Queries::SlaSchedulesQueriesHelper 
 
   def index
     retrieve_query(Queries::SlaScheduleQuery) 

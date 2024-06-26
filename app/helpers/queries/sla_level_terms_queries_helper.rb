@@ -19,16 +19,19 @@
 
 module Queries::SlaLevelTermsQueriesHelper
   include ApplicationHelper
+  include SlaLevelTermsHelper
   include SlaLevelsHelper
   include SlaTypesHelper
 
   def column_value(column, item, value)
     if item.is_a?(SlaLevelTerm)
       case column.name
+      when :id
+        link_to_sla_level_term_id(item)        
       when :sla_level
-        link_to_sla_level(item.sla_level)     
+        link_to_sla_level_name(item.sla_level)     
       when :sla_type
-        link_to_sla_type(item.sla_type)
+        link_to_sla_type_name(item.sla_type)
       when :sla_priority_id
         ( item.sla_level.custom_field_id.nil? ? "[IssuePriority] " : "[CustomField] " ) +
           SlaPriority.create(item.sla_level.custom_field_id).find_by_priority_id(value).name

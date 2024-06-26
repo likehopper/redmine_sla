@@ -30,8 +30,12 @@ class SlaHolidaysController < ApplicationController
 
   helper :sla_holidays
   helper :context_menus
+
   helper :queries
   include QueriesHelper
+
+  helper Queries::SlaHolidaysQueriesHelper
+  include Queries::SlaHolidaysQueriesHelper     
 
   def index
     retrieve_query(Queries::SlaHolidayQuery) 
