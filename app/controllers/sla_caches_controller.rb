@@ -79,6 +79,13 @@ class SlaCachesController < ApplicationController
     render_404
   end
 
+  def show
+    respond_to do |format|
+      format.html { redirect_back_or_default sla_caches_path }
+      format.api { }
+    end
+  end  
+
   def refresh
     @sla_caches.each do |sla_cache|
       begin
