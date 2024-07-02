@@ -18,8 +18,6 @@
 
 class SlaSchedulesController < ApplicationController
 
-  # TODO: error on creation of a calendar with new schedule
-
   unloadable
 
   accept_api_auth :index, :create, :show, :update, :destroy
@@ -41,7 +39,7 @@ class SlaSchedulesController < ApplicationController
   include Queries::SlaSchedulesQueriesHelper 
 
   def index
-    retrieve_query(Queries::SlaScheduleQuery) 
+    retrieve_query(SlaScheduleQuery) 
     @entity_count = @query.sla_schedules.count
     @entity_pages = Paginator.new @entity_count, per_page_option, params['page']
     @entities = @query.sla_schedules(offset: @entity_pages.offset, limit: @entity_pages.per_page)
@@ -53,14 +51,6 @@ class SlaSchedulesController < ApplicationController
       end
     end      
   end
-
-  # def show
-  #   respond_to do |format|
-  #     format.html do
-  #       end
-  #     format.api
-  #   end
-  # end
   
   def new
     @sla_schedule = SlaSchedule.new
@@ -173,6 +163,38 @@ class SlaSchedulesController < ApplicationController
     raise ActiveRecord::RecordNotFound if @sla_schedules.empty?
   rescue ActiveRecord::RecordNotFound
     render_404
+  end
+
+  def retrieve_default_query(use_session)
+    return if params[:query_id].present?
+    return if api_request?
+    return if params[:set_filter]
+
+    if params[:without_default].present?
+      params[:set_filter] = 1
+      return
+    end
+    if !params[:set_filter] && use_session && session[:sla_schedule_query]
+      query_id = session[:sla_schedule_query].values_at(:id)
+      return if SlaScheduleQuery.where(id: query_id).exists?
+    end
+    if default_query = SlaScheduleQuery.default()
+      params[:query_id] = default_query.id
+    end
+  end    
+
+  # Returns the SlaScheduleQuery scope for index and report actions
+  def sla_schedule_scope(options={})
+    @query.results_scope(options)
+  end
+
+  def retrieve_sla_schedule_query
+    retrieve_query(SlaScheduleQuery, false, :defaults => @default_columns_names)
+  end
+
+  def query_error(exception)
+    session.delete(:sla_schedule_query)
+    super
   end
 
   # https://dev.to/pezza/dynamic-nested-forms-with-turbo-3786

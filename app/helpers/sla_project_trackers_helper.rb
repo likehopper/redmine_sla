@@ -25,19 +25,9 @@ module SlaProjectTrackersHelper
   end  
 
   def _sla_project_trackers_path(project=nil, *args)
-    #options = args.extract_options!
-    Rails.logger.debug "Arguments: back_url = #{back_url}"
-    #Rails.logger.debug "Arguments: options = #{options.inspect}"
     if project
-    #  if options.empty? && options[:tab].nil?
-        Rails.logger.debug "Arguments: project_sla_project_trackers_path"
         project_sla_project_trackers_path(project, *args)
-    #  else
-    #    Rails.logger.debug "Arguments: settings_project_path"
-    #    settings_project_path(project, *args)
-    #  end
     else
-      Rails.logger.debug "Arguments: sla_project_trackers_path"
       sla_project_trackers_path(*args)
     end
   end

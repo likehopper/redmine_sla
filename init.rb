@@ -81,13 +81,15 @@ end
 
 RedmineApp::Application.config.after_initialize do
 
-  require_dependency 'projects_controller'
-  ProjectsController.helper(RedmineSla::Patches::ProjectsHelperPatch)
-
-  # Adds methods on Redmine's Issues for SLA management
-  unless Issue.included_modules.include? RedmineSla::Patches::IssuePatch
-    Issue.send(:include, RedmineSla::Patches::IssuePatch)
+  # require_dependency 'projects_controller'
+  unless ProjectsController.included_modules.include? RedmineSla::Patches::ProjectsHelperPatch
+    ProjectsController.helper(RedmineSla::Patches::ProjectsHelperPatch)
   end
+
+  # Only to display SlaLevel in issues#index & time_entries#index
+  unless QueriesHelper.included_modules.include? RedmineSla::Patches::QueriesHelperPatch
+    QueriesHelper.send(:include, RedmineSla::Patches::QueriesHelperPatch)
+  end  
 
   # Adds methods on Redmine's TimeEntry for SLA management
   unless TimeEntry.included_modules.include? RedmineSla::Patches::TimeEntryPatch
@@ -99,9 +101,9 @@ RedmineApp::Application.config.after_initialize do
     IssueCustomField.send(:include, RedmineSla::Patches::IssueCustomFieldPatch)
   end
 
-  # Only to display SlaLevel in issues#index & time_entries#index
-  unless QueriesHelper.included_modules.include? RedmineSla::Patches::QueriesHelperPatch
-    QueriesHelper.send(:include, RedmineSla::Patches::QueriesHelperPatch)
+  # Adds methods on Redmine's Issues for SLA management
+  unless Issue.included_modules.include? RedmineSla::Patches::IssuePatch
+    Issue.send(:include, RedmineSla::Patches::IssuePatch)
   end
 
   if (ActiveRecord::Base.connection.tables.include?('queries') rescue false) &&

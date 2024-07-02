@@ -31,5 +31,5 @@ module Queries::SlasQueriesHelper
       end
     end
   end
-  
+
 end

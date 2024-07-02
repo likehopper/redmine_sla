@@ -38,7 +38,7 @@ class SlaTypesController < ApplicationController
   include Queries::SlaTypesQueriesHelper   
 
   def index
-    retrieve_query(Queries::SlaTypeQuery) 
+    retrieve_query(SlaTypeQuery) 
     @entity_count = @query.sla_types.count
     @entity_pages = Paginator.new @entity_count, per_page_option, params['page']
     @entities = @query.sla_types(offset: @entity_pages.offset, limit: @entity_pages.per_page) 
@@ -50,14 +50,6 @@ class SlaTypesController < ApplicationController
       end
     end    
   end
-
-  # def show
-  #   respond_to do |format|
-  #     format.html do
-  #       end
-  #     format.api
-  #   end
-  # end  
 
   def new
     @sla_type = SlaType.new
@@ -172,6 +164,38 @@ class SlaTypesController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render_404
   end
+  
+  def retrieve_default_query(use_session)
+    return if params[:query_id].present?
+    return if api_request?
+    return if params[:set_filter]
+
+    if params[:without_default].present?
+      params[:set_filter] = 1
+      return
+    end
+    if !params[:set_filter] && use_session && session[:sla_type_query]
+      query_id = session[:sla_type_query].values_at(:id)
+      return if SlaTypeQuery.where(id: query_id).exists?
+    end
+    if default_query = SlaTypeQuery.default()
+      params[:query_id] = default_query.id
+    end
+  end
+
+  # Returns the SlaTypeQuery scope for index and report actions
+  def sla_type_scope(options={})
+    @query.results_scope(options)
+  end
+
+  def retrieve_sla_type_query
+    retrieve_query(SlaTypeQuery, false, :defaults => @default_columns_names)
+  end
+
+  def query_error(exception)
+    session.delete(:sla_type_query)
+    super
+  end    
 
   # Dynamic creation of the new SlaType
   def post_create

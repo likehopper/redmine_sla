@@ -40,7 +40,7 @@ class SlaCalendarsController < ApplicationController
   include Queries::SlaCalendarsQueriesHelper   
 
   def index
-    retrieve_query(Queries::SlaCalendarQuery) 
+    retrieve_query(SlaCalendarQuery) 
     @entity_count = @query.sla_calendars.count
     @entity_pages = Paginator.new @entity_count, per_page_option, params['page']
     @entities = @query.sla_calendars(offset: @entity_pages.offset, limit: @entity_pages.per_page) 
@@ -49,13 +49,6 @@ class SlaCalendarsController < ApplicationController
       format.api { @offset, @limit = api_offset_and_limit }
     end    
   end
-
-  # def show
-  #   respond_to do |format|
-  #     format.html
-  #     format.api
-  #   end
-  # end    
 
   def new
     @sla_calendar = SlaCalendar.new
@@ -199,5 +192,37 @@ class SlaCalendarsController < ApplicationController
     end
     true
   end
+
+  def retrieve_default_query(use_session)
+    return if params[:query_id].present?
+    return if api_request?
+    return if params[:set_filter]
+
+    if params[:without_default].present?
+      params[:set_filter] = 1
+      return
+    end
+    if !params[:set_filter] && use_session && session[:sla_calendar_query]
+      query_id = session[:sla_calendar_query].values_at(:id)
+      return if SlaCalendarQuery.where(id: query_id).exists?
+    end
+    if default_query = SlaCalendarQuery.default()
+      params[:query_id] = default_query.id
+    end
+  end    
+
+  # Returns the SlaCalendarQuery scope for index and report actions
+  def sla_calendar_scope(options={})
+    @query.results_scope(options)
+  end
+
+  def retrieve_sla_calendar_query
+    retrieve_query(SlaCalendarQuery, false, :defaults => @default_columns_names)
+  end
+
+  def query_error(exception)
+    session.delete(:sla_calendar_query)
+    super
+  end  
 
 end

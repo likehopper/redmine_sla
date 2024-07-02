@@ -28,6 +28,64 @@ module RedmineSla
           unloadable
           alias_method :column_value_without_custom_sla_priority_id, :column_value
           alias_method :column_value, :column_value_with_custom_sla_priority_id
+
+          def redirect_to_sla_query(options)
+            redirect_to slas_path(options)
+          end
+
+          def redirect_to_sla_type_query(options)
+            redirect_to sla_types_path(options)
+          end
+
+          def redirect_to_sla_status_query(options)
+            redirect_to sla_statuses_path(options)
+          end
+
+          def redirect_to_sla_calendar_query(options)
+            redirect_to sla_calendars_path(options)
+          end
+
+          def redirect_to_sla_holiday_query(options)
+            redirect_to sla_holidays_path(options)
+          end
+
+          def redirect_to_sla_calendar_holiday_query(options)
+            redirect_to sla_calendar_holidays_path(options)
+          end
+
+          def redirect_to_sla_schedule_query(options)
+            redirect_to sla_schedules_path(options)
+          end          
+
+          def redirect_to_sla_level_query(options)
+            redirect_to sla_levels_path(options)
+          end
+
+          def redirect_to_sla_level_term_query(options)
+            redirect_to sla_level_terms_path(options)
+          end          
+
+          def redirect_to_sla_project_tracker_query(options)
+            if @project  
+              redirect_to project_sla_project_trackers_path(@project,options)
+            else
+              redirect_to sla_project_trackers_path(options)
+            end
+          end          
+
+          def redirect_to_sla_cache_query(options)
+            Rails.logger.debug "==>> redirect_to_sla_cache_query options=#{options}"
+            if @project
+              redirect_to project_sla_caches_path(@project,options)
+            else
+              redirect_to sla_caches_path(options)
+            end
+          end
+
+          def redirect_to_sla_cache_spent_query(options)
+            redirect_to sla_cache_spents_path(options)
+          end
+
         end 
       end
     end
