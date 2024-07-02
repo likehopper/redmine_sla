@@ -40,7 +40,7 @@ class SlasController < ApplicationController
   include Queries::SlasQueriesHelper  
 
   def index
-    retrieve_query(Queries::SlaQuery) 
+    retrieve_query(SlaQuery)
     @entity_count = @query.slas.count
     @entity_pages = Paginator.new @entity_count, per_page_option, params['page']
     @entities = @query.slas(offset: @entity_pages.offset, limit: @entity_pages.per_page) 
@@ -52,15 +52,6 @@ class SlasController < ApplicationController
       end
     end
   end
-
-  # def show
-  #   respond_to do |format|
-  #     format.html do
-  #     end
-  #     format.api do
-  #     end
-  #   end
-  # end  
 
   def new
     @sla = Sla.new
@@ -175,5 +166,37 @@ class SlasController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render_404
   end
+
+  def retrieve_default_query(use_session)
+    return if params[:query_id].present?
+    return if api_request?
+    return if params[:set_filter]
+
+    if params[:without_default].present?
+      params[:set_filter] = 1
+      return
+    end
+    if !params[:set_filter] && use_session && session[:sla_query]
+      query_id = session[:sla_query].values_at(:id)
+      return if SlaQuery.where(id: query_id).exists?
+    end
+    if default_query = SlaQuery.default()
+      params[:query_id] = default_query.id
+    end
+  end  
+
+  # Returns the SlaQuery scope for index and report actions
+  def sla_scope(options={})
+    @query.results_scope(options)
+  end
+
+  def retrieve_sla_query
+    retrieve_query(SlaQuery, false, :defaults => @default_columns_names)
+  end
+
+  def query_error(exception)
+    session.delete(:sla_query)
+    super
+  end  
 
 end

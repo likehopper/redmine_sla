@@ -16,59 +16,52 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-class Queries::SlaScheduleQuery < Query
+class SlaLevelQuery < Query
 
   unloadable
-
-  self.queried_class = SlaSchedule
+  
+  self.queried_class = SlaLevel
 
   def initialize_available_filters
+    add_available_filter 'name', type: :string
+    add_available_filter 'sla_id', type: :list, :values => lambda {all_sla_values}
     add_available_filter 'sla_calendar_id', :type => :list, :values => lambda {all_sla_calendar_values}
-    add_available_filter 'dow', type: :list, :values => I18n.t('date.day_names').map.with_index{|name,id| [name.to_s, id.to_s] } 
-    # TODO : type time need to override query class ;(
-    # add_available_filter 'start_time', type: :time
-    # add_available_filter 'end_time', type: :time
-    add_available_filter 'match', :type => :list, :values => [[l(:general_text_yes), "1"], [l(:general_text_no), "0"]]
+    add_available_filter 'custom_field_id', :type => :list, :values => lambda {all_sla_custom_fields_values}
   end
 
   def available_columns
     return @available_columns if @available_columns
     @available_columns = []
-    @available_columns << QueryColumn.new(:id, :sortable => "#{SlaSchedule.table_name}.id", :default_order => nil, :groupable => false )
+    @available_columns << QueryColumn.new(:id, :sortable => "#{SlaLevel.table_name}.id", :default_order => :asc, :groupable => false)
+    @available_columns << QueryColumn.new(:name, :sortable => "#{SlaLevel.table_name}.name", :default_order => :asc, :groupable => false)
+    @available_columns << QueryColumn.new(:sla, :sortable => "#{Sla.table_name}.name", :default_order => :asc, :groupable => true)
     @available_columns << QueryColumn.new(:sla_calendar, :sortable => "#{SlaCalendar.table_name}.name", :default_order => :asc, :groupable => true)
-    @available_columns << QueryColumn.new(:dow, :sortable => "#{SlaSchedule.table_name}.dow", :default_order => nil, :groupable => true )
-    # TODO : type time need to override query class ;(
-    #@available_columns << QueryColumn.new(:start_time, :sortable => "#{SlaSchedule.table_name}.start_time", :default_order => :desc, :groupable => false )
-    #@available_columns << QueryColumn.new(:end_time, :sortable => "#{SlaSchedule.table_name}.end_time", :default_order => :desc, :groupable => false )
-    @available_columns << QueryColumn.new(:match, :sortable => "#{SlaSchedule.table_name}.match", :default_order => nil, :groupableupable => true )
+    @available_columns << QueryColumn.new(:custom_field, :sortable => "#{CustomField.table_name}.name", :default_order => :asc, :groupable => true)
     @available_columns
   end
 
   def initialize(attributes=nil, *args)
     super attributes
     self.filters ||= {
-    #  "sla_calendar_id" => {:operator => "*", :values => []},
-    #  "dow" => {:operator => "*", :values => []},
-    #  "start_time" => {:operator => "*", :values => []},            
-    #  "end_time" => {:operator => "*", :values => []},
-    #  "match" => {:operator => "*", :values => []}
+    #  "name" => {:operator => "*", :values => []},
+    #  "sla_id" => {:operator => "*", :values => []},
+    #  "sla_calendar_id" => {:operator => "*", :values => []}
     }
   end
 
   def default_columns_names
     super.presence || [
+      "name",
+      "sla",
       "sla_calendar",
-      "dow",
-      "start_time",
-      "end_time",
-      "match"
+      "custom_field"
     ].flat_map{|c| [c.to_s, c.to_sym]}
   end
   
-  def sla_schedules(options={})
+  def sla_levels(options={})
     order_option = [group_by_sort_order, (options[:order] || sort_clause)].flatten.reject(&:blank?)
 
-    scope = self.queried_class.visible.where(statement).
+    scope = base_scope.
         includes(((options[:include] || [])).uniq).
         where(options[:conditions]).
         order(order_option).
@@ -76,8 +69,8 @@ class Queries::SlaScheduleQuery < Query
         limit(options[:limit]).
         offset(options[:offset])
 
-    sla_schedules = scope.to_a
-    sla_schedules
+    sla_levels = scope.to_a
+    sla_levels
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)
   end
@@ -87,6 +80,16 @@ class Queries::SlaScheduleQuery < Query
     self.queried_class.visible.where(statement)
   end  
 
+  def all_sla_values
+    return @all_sla_values if @all_sla_values
+
+    values ||= []
+    Sla.pluck(:name,:id).map { |name,id|
+      values << [name.to_s,id.to_s]
+    }
+    @all_sla_values = values
+  end
+
   def all_sla_calendar_values
     return @all_sla_calendar_values if @all_sla_calendar_values
 
@@ -95,6 +98,16 @@ class Queries::SlaScheduleQuery < Query
       values << [name.to_s,id.to_s]
     }
     @all_sla_calendar_values = values
+  end
+
+  def all_sla_custom_fields_values
+    return @all_sla_custom_fields_values if @all_sla_custom_fields_values
+
+    values ||= []
+    SlaCustomField.pluck(:name,:id).map { |name,id|
+      values << [name.to_s,id.to_s]
+    }
+    @all_sla_custom_fields_values = values
   end
 
 end

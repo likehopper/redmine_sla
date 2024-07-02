@@ -40,7 +40,7 @@ class SlaLevelTermsController < ApplicationController
   def index
     use_session = !request.format.csv?
     retrieve_default_query(use_session) 
-    retrieve_query(Queries::SlaLevelTermQuery,use_session) 
+    retrieve_query(SlaLevelTermQuery,use_session) 
 
     @entity_count = @query.sla_level_terms.count
     @entity_pages = Paginator.new @entity_count, per_page_option, params['page']
@@ -53,14 +53,6 @@ class SlaLevelTermsController < ApplicationController
       end
     end    
   end
-
-  # def show
-  #   respond_to do |format|
-  #     format.html do
-  #       end
-  #     format.api
-  #   end
-  # end  
 
   def new
     raise Unauthorized
@@ -188,9 +180,9 @@ class SlaLevelTermsController < ApplicationController
     end
     if !params[:set_filter] && use_session && session[:sla_level_term_query]
       query_id = session[:sla_level_term_query].values_at(:id)
-      return if Queries::SlaLevelTermQuery.where(id: query_id).exists?
+      return if SlaLevelTermQuery.where(id: query_id).exists?
     end
-    if default_query = Queries::SlaLevelTermQuery.default()
+    if default_query = SlaLevelTermQuery.default()
       params[:query_id] = default_query.id
     end
   end  
@@ -201,7 +193,7 @@ class SlaLevelTermsController < ApplicationController
   end
 
   def retrieve_sla_level_term_query
-    retrieve_query(SlaCacheQuery, false, :defaults => @default_columns_names)
+    retrieve_query(SlaLevelTermQuery, false, :defaults => @default_columns_names)
   end
 
   def query_error(exception)

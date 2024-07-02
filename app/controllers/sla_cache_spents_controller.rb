@@ -47,7 +47,7 @@ class SlaCacheSpentsController < ApplicationController
   def index
     use_session = !request.format.csv?
     retrieve_default_query(use_session) 
-    retrieve_query(Queries::SlaCacheSpentQuery,use_session)
+    retrieve_query(SlaCacheSpentQuery,use_session)
 
     scope = sla_cache_spent_scope.
       preload(:issue => [:project, :tracker, :status, :priority]).
@@ -187,14 +187,14 @@ private
     end
     if !params[:set_filter] && use_session && session[:sla_cache_spent_query]
       query_id, project_id = session[:sla_cache_spent_query].values_at(:id, :project_id)
-      return if Queries::SlaCacheSpentQuery.where(id: query_id).exists? && project_id == @project&.id
+      return if SlaCacheSpentQuery.where(id: query_id).exists? && project_id == @project&.id
     end
-    if default_query = Queries::SlaCacheSpentQuery.default(project: @project)
+    if default_query = SlaCacheSpentQuery.default(project: @project)
       params[:query_id] = default_query.id
     end
   end  
     
-  # Returns the SlaCache scope for index and report actions
+  # Returns the SlaCacheSpentQuery scope for index and report actions
   def sla_cache_spent_scope(options={})
     @query.results_scope(options)
   end

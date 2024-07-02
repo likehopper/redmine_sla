@@ -1,5 +1,7 @@
-<% if User.current.admin? %>
 <% content_for :sidebar do %>
+<%= render_sidebar_queries(@query.class, @project) unless @query.nil? -%>
+<%= call_hook(:view_users_sidebar_queries_bottom) -%>
+<% if User.current.admin? && @project.nil? %>
   <h3><%= l(:sla_label_global_settings) %></h3>
   <ul>
     <%= 
@@ -58,7 +60,7 @@
     class: 'icon icon-sla_cache_spent'))
   %>
   </ul>
-  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-  <span class="redmine_sla_footer"><a href="https://www.flaticon.com/authors/freepik" title="icons">Icons created by Freepik - Flaticon</a></span>
+  <br /><br /><span class="redmine_sla_footer"><a href="https://www.flaticon.com/authors/freepik" title="icons">Icons created by Freepik - Flaticon</a></span>
 <% end %>
+<br />
 <% end %>
