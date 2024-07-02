@@ -40,7 +40,7 @@ class SlaLevelsController < ApplicationController
   include Queries::SlaLevelsQueriesHelper 
 
   def index
-    retrieve_query(Queries::SlaLevelQuery) 
+    retrieve_query(SlaLevelQuery) 
     @entity_count = @query.sla_levels.count
     @entity_pages = Paginator.new @entity_count, per_page_option, params['page']
     @entities = @query.sla_levels(offset: @entity_pages.offset, limit: @entity_pages.per_page) 
@@ -52,14 +52,6 @@ class SlaLevelsController < ApplicationController
       end
     end    
   end
-
-  # def show
-  #   respond_to do |format|
-  #     format.html do
-  #       end
-  #     format.api
-  #   end
-  # end
 
   def new
     @sla_level = SlaLevel.new
@@ -192,6 +184,7 @@ class SlaLevelsController < ApplicationController
     render_404
   end
 
+  # Translate sla_level_terms_attributes from params in good format for update  SlaLevelTerm
   def sla_level_params
     sla_level_terms = []
     params[:sla_level][:sla_level_terms_attributes].each do |sla_type_id,sla_priorities|
@@ -209,5 +202,37 @@ class SlaLevelsController < ApplicationController
     params[:sla_level][:sla_level_terms_attributes] = sla_level_terms
     params.require(:sla_level).permit(sla_level_terms_attributes: SlaLevelTerm.attribute_names.map(&:to_sym).push(:_destroy) )
   end
+
+  def retrieve_default_query(use_session)
+    return if params[:query_id].present?
+    return if api_request?
+    return if params[:set_filter]
+
+    if params[:without_default].present?
+      params[:set_filter] = 1
+      return
+    end
+    if !params[:set_filter] && use_session && session[:sla_level_query]
+      query_id = session[:sla_level_query].values_at(:id)
+      return if SlaLevelQuery.where(id: query_id).exists?
+    end
+    if default_query = SlaLevelQuery.default()
+      params[:query_id] = default_query.id
+    end
+  end  
+
+  # Returns the SlaLevelQuery scope for index and report actions
+  def sla_level_scope(options={})
+    @query.results_scope(options)
+  end
+
+  def retrieve_sla_level_query
+    retrieve_query(SlaLevelQuery, false, :defaults => @default_columns_names)
+  end
+
+  def query_error(exception)
+    session.delete(:sla_level_query)
+    super
+  end  
   
 end

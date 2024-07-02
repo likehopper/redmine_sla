@@ -37,7 +37,7 @@ class SlaCalendarHolidaysController < ApplicationController
   include Queries::SlaCalendarHolidaysQueriesHelper  
 
   def index
-    retrieve_query(Queries::SlaCalendarHolidayQuery) 
+    retrieve_query(SlaCalendarHolidayQuery) 
     @entity_count = @query.sla_calendar_holidays.count
     @entity_pages = Paginator.new @entity_count, per_page_option, params['page']
     @entities = @query.sla_calendar_holidays(offset: @entity_pages.offset, limit: @entity_pages.per_page) 
@@ -46,13 +46,6 @@ class SlaCalendarHolidaysController < ApplicationController
       format.api do @offset, @limit = api_offset_and_limit end
     end    
   end
-
-  # def show
-  #   respond_to do |format|
-  #     format.html
-  #     format.api
-  #   end
-  # end
 
   def new
     @sla_calendar_holiday = SlaCalendarHoliday.new
@@ -158,5 +151,37 @@ class SlaCalendarHolidaysController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render_404
   end
+
+  def retrieve_default_query(use_session)
+    return if params[:query_id].present?
+    return if api_request?
+    return if params[:set_filter]
+
+    if params[:without_default].present?
+      params[:set_filter] = 1
+      return
+    end
+    if !params[:set_filter] && use_session && session[:sla_calendar_holiday_query]
+      query_id = session[:sla_calendar_holiday_query].values_at(:id)
+      return if SlaCalendarHolidayQuery.where(id: query_id).exists?
+    end
+    if default_query = SlaCalendarHolidayQuery.default()
+      params[:query_id] = default_query.id
+    end
+  end   
+
+  # Returns the SlaCalendarHolidayQuery scope for index and report actions
+  def sla_calendar_holiday_scope(options={})
+    @query.results_scope(options)
+  end
+
+  def retrieve_sla_calendar_holiday_query
+    retrieve_query(SlaCalendarHolidayQuery, false, :defaults => @default_columns_names)
+  end
+
+  def query_error(exception)
+    session.delete(:sla_calendar_holiday_query)
+    super
+  end    
 
 end

@@ -44,7 +44,7 @@ class SlaProjectTrackersController < ApplicationController
   def index
     use_session = !request.format.csv?
     retrieve_default_query(use_session) 
-    retrieve_query(Queries::SlaProjectTrackerQuery) 
+    retrieve_query(SlaProjectTrackerQuery) 
 
     @entity_count = @query.sla_project_trackers.count
     @entity_pages = Paginator.new @entity_count, per_page_option, params['page']
@@ -57,13 +57,6 @@ class SlaProjectTrackersController < ApplicationController
       end
     end      
   end
-
-  # def show
-  #   respond_to do |format|
-  #     format.html do end
-  #     format.api do end
-  #   end
-  # end  
 
   def new
     @sla_project_tracker = SlaProjectTracker.new
@@ -125,11 +118,7 @@ class SlaProjectTrackersController < ApplicationController
       format.html do
         flash[:notice] = l(:notice_successful_delete)
         flash[:warning] = l('label_sla_warning',changes: 'destroy')
-        #Rails.logger.debug "Arguments: controller @project = #{@project}"
-        #Rails.logger.debug "Arguments: controller back_url = #{back_url}"
-        #Rails.logger.debug "Arguments: controller @back = #{@back}"
         redirect_back_or_default ( @project.nil? ? sla_project_trackers_path : settings_project_path(@project,tab: :sla) )
-        # redirect_to
       end
       format.api { render_api_ok }
     end
@@ -192,14 +181,32 @@ private
     end
     if !params[:set_filter] && use_session && session[:sla_project_tracker_query]
       query_id, project_id = session[:sla_project_tracker_query].values_at(:id, :project_id)
-      return if Queries::SlaProjectTrackerQuery.where(id: query_id).exists? && project_id == @project&.id
+      return if SlaProjectTrackerQuery.where(id: query_id).exists? && project_id == @project&.id
     end
-    if default_query = Queries::SlaProjectTrackerQuery.default(project: @project)
+    if default_query = SlaProjectTrackerQuery.default(project: @project)
       params[:query_id] = default_query.id
     end
   end    
 
-  # Returns the SlaProjectTracker scope for index and report actions
+  def retrieve_default_query(use_session)
+    return if params[:query_id].present?
+    return if api_request?
+    return if params[:set_filter]
+
+    if params[:without_default].present?
+      params[:set_filter] = 1
+      return
+    end
+    if !params[:set_filter] && use_session && session[:sla_project_tracker_query]
+      query_id, project_id = session[:sla_project_tracker_query].values_at(:id, :project_id)
+      return if SlaProjectTrackerQuery.where(id: query_id).exists? && project_id == @project&.id
+    end
+    if default_query = SlaProjectTrackerQuery.default(project: @project)
+      params[:query_id] = default_query.id
+    end
+  end  
+
+  # Returns the SlaProjectTrackerQuery scope for index and report actions
   def sla_project_tracker_scope(options={})
     @query.results_scope(options)
   end
