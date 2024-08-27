@@ -48,7 +48,14 @@
     </fieldset>
   <% end %>
   <%= export_csv_encoding_select_tag %>
+  <% if ( Redmine::VERSION::MAJOR > 5 || ( Redmine::VERSION::MAJOR == 5 && Redmine::VERSION::MINOR >= 1 ) ) %>
   <%= export_csv_separator_select_tag %>
+  <% end %>
+  <% if @entity_count > Setting.issues_export_limit.to_i %>
+  <p class="icon icon-warning">
+    <%= l(:setting_issues_export_limit) %>: <%= Setting.issues_export_limit.to_i %>
+  </p>
+  <% end %>
   <p class="buttons">
     <%= submit_tag l(:button_export), :name => nil, :onclick => "hideModal(this);", :data => { :disable_with => false } %>
     <%= link_to_function l(:button_cancel), "hideModal(this);" %>
