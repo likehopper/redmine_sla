@@ -23,6 +23,7 @@ class SlaSchedule < ActiveRecord::Base
   belongs_to :sla_calendar
 
   include Redmine::SafeAttributes
+  include Redmine::I18n
 
   scope :visible, ->(*args) { where(SlaSchedule.visible_condition(args.shift || User.current, *args)) }
 

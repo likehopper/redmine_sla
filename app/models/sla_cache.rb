@@ -30,6 +30,7 @@ class SlaCache < ActiveRecord::Base
 
   include Redmine::SafeAttributes
   safe_attributes *%w[]
+  include Redmine::I18n
 
   # Join order is important
   default_scope { joins(:sla_level,:project,:issue) }

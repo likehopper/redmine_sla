@@ -24,6 +24,7 @@ class SlaCalendarHoliday < ActiveRecord::Base
   belongs_to :sla_holiday
 
   include Redmine::SafeAttributes
+  include Redmine::I18n
 
   scope :visible, ->(*args) { where(SlaCalendarHoliday.visible_condition(args.shift || User.current, *args)) }
 

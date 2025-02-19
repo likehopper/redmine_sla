@@ -32,6 +32,7 @@ class SlaProjectTracker < ActiveRecord::Base
   after_destroy :sla_cache_destroy
 
   include Redmine::SafeAttributes
+  include Redmine::I18n
 
   default_scope { joins(:tracker) }  
 
