@@ -84,7 +84,7 @@ module RedmineSla
         base.extend(ClassMethods)
         base.send(:include, InstanceMethods)
         base.class_eval do
-          unloadable
+          unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
           # After issue update, if project or tracker changed then refresh sla_cache !!!
           after_save :sla_cache_update
         end

@@ -18,7 +18,7 @@
 
 class SlaStatus < ActiveRecord::Base
 
-  unloadable
+  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
   
   belongs_to :sla_type
   belongs_to :status, :class_name => 'IssueStatus'
