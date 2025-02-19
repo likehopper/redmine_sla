@@ -19,7 +19,7 @@
 # class Queries::SlaCacheQuery < Query
 class SlaCacheQuery < Query
 
-  unloadable
+  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
   
   self.queried_class = SlaCache
   self.view_permission = :view_sla

@@ -18,7 +18,7 @@
 
 class Sla < ActiveRecord::Base
   
-  unloadable
+  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
 
   has_many :sla_project_trackers
   has_many :sla_levels

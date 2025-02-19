@@ -18,7 +18,7 @@
 
 class SlaLevelTerm < ActiveRecord::Base
 
-  unloadable
+  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
   
   belongs_to :sla_level
   belongs_to :sla_type

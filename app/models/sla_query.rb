@@ -19,7 +19,7 @@
 # class Queries::SlaQuery < Query
 class SlaQuery < Query
 
-  unloadable
+  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
   
   self.queried_class = Sla
 
