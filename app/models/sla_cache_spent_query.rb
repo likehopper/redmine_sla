@@ -18,7 +18,7 @@
 
 class SlaCacheSpentQuery < Query
 
-  unloadable
+  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
   
   self.queried_class = SlaCacheSpent
   self.view_permission = :view_sla
