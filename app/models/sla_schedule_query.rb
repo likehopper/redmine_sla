@@ -20,6 +20,8 @@ class SlaScheduleQuery < Query
 
   unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
 
+  include Redmine::I18n
+
   self.queried_class = SlaSchedule
 
   def initialize_available_filters
