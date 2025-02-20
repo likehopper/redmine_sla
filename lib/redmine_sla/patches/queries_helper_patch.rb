@@ -25,7 +25,7 @@ module RedmineSla
       def self.included(base)
         base.send(:include, InstanceMethods)
         base.class_eval do          
-          unloadable
+          unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
           alias_method :column_value_without_custom_sla_priority_id, :column_value
           alias_method :column_value, :column_value_with_custom_sla_priority_id
 

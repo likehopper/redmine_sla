@@ -19,7 +19,7 @@
 class SlaProjectTrackersController < ApplicationController
   default_search_scope :sla_project_trackers
   
-  unloadable
+  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
 
   accept_api_auth :index, :create, :update, :destroy
 
