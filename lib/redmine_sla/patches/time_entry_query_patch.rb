@@ -28,7 +28,7 @@ module RedmineSla
       def self.included(base)
         base.send(:include, InstanceMethods)
         base.class_eval do
-          unloadable
+          unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
           alias_method :available_filters_without_sla_time_entry, :available_filters
           alias_method :available_filters, :available_filters_with_sla_time_entry
                    

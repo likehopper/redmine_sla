@@ -18,12 +18,13 @@
 
 class SlaCalendarHoliday < ActiveRecord::Base
 
-  unloadable
+  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
 
   belongs_to :sla_calendar
   belongs_to :sla_holiday
 
   include Redmine::SafeAttributes
+  include Redmine::I18n
 
   scope :visible, ->(*args) { where(SlaCalendarHoliday.visible_condition(args.shift || User.current, *args)) }
 

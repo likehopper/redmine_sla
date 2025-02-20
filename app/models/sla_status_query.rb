@@ -18,7 +18,7 @@
 
 class SlaStatusQuery < Query
 
-  unloadable
+  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
   
   self.queried_class = SlaStatus
 
