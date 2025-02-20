@@ -18,7 +18,7 @@
 
 class SlasController < ApplicationController
 
-  unloadable
+  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
 
   # It's possible to view and manage SLA via API
   accept_api_auth :index, :create, :show, :update, :destroy

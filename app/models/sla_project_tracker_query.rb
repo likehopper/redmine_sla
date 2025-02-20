@@ -18,7 +18,7 @@
 
 class SlaProjectTrackerQuery < Query
 
-  unloadable
+  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
   
   self.queried_class = SlaProjectTracker
   self.view_permission = :manage_sla

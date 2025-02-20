@@ -19,7 +19,7 @@
 class SlaCachesController < ApplicationController
   default_search_scope :sla_caches
   
-  unloadable
+  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
 
   accept_api_auth :index, :show, :refresh, :destroy, :purge
 
