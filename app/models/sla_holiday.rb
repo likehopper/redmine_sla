@@ -18,7 +18,7 @@
 
 class SlaHoliday < ActiveRecord::Base
 
-  unloadable
+  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
 
   include Redmine::SafeAttributes
 

@@ -18,7 +18,9 @@
 
 class SlaScheduleQuery < Query
 
-  unloadable
+  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
+
+  include Redmine::I18n
 
   self.queried_class = SlaSchedule
 

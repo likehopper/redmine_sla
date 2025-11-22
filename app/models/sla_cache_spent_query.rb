@@ -18,8 +18,10 @@
 
 class SlaCacheSpentQuery < Query
 
-  unloadable
-  
+  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
+
+  include Redmine::I18n
+
   self.queried_class = SlaCacheSpent
   self.view_permission = :view_sla
 
