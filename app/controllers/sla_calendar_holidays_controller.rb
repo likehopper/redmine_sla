@@ -18,7 +18,7 @@
 
 class SlaCalendarHolidaysController < ApplicationController
 
-  unloadable
+  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
 
   accept_api_auth :index, :create, :show, :update, :destroy
   before_action :require_admin

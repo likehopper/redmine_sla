@@ -18,7 +18,7 @@
 
 class SlaLevelTerm < ActiveRecord::Base
 
-  unloadable
+  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
   
   belongs_to :sla_level
   belongs_to :sla_type
@@ -26,6 +26,7 @@ class SlaLevelTerm < ActiveRecord::Base
   belongs_to :priority, :class_name => 'IssuePriority'
   
   include Redmine::SafeAttributes
+  include Redmine::I18n
 
   scope :visible, ->(*args) { where(SlaLevelTerm.visible_condition(args.shift || User.current, *args)) }
 
