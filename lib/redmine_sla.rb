@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
-# Redmine SLA - Redmine's Plugin 
+# File: redmine_sla/lib/redmine_sla.rb
+# Purpose:
+#   Main entry point for the Redmine SLA plugin. This file loads all required
+#   hook listeners and provides a central namespace for the plugin’s modules.
+#
+# Redmine SLA - Redmine Plugin
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -14,17 +19,21 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
+# Base directory for loading plugin files
 base_url = File.dirname(__FILE__)
 
 # Hooks
-#require base_url+'/redmine_sla/hooks/helpers_queries_hook'
-require base_url+'/redmine_sla/hooks/views_layouts_hook'
-require base_url+'/redmine_sla/hooks/views_issues_hook'
+# require base_url + '/redmine_sla/hooks/helpers_queries_hook'
+# (commented out, presumably unused)
+require base_url + '/redmine_sla/hooks/views_layouts_hook'
+require base_url + '/redmine_sla/hooks/views_issues_hook'
 
 module RedmineSla
-
+  # This module acts as the main namespace for the plugin.
+  #
+  # QueriesHelper may be extended via Hooks::HelpersQueriesHook (if uncommented):
+  #
   # QueriesHelper.send(:include, RedmineSla::Hooks::HelpersQueriesHook)
-
 end

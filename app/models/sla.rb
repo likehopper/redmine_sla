@@ -17,8 +17,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 class Sla < ActiveRecord::Base
-  
-  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
 
   has_many :sla_project_trackers
   has_many :sla_levels

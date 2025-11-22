@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# File: redmine_sla/app/helpers/queries/sla_caches_queries_helper.rb
 # Redmine - project management software
 # Copyright (C) 2006-  Jean-Philippe Lang
 #
@@ -28,10 +29,8 @@ module Queries::SlaCachesQueriesHelper
         item.id
       when :sla_level
         link_to_sla_level_name(item.sla_level)
-      when /^issue.get_sla_respect/, /^get_sla_respect/
-        if ! value.nil?
-          content_tag('span', '', :title => value, :class => "icon #{value ? 'icon-ok' : 'icon-not-ok' }")
-        end
+      when /^(?:issue\.|time_entry\.|sla_cache\.|sla_caches\.)?get_sla_respect/
+        sla_respect_icon_tag(item.send(column.name))
       else
         super
       end

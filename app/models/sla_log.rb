@@ -18,8 +18,6 @@
 
 class SlaLog < ActiveRecord::Base
   
-  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
-  
   belongs_to :project
   belongs_to :issue
   belongs_to :sla_leveldeveloper

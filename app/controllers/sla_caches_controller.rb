@@ -1,6 +1,18 @@
 # frozen_string_literal: true
 
-# Redmine SLA - Redmine's Plugin 
+# File: redmine_sla/app/controllers/sla_caches_controller.rb
+# Purpose:
+#   Controller used to list, refresh, purge, delete and manage SLA cache
+#   entries (SlaCache). These records store precomputed SLA level data
+#   for issues, allowing faster SLA evaluation and reporting.
+#
+#   This controller:
+#     - exposes HTML, API, Atom and CSV exports,
+#     - integrates with SlaCacheQuery for filtering/sorting,
+#     - supports both global and project-specific contexts,
+#     - provides context menu actions for bulk operations.
+
+# Redmine SLA - Redmine Plugin 
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -14,26 +26,25 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+# ------------------------------------------------------------------------------
 
 class SlaCachesController < ApplicationController
   default_search_scope :sla_caches
   
-  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
-
   accept_api_auth :index, :show, :refresh, :destroy, :purge
 
   before_action :require_admin, except: [ :index, :show, :refresh, :destroy, :context_menu ]
   before_action :authorize_global
     
-  before_action :find_sla_cache, only: [ :show ]
+  before_action :find_sla_cache,  only: [ :show ]
   before_action :find_sla_caches, only: [ :refresh, :destroy, :context_menu ]
 
   before_action :find_optional_project, :only => [ :index, :show, :refresh, :destroy, :purge ]
   # before_action :check_routing_users, :only => [ :index, :show, :refresh, :destroy, :purge ]
   
   rescue_from Query::StatementInvalid, :with => :query_statement_invalid
-  rescue_from Query::QueryError, :with => :query_error
+  rescue_from Query::QueryError,       :with => :query_error
   
   helper :sla_caches
   helper :context_menus
@@ -44,10 +55,12 @@ class SlaCachesController < ApplicationController
   helper Queries::SlaCachesQueriesHelper
   include Queries::SlaCachesQueriesHelper
 
+  # List SLA cache entries with filters and pagination.
+  # Supports HTML, API, Atom and CSV export.
   def index
     use_session = !request.format.csv?
     retrieve_default_query(use_session) 
-    retrieve_query(SlaCacheQuery,use_session)
+    retrieve_query(SlaCacheQuery, use_session)
 
     scope = sla_cache_scope.
       preload(:issue => [:project, :tracker, :status, :priority]).
@@ -57,7 +70,7 @@ class SlaCachesController < ApplicationController
       format.html do
         @entity_count = scope.count
         @entity_pages = Paginator.new @entity_count, per_page_option, params['page']
-        @entities = scope.offset(@entity_pages.offset).limit(@entity_pages.per_page).to_a
+        @entities     = scope.offset(@entity_pages.offset).limit(@entity_pages.per_page).to_a
         render :layout => !request.xhr?
       end
       format.api do
@@ -66,26 +79,35 @@ class SlaCachesController < ApplicationController
         @entities = scope.offset(@offset).limit(@limit).to_a
       end
       format.atom do
-        entities = scope.limit(Setting.feeds_limit.to_i).reorder("#{SlaCache.table_name}.updated_on DESC").to_a
+        entities = scope.
+          limit(Setting.feeds_limit.to_i).
+          reorder("#{SlaCache.table_name}.updated_on DESC").to_a
         render_feed(entities, :title => l(:label_sla_cache))
       end
       format.csv do
-        # Export all entities
+        # Export all entities (no pagination)
         @entities = scope.to_a
-        send_data(query_to_csv(@entities, @query, params), :type => 'text/csv; header=present', :filename => "#{filename_for_export(@query, 'sla_caches')}.csv")
+        send_data(
+          query_to_csv(@entities, @query, params),
+          :type => 'text/csv; header=present',
+          :filename => "#{filename_for_export(@query, 'sla_caches')}.csv"
+        )
       end
     end      
   rescue ActiveRecord::RecordNotFound
     render_404
   end
 
+  # Show a single SLA cache entry.
   def show
     respond_to do |format|
       format.html { redirect_back_or_default sla_caches_path }
-      format.api { }
+      format.api  { }
     end
   end  
 
+  # Refresh SLA cache entries for the selected records.
+  # If @project is present, refresh only its caches; otherwise act globally.
   def refresh
     @sla_caches.each do |sla_cache|
       begin
@@ -103,6 +125,7 @@ class SlaCachesController < ApplicationController
     end    
   end
 
+  # Purge all SLA cache entries for the current project (or globally if no project).
   def purge
     SlaCache.purge(@project)
     respond_to do |format|
@@ -114,6 +137,7 @@ class SlaCachesController < ApplicationController
     end    
   end
 
+  # Destroy selected SLA cache entries.
   def destroy # Cache
     @sla_caches.each do |sla_cache|
       begin
@@ -130,16 +154,19 @@ class SlaCachesController < ApplicationController
     end
   end
 
+  # Build the context menu for one or multiple SLA caches.
   def context_menu
     if @sla_caches.size == 1
       @sla_cache = @sla_caches.first
     end
-    can_show = User.current.admin?
-    can_refresh = @sla_caches.detect{|c| !c.visible?}.nil?
-    can_delete = @sla_caches.detect{|c| !c.deletable?}.nil?
-    @can = {show: can_show, refresh: can_refresh, delete: can_delete}
+    can_show    = User.current.admin?
+    can_refresh = @sla_caches.detect { |c| !c.visible? }.nil?
+    can_delete  = @sla_caches.detect { |c| !c.deletable? }.nil?
+    @can = { show: can_show, refresh: can_refresh, delete: can_delete }
+
     @back = back_url
     @sla_cache_ids, @safe_attributes, @selected = [], [], {}
+
     @sla_caches.each do |e|
       @sla_cache_ids << e.id
       @safe_attributes.concat e.safe_attribute_names
@@ -159,6 +186,7 @@ class SlaCachesController < ApplicationController
 
 private
 
+  # Find a single SLA cache and check visibility.
   def find_sla_cache
     @sla_cache = SlaCache.find(params[:id])
     raise Unauthorized unless @sla_cache.visible?
@@ -167,17 +195,21 @@ private
     render_404
   end
 
+  # Find a collection of SLA caches (used in bulk actions).
   def find_sla_caches
-    params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]] 
-    @sla_caches = SlaCache.find(params[:ids]).to_a
-    @sla_cache = @sla_caches.first if @sla_caches.count == 1
+    params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]]
+    @sla_caches  = SlaCache.find(params[:ids]).to_a
+    @sla_cache   = @sla_caches.first if @sla_caches.count == 1
     raise Unauthorized unless @sla_caches.all?(&:visible?)
     raise ActiveRecord::RecordNotFound if @sla_caches.empty?
   rescue ActiveRecord::RecordNotFound
     render_404
   end
 
-  # Force users through projects
+  # Force users through project context for access control (optional).
+  # If enabled, this restricts which routes can be used to access SLA caches,
+  # depending on the current user and project.
+  #
   # def check_routing_users
   #   unless User.current.admin? && @project.nil?
   #     valid_routes = []
@@ -202,6 +234,7 @@ private
   #   end
   # end  
 
+  # Retrieve the default SlaCacheQuery if no query is selected by the user.
   def retrieve_default_query(use_session)
     return if params[:query_id].present?
     return if api_request?
@@ -211,24 +244,28 @@ private
       params[:set_filter] = 1
       return
     end
+
     if !params[:set_filter] && use_session && session[:sla_cache_query]
       query_id, project_id = session[:sla_cache_query].values_at(:id, :project_id)
       return if SlaCacheQuery.where(id: query_id).exists? && project_id == @project&.id
     end
+
     if default_query = SlaCacheQuery.default(project: @project)
       params[:query_id] = default_query.id
     end
   end  
 
-  # Returns the SlaCacheQuery scope for index and report actions
-  def sla_cache_scope(options={})
+  # Returns the SlaCacheQuery scope for index and report actions.
+  def sla_cache_scope(options = {})
     @query.results_scope(options)
   end
 
+  # Initialize or restore the SlaCacheQuery from params or session.
   def retrieve_sla_cache_query
     retrieve_query(SlaCacheQuery, false, :defaults => @default_columns_names)
   end
 
+  # Handle query errors, and reset stored SLA cache query session key.
   def query_error(exception)
     session.delete(:sla_cache_query)
     super
