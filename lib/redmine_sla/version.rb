@@ -17,5 +17,5 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 module RedmineSla
-  Version = '0.0.9-master'.freeze
+  Version = '1.0.0-master'.freeze
 end
