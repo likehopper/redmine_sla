@@ -18,8 +18,6 @@
 
 class SlaType < ActiveRecord::Base
 
-  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
-  
   has_many :sla_level_terms
 
   has_many :sla_levels, through: :sla_level_terms

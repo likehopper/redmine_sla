@@ -1,4 +1,4 @@
-# head config/locales/en.yml
+# File: redmine_sla/config/locales/en.yml
 en:
   permission_view_sla: View SLA
   permission_manage_sla: Manage SLA

@@ -1,6 +1,15 @@
 # frozen_string_literal: true
 
-# Redmine SLA - Redmine's Plugin 
+# File: redmine_sla/lib/redmine_sla/patches/issue_patch.rb
+# Purpose:
+#   Extend Redmine's Issue model with helper methods used by the SLA plugin:
+#     - access to the SLA cache and level,
+#     - calculation of SLA terms, spent time and remaining time,
+#     - boolean SLA respect flag,
+#     - dynamic helper methods per SLA type,
+#     - automatic SLA cache refresh when project or tracker changes.
+#
+# Redmine SLA - Redmine Plugin 
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -22,69 +31,102 @@ module RedmineSla
 
   module Patches
     
-    # Patches Redmine's IssuesController dynamically
+    # Patch module applied to Redmine's Issue model.
     module IssuePatch
 
-      # Use in IssueQueryPatch and sla_issues_helper/_show for diplay level in list column level
-      #   self.get_sla_cache.sla_level => method "to_s" display [:name] by default
-      #   self.get_sla_cache.sla_level[:id] &  self.get_sla_cache.sla_level[:name]
+      # Used in IssueQueryPatch and in sla_issues_helper/_show to display the
+      # SLA level in list columns.
+      #
+      # Examples:
+      #   self.get_sla_cache.sla_level
+      #     → "to_s" on sla_level returns the name by default
+      #
+      #   self.get_sla_cache.sla_level[:id]
+      #   self.get_sla_cache.sla_level[:name]
       def get_sla_cache
         SlaCache.find_by_issue_id(id)
       end
 
+      # Returns the SLA level associated with the current issue, if any.
       def get_sla_level
         self.get_sla_cache.sla_level if ! self.get_sla_cache.nil?
       end
 
-      # The expected SLA's delay
+      # Returns the expected SLA delay (term) for a given SLA type.
       def get_sla_term(sla_type_id)
         sla_level_term = SlaLevelTerm.find_by_issue_and_type_id(self,sla_type_id)
         sla_level_term.term if ! sla_level_term.nil? 
       end
 
-      # The effective SLA's delay
+      # Returns the effective SLA time spent for a given SLA type.
       def get_sla_spent(sla_type_id)
         sla_cache_spent = SlaCacheSpent.find_by_issue_and_type_id(self,sla_type_id)
         sla_cache_spent.spent if ! sla_cache_spent.nil? && ! self.get_sla_term(sla_type_id).nil?
       end
 
-      # Use in IssueQueryPatch for diplay respect in list column level
+      # Used in IssueQueryPatch to display SLA remaining time in list columns.
       def get_sla_remain(sla_type_id)
         sla_term = self.get_sla_term(sla_type_id)
-        # TODO : SlaLog : no sla_level
+        # TODO: SlaLog: handle missing sla_level
 
         sla_spent = self.get_sla_spent(sla_type_id)
-        # TODO : SlaLog : si valeur nulle
+        # TODO: SlaLog: handle nil/zero spent values
 
         ( sla_term - sla_spent ) if sla_term && sla_spent
       end      
 
-      # Use in IssueQueryPatch for diplay respect in list column level
+      # Used in IssueQueryPatch to display SLA respect (boolean) in list columns.
+      #
+      # Returns:
+      #   - true  if SLA is respected
+      #   - false if SLA is violated (spent strictly greater than term)
+      #   - nil   if SLA data is incomplete
       def get_sla_respect(sla_type_id)
         sla_term = self.get_sla_term(sla_type_id)
-        # TODO : SlaLog : no sla_level
-
         sla_spent = self.get_sla_spent(sla_type_id)
-        # TODO : SlaLog : si valeur nulle
 
-        ( ! ( sla_term < sla_spent ) ) if sla_term && sla_spent
-      end
+        # Added .to_i conversion to ensure numerical comparison
+        if sla_term && sla_spent
+          term_i = sla_term.to_i
+          spent_i = sla_spent.to_i
+          
+          # Logic: respected if term is not strictly less than spent.
+          ( ! ( term_i < spent_i ) )
+        else
+          nil # Returns nil if the SLA data is missing
+        end
+      end      
 
-      # For SlaCacheQuery#GRoupBy
-      if ActiveRecord::Base.connection.table_exists? 'sla_types'
-        SlaType.all.each { |sla_type|
-          define_method("get_sla_respect_#{sla_type.id}") do 
-            self.get_sla_respect(sla_type.id)
-          end
-        }
+      # For SlaCacheQuery#group_by:
+      # Dynamically define convenience methods on Issue such as:
+      #   get_sla_respect_1, get_sla_respect_2, ...
+      # one per SLA type, to simplify grouping and display logic.
+      #
+      # Database access is wrapped in a begin/rescue to avoid errors when
+      # the database is not yet available (e.g. during installation).
+      begin
+        if ActiveRecord::Base.connection.table_exists? 'sla_types'
+          SlaType.all.each { |sla_type|
+            define_method("get_sla_respect_#{sla_type.id}") do 
+              self.get_sla_respect(sla_type.id)
+            end
+          }
+        end
+      rescue ActiveRecord::NoDatabaseError, PG::ConnectionBad
+        # Skip the dynamic method definition if the database connection fails
       end
       
-      # Trigger for update sla_cache if necessary
+      # Trigger to update sla_cache when necessary.
+      #
+      # This hook is called when the module is included into Issue:
+      #   - extends the base with ClassMethods
+      #   - includes InstanceMethods
+      #   - registers an after_save callback to refresh SLA cache when
+      #     project or tracker changes.
       def self.included(base)
         base.extend(ClassMethods)
         base.send(:include, InstanceMethods)
         base.class_eval do
-          unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
           # After issue update, if project or tracker changed then refresh sla_cache !!!
           after_save :sla_cache_update
         end
@@ -96,12 +138,14 @@ module RedmineSla
     end
 
     module InstanceMethods
+      # Refresh SLA cache after an issue is updated, if project or tracker changed.
       def sla_cache_update
-        # if project or tracker changed then must refresh sla_cache
+        # If project or tracker changed then the SLA cache must be refreshed
         unless ( self.project_id == self.project_id_before_last_save && self.tracker_id == self.tracker_id_before_last_save )
           SlaCache.find(self.id).refresh
         end
       rescue ActiveRecord::RecordNotFound
+        # Ignore missing SLA cache entries
       end
     end
 
