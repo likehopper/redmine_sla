@@ -18,7 +18,6 @@
 
 class SlaLevel < ActiveRecord::Base
 
-  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
   
   belongs_to :sla
   belongs_to :sla_calendar

@@ -18,8 +18,6 @@
 
 class SlaCalendar < ActiveRecord::Base
 
-  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
-
   has_many :sla_levels
   has_many :sla_schedules, inverse_of: :sla_calendar, :dependent => :destroy
 
