@@ -18,7 +18,7 @@
 
 class SlaViewJournal < ActiveRecord::Base
   
-  unloadable
+  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
 
   belongs_to :issue
   belongs_to :to_status_, :class_name => 'issues_statuses', :foreign_key => 'to_status_id' 

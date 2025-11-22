@@ -18,7 +18,7 @@
 
 class SlaProjectTracker < ActiveRecord::Base
   
-  unloadable
+  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
 
   belongs_to :project
   belongs_to :tracker
@@ -32,6 +32,7 @@ class SlaProjectTracker < ActiveRecord::Base
   after_destroy :sla_cache_destroy
 
   include Redmine::SafeAttributes
+  include Redmine::I18n
 
   default_scope { joins(:tracker) }  
 

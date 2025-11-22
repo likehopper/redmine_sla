@@ -18,7 +18,7 @@
 
 class Sla < ActiveRecord::Base
   
-  unloadable
+  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
 
   has_many :sla_project_trackers
   has_many :sla_levels
@@ -38,7 +38,13 @@ class Sla < ActiveRecord::Base
   safe_attributes *%w[name]
 
   # Use for select in app/views/sla_settings_plugin/_sla_settings_plugin_logs.html.erb
-  enum sla_log_levels: { 'sla_log_level_none': 0, 'sla_log_level_error': 1, 'sla_log_level_info': 2, 'sla_log_level_debug': 3 }
+  attribute :sla_log_levels, :integer, default: 0
+  enum sla_log_levels: {
+    sla_log_level_none: 0,
+    sla_log_level_error: 1,
+    sla_log_level_info: 2,
+    sla_log_level_debug: 3
+  }
 
   # No selection limitations
   def self.visible_condition(user, options = {})
