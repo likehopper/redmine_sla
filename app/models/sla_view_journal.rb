@@ -17,8 +17,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 class SlaViewJournal < ActiveRecord::Base
-  
-  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
 
   belongs_to :issue
   belongs_to :to_status_, :class_name => 'issues_statuses', :foreign_key => 'to_status_id' 

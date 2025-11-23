@@ -18,8 +18,6 @@
 
 class SlaLevelTermQuery < Query
 
-  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
-  
   self.queried_class = SlaLevelTerm
   self.view_permission = :view_sla
 

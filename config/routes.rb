@@ -1,4 +1,6 @@
 
+# File: redmine_sla/config/routes.rb
+
 # SLAs project configuration ( activation of SLAs by trackers : sla_project_trackers )
 resources :projects do
   resources :sla_caches, path: "sla/caches", :only => [ :index, :show, :destroy ] do
