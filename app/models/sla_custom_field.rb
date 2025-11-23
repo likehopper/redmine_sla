@@ -19,8 +19,6 @@
 
 class SlaCustomField < IssueCustomField
   
-  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
-
   include ActiveModel::Model
 
   def self.class

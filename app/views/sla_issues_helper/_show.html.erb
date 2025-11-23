@@ -21,7 +21,7 @@ if User.current.allowed_to?(:view_sla, @project, :global => true)
     </ul>
       <ul class="flex-container">      
 <%
-    SlaType.all.each { |sla_type|
+    SlaType.all.each { |sla_type| 
 
       sla_term = issue.get_sla_term(sla_type.id)
       # TODO : SlaLog : no sla_level

@@ -18,8 +18,6 @@
 
 class SlaHolidayQuery < Query
 
-  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
-  
   self.queried_class = SlaHoliday
 
   def initialize_available_filters

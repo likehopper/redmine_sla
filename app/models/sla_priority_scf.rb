@@ -19,8 +19,6 @@
 
 class SlaPriorityScf < SlaPriority
 
-  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
-
   include ActiveModel::Model
 
   def initialize(custom_field_id)

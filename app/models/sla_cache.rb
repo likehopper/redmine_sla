@@ -18,8 +18,6 @@
 
 class SlaCache < ActiveRecord::Base
 
-  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
-  
   belongs_to :sla_level
   belongs_to :project
   belongs_to :issue

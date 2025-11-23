@@ -18,8 +18,6 @@
 
 class SlaHoliday < ActiveRecord::Base
 
-  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
-
   include Redmine::SafeAttributes
 
   scope :visible, ->(*args) { where(SlaHoliday.visible_condition(args.shift || User.current, *args)) }

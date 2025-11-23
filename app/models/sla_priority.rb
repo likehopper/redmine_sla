@@ -19,8 +19,6 @@
 
 class SlaPriority
 
-  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
-
   include ActiveModel::Model
 
   class SlaPriorityValue

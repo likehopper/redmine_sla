@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
-# Redmine SLA - Redmine's Plugin 
+# File: redmine_sla/lib/redmine_sla/patches/projects_helper_patch.rb
+# Purpose:
+#   Extend Redmine's ProjectsHelper in order to inject an additional
+#   configuration tab dedicated to SLA settings in the project settings UI.
+#   The tab is only shown if the current user has the :manage_sla permission.
+
+# Redmine SLA - Redmine Plugin
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -14,25 +20,32 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 module RedmineSla
   module Patches
-    # Project's configuration
+
+    # Patch for Redmine's ProjectsHelper
+    # Adds a new "SLA" tab to the project settings screen.
     module ProjectsHelperPatch
-      # Overload project's configuration tabs
+
+      # Overrides the default Redmine method to inject an additional tab.
       def project_settings_tabs
         tabs = super
-        # Permissions check
+
+        # Show the tab only if the current user is allowed to manage SLAs
         if User.current.allowed_to?(:manage_sla, @project)
-          # Create new tab for project's configuration
-          tabs << { name: 'sla',
-                    action: :manage_sla,
-                    partial: 'sla_project_trackers/show',
-                    label: :sla_label_project_settings }
+          tabs << {
+            name: 'sla',
+            action: :manage_sla,
+            partial: 'sla_project_trackers/show',
+            label: :sla_label_project_settings
+          }
         end
+
         tabs
       end
+
     end
   end
 end
