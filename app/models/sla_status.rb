@@ -17,8 +17,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 class SlaStatus < ActiveRecord::Base
-
-  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
   
   belongs_to :sla_type
   belongs_to :status, :class_name => 'IssueStatus'

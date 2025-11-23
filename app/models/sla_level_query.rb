@@ -18,8 +18,6 @@
 
 class SlaLevelQuery < Query
 
-  unloadable if defined?(Rails) && !Rails.autoloaders.zeitwerk_enabled?
-  
   self.queried_class = SlaLevel
 
   def initialize_available_filters

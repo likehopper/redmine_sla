@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
-# Redmine SLA - Redmine's Plugin 
+# File: redmine_sla/init.rb
+# Purpose:
+#   Main initializer for the Redmine SLA plugin. Declares plugin metadata,
+#   loads dependencies, registers settings, menus, permissions, and injects
+#   runtime patches into core Redmine classes after initialization.
+#
+# Redmine SLA - Redmine Plugin
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -14,17 +20,22 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 require "redmine"
 
+# Plugin dependencies
 require "nested_form"
 require "chronic"
 require "chronic_duration"
 
-# For good translation of "sla_cache" in the plural
+# Load custom pluralization rules (e.g., "sla_cache" → "sla_caches")
 require_relative "config/initializers/inflections.rb"
 
+# Load helper modules
+require_relative "lib/redmine_sla/helpers/sla_rendering_helper"
+
+# Plugin registration block
 Redmine::Plugin.register :redmine_sla do
 
   name 'Redmine SLA'
@@ -34,84 +45,92 @@ Redmine::Plugin.register :redmine_sla do
   author_url 'https://github.com/likehopper'
   url 'https://github.com/likehopper/redmine_sla'
 
-  requires_redmine :version_or_higher => '4.0'
+  # Minimum Redmine version required
+  requires_redmine version_or_higher: '4.0'
 
-  # Global Settings definition
+  # Global plugin settings (default values + configuration partial)
   settings(
-    # Default global value for all projects
-    :default => {   
+    default: {
       'sla_log_level' => '1',
       'sla_cache_ttl' => '1',
       'sla_time_zone' => 'Etc/UTC',
-      'sla_display'   => 'bar',
+      'sla_display'   => 'bar'
     },
-    # Ref. file "app/views/sla_settings_plugin/_sla_settings_plugin.html.erb" 
-    :partial => 'sla_settings_plugin/sla_settings_plugin'
+    # Settings UI partial
+    partial: 'sla_settings_plugin/sla_settings_plugin'
   )
 
-  # Add entry in administration menu
+  # Add entry in Redmine's administration menu
   menu :admin_menu, :redmine_sla,
-    { controller: 'slas', action: 'index'},
+    { controller: 'slas', action: 'index' },
     html: { class: 'icon redmine-sla' },
     caption: :sla_label_global_settings,
     public: false
-    
-  # Add entry in project menu
+
+  # Add entry in the project-specific menu
   menu :project_menu, :redmine_sla,
     { controller: 'sla_caches', action: 'index' },
-    :caption => :sla_label_abbreviation,
-    :param => :project_id
+    caption: :sla_label_abbreviation,
+    param: :project_id
 
-  # Project Permission Definition
+  # Define permissions
   project_module :sla do
+
+    # Read-only SLA access
     permission :view_sla, {
-      sla_levels: [ :show ],
-      sla_calendars: [ :show ],
-      sla_caches: [ :index, :show, :refresh, :context_menu ],
-      sla_cache_spents: [ :index, :show, :refresh, :context_menu ],
-    }, :require => :member
+      sla_levels:        [:show],
+      sla_calendars:     [:show],
+      sla_caches:        [:index, :show, :refresh, :context_menu],
+      sla_cache_spents:  [:index, :show, :refresh, :context_menu]
+    }, require: :member
+
+    # Full SLA management
     permission :manage_sla, {
-      sla_project_trackers: [ :index, :new, :create, :edit, :update, :destroy, :context_menu ],
-      sla_cache_spents: [ :index, :show, :refresh, :destroy, :purge, :context_menu ],
-      sla_caches: [ :index, :show, :refresh, :destroy, :purge, :context_menu ],
-    }, :require => :member
+      sla_project_trackers: [:index, :new, :create, :edit, :update, :destroy, :context_menu],
+      sla_cache_spents:     [:index, :show, :refresh, :destroy, :purge, :context_menu],
+      sla_caches:           [:index, :show, :refresh, :destroy, :purge, :context_menu]
+    }, require: :member
   end
-       
+
 end
 
+# After Redmine bootstrap, extend core classes with SLA patches
 RedmineApp::Application.config.after_initialize do
 
-  # require_dependency 'projects_controller'
+  # Adds Project-level SLA helpers
   unless ProjectsController.included_modules.include? RedmineSla::Patches::ProjectsHelperPatch
     ProjectsController.helper(RedmineSla::Patches::ProjectsHelperPatch)
   end
 
-  # Only to display SlaLevel in issues#index & time_entries#index
+  # Adds SLA display/filter support in issues#index and time_entries#index
   unless QueriesHelper.included_modules.include? RedmineSla::Patches::QueriesHelperPatch
     QueriesHelper.send(:include, RedmineSla::Patches::QueriesHelperPatch)
-  end  
+  end
 
-  # Adds methods on Redmine's TimeEntry for SLA management
+  # Extend TimeEntry with SLA calculation helpers
   unless TimeEntry.included_modules.include? RedmineSla::Patches::TimeEntryPatch
     TimeEntry.send(:include, RedmineSla::Patches::TimeEntryPatch)
   end
 
-  # Adds the "to_s" method on Redmine's IssueCustomField to display the name of the SlaCustomField in the sla_level list
+  # Extend IssueCustomField to render SLA custom fields correctly
   unless IssueCustomField.included_modules.include? RedmineSla::Patches::IssueCustomFieldPatch
     IssueCustomField.send(:include, RedmineSla::Patches::IssueCustomFieldPatch)
   end
 
-  # Adds methods on Redmine's Issues for SLA management
+  # Extend Issue with SLA computation methods
   unless Issue.included_modules.include? RedmineSla::Patches::IssuePatch
     Issue.send(:include, RedmineSla::Patches::IssuePatch)
   end
 
-  if (ActiveRecord::Base.connection.tables.include?('queries') rescue false) &&
-    # Adds methods on Redmine's Issues to Display/Filter/Sort 
+  # Extend IssueQuery and TimeEntryQuery for SLA filtering/sorting
+  if (ActiveRecord::Base.connection.tables.include?('queries') rescue false)
+    
+    # SLA columns in issue queries
     unless IssueQuery.included_modules.include? RedmineSla::Patches::IssueQueryPatch
       IssueQuery.send(:include, RedmineSla::Patches::IssueQueryPatch)
     end
-    # Adds methods on Redmine's TimeEntry to Display/Filter/Sort
+
+    # SLA columns in time entry queries
     unless TimeEntryQuery.included_modules.include? RedmineSla::Patches::TimeEntryQueryPatch
       TimeEntryQuery.send(:include, RedmineSla::Patches::TimeEntryQueryPatch)
     end

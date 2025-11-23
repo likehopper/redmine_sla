@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Redmine SLA - Redmine's Plugin 
+# Redmine SLA - Redmine Plugin
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -14,17 +14,35 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../test/test_helper')
 require File.expand_path(File.dirname(__FILE__) + '/assertion_helpers')
 require File.expand_path(File.dirname(__FILE__) + '/object_helpers')
 
+# --- Ensure Rake and tasks are available (Rails 7 / Redmine 6 compatibility) ---
+require 'rake'
+
+# Load general Rails tasks if not already defined.
+# In Redmine 5, Rake was loaded by default through `rake test`.
+# In Redmine 6 (Rails 7+), tests are run via `rails test` and Rake is not preloaded.
+Rails.application.load_tasks unless Rake::Task.task_defined?('environment')
+
+# Explicitly load the plugin's .rake file if the task isn't already defined.
+# This makes sure plugin-specific tasks like `update_sla` are available during tests.
+unless Rake::Task.task_defined?('redmine:plugins:redmine_sla:update_sla')
+  task_file = File.expand_path('../../lib/tasks/redmine_sla.rake', __dir__)
+  load task_file if File.exist?(task_file)
+end
+
 include AssertionHelpers
 include ObjectHelpers
 
+# -----------------------------------------------------------------------------
+# Load fixtures for Redmine and the SLA plugin.
+# This helper ensures all necessary test data is available before executing tests.
+# -----------------------------------------------------------------------------
 def plugin_fixtures
-
   fixtures_directory = "#{File.dirname(__FILE__)}/fixtures/"
 
   fixture_names = [
@@ -65,16 +83,20 @@ def plugin_fixtures
   else
     ActiveRecord::Fixtures.create_fixtures fixtures_directory, fixture_names
   end
-
 end
 
+# -----------------------------------------------------------------------------
+# Execute the SLA update Rake task, ensuring it is defined and reusable.
+# -----------------------------------------------------------------------------
 def execute_update_sla_task
-  # Rechercher et exécuter la tâche Rake
-  Rake::Task['redmine:plugins:redmine_sla:update_sla'].invoke
+  name = 'redmine:plugins:redmine_sla:update_sla'
+  raise "Rake task #{name} is not defined" unless Rake::Task.task_defined?(name)
+  Rake::Task[name].reenable # Allow task to be run multiple times within tests
+  Rake::Task[name].invoke
 end
 
+# -----------------------------------------------------------------------------
+# Initialize fixtures and trigger SLA task execution for consistent test setup.
+# -----------------------------------------------------------------------------
 plugin_fixtures
-
 execute_update_sla_task
-
-
