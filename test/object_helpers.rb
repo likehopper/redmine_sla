@@ -106,10 +106,29 @@ module ObjectHelpers
 
   # Generates a saved SlaCalendar
   def SlaCalendar.generate!(attributes={}, &block)
-    sla_calendar = SlaCalendar.generate(attributes, &block)
-    sla_calendar.save!
-    sla_calendar.reload
+    sla_schedule = SlaCalendar.generate(attributes, &block)
+    sla_schedule.save!
+    sla_schedule.reload
   end
+
+# Generates an unsaved SlaSchedule
+def SlaSchedule.generate(attributes={})
+  sla_schedule = SlaSchedule.new()
+  sla_schedule.sla_calendar_id = attributes.key?(:sla_calendar) ? attributes[:sla_calendar] : SlaCalendar.generate!.id
+  sla_schedule.dow = attributes.key?(:dow) ? attributes[:dow] : 1
+  sla_schedule.start_time = attributes.key?(:start_time) ? attributes[:start_time] : format('%02d:%02d:00', rand(0..11), rand(0..59))
+  sla_schedule.end_time = attributes.key?(:end_time) ? attributes[:end_time] : format('%02d:%02d:00', rand(12..23), rand(0..59))
+  sla_schedule.match = attributes.key?(:match) ? attributes[:match] : false
+  yield sla_schedule if block_given?
+  sla_schedule
+end
+
+# Generates a saved SlaSchedule
+def SlaSchedule.generate!(attributes={}, &block)
+  sla_calendar = SlaSchedule.generate(attributes, &block)
+  sla_calendar.save!
+  sla_calendar.reload
+end  
 
   # Generates an unsaved SlaLevel
   def SlaLevel.generate(attributes={})
