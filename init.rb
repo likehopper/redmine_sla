@@ -32,8 +32,8 @@ require "chronic_duration"
 # Load custom pluralization rules (e.g., "sla_cache" → "sla_caches")
 require_relative "config/initializers/inflections.rb"
 
-# Load helper modules
-require_relative "lib/redmine_sla/helpers/sla_rendering_helper"
+# Load helper modules ( to display respect boolean in lists )
+ActionView::Base.send(:include, RedmineSla::Helpers::SlaRenderingHelper)
 
 # Plugin registration block
 Redmine::Plugin.register :redmine_sla do

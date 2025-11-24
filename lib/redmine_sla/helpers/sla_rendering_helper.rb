@@ -22,42 +22,43 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 module RedmineSla
-  # Rendering helpers for SLA display logic.
-  # Placed under a dedicated submodule for clarity.
-  module SlaRenderingHelper
-    include ActionView::Helpers::TagHelper
+  module Helpers
+    # Rendering helpers for SLA display logic.
+    # Placed under a dedicated submodule for clarity.
+    module SlaRenderingHelper
 
-    # Generates the HTML tag for an SLA compliance icon.
-    #
-    # Parameters:
-    #   respect_status (Boolean or nil)
-    #     - true  → SLA respected
-    #     - false → SLA violated
-    #     - nil   → no icon displayed
-    #
-    # Returns:
-    #   HTML-safe <span> tag containing a contextual icon.
-    #
-    # Notes:
-    #   - Uses Redmine's built-in "icon" CSS classes.
-    #   - `raw('&nbsp;')` ensures icon alignment on certain Redmine themes.
-    #   - The icon includes a tooltip (title) for accessibility.
-    def sla_respect_icon_tag(respect_status)
-      return if respect_status.nil?
+      # Generates the HTML tag for an SLA compliance icon.
+      #
+      # Parameters:
+      #   respect_status (Boolean or nil)
+      #     - true  → SLA respected
+      #     - false → SLA violated
+      #     - nil   → no icon displayed
+      #
+      # Returns:
+      #   HTML-safe <span> tag containing a contextual icon.
+      #
+      # Notes:
+      #   - Uses Redmine's built-in "icon" CSS classes.
+      #   - `raw('&nbsp;')` ensures icon alignment on certain Redmine themes.
+      #   - The icon includes a tooltip (title) for accessibility.
+      def sla_respect_icon_tag(respect_status)
+        return if respect_status.nil?
 
-      icon_class = respect_status ? 'icon-ok' : 'icon-not-ok'
-      text       = respect_status ? l(:general_text_Yes) : l(:general_text_No)
+        icon_class = respect_status ? 'icon-ok' : 'icon-not-ok'
+        text       = respect_status ? l(:general_text_Yes) : l(:general_text_No)
 
-      # The content_tag creates a <span> element with:
-      #   - a forced non-breaking space for visual rendering,
-      #   - a CSS icon class,
-      #   - a tooltip containing localized text.
-      content_tag(
-        'span',
-        raw('&nbsp;'),
-        title: text,
-        class: "icon #{icon_class}"
-      )
+        # The content_tag creates a <span> element with:
+        #   - a forced non-breaking space for visual rendering,
+        #   - a CSS icon class,
+        #   - a tooltip containing localized text.
+        content_tag(
+          'span',
+          raw('&nbsp;'),
+          title: text,
+          class: "icon #{icon_class}"
+        )
+      end
     end
   end
 end
