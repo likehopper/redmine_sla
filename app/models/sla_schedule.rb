@@ -54,8 +54,8 @@ class SlaSchedule < ActiveRecord::Base
   safe_attributes *%w[sla_calendar_id dow start_time end_time match]
 
   before_save do
-    self.start_time = self.start_time.strftime("%H:%M:00")
-    self.end_time = self.end_time.strftime("%H:%M:59")
+    self.start_time = self.start_time.strftime("%H:%M:00") if self.start_time.present?
+    self.end_time = self.end_time.strftime("%H:%M:59") if self.end_time.present?
   end  
 
   # No selection limitations
@@ -82,14 +82,14 @@ class SlaSchedule < ActiveRecord::Base
   
   def sla_schedules_inconsistency
     # Format datas
-    @start_time = self.start_time.strftime("%H:%M")
-    @end_time = self.end_time.strftime("%H:%M")
+    @start_time = self.start_time.strftime("%H:%M") if self.start_time.present?
+    @end_time = self.end_time.strftime("%H:%M") if self.end_time.present?
     # Logs 
     # "==>> sla_schedules_inconsistency ID=#{self.id}, #{self.sla_calendar_id}, #{self.dow}, #{@start_time} #{@end_time}"
     #Rails.logger.debug "==>> sla_schedules_inconsistency #{@start_time} < #{@end_time}) = #{@start_time < @end_time}"
     #Rails.logger.debug "==>> sla_schedules_inconsistency ok? #{self.marked_for_destruction?}"
     # Start must be strictly before end!
-    if ( not ( @start_time < @end_time ) ) 
+    if not ( @start_time.present? && @end_time.present? && ( @start_time < @end_time ) ) 
       #Rails.logger.debug "==>> sla_schedules_inconsistency END ERROR"
       errors.add(:base,l('sla_label.sla_schedule.inconsistency'))
     end

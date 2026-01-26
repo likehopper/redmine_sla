@@ -32,9 +32,6 @@ require "chronic_duration"
 # Load custom pluralization rules (e.g., "sla_cache" → "sla_caches")
 require_relative "config/initializers/inflections.rb"
 
-# Load helper modules
-require_relative "lib/redmine_sla/helpers/sla_rendering_helper"
-
 # Plugin registration block
 Redmine::Plugin.register :redmine_sla do
 
@@ -96,6 +93,9 @@ end
 
 # After Redmine bootstrap, extend core classes with SLA patches
 RedmineApp::Application.config.after_initialize do
+
+  # Load helper modules ( to display respect boolean in lists )
+  ActionView::Base.send(:include, RedmineSla::Helpers::SlaRenderingHelper)
 
   # Adds Project-level SLA helpers
   unless ProjectsController.included_modules.include? RedmineSla::Patches::ProjectsHelperPatch
