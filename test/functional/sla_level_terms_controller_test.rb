@@ -43,12 +43,11 @@ class SlaLevelTermsControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should get 302 on edit as anonymous" do
-    with_settings :default_language => "en" do
-      get(:edit, :params => {:id => 1})
-      assert_response 302
+  test "should NoRoute on get edit as anonymous" do
+    assert_raises ActionController::UrlGenerationError do
+      get :edit, :params => { id: 1 }
     end
-  end
+  end   
 
   ### As admin #1 ###
 
@@ -73,13 +72,12 @@ class SlaLevelTermsControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should return success on get edit as admin" do
+  test "should NoRoute on get edit as admin" do
     @request.session[:user_id] = 1
-    with_settings :default_language => "en" do
-      get(:edit, :params => {:id => 1})
-      assert_response :forbidden
+    assert_raises ActionController::UrlGenerationError do
+      get :edit, :params => { id: 1 }
     end
-  end
+  end    
 
   ### As manager #2 ###
 
@@ -99,11 +97,10 @@ class SlaLevelTermsControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should return 403 on get edit as manager" do
+  test "should NoRoute on get edit as manager" do
     @request.session[:user_id] = 2
-    with_settings :default_language => "en" do
-      get(:edit, :params => {:id => 1})
-      assert_response 403
+    assert_raises ActionController::UrlGenerationError do
+      get :edit, :params => { id: 1 }
     end
   end
 
@@ -125,13 +122,13 @@ class SlaLevelTermsControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should return 403 on get edit as developper" do
+  test "should NoRoute on get edit as developper" do
     @request.session[:user_id] = 3
-    with_settings :default_language => "en" do
-      get(:edit, :params => {:id => 1})
-      assert_response 403
+    assert_raises ActionController::UrlGenerationError do
+      get :edit, :params => { id: 1 }
     end
-  end
+  end  
+
 
   ### As sysadmin #4 ###
 
@@ -151,13 +148,12 @@ class SlaLevelTermsControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should return 403 on get edit as sysadmin" do
+  test "should NoRoute on get edit as sysadmin" do
     @request.session[:user_id] = 4
-    with_settings :default_language => "en" do
-      get(:edit, :params => {:id => 1})
-      assert_response 403
+    assert_raises ActionController::UrlGenerationError do
+      get :edit, :params => { id: 1 }
     end
-  end
+  end  
 
   ### As reporter #5 ###
 
@@ -177,13 +173,12 @@ class SlaLevelTermsControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should return 403 on get edit as reporter" do
+  test "should NoRoute on get edit as reporter" do
     @request.session[:user_id] = 5
-    with_settings :default_language => "en" do
-      get(:edit, :params => {:id => 1})
-      assert_response 403
+    assert_raises ActionController::UrlGenerationError do
+      get :edit, :params => { id: 1 }
     end
-  end
+  end  
 
   ### As other #6 ###
 
@@ -203,11 +198,10 @@ class SlaLevelTermsControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should return 403 on get edit as other" do
+  test "should NoRoute on get edit as other" do
     @request.session[:user_id] = 6
-    with_settings :default_language => "en" do
-      get(:edit, :params => {:id => 1})
-      assert_response 403
+    assert_raises ActionController::UrlGenerationError do
+      get :edit, :params => { id: 1 }
     end
   end
 
