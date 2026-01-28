@@ -72,8 +72,12 @@ class SlaCacheSpent < ActiveRecord::Base
     ActiveRecord::Base.connection.execute("SELECT sla_get_spent(#{self.sla_cache.issue_id},#{self.sla_type.id}) ; ")
   end
 
-  def self.purge()
-    return ActiveRecord::Base.connection.select_value("TRUNCATE sla_cache_spents CASCADE ; ")
+  def self.purge(project)
+    if ( project.nil? )
+      ActiveRecord::Base.connection.execute("TRUNCATE sla_cache_spents CASCADE ; ")
+    else
+      SlaCacheSpent.where(project: project.id).destroy_all
+    end
   end  
     
 end

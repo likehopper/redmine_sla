@@ -127,7 +127,7 @@ class SlaCacheSpentsControllerTest < Redmine::ControllerTest
     end
   end
 
-  test "should success on get edit as admin" do
+  test "should NoRoute on get edit as admin" do
     @request.session[:user_id] = 1
     assert_raises ActionController::UrlGenerationError do
       get :edit, :params => { id: 1 }
