@@ -34,6 +34,7 @@ module RedmineSla
 
       def self.included(base)
         base.send(:include, InstanceMethods)
+        base.send(:include, RedmineSla::Helpers::SlaRenderingHelper)
         
         base.class_eval do
 
