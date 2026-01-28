@@ -35,6 +35,7 @@ module RedmineSla
       def self.included(base)
         base.send(:include, InstanceMethods)
         base.send(:include, RedmineSla::Helpers::SlaRenderingHelper)
+        
         base.class_eval do
 
           alias_method :column_value_without_custom_sla_priority_id, :column_value

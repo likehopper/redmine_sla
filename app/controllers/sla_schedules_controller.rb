@@ -78,8 +78,8 @@ class SlaSchedulesController < ApplicationController
     @sla_schedule.safe_attributes = params[:sla_schedule]
 
     # Normalize start/end times to full HH:MM:SS
-    @sla_schedule.start_time = @sla_schedule.start_time.strftime("%H:%M:00")
-    @sla_schedule.end_time   = @sla_schedule.end_time.strftime("%H:%M:59")
+    @sla_schedule.start_time = @sla_schedule.start_time.strftime("%H:%M:00") if @sla_schedule.start_time.present?
+    @sla_schedule.end_time   = @sla_schedule.end_time.strftime("%H:%M:59") if @sla_schedule.end_time.present?
 
     if @sla_schedule.save
       respond_to do |format|
@@ -107,8 +107,8 @@ class SlaSchedulesController < ApplicationController
     @sla_schedule.safe_attributes = params[:sla_schedule]
 
     # Same normalization logic as in create
-    @sla_schedule.start_time = @sla_schedule.start_time.strftime("%H:%M:00")
-    @sla_schedule.end_time   = @sla_schedule.end_time.strftime("%H:%M:59")
+    @sla_schedule.start_time = @sla_schedule.start_time.strftime("%H:%M:00") if @sla_schedule.start_time.present?
+    @sla_schedule.end_time   = @sla_schedule.end_time.strftime("%H:%M:59") if @sla_schedule.end_time.present?
 
     if @sla_schedule.save
       respond_to do |format|
