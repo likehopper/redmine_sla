@@ -26,6 +26,7 @@ module RedmineSla
     # Rendering helpers for SLA display logic.
     # Placed under a dedicated submodule for clarity.
     module SlaRenderingHelper
+      include ActionView::Helpers::TagHelper
 
       # Generates the HTML tag for an SLA compliance icon.
       #
