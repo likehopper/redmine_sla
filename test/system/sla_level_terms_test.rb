@@ -102,7 +102,7 @@ class SlaLevelTermsHelperSystemTest < ApplicationSlaSystemTestCase
     assert page.has_css?('#flash_notice'),
       :visible => true,
       :text => l(:notice_successful_delete)
-    # TODO : teste in SlaLevelTerm#index after filtering
+    # TODO : check in SlaLevelTerm#index after filtering
   end
 
 end
