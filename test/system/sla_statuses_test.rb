@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# File: redmine_sla/test/system/sla_statuses_helper.rb
 # Redmine SLA - Redmine's Plugin 
 #
 # This program is free software; you can redistribute it and/or
@@ -16,10 +17,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-module SlaStatusesHelperSystemTest
+require_relative "../application_sla_system_test_case"
 
-  def contextual_menu_sla_status
+class SlaStatusesHelperSystemTest < ApplicationSlaSystemTestCase
+
+  test "contextual_menu_sla_status" do
     sla_status = SlaStatus.find(1)
+
+    log_user('admin', 'admin')
 
     visit '/sla/statuses/'
     assert_text l('sla_label.sla_status.index')
@@ -59,16 +64,22 @@ module SlaStatusesHelperSystemTest
     
   end   
 
-  def create_sla_status(sla_type_name,issue_status_name)
+  test "create_sla_status()" do
+    issue_status_name = 'New'
+
+    sla_type = SlaType.generate!
+
+    log_user('admin', 'admin')
+
     visit '/sla/statuses/new'
     within('form#sla-status-form') do
-      select sla_type_name, from: "sla_status_sla_type_id"
+      select sla_type.name, from: "sla_status_sla_type_id"
       select issue_status_name, from: "sla_status_status_id"
       find('input[name=commit]').click
     end
 
     # find created issue
-    sla_status = SlaStatus.find_by(sla_type_id: SlaType.find_by(name: sla_type_name), status_id: IssueStatus.find_by(name: issue_status_name))
+    sla_status = SlaStatus.find_by(sla_type_id: SlaType.find_by(name: sla_type.name), status_id: IssueStatus.find_by(name: issue_status_name))
     assert_kind_of SlaStatus, sla_status
 
     # check redirection
@@ -82,13 +93,16 @@ module SlaStatusesHelperSystemTest
     # compate sla_status attributs
 
     # check issue attributes
-    assert_equal sla_type_name, sla_status.sla_type.name
+    assert_equal sla_type.name, sla_status.sla_type.name
     assert_equal issue_status_name, sla_status.status.name
   end
 
-  def update_sla_status
+  test "update_sla_status" do
     sla_status = SlaStatus.generate!
     sla_type = SlaType.generate!
+
+    log_user('admin', 'admin')
+
     visit "/sla/statuses/#{sla_status.id}"
     page.first(:link,  l('sla_label.sla_status.edit')).click
     within('form#sla-status-form') do
@@ -105,8 +119,11 @@ module SlaStatusesHelperSystemTest
     # TODO : teste in SlaStatus#index after filtering
   end
 
-  def destroy_sla_status
+  test "destroy_sla_status" do 
     sla_status = SlaStatus.generate!
+
+    log_user('admin', 'admin')
+
     visit "/sla/statuses/#{sla_status.id}"
     page.first(:link, l('sla_label.sla_status.delete')).click
     page.accept_confirm /Are you sure/

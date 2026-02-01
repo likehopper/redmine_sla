@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# File: redmine_sla/test/integration/routing/sla_caches_test.rb
 # Redmine SLA - Redmine's Plugin 
 #
 # This program is free software; you can redistribute it and/or
@@ -16,9 +17,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require_relative "../../test_helper"
+# require_relative "../../test_helper"
+require_relative "../../application_sla_routing_test_case"
 
-class RoutingSlaCachesTest < Redmine::RoutingTest
+class RoutingSlaCachesTest < ApplicationSlaRoutingTestCase
 
   def test_sla_caches
     should_route 'GET /sla/caches' => 'sla_caches#index'
