@@ -26,27 +26,21 @@ class ApplicationSlaSystemTestCase < ApplicationSystemTestCase
 
   include Redmine::I18n
 
-  include RedmineSlaTestBootstrap
-  
-  # Functional tests run in-process, but we keep the same behavior as units/system
+  # Explicitly enable transactional tests for unit tests
   self.use_transactional_tests = true  
 
-  # Force plugin-only fixtures directory (works on Redmine 5 & 6)
+  # Use only the plugin fixtures directory (compatible with Redmine 5 & 6)
   RedmineSlaTestHelper.set_fixture_paths!(self)
+
+  # Redmine 6 may set `fixtures :all` globally; reset and use an explicit list
+  self.fixture_table_names = [] if respond_to?(:fixture_table_names=)
 
   # Load only the fixture sets defined by the plugin bootstrap
   fixtures(*RedmineSlaTestBootstrap.fixture_names(include_sla: true))
 
-  # Variable de classe pour suivre l'état du calcul
-  @@sla_update_done = false
-
   def setup_fixtures
-    super
-    # On ne l'exécute que si ça n'a pas encore été fait pour cette session
-    # unless @@sla_update_done
-      RedmineSlaTestBootstrap.ensure_update_sla!
-      # @@sla_update_done = true
-    # end
+    super # After fixtures are loaded
+    RedmineSlaTestBootstrap.ensure_update_sla!
   end
 
 end
