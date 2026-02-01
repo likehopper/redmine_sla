@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# File: redmine_sla/test/functional/sla_cache_controller_test.rb
 # Redmine SLA - Redmine's Plugin 
 #
 # This program is free software; you can redistribute it and/or
@@ -16,15 +17,21 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../test_helper', __FILE__)
+require_relative "../application_sla_functionals_test_case"
 
-class SlaCachesControllerTest < Redmine::ControllerTest
-
-  include Redmine::I18n
+class SlaCachesControllerTest < ApplicationSlaFunctionalsTestCase
 
   def setup
+    super
     User.current = nil
     set_language_if_valid 'en'
+    # puts "\n>>> Verification SQL : #{ActiveRecord::Base.connection.execute("SELECT count(*) FROM sla_caches").first}"
+    # # On vérifie si la table est vide OU si c'est le premier passage
+    # if !defined?(@@sla_update_done) || !@@sla_update_done || SlaCache.count == 0
+    #   RedmineSlaTestBootstrap.ensure_update_sla!
+    #   @@sla_update_done = true
+    # end
+    # puts "\n>>> Verification SQL : #{ActiveRecord::Base.connection.execute("SELECT count(*) FROM sla_caches").first}"
   end
 
   ### As anonymous ###

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# File: redmine_sla/test/helpers/sla_assertion_helpers.rb
 # Redmine SLA - Redmine's Plugin 
 #
 # This program is free software; you can redistribute it and/or
@@ -16,6 +17,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../test/test_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../../test/application_system_test_case')
-require File.expand_path(File.dirname(__FILE__) + '/test_helper')
+module SlaAssertionHelperTest
+
+  def assert_select_not(selector, attributes = {}, message = nil)
+    attribute_selector = attributes.map { |key, value| "[#{key}=\"#{value}\"]" }.join
+    assert_select "#{selector}#{attribute_selector}", 0, message
+  end
+  
+end
