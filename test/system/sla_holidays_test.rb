@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# File: redmine_sla/test/system/sla_holidays_helper.rb
 # Redmine SLA - Redmine's Plugin 
 #
 # This program is free software; you can redistribute it and/or
@@ -16,10 +17,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-module SlaHolidaysHelperSystemTest
+require_relative "../application_sla_system_test_case"
 
-  def contextual_menu_sla_holiday
+class SlaHolidaysHelperSystemTest < ApplicationSlaSystemTestCase
+
+  test "contextual_menu_sla_holiday" do
     sla_holiday = SlaHoliday.find(1)
+
+    log_user('admin', 'admin')
 
     visit '/sla/holidays?sort=id'
     assert_text l('sla_label.sla_holiday.index')
@@ -57,7 +62,12 @@ module SlaHolidaysHelperSystemTest
     
   end 
 
-  def create_sla_holiday(sla_holiday_name,sla_holiday_date)
+  test "create_sla_holiday" do
+    sla_holiday_name = 'new SLA Holiday'
+    sla_holiday_date = '31/01/2025'
+
+    log_user('admin', 'admin')
+
     visit '/sla/holidays/new'
     within('form#sla-holiday-form') do
       fill_in 'sla_holiday_name', :with => sla_holiday_name
@@ -83,8 +93,11 @@ module SlaHolidaysHelperSystemTest
     assert_equal sla_holiday_name, sla_holiday.name
   end
 
-  def update_sla_holiday
+  test "update_sla_holiday" do
     sla_holiday = SlaHoliday.generate!
+
+    log_user('admin', 'admin')
+
     visit "/sla/holidays/#{sla_holiday.id}"
     page.first(:link, l('sla_label.sla_holiday.edit')).click
     within('form#sla-holiday-form') do
@@ -99,8 +112,11 @@ module SlaHolidaysHelperSystemTest
     # TODO : teste in SlaHoliday#index after filtering
   end
 
-  def destroy_sla_holiday
+  test "destroy_sla_holiday" do
     sla_holiday = SlaHoliday.generate!
+
+    log_user('admin', 'admin')
+
     visit "/sla/holidays/#{sla_holiday.id}"
     page.first(:link, l('sla_label.sla_holiday.delete')).click
     page.accept_confirm /Are you sure/

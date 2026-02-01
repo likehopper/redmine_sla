@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# File: redmine_sla/test/integration/api_test/sla_cache_spents_test.rb
 # Redmine SLA - Redmine's Plugin 
 #
 # This program is free software; you can redistribute it and/or
@@ -16,10 +17,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+require_relative "../../application_sla_api_test_case"
 require_relative "../../helpers/sla_caches_helper"
-require_relative "../../test_helper"
 
-class Redmine::ApiTest::SlaCacheSpentsTest < Redmine::ApiTest::Base
+class Redmine::ApiTest::SlaCacheSpentsTest < ApplicationSlaApiTestCase
   include ActiveJob::TestHelper
   include SlaCachesHelperTest
 
