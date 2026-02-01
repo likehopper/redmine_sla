@@ -14,3 +14,6 @@ gem "chronic"
 
 # Duration parsing and formatting used for SLA time representation
 gem "chronic_duration"
+
+# Prevent Ruby 3.5 deprecation warnings (ostruct removed from default gems)
+gem 'ostruct', require: false
