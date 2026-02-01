@@ -107,7 +107,7 @@ class SlaCalendarsHelperSystemTest < ApplicationSlaSystemTestCase
       :visible => true,
       :text => l('sla_label.sla_calendar.notice_successful_update', :id => "##{sla_calendar.id}" )    
     assert_equal 'mod SLA Calendar', sla_calendar.reload.name
-    # TODO : teste in SlaCalendar#index after filtering
+    # TODO : check in SlaCalendar#index after filtering
   end
 
   test "destroy_sla_calendar" do
@@ -121,7 +121,7 @@ class SlaCalendarsHelperSystemTest < ApplicationSlaSystemTestCase
     assert page.has_css?('#flash_notice'),
       :visible => true,
       :text => l(:notice_successful_delete)
-    # TODO : teste in SlaCalendar#index after filtering
+    # TODO : check in SlaCalendar#index after filtering
   end
 
 end

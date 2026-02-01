@@ -83,7 +83,7 @@ class SlaTypesHelperSystemTest < ApplicationSlaSystemTestCase
       :text => l("sla_label.sla_type.notice_successful_create", :id => "##{sla_type.id}" )
     assert_equal sla_types_path, current_path
 
-    # TODO : vérifier SlaTypes#show
+    # TODO : check SlaTypes#show
     # visit "/sla/type/#{sla_types.id}"
     # compate sla_types attributs
 
@@ -107,7 +107,7 @@ class SlaTypesHelperSystemTest < ApplicationSlaSystemTestCase
       :visible => true,
       :text => l("sla_label.sla_type.notice_successful_update", :id => "##{sla_type.id}" )
     assert_equal 'mod SLA Type', sla_type.reload.name
-    # TODO : teste in SlaType#index after filtering
+    # TODO : check in SlaType#index after filtering
   end
 
   test "destroy_sla_type" do
@@ -120,7 +120,7 @@ class SlaTypesHelperSystemTest < ApplicationSlaSystemTestCase
     assert page.has_css?('#flash_notice'),
       :visible => true,
       :text => l(:notice_successful_delete)
-    # TODO : teste in SlaType#index after filtering
+    # TODO : check in SlaType#index after filtering
   end
 
 end
