@@ -16,9 +16,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require_relative "../../test_helper"
+require_relative "../../application_sla_api_test_case"
 
-class Redmine::ApiTest::SlaTypesTest < Redmine::ApiTest::Base
+class Redmine::ApiTest::SlaTypesTest < ApplicationSlaApiTestCase
   include ActiveJob::TestHelper
 
   # SlaType#index in XML

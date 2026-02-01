@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# File: redmine_sla/test/application_sla_units_test_case.rb
 # Redmine SLA - Redmine's Plugin 
 #
 # This program is free software; you can redistribute it and/or
@@ -16,11 +17,25 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-module AssertionHelpers
+require_relative 'helpers/sla_test_helper'
 
-  def assert_select_not(selector, attributes = {}, message = nil)
-    attribute_selector = attributes.map { |key, value| "[#{key}=\"#{value}\"]" }.join
-    assert_select "#{selector}#{attribute_selector}", 0, message
+class ApplicationSlaUnitsTestCase < ActiveSupport::TestCase
+
+  # Explicitly enable transactional tests for unit tests
+  self.use_transactional_tests = true  
+
+  # Use only the plugin fixtures directory (compatible with Redmine 5 & 6)
+  RedmineSlaTestHelper.set_fixture_paths!(self)
+
+  # Redmine 6 may set `fixtures :all` globally; reset and use an explicit list
+  self.fixture_table_names = [] if respond_to?(:fixture_table_names=)
+
+  # Load only the fixture sets defined by the plugin bootstrap
+  fixtures(*RedmineSlaTestBootstrap.fixture_names(include_sla: true))
+
+  def setup_fixtures
+    super # After fixtures are loaded
+    RedmineSlaTestBootstrap.ensure_update_sla!
   end
-  
+
 end

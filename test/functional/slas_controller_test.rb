@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# File: redmine_sla/test/functional/slas_controller_test.rb
 # Redmine SLA - Redmine's Plugin 
 #
 # This program is free software; you can redistribute it and/or
@@ -16,13 +17,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require File.expand_path('../../test_helper', __FILE__)
+require_relative "../application_sla_functionals_test_case"
 
-class SlasControllerTest < Redmine::ControllerTest
-
-  include Redmine::I18n
+class SlasControllerTest < ApplicationSlaFunctionalsTestCase
 
   def setup
+    super
     User.current = nil
     set_language_if_valid 'en'
   end
