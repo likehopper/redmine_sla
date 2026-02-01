@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# File: redmine_sla/test/system/sla_types_helper.rb
 # Redmine SLA - Redmine's Plugin 
 #
 # This program is free software; you can redistribute it and/or
@@ -16,10 +17,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-module SlaTypesHelperSystemTest
+require_relative "../application_sla_system_test_case"
 
-  def contextual_menu_sla_type
+class SlaTypesHelperSystemTest < ApplicationSlaSystemTestCase
+
+  test "contextual_menu_sla_type" do
     sla_type = SlaType.find(1)
+
+    log_user('admin', 'admin')
 
     visit '/sla/types/'
     assert_text l('sla_label.sla_type.index')
@@ -57,7 +62,11 @@ module SlaTypesHelperSystemTest
     
   end   
 
-  def create_sla_type(sla_type_name)
+  test "create_sla_type" do
+    sla_type_name="new SLA Type"
+    
+    log_user('admin', 'admin')
+
     visit '/sla/types/new'
     within('form#sla-type-form') do
       fill_in 'sla_type_name', :with => sla_type_name
@@ -74,7 +83,7 @@ module SlaTypesHelperSystemTest
       :text => l("sla_label.sla_type.notice_successful_create", :id => "##{sla_type.id}" )
     assert_equal sla_types_path, current_path
 
-    # TODO : vérifier SlaTypes#show
+    # TODO : check SlaTypes#show
     # visit "/sla/type/#{sla_types.id}"
     # compate sla_types attributs
 
@@ -82,8 +91,11 @@ module SlaTypesHelperSystemTest
     assert_equal sla_type_name, sla_type.name
   end
 
-  def update_sla_type
+  test "update_sla_type" do
     sla_type = SlaType.generate!
+
+    log_user('admin', 'admin')
+
     visit "/sla/types/#{sla_type.id}"
     page.first(:link, l('sla_label.sla.edit')).click
     within('form#sla-type-form') do
@@ -95,18 +107,20 @@ module SlaTypesHelperSystemTest
       :visible => true,
       :text => l("sla_label.sla_type.notice_successful_update", :id => "##{sla_type.id}" )
     assert_equal 'mod SLA Type', sla_type.reload.name
-    # TODO : teste in SlaType#index after filtering
+    # TODO : check in SlaType#index after filtering
   end
 
-  def destroy_sla_type
+  test "destroy_sla_type" do
     sla_type = SlaType.generate!
+
+    log_user('admin', 'admin')
     visit "/sla/types/#{sla_type.id}"
     page.first(:link, l('sla_label.sla_type.delete')).click
     page.accept_confirm /Are you sure/
     assert page.has_css?('#flash_notice'),
       :visible => true,
       :text => l(:notice_successful_delete)
-    # TODO : teste in SlaType#index after filtering
+    # TODO : check in SlaType#index after filtering
   end
 
 end

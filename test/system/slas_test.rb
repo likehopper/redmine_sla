@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# File: redmine_sla/test/system/slas_helper.rb
 # Redmine SLA - Redmine's Plugin 
 #
 # This program is free software; you can redistribute it and/or
@@ -16,16 +17,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-# require File.expand_path('../../../application_system_test_case', __FILE__)
+require_relative "../application_sla_system_test_case"
 
-# class SlasSystemTest < ApplicationSystemTestCase
-module SlasHelperSystemTest
+class SlasHelperSystemTest < ApplicationSlaSystemTestCase
 
-  #include Redmine::I18n
-
-  def contextual_menu_sla
+  test "contextual_menu_sla" do
     sla = Sla.find(1)
 
+    log_user('admin', 'admin')
     visit '/sla/slas/'
     assert_text l('sla_label.sla.index')
     element = find('tr#entity_id_1')
@@ -62,7 +61,9 @@ module SlasHelperSystemTest
 
   end 
 
-  def create_sla(sla_name)
+  test "create_sla" do
+    sla_name = 'new Sla'
+    log_user('admin', 'admin')
     visit '/sla/slas/new'
     within('form#sla-form') do
       fill_in 'sla_name', :with => sla_name
@@ -79,7 +80,7 @@ module SlasHelperSystemTest
       :text => l("sla_label.sla.notice_successful_create", :id => "##{sla.id}" )
     assert_equal slas_path, current_path
 
-    # TODO : vérifier SlaStatus#show
+    # TODO : check SlaStatus#show
     # visit "/sla/statuses/#{sla_status.id}"
     # compate sla_status attributs
 
@@ -87,8 +88,9 @@ module SlasHelperSystemTest
     assert_equal sla_name, sla.name
   end
 
-  def update_sla
+  test "update_sla" do
     sla = Sla.generate!
+    log_user('admin', 'admin')
     visit "/sla/slas/#{sla.id}"
     page.first(:link, l('sla_label.sla.edit')).click
     within('form#sla-form') do
@@ -100,18 +102,19 @@ module SlasHelperSystemTest
       :visible => true,
       :text => l("sla_label.sla.notice_successful_update", :id => "##{sla.id}" )    
     assert_equal 'mod Sla', sla.reload.name
-    # TODO : teste in Sla#index after filtering
+    # TODO : check in Sla#index after filtering
   end
 
-  def destroy_sla
+  test "destroy_sla" do
     sla = Sla.generate!
+    log_user('admin', 'admin')
     visit "/sla/slas/#{sla.id}"
     page.first(:link, l('sla_label.sla.delete')).click
     page.accept_confirm /Are you sure/
     assert page.has_css?('#flash_notice'),
       :visible => true,
       :text => l(:notice_successful_delete)
-      # TODO : teste in Sla#index after filtering
+      # TODO : check in Sla#index after filtering
   end
 
 end

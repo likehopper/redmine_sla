@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# File: redmine_sla/test/system/sla_calendars_helper.rb
 # Redmine SLA - Redmine's Plugin 
 #
 # This program is free software; you can redistribute it and/or
@@ -16,10 +17,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-module SlaCalendarsHelperSystemTest
+require_relative "../application_sla_system_test_case"
 
-  def contextual_menu_sla_calendar
+class SlaCalendarsHelperSystemTest < ApplicationSlaSystemTestCase
+
+  test "contextual_menu_sla_calendar" do
     sla_calendar = SlaCalendar.find(1)
+
+    log_user('admin', 'admin')
 
     visit '/sla/calendars/'
     assert_text l('sla_label.sla_calendar.index')
@@ -57,7 +62,11 @@ module SlaCalendarsHelperSystemTest
     
   end 
 
-  def create_sla_calendar(sla_calendar_name)
+  test "create_sla_calendar" do
+    sla_calendar_name = 'new SLA Calendar'
+
+    log_user('admin', 'admin')
+
     visit '/sla/calendars/new'
     within('form#sla-calendar-form') do
       fill_in 'sla_calendar_name', :with => sla_calendar_name
@@ -82,8 +91,11 @@ module SlaCalendarsHelperSystemTest
     assert_equal sla_calendar_name, sla_calendar.name
   end
 
-  def update_sla_calendar
+  test "update_sla_calendar" do
     sla_calendar = SlaCalendar.generate!
+
+    log_user('admin', 'admin')
+
     visit "/sla/calendars/#{sla_calendar.id}"
     page.first(:link, l('sla_label.sla_calendar.edit')).click
     within('form#sla-calendar-form') do
@@ -95,18 +107,21 @@ module SlaCalendarsHelperSystemTest
       :visible => true,
       :text => l('sla_label.sla_calendar.notice_successful_update', :id => "##{sla_calendar.id}" )    
     assert_equal 'mod SLA Calendar', sla_calendar.reload.name
-    # TODO : teste in SlaCalendar#index after filtering
+    # TODO : check in SlaCalendar#index after filtering
   end
 
-  def destroy_sla_calendar
+  test "destroy_sla_calendar" do
     sla_calendar = SlaCalendar.generate!
+
+    log_user('admin', 'admin')
+
     visit "/sla/calendars/#{sla_calendar.id}"
     page.first(:link, l('sla_label.sla_calendar.delete')).click
     page.accept_confirm /Are you sure/
     assert page.has_css?('#flash_notice'),
       :visible => true,
       :text => l(:notice_successful_delete)
-    # TODO : teste in SlaCalendar#index after filtering
+    # TODO : check in SlaCalendar#index after filtering
   end
 
 end
