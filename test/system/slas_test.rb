@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# File: redmine_sla/test/system/slas_helper.rb
 # Redmine SLA - Redmine's Plugin 
 #
 # This program is free software; you can redistribute it and/or
@@ -16,35 +17,38 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-module SlaTypesHelperSystemTest
+require_relative "../application_sla_system_test_case"
 
-  def contextual_menu_sla_type
-    sla_type = SlaType.find(1)
+class SlasHelperSystemTest < ApplicationSlaSystemTestCase
 
-    visit '/sla/types/'
-    assert_text l('sla_label.sla_type.index')
+  test "contextual_menu_sla" do
+    sla = Sla.find(1)
+
+    log_user('admin', 'admin')
+    visit '/sla/slas/'
+    assert_text l('sla_label.sla.index')
     element = find('tr#entity_id_1')
     element.right_click
     assert_selector 'div#context-menu', visible: true
-    assert_selector 'div#context-menu a', text: 'Show'
+    assert_selector 'div#context-menu a', text: l(:button_show)
     find('div#context-menu a', text: l(:button_show)).click
-    assert_current_path sla_type_path(sla_type)
-    assert_text l('sla_label.sla_type.show')
-    assert_text sla_type.name
+    assert_current_path sla_path(sla)
+    assert_text l('sla_label.sla.show')
+    assert_text sla.name
 
-    visit '/sla/types/'
-    assert_text l('sla_label.sla_type.index')
+    visit '/sla/slas/'
+    assert_text l('sla_label.sla.index')
     element = find('tr#entity_id_1')
     element.right_click
     assert_selector 'div#context-menu', visible: true
     assert_selector 'div#context-menu a', text: l(:button_edit)
     find('div#context-menu a', text: l(:button_edit)).click
-    assert_current_path edit_sla_type_path(sla_type)
-    assert_text l('sla_label.sla_type.edit')
-    assert_field 'sla_type_name', with: sla_type.name
+    assert_current_path edit_sla_path(sla)
+    assert_text l('sla_label.sla.edit')
+    assert_field 'sla_name', with: sla.name
 
-    visit '/sla/types/'
-    assert_text l('sla_label.sla_type.index')
+    visit '/sla/slas/'
+    assert_text l('sla_label.sla.index')
     element = find('tr#entity_id_1')
     element.right_click
     assert_selector 'div#context-menu', visible: true
@@ -52,61 +56,65 @@ module SlaTypesHelperSystemTest
     accept_confirm do
       find('div#context-menu a', text: l(:button_delete)).click
     end
-    assert_current_path sla_types_path()
+    assert_current_path slas_path()
     assert_text l(:notice_successful_delete)
-    
-  end   
 
-  def create_sla_type(sla_type_name)
-    visit '/sla/types/new'
-    within('form#sla-type-form') do
-      fill_in 'sla_type_name', :with => sla_type_name
+  end 
+
+  test "create_sla" do
+    sla_name = 'new Sla'
+    log_user('admin', 'admin')
+    visit '/sla/slas/new'
+    within('form#sla-form') do
+      fill_in 'sla_name', :with => sla_name
       find('input[name=commit]').click
     end
 
     # find created issue
-    sla_type = SlaType.find_by_name(sla_type_name)
-    assert_kind_of SlaType, sla_type
+    sla = Sla.find_by_name(sla_name)
+    assert_kind_of Sla, sla
 
     # check redirection
     find 'div#flash_notice',
       :visible => true,
-      :text => l("sla_label.sla_type.notice_successful_create", :id => "##{sla_type.id}" )
-    assert_equal sla_types_path, current_path
+      :text => l("sla_label.sla.notice_successful_create", :id => "##{sla.id}" )
+    assert_equal slas_path, current_path
 
-    # TODO : vérifier SlaTypes#show
-    # visit "/sla/type/#{sla_types.id}"
-    # compate sla_types attributs
+    # TODO : vérifier SlaStatus#show
+    # visit "/sla/statuses/#{sla_status.id}"
+    # compate sla_status attributs
 
     # check issue attributes
-    assert_equal sla_type_name, sla_type.name
+    assert_equal sla_name, sla.name
   end
 
-  def update_sla_type
-    sla_type = SlaType.generate!
-    visit "/sla/types/#{sla_type.id}"
+  test "update_sla" do
+    sla = Sla.generate!
+    log_user('admin', 'admin')
+    visit "/sla/slas/#{sla.id}"
     page.first(:link, l('sla_label.sla.edit')).click
-    within('form#sla-type-form') do
-      fill_in 'Name', :with => 'mod SLA Type'
+    within('form#sla-form') do
+      fill_in 'Name', :with => 'mod Sla'
     end
-    page.first(:button, l('sla_label.sla_type.save')).click
-    # assert page.has_css?('#flash_notice')
+    page.first(:button, l('sla_label.sla.save')).click
+    #assert page.has_css?('#flash_notice')
     find 'div#flash_notice',
       :visible => true,
-      :text => l("sla_label.sla_type.notice_successful_update", :id => "##{sla_type.id}" )
-    assert_equal 'mod SLA Type', sla_type.reload.name
-    # TODO : teste in SlaType#index after filtering
+      :text => l("sla_label.sla.notice_successful_update", :id => "##{sla.id}" )    
+    assert_equal 'mod Sla', sla.reload.name
+    # TODO : teste in Sla#index after filtering
   end
 
-  def destroy_sla_type
-    sla_type = SlaType.generate!
-    visit "/sla/types/#{sla_type.id}"
-    page.first(:link, l('sla_label.sla_type.delete')).click
+  test "destroy_sla" do
+    sla = Sla.generate!
+    log_user('admin', 'admin')
+    visit "/sla/slas/#{sla.id}"
+    page.first(:link, l('sla_label.sla.delete')).click
     page.accept_confirm /Are you sure/
     assert page.has_css?('#flash_notice'),
       :visible => true,
       :text => l(:notice_successful_delete)
-    # TODO : teste in SlaType#index after filtering
+      # TODO : teste in Sla#index after filtering
   end
 
 end

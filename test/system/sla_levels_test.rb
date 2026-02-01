@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# File: redmine_sla/test/system/sla_levels_helper.rb
 # Redmine SLA - Redmine's Plugin 
 #
 # This program is free software; you can redistribute it and/or
@@ -16,10 +17,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-module SlaLevelsHelperSystemTest
+require_relative "../application_sla_system_test_case"
 
-  def contextual_menu_sla_level
+class SlaLevelsHelperSystemTest < ApplicationSlaSystemTestCase
+
+  test "contextual_menu_sla_level" do
     sla_level = SlaLevel.find(1)
+
+    log_user('admin', 'admin')
 
     visit '/sla/levels?sort=id'
     assert_text l('sla_label.sla_level.index')
@@ -57,12 +62,19 @@ module SlaLevelsHelperSystemTest
     
   end 
 
-  def create_sla_level(sla_level_name,sla_level_sla_name,sla_level_sla_calendar_name)
+  test "create_sla_level" do
+    sla_level_name = 'new SLA Level'
+
+    sla = Sla.generate!
+    sla_calendar = SlaCalendar.generate!
+
+    log_user('admin', 'admin')
+
     visit '/sla/levels/new'
     within('form#sla-level-form') do
       fill_in 'sla_level_name', :with => sla_level_name
-      select sla_level_sla_name, from: "sla_level_sla_id"
-      select sla_level_sla_calendar_name, from: "sla_level_sla_calendar_id"
+      select sla.name, from: "sla_level_sla_id"
+      select sla_calendar.name, from: "sla_level_sla_calendar_id"
       find('input[name=commit]').click
     end
 
@@ -84,8 +96,11 @@ module SlaLevelsHelperSystemTest
     assert_equal sla_level_name, sla_level.name
   end
 
-  def update_sla_level
+  test "update_sla_level" do
     sla_level = SlaLevel.generate!
+
+    log_user('admin', 'admin')
+
     visit "/sla/levels/#{sla_level.id}"
     page.first(:link, l('sla_label.sla_level.edit')).click
     within('form#sla-level-form') do
@@ -100,8 +115,11 @@ module SlaLevelsHelperSystemTest
     # TODO : teste in SlaLevel#index after filtering
   end
 
-  def destroy_sla_level
+  test "destroy_sla_level" do 
     sla_level = SlaLevel.generate!
+
+    log_user('admin', 'admin')
+
     visit "/sla/levels/#{sla_level.id}"
     page.first(:link, l('sla_label.sla_level.delete')).click
     page.accept_confirm /Are you sure/

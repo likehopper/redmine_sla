@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# File: redmine_sla/test/system/sla_level_terms_helper.rb
 # Redmine SLA - Redmine's Plugin 
 #
 # This program is free software; you can redistribute it and/or
@@ -16,10 +17,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-module SlaLevelTermsHelperSystemTest
+require_relative "../application_sla_system_test_case"
 
-  def contextual_menu_sla_level_term
+class SlaLevelTermsHelperSystemTest < ApplicationSlaSystemTestCase
+
+  test "contextual_menu_sla_level_term" do
     sla_level_term = SlaLevelTerm.find(1)
+
+    log_user('admin', 'admin')
 
     visit '/sla/level_terms?sort=id'
     assert_text l('sla_label.sla_level_term.index')
@@ -58,8 +63,11 @@ module SlaLevelTermsHelperSystemTest
   end 
 
   # SlaLevelTerm create/update involve by SlaLevel#sla_terms !
-  def create_update_sla_level_term
+  test "create_update_sla_level_term" do
     sla_level = SlaLevel.generate!
+
+    log_user('admin', 'admin')
+
     visit "/sla/levels/#{sla_level.id}/sla_terms"
     within('form#sla-level-terms-form') do
       fill_in "sla_level_sla_level_terms_attributes_1_1_term", :with => 60
@@ -83,8 +91,11 @@ module SlaLevelTermsHelperSystemTest
     assert_equal 60, sla_level_term.term
   end
 
-  def destroy_sla_level_term
+  test "destroy_sla_level_term" do 
     sla_level_term = SlaLevelTerm.generate!
+
+    log_user('admin', 'admin')
+
     visit "/sla/level_terms/#{sla_level_term.id}"
     page.first(:link, l('sla_label.sla_level_term.delete')).click
     page.accept_confirm /Are you sure/
