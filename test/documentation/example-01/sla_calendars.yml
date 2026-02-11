@@ -1,0 +1,18 @@
+sla_calendars:
+  - name: "Calendar Support"
+    sla_schedules:
+      Monday:
+        - ["09:30","12:29",true]
+        - ["14:00","17:59",true]
+      Tuesday:
+        - ["09:30","12:29",true]
+        - ["14:00","17:59",true]
+      Wednesday:
+        - ["09:30","12:29",true]
+        - ["14:00","17:59",true]
+      Thursday:
+        - ["09:30","12:29",true]
+        - ["14:00","17:59",true]
+      Friday:
+        - ["09:30","12:29",true]
+        - ["14:00","17:59",true]

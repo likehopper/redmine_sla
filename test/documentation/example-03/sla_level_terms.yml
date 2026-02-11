@@ -1,0 +1,25 @@
+sla_level_terms:
+
+  sla_level_term_1:
+    sla_level: "Level TMA Bug"
+    sla_type: "Response time"
+    sla_priority:
+      Low: 120
+      Normal: 60
+      High: 30
+
+  sla_level_term_2:
+    sla_level: "Level TMA Bug"
+    sla_type: "Resolution deadline"
+    sla_priority:
+      Low: 240
+      Normal: 120
+      High: 60
+
+  sla_level_term_3:
+    sla_level: "Level TMA Feature"
+    sla_type: "Response time"
+    sla_priority:
+      Low: 1440
+      Normal: 480
+      High: 240

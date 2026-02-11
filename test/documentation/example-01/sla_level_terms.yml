@@ -1,0 +1,8 @@
+sla_level_terms:
+  sla_level_term_1:
+    sla_level: Level Support
+    sla_type: Response time
+    sla_priority:
+      Low: 1440
+      Normal: 480
+      High: 240
