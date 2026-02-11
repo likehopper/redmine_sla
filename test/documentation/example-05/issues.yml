@@ -1,0 +1,81 @@
+issues:
+  issue_past_1:
+    project: project-managed-services
+    tracker: tracker_change_request
+    subject: GTI=OK GTR=OK
+    start_date: '2026-01-06'
+    due_date: '2026-01-06'
+    issue_priority_name: Normal
+    history:
+    - status: New
+      at: '2026-01-06 10:00:00'
+      notes: Created
+    - status: Assigned
+      at: '2026-01-06 10:30:00'
+      notes: Work started
+    - status: Resolved
+      at: '2026-01-06 11:00:00'
+      notes: Fix delivered
+    - status: Closed
+      at: '2026-01-06 11:30:00'
+      notes: Validated
+  issue_past_2:
+    project: project-managed-services
+    tracker: tracker_change_request
+    subject: GTI=OK GTR=KO
+    start_date: '2026-01-07'
+    due_date: '2026-01-07'
+    issue_priority_name: Normal
+    history:
+    - status: New
+      at: '2026-01-07 09:00:00'
+      notes: Created
+    - status: Assigned
+      at: '2026-01-07 10:00:00'
+      notes: Work started
+    - status: Resolved
+      at: '2026-01-07 16:00:00'
+      notes: Fix delivered
+    - status: Closed
+      at: '2026-01-07 17:00:00'
+      notes: Validated
+  issue_past_3:
+    project: project-managed-services
+    tracker: tracker_production_incident
+    subject: GTI=KO GTR=OK
+    start_date: '2026-01-08'
+    due_date: '2026-01-08'
+    issue_priority_name: Normal
+    history:
+    - status: New
+      at: '2026-01-08 11:15:00'
+      notes: Created
+    - status: Assigned
+      at: '2026-01-08 12:30:00'
+      notes: Work started
+    - status: Resolved
+      at: '2026-01-08 14:15:00'
+      notes: Fix delivered
+    - status: Closed
+      at: '2026-01-08 16:00:00'
+      notes: Validated
+  issue_past_4:
+    project: project-managed-services
+    tracker: tracker_production_incident
+    subject: GTI=KO GTR=KO
+    start_date: '2026-01-09'
+    due_date: '2026-01-09'
+    issue_priority_name: Normal
+    history:
+    - status: New
+      at: '2026-01-09 15:00:00'
+      notes: Created
+    - status: Assigned
+      at: '2026-01-09 17:00:00'
+      notes: Work started
+    - status: Resolved
+      at: '2026-01-12 10:00:00'
+      notes: Fix delivered
+    - status: Closed
+      at: '2026-01-12 10:30:00'
+      notes: Validated

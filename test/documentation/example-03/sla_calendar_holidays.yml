@@ -1,0 +1,34 @@
+sla_calendar_holidays:
+  - sla_calendar: "Calendar TMA"
+    sla_holiday: "2026 - Jour de l’an"
+    match: false
+  - sla_calendar: "Calendar TMA"
+    sla_holiday: "2026 - Lundi de Pâques"
+    match: false
+  - sla_calendar: "Calendar TMA"
+    sla_holiday: "2026 - Fête du Travail"
+    match: false
+  - sla_calendar: "Calendar TMA"
+    sla_holiday: "2026 - Victoire 1945"
+    match: false
+  - sla_calendar: "Calendar TMA"
+    sla_holiday: "2026 - Ascension"
+    match: false
+  - sla_calendar: "Calendar TMA"
+    sla_holiday: "2026 - Lundi de Pentecôte"
+    match: false
+  - sla_calendar: "Calendar TMA"
+    sla_holiday: "2026 - Fête nationale"
+    match: false
+  - sla_calendar: "Calendar TMA"
+    sla_holiday: "2026 - Assomption"
+    match: false
+  - sla_calendar: "Calendar TMA"
+    sla_holiday: "2026 - Toussaint"
+    match: false
+  - sla_calendar: "Calendar TMA"
+    sla_holiday: "2026 - Armistice 1918"
+    match: false
+  - sla_calendar: "Calendar TMA"
+    sla_holiday: "2026 - Noël"
+    match: false

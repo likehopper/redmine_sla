@@ -1,0 +1,6 @@
+projects:
+  - name: "Project Bug"
+    identifier: "project-bug"
+    description: "Simple service levels with Response time and Resolution deadline"
+    public: false
+    sla: true

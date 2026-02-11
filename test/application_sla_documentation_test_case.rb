@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# File: redmine_sla/test/application_system_test_case.rb
+# File: redmine_sla/test/application_documentation_test_case.rb
 # Redmine SLA - Redmine's Plugin 
 #
 # This program is free software; you can redistribute it and/or
@@ -18,16 +18,17 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 require_relative 'helpers/sla_test_helper'
-require_relative 'helpers/sla_object_helper'
+require_relative 'helpers/sla_documentation_helper'
 
-require File.expand_path('../../../../test/application_system_test_case', __FILE__)
-
-class ApplicationSlaSystemTestCase < ApplicationSystemTestCase
+class ApplicationSlaDocumentationTestCase < ApplicationSystemTestCase
 
   include Redmine::I18n
+  include SlaDocumentationHelperTest
+
+  i_suck_and_my_tests_are_order_dependent!
 
   # Explicitly enable transactional tests for unit tests
-  self.use_transactional_tests = true  
+  self.use_transactional_tests = false  
 
   # Use only the plugin fixtures directory (compatible with Redmine 5 & 6)
   RedmineSlaTestHelper.set_fixture_paths!(self)
@@ -36,11 +37,6 @@ class ApplicationSlaSystemTestCase < ApplicationSystemTestCase
   self.fixture_table_names = [] if respond_to?(:fixture_table_names=)
 
   # Load only the fixture sets defined by the plugin bootstrap
-  fixtures(*RedmineSlaTestBootstrap.fixture_names(include_sla: true))
-
-  def setup_fixtures
-    super # After fixtures are loaded
-    RedmineSlaTestBootstrap.ensure_update_sla!
-  end
+  fixtures(*RedmineSlaTestBootstrap.fixture_names(include_sla: false))
 
 end

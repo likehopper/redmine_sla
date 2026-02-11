@@ -1,0 +1,8 @@
+sla_statuses:
+- sla_type: Response time
+  issue_statuses: 
+  - New
+- sla_type: Resolution deadline
+  issue_statuses:
+  - New
+  - Assigned

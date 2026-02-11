@@ -1,0 +1,10 @@
+sla_levels:
+- name: Level Managed Services tracker_change_request HO
+  sla: SLA Managed Services tracker_change_request
+  sla_calendar: Calendar HO tracker_change_request
+- name: Level Managed Services tracker_production_incident HO
+  sla: SLA Managed Services tracker_production_incident
+  sla_calendar: Calendar HO tracker_production_incident
+- name: Level Managed Services tracker_production_incident HNO
+  sla: SLA Managed Services tracker_production_incident
+  sla_calendar: Calendar HNO tracker_production_incident

@@ -1,0 +1,6 @@
+projects:
+- name: Project Support
+  identifier: project-support
+  description: Simple service levels with only response time
+  public: false
+  sla: true
