@@ -20,7 +20,8 @@
 require_relative 'helpers/sla_test_helper'
 require_relative 'helpers/sla_object_helper'
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../test/integration/api_test/api_test')
+# TODO : control !
+# require File.expand_path(File.dirname(__FILE__) + '/../../../test/integration/api_test/api_test')
 
 class ApplicationSlaApiTestCase < Redmine::ApiTest::Base
 

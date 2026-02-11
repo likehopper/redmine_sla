@@ -1,0 +1,5 @@
+sla_levels:
+  - name: "Level Support"
+    sla: "SLA Support"
+    sla_calendar: "Calendar Support"
+    sla_priority_custom_field: "SlaPriorityScf"
