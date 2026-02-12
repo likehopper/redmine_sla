@@ -24,19 +24,21 @@ module ProjectsDocumentationTest
     log_user('admin', 'admin')
 
     fixture!('projects').each.with_index(1) do |project, idx|
+
+      # Resolve names -> records
       project_name        = project.fetch('name')
       project_identifier  = project.fetch('identifier')
       project_description = project.fetch('description', '')
       project_public      = project.fetch('public',false)
       project_sla         = project.fetch('sla',false)
 
+      # Open and fill out the form
       visit '/projects/new'
-
       fill_in 'project_name',        with: project_name
       fill_in 'project_identifier',  with: project_identifier
       fill_in 'project_description', with: project_description
 
-      # Public / privé
+      # Public / private
       if project_public
         check 'project_is_public'
       else
@@ -52,16 +54,19 @@ module ProjectsDocumentationTest
 
       check 'project_enabled_module_names_issue_tracking'
 
+      # Take the photo and submit the form
       take_doc_screenshot(format("%02d-01-%02d-project-new.png", id, idx))
-
       click_button 'Create'
 
       assert_text l(:notice_successful_create)
 
+      # Search for the record
       project = Project.find_by!(identifier: project_identifier)
-      assert_equal project_name, project.name
 
+      # Validation and screenshot
+      assert_equal project_name, project.name
       take_doc_screenshot(format("%02d-02-%02d-project-show.png", id, idx))
+      
     end
   end
 end

@@ -28,17 +28,21 @@ module SlaTypesDocumentationTest
 
     sla_types.each.with_index(1) do |sla_type, idx|
 
+      # Resolve names -> records
       sla_type_name = sla_type.fetch('name')
 
+      # Open and fill out the form
       visit '/sla/types/new'
       fill_in 'sla_type_name', with: sla_type_name
 
+      # Take the photo and submit the form
       take_doc_screenshot(format("%02d-01-%02d-01-sla_type-new.png", id, idx))
       click_button(l('sla_label.sla_type.new'))
 
-      # Vérification de la création
+      # Search for the record
       sla_type = SlaType.find_by!(name: sla_type_name)
 
+      # Validation and screenshot
       assert_text(l('sla_label.sla_type.notice_successful_create', id: "##{sla_type.id}"))
       take_doc_screenshot(format("%02d-01-%02d-02-sla_type-created.png", id, idx))
 

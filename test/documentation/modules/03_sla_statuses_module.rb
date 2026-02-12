@@ -32,6 +32,7 @@ module SlaStatusesDocumentationTest
 
       issue_statuses.each.with_index(1) do |issue_status_name, idx2|
 
+        # Open and fill out the form
         visit '/sla/statuses/new'
 
         # Resolve names -> records
@@ -42,14 +43,17 @@ module SlaStatusesDocumentationTest
         find('#sla_status_sla_type_id').find("option[value='#{sla_type.id}']").select_option
         find('#sla_status_status_id').find("option[value='#{issue_status.id}']").select_option
 
+        # Take the photo and submit the form
         take_doc_screenshot(format("%02d-01-%02d-%02d-01-sla_status-new.png", id, idx, idx2))
         click_button(l('sla_label.sla_status.new'))
 
+        # Search for the record
         sla_status = SlaStatus.find_by!(
           sla_type_id: sla_type.id,
           status_id: issue_status.id
         )
 
+      # Validation and screenshot
       assert_text(l('sla_label.sla_status.notice_successful_create', id: "##{sla_status.id}"))
       take_doc_screenshot(format("%02d-01-%02d-%02d-02-sla_status-created.png", id, idx, idx2))        
 
