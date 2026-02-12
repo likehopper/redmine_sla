@@ -247,7 +247,7 @@ Restart application server.
     -   [Example 02](doc/EXAMPLE-02.md)
     -   [Example 03](doc/EXAMPLE-03.md)
     -   [Example 04](doc/EXAMPLE-04.md)
-    -   [Example 05](doc/EXAMPLE-04.md)
+    -   [Example 05](doc/EXAMPLE-05.md)
 -   [SLA Compute Explanation](doc/COMPUTE.md)
 -   [Plugin settings](doc/SETTINGS.md)
 -   [API Rest for SLA](doc/API.md)
