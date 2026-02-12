@@ -1,189 +1,325 @@
-# Example n°1 : Simple service levels with only response time
+# EXAMPLE-01 — Simple service levels with *Response time* only
 
-For a support service, open Monday to Friday from 9:30 a.m. to 12:30 a.m. and from 2:00 p.m. to 6:00 p.m., we want to monitor only commitments on issues handling times.
+This first example introduces the **core concepts** of the *Redmine SLA* plugin through the simplest possible use case.
 
-**Calendar Support Tracker**
-| Dow       | Start time  |	End time  |
-|-----------|-------------|-----------|
-| Monday    |    09:30    |   12:30   |
-| Monday    |    14:00    |   18:00   |
-| Tuesday   |    09:30    |   12:30   |
-| Tuesday   |    14:00    |   18:00   |
-| Wednesday |    09:30    |   12:30   |
-| Wednesday |    14:00    |   18:00   |
-| Thursday  |    09:30    |   12:30   |
-| Thursday  |    14:00    |   18:00   |
-| Friday    |    09:30    |   12:30   |
-| Friday    |    14:00    |   18:00   |
+The goal is to understand **how SLA time is calculated**, **when it is counted**, and **how it is displayed on an issue**, without any advanced configuration.
 
-Outside these hours, or during the defined vacation days, the calculation of times will be suspended.
-The delay will be calculated as long as the issue is in the « new » status during the working hours above. 
+This example is the **foundation** for all the following ones.
 
-In the projects, we will apply this SLA to the tracker « Support » :
+---
 
-**Support Tracker Terms**
-| Issue priorities / SLA Levels | Response time |
-|-------------------------------|---------------|
-| Minor                         |      24h      |
-| Major                         |       9h      |
-| blocker                       |       4h      |
+## What we want to achieve
 
+We manage a **support service** with clearly defined working hours.
 
-## Create SLA
+For each issue, we want to measure **how long it takes to respond**, depending on its **priority**, while respecting business hours.
 
-The SLA configuration bring together the entire definition of the SLA
+### Business rules
 
-To begin, go to `Administration » SLA Global settings` (https://[redmine-host]/sla/slas). Add "Sla Support Tracker" as new "Service Level Agreements".
-<div style=" width:50%; height:50%; " >
+- The service is open **Monday to Friday**
+- Working hours are:
+  - **09:30 → 12:30**
+  - **14:00 → 18:00**
+- Outside these hours:
+  - SLA time **does not elapse**
+- Public holidays are **not working days**
 
-![Redmine SLA - Example 01 - 01](images/example_01/redmine_sla_doc_example_01_01.png)
-</div>
+### SLA objective
 
-So, this will bring together the entire definition of the SLA that we described in the introduction.
+We want to measure **Response time** (also called *GTI*):
+> the time between issue creation and the first handling phase.
 
+The allowed response time depends on the **Redmine issue priority**:
 
-## Create SLA Types
+| Priority | Response time |
+|--------|---------------|
+| Low    | 24 hours |
+| Normal | 8 hours |
+| High   | 4 hours |
 
-The SLA Types' configuration define the various commitments possibles.
+---
 
-Go to `Administration » SLA Global settings » SLA Types` (https://[redmine-host]/sla/types). Add "Response time" as new "SLA Type".
-<div style=" width:50%; height:50%; " >
+## Key concepts introduced in this example
 
-![Redmine SLA - Example 01 - 02](images/example_01/redmine_sla_doc_example_01_02.png)
-</div>
+This example introduces **only the minimal SLA chain**:
 
-Restart Redmine for applys patches with all sla types:
-- Issue : for display columns of the respect of each sla type in issues report
-- IssueQuery : for filter issues on the respect of each sla type in issues report
-- TimeEntry : for display columns of the respect of each sla type in time entries report
-- TimeEntryQuery : for filter issues on the respect of each sla type in time entries report
+```
+SLA
+ └─ SLA Type (Response time)
+     └─ SLA Status (New)
+         └─ SLA Calendar (working hours)
+             └─ SLA Level
+                 └─ SLA Terms (per priority)
+                     └─ Project mapping
+                         └─ Issue display
+```
 
+Each concept is configured step by step below.
 
-## Create SLA Statuses
+---
 
-The SLA Statuses' configuration allows to define for which statuses the time elapses.
+## 1. Creating the SLA
 
-Go to `Administration » SLA Global settings » SLA Statuses` (https://[redmine-host]/sla/statuses). Add "SLA Statuses" for "Response time" with this statuses :
-- New
-<div style=" width:50%; height:50%; " >
+The **SLA** is the top-level object.  
+It represents a *service contract* that will later be attached to projects and trackers.
 
-![Redmine SLA - Example 01 - 03](images/example_01/redmine_sla_doc_example_01_03.png)
-</div>
+Go to:
 
-The addition of this tuple indicates that the ticket creation delay should be calculated only when then issue was is in this status (i.e. while the ticket is in this status).
+`Administration → SLA Global settings → Service Level Agreements`
 
+Create a new SLA named **“SLA Support”**.
 
-## Create SLA Holidays
+![Create SLA](screenshots/example-01/01-01-01-01-sla-new.png)
 
-This module is used to list all the holidays (non-working days or even exceptional closing days) that will be needed in the SLA duration count.
+After saving, Redmine confirms the SLA creation:
 
-Go to `Administration » SLA Global settings » SLA Holidays` ( https://[redmine-host]/sla/holidays). Add new "SLA Holidays" like "New Year's Day" for example, and all the others to come for your tests (even if they are not real public holidays).
-<div style=" width:50%; height:50%; " >
+![SLA created](screenshots/example-01/01-01-01-02-sla-created.png)
 
-![Redmine SLA - Example 01 - 04](images/example_01/redmine_sla_doc_example_01_04.png)
-</div>
+At this stage, the SLA exists but **does nothing yet**.
 
+---
 
-## Create SLA Calendar (& SLA Calendar' Schedule)
+## 2. Defining what we measure: the SLA Type
 
-The SLA calendar is important, it allows to define the working hours of the week.
+An **SLA Type** defines *what is measured*.
 
-If the "match" field is checked, then the issue can be opened in this time slot (opening hours). If the time is declared with the "match" field unchecked, then the issue cannot be opened in this slot, however the time calculation can continue on this slot (non-working hours).
+In this example, we measure **Response time** only.
 
-Typically, for support activities, deadlines are suspended outside business hours. If an issue is opened during non-working hours, then the calculation starts at the next working hour. Conversely, in the case of web hosting, an issue can be opened at any time and continues regardless of the time. If an exit is opened during working hours then it continues during non-working hours and vice versa.
+Go to:
 
-Go to Administration » SLA Global settings » SLA Calendar ( https://[redmine-host]/sla/calendars ). Add "Calendar Support Tracker" as new "SLA Calendar":
-<div style=" width:50%; height:50%; " >
+`Administration → SLA Global settings → SLA Types`
 
-![Redmine SLA - Example 01 - 05](images/example_01/redmine_sla_doc_example_01_05.png)
-</div>
+Create a new SLA Type named **“Response time”**.
 
-Edit this SLA Calendar and add schedules:
-<div style=" width:50%; height:50%; " >
+![Create SLA Type](screenshots/example-01/02-01-01-01-sla_type-new.png)
 
-![Redmine SLA - Example 01 - 06](images/example_01/redmine_sla_doc_example_01_06.png)
-</div>
+After saving, Redmine confirms the SLA Type creation.
 
-We are here in the case of a support service, so only the opening hours count. Tickets are processed during working hours and counting is suspended outside these hours.
+![SLA Type created](screenshots/example-01/02-01-01-02-sla_type-created.png)
 
-> **_NOTE:_** These are the intervals from a start time to an end time, so the time is usually stopped by subtracting one minute from the end time. Indeed, taking a schedule of 8am to 9am, so to get well 60 minutes, it's therefore necessary to declare from 8am to 8:59am.
+> At this point, we know *what* we want to measure, but not *when*.
 
+---
 
-## Create SLA Calendars' Holidays
+## 3. Defining when time elapses: SLA Statuses
 
-So, we can create several SLA Calendars with SLA Schedules. For each SLA Calendar, you can also assign SLA Holidays.
+SLA time should not always run.  
+It usually depends on the **issue status**.
 
-For SLA Calendars' Holidays, the "match" field has the opposite meaning to SLA Calendar' Schedules. Indeed, for SLA Calendar' Schedules, the hours worked were declared. For SLA Calendars' Holidays, the hours not worked are declared. 
-By default, we add a public holiday to remove it from the calculations. However, if the "match" field is checked, then the time will be counted. However, if a ticket is open on this slot, then it cannot start until the next working hour.
+For a response time, we typically measure the delay **while the issue is still new**.
 
+Go to:
 
-Go to `Administration » SLA Global settings » SLA Calendars' Holidays` (https://[redmine-host]/sla/calendar_holidays). Add new "SLA Calendars' Holidays":
-<div style=" width:50%; height:50%; " >
+`Administration → SLA Global settings → SLA Statuses`
 
-![Redmine SLA - Example 01 - 07](images/example_01/redmine_sla_doc_example_01_07.png)
-</div>
+Create a new mapping:
 
-For our example, which is a support service, public holidays are equivalent to times that shouldn't be counted.
+- **SLA Type:** Response time
+- **Status:** New
 
+![Create SLA Status](screenshots/example-01/03-01-01-01-01-sla_status-new.png)
 
-## Create SLA Levels
+After saving, Redmine confirms the mapping.
 
-After declaring SLAs and SLA Schedules, they can be linked to define service levels. In other words, the SLA Levels make it possible to know the moment "when" commitments will apply.
+![SLA Status created](screenshots/example-01/03-01-01-01-02-sla_status-created.png)
 
-Go to `Administration » SLA Global settings » SLA Levels` (https://[redmine-host]/sla/levels). Add "Level Support" as new "SLA Levels":
-<div style=" width:50%; height:50%; " >
+➡️ From now on, **Response time is counted only while the issue is in status “New”**.
 
-![Redmine SLA - Example 01 - 08](images/example_01/redmine_sla_doc_example_01_08.png)
-</div>
+---
 
+## 4. Defining working hours: the SLA Calendar
 
-## Create SLA Terms
+The **SLA Calendar** defines **when time is allowed to elapse**.
 
-Finally, we can define the SLA Terms. For an SLA Level, an SLA Type and a priority, you can define a time commitment (in minutes).
+In this example, time is counted **only during working hours**.
 
-Go to `Administration » SLA Global settings » SLA Terms` (https://[redmine-host]/sla/level_terms). Add "Terms Support Tracker" for each SLA Type / Priority as new "SLA Terms":
-<div style=" width:50%; height:50%; " >
+Go to:
 
-![Redmine SLA - Example 01 - 09](images/example_01/redmine_sla_doc_example_01_09.png)
-</div>
+`Administration → SLA Global settings → SLA Calendars`
 
+Create a calendar named **“Calendar Support”**, and define the weekly schedules.
 
-## Apply SLA to a Project
+![Create SLA Calendar](screenshots/example-01/04-01-01-01-sla_calendar-new.png)
 
-Go to your project' settings ( https://[redmine-host]/projects/[project-identifier]/settings ). Active SLA module for your project:
-<div style=" width:50%; height:50%; " >
+After saving, Redmine confirms the calendar creation.
 
-![Redmine SLA - Example 01 - 10](images/example_01/redmine_sla_doc_example_01_10.png)
-</div>
+![Calendar created](screenshots/example-01/04-01-01-02-sla_calendar-created.png)
 
-The tab should appear `SLA Project settings`, go to this tab (http://[redmine-host]/projects/[project-identifier]/settings/slas). With "New SLA project's tracker" defineà the SLA for a tracker:
-<div style=" width:50%; height:50%; " >
+### About time slots
 
-![Redmine SLA - Example 01 - 11](images/example_01/redmine_sla_doc_example_01_11.png)
-</div>
+Time slots are defined as **minute-based intervals**.
 
+To represent a range such as *09:30 → 12:30*, the end time is usually stored as *12:29*.
 
-## View SLA into an issue
+This ensures the exact number of minutes is counted.
 
-When you go to a project's issue, you should see the SLA appear if it matches with the status and priority:
-<div style=" width:50%; height:50%; " >
+---
 
-![Redmine SLA - Example 01 - 12](images/example_01/redmine_sla_doc_example_01_12.png)
-</div>
+## 5. Defining non-working days: SLA Holidays
 
+Holidays represent **days when the service is closed**.
 
-## implementation of this example with the APIs
+Go to:
 
-You can deploy this example on a fresh Redmine with this bash script [Script Example 01](scripts/EXAMPLE-01.bash) which use the plugin's API.
+`Administration → SLA Global settings → SLA Holidays`
 
+Create at least one holiday (for example *New Year’s Day*).
 
-> **_REQUIREMENTS:_** The code requires curl and jq commands.
+![Create SLA Holiday](screenshots/example-01/05-01-01-01-sla_holiday-new.png)
 
-> **_NOTE:_** The code has not been optimized to precisely highlight the use of APIs.
+Then add the other holidays needed and verify the list.
 
+![Holiday list](screenshots/example-01/05-02-sla_holiday-list.png)
 
-## Rôles
+In this example, holidays are **not counted** as working time.
 
-Until then, you were an administrator. However, in order for the members of your project to be able to see the SLAs, or even manage their activation within the project, you must grant them this right.
+---
 
-Got to `Administration » Roles and permissions` (http://[redmine-host]/roles). Edit a role (http://[redmine-host]/roles/[role-id]/edit) to check "View SLA" (ex: for manager and developer) and/or "Manage SLA" (ex: for manager).
+## 6. Linking holidays to the calendar
+
+Holidays must be attached to a calendar to be taken into account.
+
+Go to:
+
+`Administration → SLA Global settings → SLA Calendars’ Holidays`
+
+Create a mapping:
+
+- **Calendar:** Calendar Support
+- **Holiday:** select a holiday
+- **Match:** unchecked
+
+![Calendar holiday mapping](screenshots/example-01/06-01-01-01-sla_calendar_holiday-new.png)
+
+Repeat for all holidays.
+
+Verify the list once completed.
+
+![Calendar holiday list](screenshots/example-01/06-02-sla_calendar_holiday-list.png)
+
+➡️ During these days, **SLA time is suspended**.
+
+---
+
+## 7. Creating the SLA Level
+
+An **SLA Level** links together:
+- an SLA
+- a calendar
+
+It represents *when* the commitments apply.
+
+Go to:
+
+`Administration → SLA Global settings → SLA Levels`
+
+Create a level named **“Level Support”** and associate it with:
+- **SLA:** SLA Support
+- **Calendar:** Calendar Support
+
+![Create SLA Level](screenshots/example-01/09-01-01-01-sla_level-new.png)
+
+After saving, Redmine confirms the SLA Level creation.
+
+![SLA Level created](screenshots/example-01/09-01-01-02-sla_leel-created.png)
+
+---
+
+## 8. Defining the commitments: SLA Terms
+
+**SLA Terms** define the actual targets.
+
+They combine:
+- an SLA Level
+- an SLA Type
+- a Redmine priority
+- a duration (in minutes)
+
+Go to:
+
+`Administration → SLA Global settings → SLA Terms`
+
+Create the following terms for **Level Support** and **Response time**:
+
+| Priority | Minutes |
+|--------|---------|
+| Low    | 1440 |
+| Normal | 480 |
+| High   | 240 |
+
+![Create SLA Terms](screenshots/example-01/10-01-01-01-sla_level_term-new.png)
+
+After saving, Redmine confirms the SLA Terms creation.
+
+![SLA Term created](screenshots/example-01/10-01-01-02-sla_level_term-created.png)
+
+➡️ The SLA logic is now fully defined.
+
+---
+
+## 9. Applying the SLA to a project
+
+### 9.1 Enable the SLA module
+
+Go to your project:
+
+`Project → Settings → Modules`
+
+Enable the **SLA** module.
+
+![Enable SLA module](screenshots/example-01/11-01-01-project-settings-issues.png)
+
+Save and confirm.
+
+![Module enabled](screenshots/example-01/11-02a-01-project-settings-issues-saved.png)
+
+---
+
+### 9.2 Map a tracker to the SLA
+
+Go to:
+
+`Project → Settings → SLA`
+
+Create a new mapping:
+- **Tracker:** Support
+- **SLA:** SLA Support
+
+![New project SLA mapping](screenshots/example-01/11-04-01-01-project-settings-sla-new.png)
+
+Verify the mapping.
+
+![Project SLA list](screenshots/example-01/11-05-01-project-settings-sla-list.png)
+
+---
+
+## 10. Viewing the SLA on an issue
+
+Create or open an issue with:
+- **Status:** New
+- **Priority:** Low, Normal, or High
+
+The SLA block appears on the issue page.
+
+![Issue with SLA](screenshots/example-01/12-01-01-issue_past_1-issue-show.png)
+
+You can see:
+- elapsed response time
+- target time
+- SLA state (respected or breached)
+
+---
+
+## What you learned in this example
+
+With this first example, you learned:
+
+- how an SLA is built step by step
+- how response time is calculated
+- how working hours and holidays affect SLA counting
+- how priorities influence SLA targets
+- how the SLA is displayed on issues
+
+This example is intentionally **simple**.
+
+The next examples will **extend** this configuration by introducing new concepts, without changing these foundations.

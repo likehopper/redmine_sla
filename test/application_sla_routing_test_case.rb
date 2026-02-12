@@ -20,8 +20,6 @@
 require_relative 'helpers/sla_test_helper'
 require_relative 'helpers/sla_object_helper'
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../test/integration/api_test/api_routing_test')
-
 class ApplicationSlaRoutingTestCase < Redmine::RoutingTest
   
   # Explicitly enable transactional tests for unit tests

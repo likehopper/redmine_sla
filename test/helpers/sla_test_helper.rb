@@ -49,14 +49,14 @@ module RedmineSlaTestBootstrap
     email_addresses
     enumerations
     issue_statuses
-    trackers
     workflows
+    trackers
+    roles
   ].freeze
 
   # Fixtures specific to the SLA plugin logic
   SLA_FIXTURES = %i[
     members
-    roles
     member_roles
     custom_field_enumerations
     custom_fields

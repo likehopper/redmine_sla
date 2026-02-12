@@ -1,0 +1,85 @@
+custom_fields:
+
+  - type: issue
+    name: SlaPriorityScf
+    field_format: key_value_list
+    description: For SLA Priority with Custom Field
+
+    required: true
+    multiple: false
+    is_filter: true
+    visible: all
+    searchable: true
+    editable: true
+
+    display: drop_down_list
+
+    values:
+      - label: Minor
+        active: true
+      - label: Major
+        active: true
+      - label: Blocking
+        active: true
+      - label: Immediate
+        active: false
+
+    default_value: Major
+
+    trackers:
+      - tracker_support_request
+
+    projects:
+      - project-support
+
+
+  - type: issue
+    name: IsNotRequired
+    field_format: key_value_list
+    description: Not for SLA Priority with Custom Field because is not required !
+
+    required: false
+    multiple: false
+    is_filter: true
+    visible: all
+    searchable: true
+    editable: true
+
+    display: drop_down_list
+
+    values:
+      - label: Item1
+        active: true
+      - label: Item2
+        active: true
+
+    default_value: Item2
+
+    trackers: []
+    projects: []
+
+
+  - type: issue
+    name: IsMultiple
+    field_format: key_value_list
+    description: Not for SLA Priority with Custom Field because is multiple !
+
+    required: true
+    multiple: true
+    is_filter: true
+    visible: all
+    searchable: true
+    editable: true
+
+    display: drop_down_list
+
+    values:
+      - label: Item1
+        active: true
+      - label: Item2
+        active: true
+
+    default_value: Item2
+
+    trackers: []
+    projects: []

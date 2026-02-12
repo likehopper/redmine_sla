@@ -1,0 +1,16 @@
+project_settings:
+- project: project-support
+  issue_trackers:
+  - tracker_support_request
+  sla_trackers:
+    tracker_support_request: SLA Support
+  members:
+  - principal: Redmine Manager
+    roles:
+    - Manager
+  - principal: Redmine Developer
+    roles:
+    - Resolver
+  - principal: Redmine Reporter
+    roles:
+    - Reporter
