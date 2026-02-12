@@ -27,11 +27,14 @@ module SlaLevelsDocumentationTest
     log_user('admin', 'admin') if sla_levels.any?
 
     sla_levels.each.with_index(1) do |sla_level, idx|
+
+      # Resolve names -> records
       sla_level_name                 = sla_level.fetch('name')
       sla_name                       = sla_level.fetch('sla')
       sla_calendar_name              = sla_level.fetch('sla_calendar')
       sla_priority_custom_field_name = sla_level.fetch('sla_priority_custom_field',nil)
 
+      # Open and fill out the form
       visit '/sla/levels/new'
       fill_in 'sla_level_name', with: sla_level_name
 
@@ -39,23 +42,24 @@ module SlaLevelsDocumentationTest
       sla = Sla.find_by!(name: sla_name)
       sla_calendar = SlaCalendar.find_by!(name: sla_calendar_name)
 
-      # On cherche le Custom Field par son nom (SlaPriorityScf)
+      # Find Custom Field by name (SlaPriorityScf)
       sla_priority_custom_field = CustomField.find_by(name: sla_priority_custom_field_name)
 
       # Select by id
       find('#sla_level_sla_id').find("option[value='#{sla.id}']").select_option
       find('#sla_level_sla_calendar_id').find("option[value='#{sla_calendar.id}']").select_option
-
-      # 3. Sélection du Custom Field (si défini dans @sla_levels)
       if sla_priority_custom_field
         find('#sla_level_custom_field_id').find("option[value='#{sla_priority_custom_field.id}']").select_option
       end
 
+      # Take the photo and submit the form
       take_doc_screenshot(format("%02d-01-%02d-01-sla_level-new.png", id, idx))
       click_button l("sla_label.sla_level.new")
 
+      # Search for the record
       sla_level = SlaLevel.find_by!(name: sla_level_name)
       
+      # Validation and screenshot
       assert_text(l('sla_label.sla_level.notice_successful_create', id: "##{sla_level.id}"))
       take_doc_screenshot(format("%02d-01-%02d-02-sla_leel-created.png", id, idx))
       

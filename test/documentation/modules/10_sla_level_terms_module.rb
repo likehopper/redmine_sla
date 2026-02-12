@@ -26,30 +26,38 @@ module SlaLevelTermsDocumentationTest
 
     log_user('admin', 'admin') if sla_level_terms.any?
 
+    # Resolve names -> records
     priorities_by_name = IssuePriority.all.index_by(&:name)
     sla_types_by_name  = SlaType.all.index_by(&:name)
 
     sla_level_terms.each.with_index(1) do |(_key, sla_level_term), idx|
 
+      # Resolve names -> records
       sla_level_name = sla_level_term.fetch('sla_level')
       sla_type_name  = sla_level_term.fetch('sla_type')
       sla_priorities = sla_level_term.fetch('sla_priority')
 
+      # Resolve names -> records
       sla_level = SlaLevel.find_by!(name: sla_level_name)
       sla_type  = sla_types_by_name.fetch(sla_type_name)
 
+      # Open and fill out the form
       visit "/sla/levels/#{sla_level.id}/sla_terms"
 
       sla_priorities.each do |priority_name, value|
+
+        # Resolve names -> records
         priority = priorities_by_name.fetch(priority_name)
 
         field_id = "sla_level_sla_level_terms_attributes_#{sla_type.id}_#{priority.id}_term"
         fill_in field_id, with: value
       end
 
+      # Take the photo and submit the form
       take_doc_screenshot(format('%02d-01-%02d-01-sla_level_term-new.png', id, idx))
       click_button l('sla_label.sla_level_term.save')
 
+      # Validation and screenshot
       assert_text(l('sla_label.sla_level.notice_successful_update', id: "##{sla_level.id}"))
       take_doc_screenshot(format("%02d-01-%02d-02-sla_level_term-created.png", id, idx))
 

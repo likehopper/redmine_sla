@@ -28,17 +28,21 @@ module SlasDocumentationTest
 
     slas.each.with_index(1) do |sla,idx|
 
+      # Resolve names -> records
       sla_name = sla.fetch('name')
 
+      # Open and fill out the form
       visit '/sla/slas/new'
       fill_in 'sla_name', with: sla_name
 
+      # Take the photo and submit the form
       take_doc_screenshot(format('%02d-01-%02d-01-sla-new.png', id, idx))
       click_button(l('sla_label.sla.new'))
 
-      # Vérification de la création
+      # Search for the record
       sla = Sla.find_by!(name: sla_name)
 
+      # Validation and screenshot
       assert_text(l('sla_label.sla.notice_successful_create', id: "##{sla.id}"))
       take_doc_screenshot(format("%02d-01-%02d-02-sla-created.png", id, idx))
       

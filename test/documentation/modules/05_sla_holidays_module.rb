@@ -27,21 +27,27 @@ module SlaHolidaysDocumentationTest
     log_user('admin', 'admin') if sla_holidays.any?
 
     sla_holidays.each.with_index(1) do |sla_holiday, idx|
+
+      # Resolve names -> records
       sla_holiday_name     = sla_holiday.fetch('name')
       sla_holiday_date     = Date.parse(sla_holiday.fetch('date').to_s)
 
+      # Open and fill out the form
       visit '/sla/holidays/new'
       fill_in 'sla_holiday_name', with: sla_holiday_name
       fill_in 'sla_holiday_date', with: format_date(sla_holiday_date)
 
+      # Take the photo and submit the form
       take_doc_screenshot(format("%02d-01-%02d-01-sla_holiday-new.png", id, idx)) if idx==1
       click_button l("sla_label.sla_holiday.new")
 
+      # Search for the record
       sla_holiday = SlaHoliday.find_by!(
         name: sla_holiday_name,
         date: sla_holiday_date,
       )
       
+      # Validation and screenshot
       assert_text(l('sla_label.sla_holiday.notice_successful_create', id: "##{sla_holiday.id}"))
       take_doc_screenshot(format("%02d-01-%02d-02-sla_holiday-created.png", id, idx)) if idx==1
       
