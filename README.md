@@ -1,92 +1,156 @@
 # redmine_sla
 
-<div style=" width:480px; height:166px; " >
+![Redmine Version](https://img.shields.io/badge/Redmine-5.x+-blue)
+![Ruby](https://img.shields.io/badge/Ruby-2.7+-red)
+![Rails](https://img.shields.io/badge/Rails-6.1+-brightgreen)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-11+-blue)
+![License](https://img.shields.io/github/license/likehopper/redmine_sla)
 
 ![Redmine SLA - Issue Patch](doc/images/redmine_sla_issue_patch.png)
-</div>
 
+------------------------------------------------------------------------
 
 ## Overview
 
-- Website: [https://github.com/likehopper/redmine_sla](https://github.com/likehopper/redmine_sla)
-- Code repository: [git@github.com:likehopper/redmine_sla.git](git@github.com:likehopper/redmine_sla.git)
-- Redmine plugins directory: [https://www.redmine.org/plugins/redmine_sla](https://www.redmine.org/plugins/redmine_sla)
+-   Website: https://github.com/likehopper/redmine_sla
+-   Code repository: git@github.com:likehopper/redmine_sla.git
+-   Redmine plugins directory:
+    https://www.redmine.org/plugins/redmine_sla
 
+------------------------------------------------------------------------
 
-### Digest
+## Digest
 
-Redmine SLA plugin gives the possibility of managing service levels. 
-It provides flexible configuration of calendars, times and terms.
-It calculates types of response times for project trackers.
+**redmine_sla** provides advanced Service Level Agreement management for
+Redmine.
 
+It enables precise SLA computation based on:
 
-### Features
+-   Project trackers
+-   Working calendars (HO / HNO)
+-   SLA levels and priorities
+-   Response and resolution terms
+-   PostgreSQL time-based procedures
 
-These are the features of this plugin :
-- Definition at plugin level
-  - SLA update step
-  - SLA calculation time zone
-  - SLA log level (but no log currently)
-- Manage at the global administration ( with full API support )
-  - SLAs
-  - SLA Types
-  - SLA Statuses
-  - SLA Holidays
-  - SLA Calendars withs SLA Schedules
-  - SLA Calendars' Holidays
-  - SLA Levels
-  - SLA Terms
-- Rights by rôles
-  - Manage SLA in project
-  - View SLA in issue ( with link to SLA Calendar & SLA Level )
-  - And therefore the lack of access to SLAs
-- At the project's configuration
-  - Specifies SLA for each tracker
-- For the issues
-  - In list
-    - Filter on SLAs
-    - Viewing SLA Columns
-  - In view
-    - Summary by type
-    - Responsive display
-- For the time log
-  - In list
-    - Filter on SLAs
-    - Viewing SLA Columns
-- Tasks
-  - Build fixture base on CSV file
-  - Update SLA manualy or by crontab
+SLA compliance is calculated directly at the database level using
+PL/pgSQL, ensuring:
 
-### Localisations
+-   Deterministic computation
+-   Accurate working-hours handling
+-   High performance on large datasets
 
-- English
-- French
+------------------------------------------------------------------------
 
+## Why redmine_sla?
 
-### Todo
+Many SLA implementations rely exclusively on Ruby time computations.
 
-Here is a list of possible evolutions without prioritization :
-- Time zone by projets 
-- Ability to sort lists
-- Have a corrector for a status log issue
-- Clear cache completely or after a given date
-- Mask SLA plugin columns and filters if module is disabled or user doesn't have access
-- Improve display and editing week' schedules of calendars ( e.g. with [https://github.com/starsirius/day-schedule-selector.git](https://github.com/starsirius/day-schedule-selector.git) )
-- Display of public holidays per year in nested ## form in calendars
-- Ability to export and import all or part of each element
-- Improve display and editing of terms in tabular form
-- Propose schedule editions in a more graphical format
-- Issues list groupable by SLA level or SLA respect
-- Manage alert thresholds for sending notifications
-- Add summary in the issues report
-- Write functional tests
+This plugin delegates SLA calculation to **PostgreSQL stored
+procedures**, allowing:
 
-> **_NOTE:_** And many others: if you have ideas or time, don't hesitate to participate!
+-   Accurate handling of working schedules
+-   Holiday-aware deadlines
+-   Efficient computation on large issue volumes
+-   Predictable and reproducible results
 
+The engine is designed for production environments.
 
-## Howto install / uninstall
+------------------------------------------------------------------------
 
-### Prerequisites
+## Core Concepts
+
+    SLA
+     ├── SLA Level
+     │     └── SLA Terms (Response / Resolution)
+     ├── SLA Calendar
+     │     ├── Weekly Schedule
+     │     └── Holidays
+     └── SLA Status Mapping
+
+------------------------------------------------------------------------
+
+## Features
+
+### Core Engine
+
+-   PostgreSQL PL/pgSQL SLA computation
+-   Working calendar awareness (HO / HNO)
+-   Response & resolution deadlines
+-   SLA compliance percentage
+-   Configurable update step
+-   Configurable calculation time zone
+
+### Administration (Global Level)
+
+Fully manageable through UI and REST API:
+
+-   SLAs
+-   SLA Types
+-   SLA Statuses
+-   SLA Holidays
+-   SLA Calendars
+-   Weekly schedules
+-   Calendar-specific holidays
+-   SLA Levels
+-   SLA Terms
+
+### Project Integration
+
+-   SLA assignment per tracker
+-   Role-based permissions
+-   SLA visibility control
+-   SLA columns in issue list
+-   SLA filtering
+-   SLA summary in issue view
+-   Responsive display
+
+### Time Logs
+
+-   SLA filtering
+-   SLA columns in time log list
+
+### Automation
+
+-   Manual SLA update task
+-   Cron-based update support
+-   CSV-based fixture builder
+
+------------------------------------------------------------------------
+
+## Localisations
+
+-   English
+-   French
+
+------------------------------------------------------------------------
+
+## Roadmap (Non-Prioritized)
+
+### UX Improvements
+
+-   Graphical schedule editor
+-   Tabular SLA term editor
+-   Group issues by SLA compliance
+-   Improved calendar visualization
+
+### Functional Extensions
+
+-   Per-project time zone
+-   Alert thresholds & notifications
+-   SLA export/import
+-   SLA summary in issue reports
+
+### Technical Improvements
+
+-   Cache invalidation strategy
+-   Full functional test coverage
+-   Column visibility based on module access
+
+------------------------------------------------------------------------
+
+# Installation
+
+## Prerequisites
 
 | Name               | requirement                      |
 |--------------------|----------------------------------|
@@ -95,46 +159,105 @@ Here is a list of possible evolutions without prioritization :
 | `Rails`            | >= 6.1                           |
 | `Database`         | PostgreSQL >= 11                 |
 
-> **_NOTE:_** It is important to note that, to calculate the SLAs, the plugin uses the features of Posgtres, including the Pl/Pgsql procedures. And for this, in `config/application.rb` file, **you must add this line `config.active_record.schema_format = :sql`** in `RedmineApp::Application section`.
+------------------------------------------------------------------------
 
+### ⚠ PostgreSQL Requirement
 
-> **_REMINDER:_** Make sure your database datestyle is set to ISO (Postgresql default setting). You can set it using: ALTER DATABASE "redmine_db" SET datestyle="ISO,MDY".
+This plugin relies heavily on:
 
-> **_TIP:_** Prefer the global configuration of the time zone on "Etc/UTC" ( and with `config.active_record.default_timezone = :local` in `RedmineApp::Application` section of `config/application.rb` file ).
+-   PostgreSQL views
+-   PL/pgSQL stored procedures
+-   SQL schema format
 
-### Install
+In `config/application.rb`:
 
-1. Download plugin and copy plugin folder redmine_sla go to Redmine's plugins folder
-2. Goto redmine root folder to install necessary gems with `bundle install`
-3. Launch install plugin to create tables, functions and view `rake redmine:plugins:migrate NAME=redmine_sla`
-4. Restart your application server (apache with passenger, nginx with passenger, unicorn, puma, etc.) and Additionals is ready to use.
+``` ruby
+config.active_record.schema_format = :sql
+```
 
-More information about installation of Redmine plugins, you can find in the official [Redmine plugin documentation](https://www.redmine.org/projects/redmine/wiki/Plugins).
+This is mandatory for proper installation.
 
+MySQL and SQLite are **not supported**.
 
-### Uninstall
+------------------------------------------------------------------------
 
-1. Launch uninstall plugin to drop tables, functions and view `rake redmine:plugins:migrate NAME=redmine_sla VERSION=0`
-2. Go to plugins folder, delete plugin folder redmine_sla `rm -r redmine_more_previews`
-3. restart server f.i. `sudo /etc/init.d/apache2 restart`
+### Database Configuration
 
+Ensure PostgreSQL datestyle is set to ISO:
 
-## More informations
+``` sql
+ALTER DATABASE "redmine_db" SET datestyle="ISO,MDY";
+```
 
-- [Functional tests](doc/TESTING.md)
-- [Conceptual Data Model](doc/MCD.md)
-- [Step-by-step use case](doc/USECASE.md)
-  - [Example 01](doc/EXAMPLE-01.md) ( and API implementation [Script Example 01](doc/scripts/EXAMPLE-01.bash) )
-  - [Example 02](doc/EXAMPLE-02.md) ( and API implementation [Script Example 02](doc/scripts/EXAMPLE-02.bash) )
-  - [Example 03](doc/EXAMPLE-03.md) ( and API implementation [Script Example 03](doc/scripts/EXAMPLE-03.bash) )
-- [SLA Compute Explanation](doc/COMPUTE.md)
-- [Plugin settings](doc/SETTINGS.md)
-- [API Rest for SLA](doc/API.md)
-- [Tasks](doc/TASKS.md)
-- [Change log](CHANGELOG.md)
-- [License](LICENSE)
+Recommended configuration:
 
+``` ruby
+config.active_record.default_timezone = :local
+```
 
-### sources / thanks
+Prefer global timezone configuration set to:
 
-- [Icons created by Freepik - Flaticon](https://www.flaticon.com/authors/freepik)
+    Etc/UTC
+
+------------------------------------------------------------------------
+
+## Install
+
+1.  Copy `redmine_sla` into Redmine's `plugins` directory\
+2.  Run:
+
+``` bash
+bundle install
+```
+
+3.  Migrate:
+
+``` bash
+rake redmine:plugins:migrate NAME=redmine_sla
+```
+
+4.  Restart application server
+
+Plugin is ready to use.
+
+------------------------------------------------------------------------
+
+## Uninstall
+
+``` bash
+rake redmine:plugins:migrate NAME=redmine_sla VERSION=0
+```
+
+Then remove the plugin folder:
+
+``` bash
+rm -r redmine_sla
+```
+
+Restart application server.
+
+------------------------------------------------------------------------
+
+# Documentation
+
+-   [Functional tests](doc/TESTING.md)
+-   [Conceptual Data Model](doc/MCD.md)
+-   [Step-by-step use case](doc/USECASE.md)
+    -   [Example 01](doc/EXAMPLE-01.md)
+    -   [Example 02](doc/EXAMPLE-02.md)
+    -   [Example 03](doc/EXAMPLE-03.md)
+    -   [Example 04](doc/EXAMPLE-04.md)
+    -   [Example 05](doc/EXAMPLE-04.md)
+-   [SLA Compute Explanation](doc/COMPUTE.md)
+-   [Plugin settings](doc/SETTINGS.md)
+-   [API Rest for SLA](doc/API.md)
+-   [Tasks](doc/TASKS.md)
+-   [Change log](CHANGELOG.md)
+-   [License](LICENSE)
+
+------------------------------------------------------------------------
+
+## Credits
+
+Icons created by Freepik -- Flaticon
+https://www.flaticon.com/authors/freepik

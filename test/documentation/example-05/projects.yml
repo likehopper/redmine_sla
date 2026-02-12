@@ -1,0 +1,6 @@
+projects:
+- name: Project Managed Services
+  identifier: project-managed-services
+  description: Complex service levels in working (HO) and non-working hours (HNO)
+  public: false
+  sla: true

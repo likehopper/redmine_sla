@@ -1,0 +1,12 @@
+project_settings:
+  - project: "project-bug"
+    issue_trackers: ["tracker_bug"]
+    sla_trackers:
+      tracker_bug: "SLA bug"
+    members:
+      - principal: "Redmine Manager"
+        roles: ["Manager"]
+      - principal: "Redmine Developer"
+        roles: ["Resolver"]
+      - principal: "Redmine Reporter"
+        roles: ["Reporter"]

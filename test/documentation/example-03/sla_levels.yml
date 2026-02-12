@@ -1,0 +1,7 @@
+sla_levels:
+  - name: "Level TMA Bug"
+    sla: "SLA bug"
+    sla_calendar: "Calendar TMA"
+  - name: "Level TMA Feature"
+    sla: "SLA feature request"
+    sla_calendar: "Calendar TMA"

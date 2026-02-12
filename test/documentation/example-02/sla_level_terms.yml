@@ -1,0 +1,16 @@
+sla_level_terms:
+  sla_level_term_1:
+    sla_level: "Level TMA"
+    sla_type: "Response time"
+    sla_priority:
+      Low: 120
+      Normal: 60
+      High: 30
+
+  sla_level_term_2:
+    sla_level: "Level TMA"
+    sla_type: "Resolution deadline"
+    sla_priority:
+      Low: 240
+      Normal: 120
+      High: 60

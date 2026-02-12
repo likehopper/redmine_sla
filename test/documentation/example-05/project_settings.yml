@@ -1,0 +1,18 @@
+project_settings:
+- project: project-managed-services
+  issue_trackers:
+  - tracker_change_request
+  - tracker_production_incident
+  sla_trackers:
+    tracker_change_request: SLA Managed Services tracker_change_request
+    racker_production_incident: SLA Managed Services tracker_production_incident
+  members:
+  - principal: Redmine Manager
+    roles:
+    - Manager
+  - principal: Redmine Developer
+    roles:
+    - Resolver
+  - principal: Redmine Reporter
+    roles:
+    - Reporter

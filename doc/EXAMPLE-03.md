@@ -1,195 +1,280 @@
-# Example n°3 : Complex service levels in working (HO) and non-working hours (HNO)
+# EXAMPLE-03 — Service levels with both *Bug* and *Request* in the same project
 
+This third example introduces a new and important capability of the Redmine SLA plugin:
+**using multiple SLAs within the same project**, depending on the **tracker**.
 
-For a managed services provider, open Monday to Friday from 9:00 a.m. to 7:00 p.m., we want to monitor commitments on response and resolution times.
+Up to now:
+- EXAMPLE-01 showed a single SLA with one commitment (GTI)
+- EXAMPLE-02 extended this SLA with a second commitment (GTR)
 
-**Working hours for Managed Services**
-| Dow       | Start time  |	End time  |
-|-----------|-------------|-----------|
-| Monday    |    09:00    |   19:00   |
-| Tuesday   |    09:00    |   19:00   |
-| Wednesday |    09:00    |   19:00   |
-| Thursday  |    09:00    |   19:00   |
-| Friday    |    09:00    |   19:00   |
+Here, we keep the same technical foundations, but we **duplicate the SLA logic** to support
+different types of work (for example *Bugs* vs *Requests*) inside a single project.
 
-However, when an issue occurs during working hours, the delays continue during non-working hours.
-And, when an anomaly occurs during non-working hours, other deadlines apply. However, when an issue occurs during non-working hours, the delays continue during working hours.
+---
 
-Response time will be calculated as long as the issue is in a "new" state during the above business hours. Indeed, the Response time is stop when the issue is in others statuses (either "In progress", "Resolved", "Comments", "Closed" and "Rejected" state).
-Resolution time will be calculated as long as the issue is in a "new" and "In progress" state during the above business hours. Indeed, the resolution time is suspended when the issue is in a "Resolved", "Comments", "Closed" and "Rejected" state.
+## What this example adds compared to EXAMPLE-02
 
-In the projects, we will apply this SLA to the tracker « Bug » :
+**One new facet only**:
 
-**Managed Services Terms on working hours **
-| Issue priorities / SLA Levels | Response time | Resolution deadline |
-|-------------------------------|---------------|---------------------|
-| Minor                         |       1h      |         24h         |
-| Major                         |      30mn     |          8h         |
-| blocker                       |      15mn     |          2h         |
+- Multiple SLAs can coexist **in the same project**
+- Each SLA is selected **by the issue tracker**
 
-**Managed Services Terms on non-working hours **
-| Issue priorities / SLA Levels | Response time | Resolution deadline |
-|-------------------------------|---------------|---------------------|
-| Minor                         |       2h      |         48h         |
-| Major                         |       1h      |         12h         |
-| blocker                       |      30mn     |          4h         |
+Everything else remains unchanged:
+- working hours only (HO)
+- priorities based on native Redmine priorities
+- no custom field
+- no HO/HNO advanced behavior
 
-Here, whatever the issue's level, the deadlines are the same.
+---
 
+## What we want to achieve
 
-## Create SLA
+We manage a single support project, but with **two different types of issues**:
 
-The SLA configuration bring together the entire definition of the SLA
+1. **Bugs**
+   - stricter response and resolution times
+2. **Requests**
+   - more flexible response and resolution times
 
-To begin, go to `Administration » SLA Global settings` (https://[redmine-host]/sla/slas). Add "Sla Managed Services" as new "Service Level Agreements".
-<div style=" width:50%; height:50%; " >
+Both issue types:
+- live in the **same project**
+- share the same working calendar
+- have **different SLAs**
 
-![Redmine SLA - Example 03 - 01](images/example_03/redmine_sla_doc_example_03_01.png)
-</div>
+The SLA applied to an issue is determined **only by its tracker**.
 
-So, this will bring together the entire definition of the SLA that we described in the introduction.
+---
 
+## Target SLA design
 
-## Create SLA Types
+### SLA 1 — Bug SLA
 
-The SLA Types' configuration define the various commitments possibles.
+Applies to tracker: **Bug**
 
-Go to `Administration » SLA Global settings » SLA Types` (https://[redmine-host]/sla/types). Add "GTI" as new "SLA Type".
-<div style=" width:50%; height:50%; " >
+- Response time (GTI)
+- Resolution deadline (GTR)
+- Aggressive targets
 
-![Redmine SLA - Example 03 - 02](images/example_03/redmine_sla_doc_example_03_02.png)
-</div>
+### SLA 2 — Request SLA
 
-Add "GTR" as new "SLA Type".
-<div style=" width:50%; height:50%; " >
+Applies to tracker: **Request**
 
-![Redmine SLA - Example 03 - 03](images/example_03/redmine_sla_doc_example_03_03.png)
-</div>
+- Response time (GTI)
+- Resolution deadline (GTR)
+- More relaxed targets
 
-Restart Redmine for applys patches with all sla types:
-- Issue : for display columns of the respect of each sla type in issues report
-- IssueQuery : for filter issues on the respect of each sla type in issues report
-- TimeEntry : for display columns of the respect of each sla type in time entries report
-- TimeEntryQuery : for filter issues on the respect of each sla type in time entries report
+---
 
+## Key idea: SLA selection is tracker-based
 
-## Create SLA Statuses
+In a project, the plugin evaluates SLAs in this order:
 
-The SLA Statuses' configuration allows to define for which statuses the time elapses.
+```
+Issue
+ └─ Tracker
+     └─ SLA mapping (project level)
+         └─ SLA definition
+             ├─ SLA Types
+             ├─ SLA Levels
+             └─ SLA Terms
+```
 
-Go to `Administration » SLA Global settings » SLA Statuses` (https://[redmine-host]/sla/statuses). Add "SLA Statuses" for "Response time" with this statuses :
-- New
+➡️ The **tracker** is the decision key.
 
-And add "SLA Statuses" for "Resolution deadline" with this statuses :
-- New
-- In progress
-<div style=" width:50%; height:50%; " >
+---
 
-![Redmine SLA - Example 03 - 03](images/example_02/redmine_sla_doc_example_03_03.png)
-</div>
+## 1) Create the SLAs
 
-The addition of this tuple indicates that the ticket creation delay should be calculated only when then issue was is in this status (i.e. while the ticket is in this status).
+Go to:
 
+`Administration → SLA Global settings → Service Level Agreements`
 
-## Create SLA Holidays
+Create **two SLAs**:
 
-This module is used to list all the holidays (non-working days or even exceptional closing days) that will be needed in the SLA duration count.
+- `SLA Bug`
+- `SLA Request`
 
-Go to `Administration » SLA Global settings » SLA Holidays` ( https://[redmine-host]/sla/holidays). Add new "SLA Holidays" like in the fixtures, we have all the French public holidays of the year 2021 for example :
-<div style=" width:50%; height:50%; " >
+![Create SLA](screenshots/example-03/01-01-01-01-sla-new.png)
 
-![Redmine SLA - Example 03 - 04](images/example_03/redmine_sla_doc_example_03_04.png)
-</div>
+Verify both appear in the list:
 
+![SLA list](screenshots/example-03/01-01-01-02-sla-created.png)
 
-## Create SLA Calendar (& SLA Calendar' Schedule)
+---
 
-The SLA calendar is important, it allows to define the working hours and non-working hours of the week.
+## 2) Create the SLA Types (same as EXAMPLE-02)
 
-If the "match" field is checked, then the issue can be opened in this time slot (opening hours). If the time is declared with the "match" field unchecked, then the issue cannot be opened in this slot, however the time calculation can continue on this slot (non-working hours).
+We reuse the same SLA Types for both SLAs:
 
-Typically, for support activities, deadlines are suspended outside business hours. If an issue is opened during non-working hours, then the calculation starts at the next working hour. Conversely, in the case of web hosting, an issue can be opened at any time and continues regardless of the time. If an exit is opened during working hours then it continues during non-working hours and vice versa.
+- Response time
+- Resolution deadline
 
-Go to Administration » SLA Global settings » SLA Calendar ( https://[redmine-host]/sla/calendars ). Add "Calendar HO Managed Services" as new "SLA Calendar" with schedules :
-<div style=" width:50%; height:50%; " >
+Go to:
 
-![Redmine SLA - Example 03 - 05](images/example_03/redmine_sla_doc_example_03_05.png)
-</div>
+`Administration → SLA Global settings → SLA Types`
 
-Go to Administration » SLA Global settings » SLA Calendar ( https://[redmine-host]/sla/calendars ). Add "Calendar HNO Managed Services" as new "SLA Calendar" with schedules :
-<div style=" width:50%; height:50%; " >
+Create the types if they do not already exist:
 
-![Redmine SLA - Example 03 - 06](images/example_03/redmine_sla_doc_example_03_06.png)
-</div>
+![Create SLA Types](screenshots/example-03/02-01-01-01-sla_type-new.png)
 
-> **_NOTE:_** These are the intervals from a start time to an end time, so the time is usually stopped by subtracting one minute from the end time. Indeed, taking a schedule of 8am to 9am, so to get well 60 minutes, it's therefore necessary to declare from 8am to 8:59am.
+Verify the list:
 
+![SLA Types list](screenshots/example-03/02-01-01-02-sla_type-created.png)
 
-## Create SLA Calendars' Holidays
+---
 
-So, we can create several SLA Calendars with SLA Schedules. For each SLA Calendar, you can also assign SLA Holidays.
+## 3) Define SLA Statuses (shared by both SLAs)
 
-For SLA Calendars' Holidays, the "match" field has the opposite meaning to SLA Calendar' Schedules. Indeed, for SLA Calendar' Schedules, the hours worked were declared. For SLA Calendars' Holidays, the hours not worked are declared. 
-By default, we add a public holiday to remove it from the calculations. However, if the "match" field is checked, then the time will be counted. However, if a ticket is open on this slot, then it cannot start until the next working hour.
+Go to:
 
-Go to `Administration » SLA Global settings » SLA Calendars' Holidays` (https://[redmine-host]/sla/calendar_holidays). Add new "SLA Calendars' Holidays"
-<div style=" width:50%; height:50%; " >
+`Administration → SLA Global settings → SLA Statuses`
 
-![Redmine SLA - Example 03 - 07](images/example_03/redmine_sla_doc_example_03_07.png)
-</div>
+Define when each SLA Type elapses:
 
-For our example, which is a support service, public holidays are equivalent to times that shouldn't be counted.
+- **Response time** → New
+- **Resolution deadline** → In Progress (and related statuses)
 
+![Create SLA Status](screenshots/example-03/03-01-01-01-01-sla_status-new.png)
 
-## Create SLA Levels
+Verify the list:
 
-After declaring SLAs and SLA Schedules, they can be linked to define service levels. In other words, the SLA Levels make it possible to know the moment "when" commitments will apply.
+![SLA Status list](screenshots/example-03/03-01-01-01-02-sla_status-created.png)
 
-Go to `Administration » SLA Global settings » SLA Levels` (https://[redmine-host]/sla/levels). Add "Level HO Managed Services" and "Level HNO Managed Services" as new "SLA Levels":
-<div style=" width:50%; height:50%; " >
+> SLA Statuses are **global**: they apply to all SLAs using the same SLA Type.
 
-![Redmine SLA - Example 03 - 08](images/example_03/redmine_sla_doc_example_03_08.png)
-</div>
+---
 
+## 4) Create the SLA Calendar (shared)
 
-## Create SLA Terms
+Go to:
 
-Finally, we can define the SLA Terms. For an SLA Level, an SLA Type and a priority, you can define a time commitment (in minutes).
+`Administration → SLA Global settings → SLA Calendars`
 
-Go to `Administration » SLA Global settings » SLA Terms` (https://[redmine-host]/sla/level_terms). Add "Terms Bug Tracker" for each SLA Type / Priority as new "SLA Terms":
-<div style=" width:50%; height:50%; " >
+Create one calendar (same working hours as previous examples):
 
-![Redmine SLA - Example 03 - 09](images/example_03/redmine_sla_doc_example_03_09.png)
-</div>
+![Create SLA Calendar](screenshots/example-03/04-01-01-01-sla_calendar-new.png)
 
+Verify the list:
 
-## Apply SLA to a Project
+![Calendar list](screenshots/example-03/04-01-01-02-sla_calendar-created.png)
 
-Go to your project' settings ( https://[redmine-host]/projects/[project-identifier]/settings ). Active SLA module for your project:
-<div style=" width:50%; height:50%; " >
+---
 
-![Redmine SLA - Example 03 - 10](images/example_03/redmine_sla_doc_example_03_10.png)
-</div>
+## 5) Create Holidays and assign them to the calendar
 
-The tab should appear `SLA Project settings`, go to this tab (http://[redmine-host]/projects/[project-identifier]/settings/slas). With "New SLA project's tracker" define the SLA for a tracker:
-<div style=" width:50%; height:50%; " >
+Create holidays (same logic as previous examples):
 
-![Redmine SLA - Example 03 - 11](images/example_03/redmine_sla_doc_example_03_11.png)
-</div>
+![Create SLA Holiday](screenshots/example-03/05-01-01-01-sla_holiday-new.png)
 
+Verify the holiday list:
 
-## View SLA into an issue
+![Holiday list](screenshots/example-03/05-02-sla_holiday-list.png)
 
-When you go to a project's issue, you should see the SLA appear if it matches with the status and priority:
-<div style=" width:50%; height:50%; " >
+Assign holidays to the calendar:
 
-![Redmine SLA - Example 03 - 12](images/example_03/redmine_sla_doc_example_03_12.png)
-</div>
+![Calendar holiday mapping](screenshots/example-03/06-01-01-01-sla_calendar_holiday-new.png)
 
+---
 
-## Roles
+## 6) Create the project
 
-Until then, you were an administrator. However, in order for the members of your project to be able to see the SLAs, or even manage their activation within the project, you must grant them this right.
+Create a project that will host **both trackers**:
 
-Got to `Administration » Roles and permissions` (http://[redmine-host]/roles). Edit a role (http://[redmine-host]/roles/[role-id]/edit) to check "View SLA" (ex: for manager and developer) and/or "Manage SLA" (ex: for manager).
+![Create project](screenshots/example-03/07-01-01-project-new.png)
 
+Verify the project:
+
+![Project overview](screenshots/example-03/07-02-01-project-show.png)
+
+Enable the SLA module in project settings (same as previous examples).
+
+---
+
+## 7) Create SLA Levels (one per SLA)
+
+Go to:
+
+`Administration → SLA Global settings → SLA Levels`
+
+Create two levels:
+
+- `Level Bug` → linked to `SLA Bug`
+- `Level Request` → linked to `SLA Request`
+
+Both levels can use the **same calendar**.
+
+![Create SLA Levels](screenshots/example-03/09-01-01-01-sla_level-new.png)
+
+Verify the list:
+
+![SLA Levels list](screenshots/example-03/09-01-01-02-sla_leel-created.png)
+
+---
+
+## 8) Define SLA Terms per SLA
+
+Go to:
+
+`Administration → SLA Global settings → SLA Terms`
+
+### 8.1 Bug SLA Terms
+
+Define stricter targets for **Bug**:
+
+![Bug SLA Terms](screenshots/example-03/10-01-01-01-sla_level_term-new.png)
+
+### 8.2 Request SLA Terms
+
+Define more relaxed targets for **Request**:
+
+![Request SLA Terms](screenshots/example-03/10-01-02-01-sla_level_term-new.png)
+
+Verify the list:
+
+![SLA Terms list](screenshots/example-03/10-01-01-02-sla_level_term-created.png)
+
+---
+
+## 9) Map trackers to SLAs at project level
+
+Go to:
+
+`Project → Settings → SLA`
+
+Create mappings:
+
+- Tracker **Bug** → `SLA Bug`
+- Tracker **Request** → `SLA Request`
+
+![Create tracker/SLA mapping](screenshots/example-03/11-04-01-01-project-settings-sla-new.png)
+
+Verify mappings:
+
+![Project SLA list](screenshots/example-03/11-05-01-project-settings-sla-list.png)
+
+---
+
+## 10) View SLAs on issues
+
+Create two issues in the same project:
+- one **Bug**
+- one **Request**
+
+Each issue will automatically use the SLA mapped to its tracker.
+
+Example issue view:
+
+![Issue with SLA](screenshots/example-03/12-01-01-issue_1-issue-show.png)
+
+---
+
+## What you learned in this example
+
+With EXAMPLE-03, you learned that:
+
+- multiple SLAs can coexist in a single project
+- SLA selection is based on the **tracker**
+- SLAs can share calendars and SLA Types
+- SLA logic remains isolated per SLA definition
+
+The next example (EXAMPLE-04) will introduce **custom fields for SLA priority**, allowing even more flexibility.
