@@ -1,0 +1,8 @@
+issues:
+  issue_1:
+    project: "project-tma"
+    tracker: "tracker_bug"
+    subject: "Bug example 03"
+    start_date: "2026-01-05"
+    due_date: "2026-01-06"
+    issue_priority_name: "Normal"

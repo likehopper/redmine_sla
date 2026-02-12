@@ -1,0 +1,4 @@
+sla_statuses:
+- sla_type: Response time
+  issue_statuses:
+  - New

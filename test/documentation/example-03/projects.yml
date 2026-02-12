@@ -1,0 +1,6 @@
+projects:
+  - name: "Project TMA"
+    identifier: "project-tma"
+    description: "Service levels with both bug and requests"
+    public: false
+    sla: true

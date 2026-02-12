@@ -1,0 +1,68 @@
+sla_calendars:
+
+  - name: "Calendar HO tracker_change_request"
+    sla_schedules:
+      Monday:
+        - ["09:00","18:59",true]
+      Tuesday:
+        - ["09:00","18:59",true]
+      Wednesday:
+        - ["09:00","18:59",true]
+      Thursday:
+        - ["09:00","18:59",true]
+      Friday:
+        - ["09:00","18:59",true]
+
+  - name: "Calendar HO tracker_production_incident"
+    sla_schedules:
+      Sunday:
+        - ["00:00","23:59",false]
+      Monday:
+        - ["00:00","08:59",false]
+        - ["09:00","18:59",true]
+        - ["19:00","23:59",false]
+      Tuesday:
+        - ["00:00","08:59",false]
+        - ["09:00","18:59",true]
+        - ["19:00","23:59",false]
+      Wednesday:
+        - ["00:00","08:59",false]
+        - ["09:00","18:59",true]
+        - ["19:00","23:59",false]
+      Thursday:
+        - ["00:00","08:59",false]
+        - ["09:00","18:59",true]
+        - ["19:00","23:59",false]
+      Friday:
+        - ["00:00","08:59",false]
+        - ["09:00","18:59",true]
+        - ["19:00","23:59",false]
+      Saturday:
+        - ["00:00","23:59",false]
+
+  - name: "Calendar HNO tracker_production_incident"
+    sla_schedules:
+      Sunday:
+        - ["00:00","23:59",true]
+      Monday:
+        - ["00:00","08:59",true]
+        - ["09:00","18:59",false]
+        - ["19:00","23:59",true]
+      Tuesday:
+        - ["00:00","08:59",true]
+        - ["09:00","18:59",false]
+        - ["19:00","23:59",true]
+      Wednesday:
+        - ["00:00","08:59",true]
+        - ["09:00","18:59",false]
+        - ["19:00","23:59",true]
+      Thursday:
+        - ["00:00","08:59",true]
+        - ["09:00","18:59",false]
+        - ["19:00","23:59",true]
+      Friday:
+        - ["00:00","08:59",true]
+        - ["09:00","18:59",false]
+        - ["19:00","23:59",true]
+      Saturday:
+        - ["00:00","23:59",false]

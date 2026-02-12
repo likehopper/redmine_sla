@@ -1,0 +1,3 @@
+sla_types:
+  - name: "Response time"
+  - name: "Resolution deadline"

@@ -1,0 +1,13 @@
+project_settings:
+  - project: "project-tma"
+    issue_trackers: ["tracker_bug","tracker_feature_request"]
+    sla_trackers:
+      tracker_bug: "SLA bug"
+      tracker_feature_request: "SLA feature request"
+    members:
+      - principal: "Redmine Manager"
+        roles: ["Manager"]
+      - principal: "Redmine Developer"
+        roles: ["Resolver"]
+      - principal: "Redmine Reporter"
+        roles: ["Reporter"]

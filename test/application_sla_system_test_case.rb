@@ -20,7 +20,7 @@
 require_relative 'helpers/sla_test_helper'
 require_relative 'helpers/sla_object_helper'
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../test/application_system_test_case')
+require File.expand_path('../../../../test/application_system_test_case', __FILE__)
 
 class ApplicationSlaSystemTestCase < ApplicationSystemTestCase
 

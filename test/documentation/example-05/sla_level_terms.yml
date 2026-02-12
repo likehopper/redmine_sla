@@ -1,0 +1,46 @@
+sla_level_terms:
+
+  sla_level_term_1_1:
+    sla_level: "Level Managed Services tracker_change_request HO"
+    sla_type: "Response time"
+    sla_priority:
+      Low: 60
+      Normal: 60
+      High: 60
+  sla_level_term_1_2:
+    sla_level: "Level Managed Services tracker_change_request HO"
+    sla_type: "Resolution deadline"
+    sla_priority:
+      Low: 480
+      Normal: 480
+      High: 480
+
+  sla_level_term_2_1:
+    sla_level: "Level Managed Services tracker_production_incident HO"
+    sla_type: "Response time"
+    sla_priority:
+      Low: 15
+      Normal: 15
+      High: 15
+  sla_level_term_2_2:      
+    sla_level: "Level Managed Services tracker_production_incident HO"
+    sla_type: "Resolution deadline"
+    sla_priority:
+      Low: 240
+      Normal: 240
+      High: 240
+
+  sla_level_term_3_1:
+    sla_level: "Level Managed Services tracker_production_incident HNO"
+    sla_type: "Response time"
+    sla_priority:
+      Low: 30
+      Normal: 30
+      High: 30
+  sla_level_term_3_2:
+    sla_level: "Level Managed Services tracker_production_incident HNO"
+    sla_type: "Resolution deadline"
+    sla_priority:
+      Low: 240
+      Normal: 240
+      High: 240
