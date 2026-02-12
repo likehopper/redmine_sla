@@ -64,6 +64,8 @@ module SlaCalendarsDocumentationTest
     log_user('admin', 'admin') if sla_calendars.any?
 
     sla_calendars.each.with_index(1) do |row, idx|
+
+      # Resolve names -> records
       sla_calendar_name = row.fetch('name')
       sla_schedules = row.fetch('sla_schedules', [])
       
@@ -83,11 +85,14 @@ module SlaCalendarsDocumentationTest
         end
       end
 
+      # Take the photo and submit the form
       take_doc_screenshot(format('%02d-01-%02d-01-sla_calendar-new.png', id, idx))
       click_button l("sla_label.sla_calendar.new")
 
+      # Search for the record
       sla_calendar = SlaCalendar.find_by(name: sla_calendar_name)
 
+      # Validation and screenshot
       assert_text(l('sla_label.sla_calendar.notice_successful_create', id: "##{sla_calendar.id}"))
       take_doc_screenshot(format("%02d-01-%02d-02-sla_calendar-created.png", id, idx))
 
