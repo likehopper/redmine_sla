@@ -56,20 +56,20 @@ class SlaCacheSpent < ActiveRecord::Base
   end
   
   def self.find_by_issue_and_type_id(issue,sla_type_id)
-    ActiveRecord::Base.connection.execute("SELECT sla_get_spent(#{issue.id},#{sla_type_id}) ; ")
+    ActiveRecord::Base.connection.execute(sanitize_sql(["SELECT sla_get_spent(?,?) ; ", issue.id, sla_type_id]))
     self.find_by(issue_id: issue.id,sla_type_id: sla_type_id)
   end
 
   # Class method for refresh cache
   def self.refresh_by_issue_id(issue_id)
     SlaType.all.each do |sla_type|
-      ActiveRecord::Base.connection.execute("SELECT sla_get_spent(#{issue_id},#{sla_type.id}) ; ")
+      ActiveRecord::Base.connection.execute(sanitize_sql(["SELECT sla_get_spent(?,?) ; ", issue_id, sla_type.id]))
     end
-  end  
+  end
 
   # Class method for refresh cache
   def refresh
-    ActiveRecord::Base.connection.execute("SELECT sla_get_spent(#{self.sla_cache.issue_id},#{self.sla_type.id}) ; ")
+    ActiveRecord::Base.connection.execute(self.class.sanitize_sql(["SELECT sla_get_spent(?,?) ; ", self.sla_cache.issue_id, self.sla_type.id]))
   end
 
   def self.purge(project)
