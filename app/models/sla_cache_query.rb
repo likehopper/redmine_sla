@@ -19,10 +19,10 @@
 
 # class Queries::SlaCacheQuery < Query
 class SlaCacheQuery < Query
-  
+
   self.queried_class = SlaCache
   self.view_permission = :view_sla
-  
+
   def initialize_available_filters
     add_available_filter 'project_id', type: :list, :name => :project, values: lambda {project_values} if project.nil?
     add_available_filter 'issue_id', type: :tree
@@ -34,25 +34,25 @@ class SlaCacheQuery < Query
     add_available_filter "issue.status_id", :type => :list_status, :name => l("label_attribute_of_issue", :name => l(:field_status)), :values => lambda {issue_statuses_values}
 
     sla_types_for_project.each { |sla_type|
-        # SLA Term : Filter ?
+        # SLA Term : Filter ?
         # SLA Spent : Filter ?
-        # SLA Remain : Filter
+        # SLA Remain : Filter
         add_available_filter("slas.sla_remain_#{sla_type.id}",
           :name => l(:label_sla_remain)+" "+sla_type.name,
           :type => :integer        )
-        # SLA Remain : Filter Function
+        # SLA Remain : Filter Function
         if ! singleton_methods.include? "sql_for_slas_sla_remain_#{sla_type.id}_field".to_sym
           define_singleton_method("sql_for_slas_sla_remain_#{sla_type.id}_field") do |field, operator, value|
             sql_for_slas_sla_remain_field(field,operator,value,sla_type.id)
           end
         end
-        # SLA Respect : Filter
+        # SLA Respect : Filter
         add_available_filter("slas.sla_respect_#{sla_type.id}",
           :name => l(:label_sla_respect)+" "+sla_type.name,
           :type => :list,
           :values => [[l(:general_text_Yes), '1'], [l(:general_text_No), '0']]
         )
-        # SLA RESPECT : Filter Function
+        # SLA RESPECT : Filter Function
         if ! singleton_methods.include? "sql_for_slas_sla_respect_#{sla_type.id}_field".to_sym
           define_singleton_method("sql_for_slas_sla_respect_#{sla_type.id}_field") do |field, operator, value|
             sql_for_slas_sla_respect_field(field,operator,value,sla_type.id)
@@ -74,112 +74,68 @@ class SlaCacheQuery < Query
     @available_columns << QueryColumn.new(:updated_on, :sortable => "#{SlaCache.table_name}.updated_on", :default_order => nil, :groupable => false )
     @available_columns << QueryAssociationColumn.new(:issue, :status, :caption => :field_status, :sortable => "#{IssueStatus.table_name}.position" )
     @available_columns << QueryAssociationColumn.new(:issue, :tracker, :caption => :field_tracker, :sortable => "#{Tracker.table_name}.position" )
-    
+
     sla_types_for_project.each { |sla_type|
+      tid = sla_type.id
 
-        # SLA Term : Column
-        name_to_sym = "get_sla_spent_#{sla_type.id}".to_sym
-        get_sla_spent = QueryColumn.new(
-          name_to_sym,
-          :caption => "🚀 "+l(:label_sla_spent)+" "+sla_type.name,
-          :groupable => false,
-          :sortable => "(
-            SELECT DISTINCT sla_cache_spents.spent
-            FROM sla_caches
-            LEFT JOIN sla_levels ON ( sla_caches.sla_level_id = sla_levels.id )
-            LEFT JOIN custom_values ON ( sla_levels.custom_field_id = custom_values.custom_field_id AND custom_values.customized_id = sla_caches.issue_id )
-            LEFT JOIN sla_cache_spents ON ( sla_caches.id = sla_cache_spents.sla_cache_id AND sla_cache_spents.sla_type_id = #{sla_type.id} )
-            WHERE sla_caches.issue_id = issues.id            
-          )"
-        )
-        # def get_sla_spent.group_by_statement
-        #   self.sortable
-        # end
-        @available_columns << get_sla_spent
+      @available_columns << build_sla_column("get_sla_spent_#{tid}", "🚀 #{l(:label_sla_spent)} #{sla_type.name}", "(
+        SELECT DISTINCT sla_cache_spents.spent
+        FROM sla_caches
+        LEFT JOIN sla_levels ON ( sla_caches.sla_level_id = sla_levels.id )
+        LEFT JOIN custom_values ON ( sla_levels.custom_field_id = custom_values.custom_field_id AND custom_values.customized_id = sla_caches.issue_id )
+        LEFT JOIN sla_cache_spents ON ( sla_caches.id = sla_cache_spents.sla_cache_id AND sla_cache_spents.sla_type_id = #{tid} )
+        WHERE sla_caches.issue_id = issues.id
+      )")
 
-        # SLA Spent : Column
-        name_to_sym = "get_sla_term_#{sla_type.id}".to_sym
-        get_sla_term = QueryColumn.new(
-          name_to_sym,
-          :caption => "🏁 "+l(:label_sla_term)+" "+sla_type.name,
-          :groupable => false,
-          :sortable => "(
-            SELECT DISTINCT sla_level_terms.term AS get_sla_term
-            FROM issues AS sla_issues
-            LEFT JOIN sla_caches ON ( sla_issues.id = sla_caches.issue_id )
-            LEFT JOIN sla_levels ON ( sla_caches.sla_level_id = sla_levels.id )
-            LEFT JOIN custom_values ON ( sla_levels.custom_field_id = custom_values.custom_field_id AND custom_values.customized_id = sla_issues.id )
-            LEFT JOIN sla_level_terms ON ( sla_caches.sla_level_id = sla_level_terms.sla_level_id AND sla_level_terms.sla_type_id = #{sla_type.id}
-              AND sla_level_terms.sla_priority_id = ( CASE
-              WHEN sla_levels.custom_field_id IS NULL THEN sla_issues.priority_id
-              ELSE CAST(custom_values.value AS BIGINT) END
-              )
-            )
-            WHERE sla_caches.issue_id = issues.id            
-          )"
+      @available_columns << build_sla_column("get_sla_term_#{tid}", "🏁 #{l(:label_sla_term)} #{sla_type.name}", "(
+        SELECT DISTINCT sla_level_terms.term AS get_sla_term
+        FROM issues AS sla_issues
+        LEFT JOIN sla_caches ON ( sla_issues.id = sla_caches.issue_id )
+        LEFT JOIN sla_levels ON ( sla_caches.sla_level_id = sla_levels.id )
+        LEFT JOIN custom_values ON ( sla_levels.custom_field_id = custom_values.custom_field_id AND custom_values.customized_id = sla_issues.id )
+        LEFT JOIN sla_level_terms ON ( sla_caches.sla_level_id = sla_level_terms.sla_level_id AND sla_level_terms.sla_type_id = #{tid}
+          AND sla_level_terms.sla_priority_id = ( CASE
+          WHEN sla_levels.custom_field_id IS NULL THEN sla_issues.priority_id
+          ELSE CAST(custom_values.value AS BIGINT) END
+          )
         )
-        # def get_sla_term.group_by_statement
-        #   self.sortable
-        # end
-        @available_columns << get_sla_term
- 
-        # SLA Remain : Column
-        name_to_sym = "get_sla_remain_#{sla_type.id}".to_sym
-        get_sla_remain = QueryColumn.new(
-          name_to_sym,
-          :caption => "🏃 "+l(:label_sla_remain)+" "+sla_type.name,
-          :groupable => false,
-          :sortable => "(
-            SELECT DISTINCT ( sla_level_terms.term - sla_cache_spents.spent ) AS get_sla_remain
-            FROM issues AS sla_issues
-            LEFT JOIN sla_caches ON ( sla_issues.id = sla_caches.issue_id )
-            LEFT JOIN sla_levels ON ( sla_caches.sla_level_id = sla_levels.id )
-            LEFT JOIN custom_values ON ( sla_levels.custom_field_id = custom_values.custom_field_id AND custom_values.customized_id = sla_issues.id )
-            LEFT JOIN sla_cache_spents ON ( sla_caches.id = sla_cache_spents.sla_cache_id AND sla_cache_spents.sla_type_id = #{sla_type.id} )
-            LEFT JOIN sla_level_terms ON ( sla_caches.sla_level_id = sla_level_terms.sla_level_id AND sla_level_terms.sla_type_id = #{sla_type.id}
-              AND sla_level_terms.sla_priority_id = ( CASE
-              WHEN sla_levels.custom_field_id IS NULL THEN sla_issues.priority_id
-              ELSE CAST(custom_values.value AS BIGINT) END
-              )
-            )
-            WHERE sla_issues.id = issues.id
-          )",
-        )
-        # def get_sla_remain.group_by_statement
-        #   self.sortable
-        # end
-        @available_columns << get_sla_remain
+        WHERE sla_caches.issue_id = issues.id
+      )")
 
-        # SLA Respect : Column
-        name_to_sym = "get_sla_respect_#{sla_type.id}".to_sym
-        get_sla_respect = QueryColumn.new(
-          name_to_sym,
-          :caption => "⏰ "+l(:label_sla_respect)+" "+sla_type.name,
-          :groupable => false,
-          :sortable => "(
-            SELECT DISTINCT CASE
-              WHEN sla_level_terms.term IS NULL THEN 0
-              WHEN ( ( NOT ( sla_level_terms.term < sla_cache_spents.spent ) ) IS NOT TRUE ) THEN 1
-              ELSE 2 END AS get_sla_respect
-            FROM issues AS sla_issues
-            LEFT JOIN sla_caches ON ( sla_issues.id = sla_caches.issue_id )
-            LEFT JOIN sla_levels ON ( sla_caches.sla_level_id = sla_levels.id )
-            LEFT JOIN custom_values ON ( sla_levels.custom_field_id = custom_values.custom_field_id AND custom_values.customized_id = sla_issues.id )
-            LEFT JOIN sla_cache_spents ON ( sla_caches.id = sla_cache_spents.sla_cache_id AND sla_cache_spents.sla_type_id = #{sla_type.id} )
-            LEFT JOIN sla_level_terms ON ( sla_caches.sla_level_id = sla_level_terms.sla_level_id AND sla_level_terms.sla_type_id = #{sla_type.id}
-              AND sla_level_terms.sla_priority_id = ( CASE
-              WHEN sla_levels.custom_field_id IS NULL THEN sla_issues.priority_id
-              ELSE CAST(custom_values.value AS BIGINT) END
-              )
-            )
-            WHERE sla_issues.id = issues.id
-          )",
+      @available_columns << build_sla_column("get_sla_remain_#{tid}", "🏃 #{l(:label_sla_remain)} #{sla_type.name}", "(
+        SELECT DISTINCT ( sla_level_terms.term - sla_cache_spents.spent ) AS get_sla_remain
+        FROM issues AS sla_issues
+        LEFT JOIN sla_caches ON ( sla_issues.id = sla_caches.issue_id )
+        LEFT JOIN sla_levels ON ( sla_caches.sla_level_id = sla_levels.id )
+        LEFT JOIN custom_values ON ( sla_levels.custom_field_id = custom_values.custom_field_id AND custom_values.customized_id = sla_issues.id )
+        LEFT JOIN sla_cache_spents ON ( sla_caches.id = sla_cache_spents.sla_cache_id AND sla_cache_spents.sla_type_id = #{tid} )
+        LEFT JOIN sla_level_terms ON ( sla_caches.sla_level_id = sla_level_terms.sla_level_id AND sla_level_terms.sla_type_id = #{tid}
+          AND sla_level_terms.sla_priority_id = ( CASE
+          WHEN sla_levels.custom_field_id IS NULL THEN sla_issues.priority_id
+          ELSE CAST(custom_values.value AS BIGINT) END
+          )
         )
-        # def get_sla_respect.group_by_statement
-        #   self.sortable
-        # end
-        @available_columns << get_sla_respect        
+        WHERE sla_issues.id = issues.id
+      )")
 
+      @available_columns << build_sla_column("get_sla_respect_#{tid}", "⏰ #{l(:label_sla_respect)} #{sla_type.name}", "(
+        SELECT DISTINCT CASE
+          WHEN sla_level_terms.term IS NULL THEN 0
+          WHEN ( ( NOT ( sla_level_terms.term < sla_cache_spents.spent ) ) IS NOT TRUE ) THEN 1
+          ELSE 2 END AS get_sla_respect
+        FROM issues AS sla_issues
+        LEFT JOIN sla_caches ON ( sla_issues.id = sla_caches.issue_id )
+        LEFT JOIN sla_levels ON ( sla_caches.sla_level_id = sla_levels.id )
+        LEFT JOIN custom_values ON ( sla_levels.custom_field_id = custom_values.custom_field_id AND custom_values.customized_id = sla_issues.id )
+        LEFT JOIN sla_cache_spents ON ( sla_caches.id = sla_cache_spents.sla_cache_id AND sla_cache_spents.sla_type_id = #{tid} )
+        LEFT JOIN sla_level_terms ON ( sla_caches.sla_level_id = sla_level_terms.sla_level_id AND sla_level_terms.sla_type_id = #{tid}
+          AND sla_level_terms.sla_priority_id = ( CASE
+          WHEN sla_levels.custom_field_id IS NULL THEN sla_issues.priority_id
+          ELSE CAST(custom_values.value AS BIGINT) END
+          )
+        )
+        WHERE sla_issues.id = issues.id
+      )")
     }
 
     @available_columns
@@ -242,7 +198,7 @@ class SlaCacheQuery < Query
       WHERE sla_issues.id = issues.id
     "
     "( #{Issue.table_name}.id = ( #{selection} AND #{condition} ) )"
-  end  
+  end
 
   def sql_for_slas_sla_respect_field(field,operator,value,sla_type_id)
     condition =
@@ -268,8 +224,8 @@ class SlaCacheQuery < Query
       WHERE sla_issues.id = issues.id
     "
     "( #{Issue.table_name}.id = ( #{selection} AND #{condition} ) )"
-  end  
-    
+  end
+
   def sla_caches(options={})
     order_option = [group_by_sort_order, (options[:order] || sort_clause)].flatten.reject(&:blank?)
 
@@ -286,7 +242,7 @@ class SlaCacheQuery < Query
   rescue ::ActiveRecord::StatementInvalid => e
     raise StatementInvalid.new(e.message)
   end
-  
+
   # For Query Class
   def base_scope
     # self.queried_class.visible.where(statement)
@@ -306,7 +262,7 @@ class SlaCacheQuery < Query
 
   def sql_for_sla_level_id_field(field, operator, value)
     sql_for_field("sla_level_id", operator, value, SlaCache.table_name, "sla_level_id")
-  end  
+  end
 
   def sql_for_issue_id_field(field, operator, value)
     self.class.queried_class = Issue
@@ -356,6 +312,10 @@ class SlaCacheQuery < Query
   end
 
   private
+
+  def build_sla_column(name, caption, sortable_sql)
+    QueryColumn.new(name.to_sym, :caption => caption, :groupable => false, :sortable => sortable_sql)
+  end
 
   def sla_types_for_project
     return [] if project.nil?
