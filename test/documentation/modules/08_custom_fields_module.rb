@@ -136,8 +136,10 @@ module CustomFieldsDocumentationTest
       end
     end
 
-    take_doc_screenshot(format('%02d-01-%02d-custom_field-new.png', id, idx))
+    take_doc_screenshot(format('%02d-01-%02d-01-custom_field-new.png', id, idx))
     click_button 'Create'
+    assert_text l(:notice_successful_create)
+    take_doc_screenshot(format('%02d-01-%02d-02-custom_field-created.png', id, idx))
 
     # -----------------------------
     # 2) Model: Inject possible values (more reliable than UI)
