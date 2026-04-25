@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# File: redmine_sla/app/models/sla_status_query.rb
 # Redmine SLA - Redmine's Plugin 
 #
 # This program is free software; you can redistribute it and/or

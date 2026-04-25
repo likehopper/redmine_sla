@@ -46,6 +46,7 @@ module SlaStatusesDocumentationTest
         # Take the photo and submit the form
         take_doc_screenshot(format("%02d-01-%02d-%02d-01-sla_status-new.png", id, idx, idx2))
         click_button(l('sla_label.sla_status.new'))
+        assert_current_path sla_statuses_path
 
         # Search for the record
         sla_status = SlaStatus.find_by!(
