@@ -70,16 +70,12 @@ class SlaSchedulesController < ApplicationController
   # Create a schedule and normalize times.
   #
   # Example:
-  #   start_time = 09:00  →  09:00:00
-  #   end_time   = 17:00  →  17:00:59   (makes interval inclusive)
+  #   start_time = "09:00"  →  "09:00:00"
+  #   end_time   = "17:00"  →  "17:00:59"   (makes interval inclusive)
   #
   def create
     @sla_schedule = SlaSchedule.new
-    @sla_schedule.safe_attributes = params[:sla_schedule]
-
-    # Normalize start/end times to full HH:MM:SS
-    @sla_schedule.start_time = @sla_schedule.start_time.strftime("%H:%M:00") if @sla_schedule.start_time.present?
-    @sla_schedule.end_time   = @sla_schedule.end_time.strftime("%H:%M:59") if @sla_schedule.end_time.present?
+    @sla_schedule.safe_attributes = normalize_schedule_times(params[:sla_schedule])
 
     if @sla_schedule.save
       respond_to do |format|
@@ -104,11 +100,7 @@ class SlaSchedulesController < ApplicationController
   # UPDATE
   # ---------------------------------------------------------------------------
   def update
-    @sla_schedule.safe_attributes = params[:sla_schedule]
-
-    # Same normalization logic as in create
-    @sla_schedule.start_time = @sla_schedule.start_time.strftime("%H:%M:00") if @sla_schedule.start_time.present?
-    @sla_schedule.end_time   = @sla_schedule.end_time.strftime("%H:%M:59") if @sla_schedule.end_time.present?
+    @sla_schedule.safe_attributes = normalize_schedule_times(params[:sla_schedule])
 
     if @sla_schedule.save
       respond_to do |format|
@@ -184,6 +176,25 @@ class SlaSchedulesController < ApplicationController
   # PRIVATE METHODS
   # ---------------------------------------------------------------------------
   private
+
+  # Normalize HH:MM string params to full HH:MM:SS before safe_attributes assignment.
+  # Operates on the raw params hash so ActiveRecord never receives a bare String
+  # that would blow up on #strftime after casting.
+  #
+  # @param schedule_params [Hash, ActionController::Parameters, nil]
+  # @return [Hash, ActionController::Parameters, nil] mutated copy with normalized times
+  def normalize_schedule_times(schedule_params)
+    return schedule_params if schedule_params.blank?
+
+    normalized = schedule_params.dup
+    raw_start  = normalized[:start_time].presence
+    raw_end    = normalized[:end_time].presence
+
+    normalized[:start_time] = "#{raw_start}:00" if raw_start
+    normalized[:end_time]   = "#{raw_end}:59"   if raw_end
+
+    normalized
+  end
 
   # Load one schedule
   def find_sla_schedule

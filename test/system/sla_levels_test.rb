@@ -78,7 +78,10 @@ class SlaLevelsHelperSystemTest < ApplicationSlaSystemTestCase
       find('input[name=commit]').click
     end
 
-    # find created issue
+    # Wait for redirect first — ensures the server has committed the transaction
+    assert_current_path sla_levels_path
+
+    # Query DB after redirect is confirmed (server connection has committed)
     sla_level = SlaLevel.find_by_name(sla_level_name)
     assert_kind_of SlaLevel, sla_level
 
@@ -86,13 +89,8 @@ class SlaLevelsHelperSystemTest < ApplicationSlaSystemTestCase
     find 'div#flash_notice',
       :visible => true,
       :text => l("sla_label.sla_level.notice_successful_create", :id => "##{sla_level.id}" )
-    assert_equal sla_levels_path, current_path
 
-    # TODO : vérifier SlaLevel#show
-    # visit "/sla/leveles/#{sla_level.id}"
-    # compate sla_level attributs
-
-    # check issue attributes
+    # check record attributes
     assert_equal sla_level_name, sla_level.name
   end
 

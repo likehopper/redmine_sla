@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# File: redmine_sla/app/models/sla_cache.rb
 # Redmine SLA - Redmine's Plugin 
 #
 # This program is free software; you can redistribute it and/or
@@ -56,7 +57,7 @@ class SlaCache < ActiveRecord::Base
   end
 
   def self.find_by_issue_id(issue_id)
-    ActiveRecord::Base.connection.execute("SELECT sla_get_level(#{issue_id}) ; ")
+    ActiveRecord::Base.connection.execute(sanitize_sql(["SELECT sla_get_level(?) ; ", issue_id]))
     self.find_by(issue_id: issue_id)
   end
 
@@ -65,7 +66,7 @@ class SlaCache < ActiveRecord::Base
     # First, delete the entry in the sla_cache
     # SlaCache.where(issue: self.issue_id).destroy_all
     # Let's recalculate the sla_cache
-    ActiveRecord::Base.connection.execute("SELECT sla_get_level(#{self.issue_id},true) ; ")
+    ActiveRecord::Base.connection.execute(self.class.sanitize_sql(["SELECT sla_get_level(?,true) ; ", self.issue_id]))
     # Then, let's recalculate the sla_cache_spents !
     SlaCacheSpent.refresh_by_issue_id(self.issue_id)
   end  

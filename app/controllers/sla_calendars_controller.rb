@@ -83,7 +83,11 @@ class SlaCalendarsController < ApplicationController
         format.html do
           flash[:notice] = l(
             "sla_label.sla_calendar.notice_successful_create",
-            id: view_context.link_to("##{@sla_calendar.id}", sla_calendar_path(@sla_calendar), title: @sla_calendar.name)
+            id: view_context.link_to(
+              "##{@sla_calendar.id}",
+              sla_calendar_path(@sla_calendar),
+              title: @sla_calendar.name
+            )
           )
           redirect_back_or_default sla_calendars_path
         end

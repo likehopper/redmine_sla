@@ -78,7 +78,11 @@ class SlaHolidaysController < ApplicationController
         format.html do
           flash[:notice] = l(
             "sla_label.sla_holiday.notice_successful_create",
-            :id => view_context.link_to("##{@sla_holiday.id}", sla_holiday_path(@sla_holiday), :title => @sla_holiday.name)
+            :id => view_context.link_to(
+              "##{@sla_holiday.id}",
+              sla_holiday_path(@sla_holiday),
+              :title => @sla_holiday.name
+            )
           )
           redirect_back_or_default sla_holidays_path
         end

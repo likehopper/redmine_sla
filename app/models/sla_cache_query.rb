@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# Redmine SLA - Redmine's Plugin 
+# File: redmine_sla/app/models/sla_cache_query.rb
+# Redmine SLA - Redmine's Plugin
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License

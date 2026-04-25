@@ -50,7 +50,7 @@ module SlaDocumentationHelperTest
     quality: 80,
     full_page: true
   )
-    suite = ENV['SUITE'] || 'default'
+    suite = @current_suite || ENV['SUITE'] || 'default'
     path  = Rails.root.join('tmp', 'redmine_sla', 'screenshots', suite, name)
     FileUtils.mkdir_p(File.dirname(path))
 

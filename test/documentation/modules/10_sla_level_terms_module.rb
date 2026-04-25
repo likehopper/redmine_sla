@@ -56,6 +56,7 @@ module SlaLevelTermsDocumentationTest
       # Take the photo and submit the form
       take_doc_screenshot(format('%02d-01-%02d-01-sla_level_term-new.png', id, idx))
       click_button l('sla_label.sla_level_term.save')
+      assert_current_path sla_levels_path
 
       # Validation and screenshot
       assert_text(l('sla_label.sla_level.notice_successful_update', id: "##{sla_level.id}"))
