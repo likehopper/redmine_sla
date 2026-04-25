@@ -34,17 +34,12 @@ module RedmineSla
     # Patch module applied to Redmine's Issue model.
     module IssuePatch
 
-      # Used in IssueQueryPatch and in sla_issues_helper/_show to display the
-      # SLA level in list columns.
-      #
-      # Examples:
-      #   self.get_sla_cache.sla_level
-      #     → "to_s" on sla_level returns the name by default
-      #
-      #   self.get_sla_cache.sla_level[:id]
-      #   self.get_sla_cache.sla_level[:name]
+      # Returns the SLA cache entry for this issue.
+      # Memoized: sla_get_level SQL function is called at most once per Issue instance
+      # per request, regardless of how many SLA columns are rendered.
       def get_sla_cache
-        SlaCache.find_by_issue_id(id)
+        return @sla_cache if defined?(@sla_cache)
+        @sla_cache = SlaCache.find_by_issue_id(id)
       end
 
       # Returns the SLA level associated with the current issue, if any.
@@ -53,15 +48,23 @@ module RedmineSla
       end
 
       # Returns the expected SLA delay (term) for a given SLA type.
+      # Memoized per sla_type_id: avoids redundant lookups when get_sla_remain
+      # and get_sla_respect both call get_sla_term for the same type.
       def get_sla_term(sla_type_id)
-        sla_level_term = SlaLevelTerm.find_by_issue_and_type_id(self,sla_type_id)
-        sla_level_term.term if ! sla_level_term.nil? 
+        @sla_term_cache ||= {}
+        return @sla_term_cache[sla_type_id] if @sla_term_cache.key?(sla_type_id)
+        sla_level_term = SlaLevelTerm.find_by_issue_and_type_id(self, sla_type_id)
+        @sla_term_cache[sla_type_id] = sla_level_term&.term
       end
 
       # Returns the effective SLA time spent for a given SLA type.
+      # Memoized per sla_type_id: sla_get_spent SQL function is called at most once
+      # per (Issue instance, sla_type_id) per request.
       def get_sla_spent(sla_type_id)
-        sla_cache_spent = SlaCacheSpent.find_by_issue_and_type_id(self,sla_type_id)
-        sla_cache_spent.spent if ! sla_cache_spent.nil? && ! self.get_sla_term(sla_type_id).nil?
+        @sla_spent_cache ||= {}
+        return @sla_spent_cache[sla_type_id] if @sla_spent_cache.key?(sla_type_id)
+        sla_cache_spent = SlaCacheSpent.find_by_issue_and_type_id(self, sla_type_id)
+        @sla_spent_cache[sla_type_id] = sla_cache_spent&.spent unless get_sla_term(sla_type_id).nil?
       end
 
       # Used in IssueQueryPatch to display SLA remaining time in list columns.
@@ -73,7 +76,7 @@ module RedmineSla
         # TODO: SlaLog: handle nil/zero spent values
 
         ( sla_term - sla_spent ) if sla_term && sla_spent
-      end      
+      end
 
       # Used in IssueQueryPatch to display SLA respect (boolean) in list columns.
       #
@@ -89,13 +92,13 @@ module RedmineSla
         if sla_term && sla_spent
           term_i = sla_term.to_i
           spent_i = sla_spent.to_i
-          
+
           # Logic: respected if term is not strictly less than spent.
           ( ! ( term_i < spent_i ) )
         else
           nil # Returns nil if the SLA data is missing
         end
-      end      
+      end
 
       # For SlaCacheQuery#group_by:
       # Dynamically define convenience methods on Issue such as:
