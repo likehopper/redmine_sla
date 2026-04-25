@@ -20,9 +20,42 @@ require File.expand_path('../../application_sla_units_test_case', __FILE__)
 
 class SlaTypeTest < ApplicationSlaUnitsTestCase
 
-  test "should not save SlaType without name" do
-    sla_type = SlaType.new
-    assert_not sla_type.save, "Saved the SlaType without name"
+  # Fixtures: "GTI" (id 1) and "GTR" (id 2) already exist.
+
+  # --- Passing cases ---
+
+  test "valid sla_type with a unique name" do
+    assert SlaType.new(name: "NEW_TYPE_TEST").valid?
+  end
+
+  test "to_s returns the name" do
+    assert_equal "GTI", SlaType.find(1).to_s
+  end
+
+  # --- Presence validation ---
+
+  test "should not save without name" do
+    t = SlaType.new
+    assert_not t.valid?
+    assert t.errors[:name].present?
+  end
+
+  # --- Uniqueness: case-insensitive ---
+
+  test "should reject an exact duplicate name" do
+    t = SlaType.new(name: "GTI")
+    assert_not t.valid?, "Duplicate name should be rejected"
+    assert t.errors[:name].present?
+  end
+
+  test "should reject the same name in different case" do
+    t = SlaType.new(name: "gti")
+    assert_not t.valid?, "Case-insensitive duplicate should be rejected"
+    assert t.errors[:name].present?
+  end
+
+  test "a distinct name is valid" do
+    assert SlaType.new(name: "GTR_PREMIUM").valid?
   end
 
 end
