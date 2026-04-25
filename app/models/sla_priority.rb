@@ -62,11 +62,19 @@ class SlaPriority
 
   # TODO : all ( IssuePriority + ScfPriority ) use in SlaLevel for make filter !!!
   def self.all
-    priorities = []
-    SlaLevel.joins(:sla_level_terms).distinct.pluck(:custom_field_id,:sla_priority_id).each { |custom_field_id,sla_priority_id|
-      priorities << SlaPriority.create(custom_field_id).find_by_priority_id(sla_priority_id)
+    pairs = SlaLevel.joins(:sla_level_terms).distinct.pluck(:custom_field_id, :sla_priority_id)
+
+    nil_priority_ids = pairs.select { |cf_id, _| cf_id.nil? }.map(&:last).compact.uniq
+    preloaded = IssuePriority.active.where(id: nil_priority_ids).index_by(&:id)
+
+    pairs.filter_map { |custom_field_id, sla_priority_id|
+      if custom_field_id.nil?
+        priority = preloaded[sla_priority_id]
+        SlaPriorityValue.new({ id: priority.id, name: priority.name }) if priority
+      else
+        SlaPriorityScf.new(custom_field_id).find_by_priority_id(sla_priority_id)
+      end
     }
-    priorities
   end
 
   private
