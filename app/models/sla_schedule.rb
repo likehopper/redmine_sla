@@ -47,7 +47,7 @@ class SlaSchedule < ActiveRecord::Base
     :message => l('sla_label.sla_schedule.exists')
 
   validates_uniqueness_of :sla_calendar_id,
-    :scope => [ :dow, :start_time, :end_time ],
+    :scope => [ :dow, :end_time ],
     :message => l('sla_label.sla_schedule.exists')
 
   validate :sla_schedules_inconsistency
