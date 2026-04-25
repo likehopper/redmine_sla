@@ -159,7 +159,7 @@ class SlaCachesController < ApplicationController
     if @sla_caches.size == 1
       @sla_cache = @sla_caches.first
     end
-    can_show    = User.current.admin?
+    can_show    = @sla_caches.detect { |c| !c.visible? }.nil?
     can_refresh = @sla_caches.detect { |c| !c.visible? }.nil?
     can_delete  = @sla_caches.detect { |c| !c.deletable? }.nil?
     @can = { show: can_show, refresh: can_refresh, delete: can_delete }
