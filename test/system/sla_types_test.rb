@@ -74,8 +74,7 @@ class SlaTypesHelperSystemTest < ApplicationSlaSystemTestCase
     # Use click_button with visible label — find('input[name=commit]') unreliable in headless Chrome
     click_button l('sla_label.sla_type.new')
 
-    # Wait for redirect first — ensures the server has committed the transaction
-    assert_equal sla_types_path, current_path
+    assert_current_path sla_types_path
 
     # Query DB after redirect is confirmed (server connection has committed)
     sla_type = SlaType.find_by_name(sla_type_name)

@@ -79,8 +79,7 @@ class SlaStatusesHelperSystemTest < ApplicationSlaSystemTestCase
     # Use click_button with visible label — find('input[name=commit]') unreliable in headless Chrome
     click_button l('sla_label.sla_status.new')
 
-    # Wait for redirect first — ensures the server has committed the transaction
-    assert_equal sla_statuses_path, current_path
+    assert_current_path sla_statuses_path
 
     # Query DB after redirect is confirmed (server connection has committed)
     sla_status = SlaStatus.find_by(

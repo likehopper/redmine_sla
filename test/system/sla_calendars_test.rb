@@ -71,8 +71,7 @@ class SlaCalendarsHelperSystemTest < ApplicationSlaSystemTestCase
     fill_in 'sla_calendar_name', :with => sla_calendar_name
     click_button l('sla_label.sla_calendar.new')
 
-    # Wait for redirect first — ensures the server has committed the transaction
-    assert_equal sla_calendars_path, current_path
+    assert_current_path sla_calendars_path
     assert_selector 'div#flash_notice', visible: true
 
     # Query DB after redirect is confirmed (server connection has committed)
