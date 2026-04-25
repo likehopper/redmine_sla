@@ -75,22 +75,24 @@ class SlaStatusesHelperSystemTest < ApplicationSlaSystemTestCase
     within('form#sla-status-form') do
       select sla_type.name, from: "sla_status_sla_type_id"
       select issue_status_name, from: "sla_status_status_id"
-      find('input[name=commit]').click
     end
+    # Use click_button with visible label — find('input[name=commit]') unreliable in headless Chrome
+    click_button l('sla_label.sla_status.new')
 
-    # find created issue
-    sla_status = SlaStatus.find_by(sla_type_id: SlaType.find_by(name: sla_type.name), status_id: IssueStatus.find_by(name: issue_status_name))
+    # Wait for redirect first — ensures the server has committed the transaction
+    assert_equal sla_statuses_path, current_path
+
+    # Query DB after redirect is confirmed (server connection has committed)
+    sla_status = SlaStatus.find_by(
+      sla_type_id: SlaType.find_by(name: sla_type.name),
+      status_id:   IssueStatus.find_by(name: issue_status_name)
+    )
     assert_kind_of SlaStatus, sla_status
 
-    # check redirection
+    # check flash notice
     find 'div#flash_notice',
       :visible => true,
       :text => l("sla_label.sla_status.notice_successful_create", :id => "##{sla_status.id}" )
-    assert_equal sla_statuses_path, current_path
-
-    # TODO : check SlaStatus#show
-    # visit "/sla/statuses/#{sla_status.id}"
-    # compate sla_status attributs
 
     # check issue attributes
     assert_equal sla_type.name, sla_status.sla_type.name
