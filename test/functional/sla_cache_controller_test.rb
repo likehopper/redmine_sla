@@ -500,6 +500,72 @@ class SlaCachesControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
+  ### context_menu ###
+  # Tests for the context_menu action.
+  # Key fix: can_show was previously User.current.admin? — only admin saw the
+  # "show" link. It now uses visible? (same as can_refresh), so any user with
+  # :view_sla on the issue's project sees the link.
+
+  test "should redirect on get context_menu as anonymous" do
+    sla_cache = SlaCache.first
+    with_settings :default_language => "en" do
+      get :context_menu, params: { ids: [sla_cache.id] }
+      assert_response :redirect
+      assert_redirected_to %r{#{signin_path}}
+    end
+  end
+
+  test "should success on get context_menu as admin and show the show-link" do
+    sla_cache = SlaCache.first
+    @request.session[:user_id] = 1
+    with_settings :default_language => "en" do
+      get :context_menu, params: { ids: [sla_cache.id] }
+      assert_response :success
+      assert_select 'a.icon-magnifier'
+    end
+  end
+
+  # Before the fix, can_show = User.current.admin? → false for manager → no show link.
+  # After the fix, can_show = visible? → true for manager with :view_sla → show link present.
+  test "should success on get context_menu as manager and show the show-link" do
+    sla_cache = SlaCache.first
+    @request.session[:user_id] = 2
+    with_settings :default_language => "en" do
+      get :context_menu, params: { ids: [sla_cache.id] }
+      assert_response :success
+      assert_select 'a.icon-magnifier'
+    end
+  end
+
+  test "should success on get context_menu as developer on project 1 and show the show-link" do
+    sla_cache = SlaCache.where(project: 1).order(:id).first
+    @request.session[:user_id] = 3
+    with_settings :default_language => "en" do
+      get :context_menu, params: { ids: [sla_cache.id] }
+      assert_response :success
+      assert_select 'a.icon-magnifier'
+    end
+  end
+
+  test "should forbidden on get context_menu as reporter" do
+    sla_cache = SlaCache.first
+    @request.session[:user_id] = 5
+    with_settings :default_language => "en" do
+      get :context_menu, params: { ids: [sla_cache.id] }
+      assert_response :forbidden
+    end
+  end
+
+  test "should forbidden on get context_menu as other" do
+    sla_cache = SlaCache.first
+    @request.session[:user_id] = 6
+    with_settings :default_language => "en" do
+      get :context_menu, params: { ids: [sla_cache.id] }
+      assert_response :forbidden
+    end
+  end
+
+
   ### As other #6 ###
 
   test "should forbidden on get index as other" do
