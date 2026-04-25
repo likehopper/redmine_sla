@@ -1,5 +1,55 @@
 # Changelog
 
+## 2.0.4 (Stable - Redmine 6.x)
+
+### Security
+
+-   Fix: replace `User.current.admin?` with `visible?` check in context menus
+    to apply proper role-based visibility (PR #43).
+-   Fix: SQL injection via `sanitize_sql` in `SlaCache` and `SlaCacheSpent`
+    (PR #36).
+
+### Bug Fixes
+
+-   Fix: duplicate `validates_uniqueness_of` in `SlaSchedule` removed (PR #42).
+-   Fix: improved error handling in `refresh` action and priority lookup
+    (PR #41).
+-   Fix: schedule time normalization and status path resolution (PR #36).
+
+### Performance
+
+-   Perf: memoize `get_sla_cache`, `get_sla_term` and `get_sla_spent` on
+    `Issue` to avoid redundant queries (PR #38).
+-   Perf: fix N+1 queries and duplicate `default_scope` in SLA models (PR #37).
+
+### Refactoring
+
+-   Refactor: extract `build_sla_column` to eliminate duplication in
+    `available_columns` (PR #39).
+
+### Testing
+
+-   Fix: replace `assert_equal` path comparison with `assert_current_path`
+    in system tests (PR #40).
+-   Fix: add `include Redmine::I18n` to `SlaSchedule` so the
+    `sla_schedules_inconsistency` validator can call `l()` as an instance
+    method (was raising `NoMethodError` in unit tests).
+-   Test: comprehensive unit tests for all models — `SlaSchedule`,
+    `SlaHoliday`, `SlaCalendarHoliday`, `SlaStatus`, `SlaType`,
+    `SlaLevelTerm`, `SlaProjectTracker`, `SlaCache`, `SlaCacheSpent`,
+    `SlaViewJournal`, `SlaLog` — covering presence, uniqueness,
+    numericality, inconsistency and read-only constraints.
+-   Test: version consistency suite (`sla_plugin_version_test`) verifying
+    semver format, plugin registry alignment and CHANGELOG coverage.
+-   Test: context\_menu authorization for `SlaCache` — non-admin users
+    with `:view_sla` now correctly see the show link (regression guard for
+    PR #43).
+-   Test: functional test suites for `SlaSchedulesController` and
+    `SlaProjectTrackersController` (both were completely untested),
+    covering all CRUD actions and context\_menu across all user roles.
+
+------------------------------------------------------------------------
+
 ## 2.0.3 (Stable - Redmine 6.x)
 
 ### Documentation
