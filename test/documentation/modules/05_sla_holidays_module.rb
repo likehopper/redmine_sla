@@ -40,6 +40,7 @@ module SlaHolidaysDocumentationTest
       # Take the photo and submit the form
       take_doc_screenshot(format("%02d-01-%02d-01-sla_holiday-new.png", id, idx)) if idx==1
       click_button l("sla_label.sla_holiday.new")
+      assert_current_path sla_holidays_path
 
       # Search for the record
       sla_holiday = SlaHoliday.find_by!(
