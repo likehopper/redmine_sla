@@ -33,8 +33,7 @@ class SlaCacheQuery < Query
     add_available_filter "issue.tracker_id", :type => :list_with_history, :name => l("label_attribute_of_issue",:name => l(:field_tracker)), :values => lambda {trackers.map {|t| [t.name, t.id.to_s]}}
     add_available_filter "issue.status_id", :type => :list_status, :name => l("label_attribute_of_issue", :name => l(:field_status)), :values => lambda {issue_statuses_values}
 
-    if ! project.nil?
-      SlaType.joins(:sla_project_trackers).where("sla_project_trackers.project_id = ?", project.id).select("sla_types.id, sla_types.name").distinct.each { |sla_type|
+    sla_types_for_project.each { |sla_type|
         # SLA Term : Filter ?
         # SLA Spent : Filter ?
         # SLA Remain : Filter
@@ -59,8 +58,7 @@ class SlaCacheQuery < Query
             sql_for_slas_sla_respect_field(field,operator,value,sla_type.id)
           end
         end
-      }
-    end
+    }
 
   end
 
@@ -77,9 +75,7 @@ class SlaCacheQuery < Query
     @available_columns << QueryAssociationColumn.new(:issue, :status, :caption => :field_status, :sortable => "#{IssueStatus.table_name}.position" )
     @available_columns << QueryAssociationColumn.new(:issue, :tracker, :caption => :field_tracker, :sortable => "#{Tracker.table_name}.position" )
     
-    if ! project.nil?
-
-      SlaType.joins(:sla_project_trackers).where("sla_project_trackers.project_id = ?", project.id).select("sla_types.id, sla_types.name").distinct.each { |sla_type|
+    sla_types_for_project.each { |sla_type|
 
         # SLA Term : Column
         name_to_sym = "get_sla_spent_#{sla_type.id}".to_sym
@@ -184,9 +180,7 @@ class SlaCacheQuery < Query
         # end
         @available_columns << get_sla_respect        
 
-      }
-
-    end
+    }
 
     @available_columns
   end
@@ -359,6 +353,18 @@ class SlaCacheQuery < Query
       values << [name.to_s,id.to_s]
     }
     @all_sla_level_values = values
+  end
+
+  private
+
+  def sla_types_for_project
+    return [] if project.nil?
+    @sla_types_for_project ||= SlaType
+      .joins(:sla_project_trackers)
+      .where("sla_project_trackers.project_id = ?", project.id)
+      .select("sla_types.id, sla_types.name")
+      .distinct
+      .to_a
   end
 
 end
