@@ -65,6 +65,8 @@ class SlaCacheSpent < ActiveRecord::Base
   def self.refresh_by_issue_id(issue_id)
     SlaType.all.each do |sla_type|
       ActiveRecord::Base.connection.execute(sanitize_sql(["SELECT sla_get_spent(?,?) ; ", issue_id, sla_type.id]))
+    rescue ActiveRecord::StatementInvalid => e
+      Rails.logger.error "[SLA] SlaCacheSpent.refresh_by_issue_id failed for issue ##{issue_id}, sla_type ##{sla_type.id}: #{e.message}"
     end
   end
 

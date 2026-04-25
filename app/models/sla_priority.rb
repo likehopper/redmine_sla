@@ -50,9 +50,9 @@ class SlaPriority
 
   # For display one SlaPriority by Priority in Query/Filter
   def find_by_priority_id(priority_id)
-    # TODO : LOG : on ActiveRecord::RecordNotFound si find et nil si find_by
-    priority = IssuePriority.active.find(priority_id)
-    self.create_value(priority.id,priority.name)
+    priority = IssuePriority.active.find_by(id: priority_id)
+    return nil if priority.nil?
+    self.create_value(priority.id, priority.name)
   end  
 
   # For display all SlaPriority in SlaLevel views after self.create ( base on all values of IssuePriority )
