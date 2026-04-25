@@ -33,8 +33,6 @@ class SlaProjectTracker < ActiveRecord::Base
   extend Redmine::I18n
   include Redmine::SafeAttributes
 
-  default_scope { joins(:tracker) }  
-
   validates_presence_of :project
   validates_presence_of :tracker
   validates_presence_of :sla
