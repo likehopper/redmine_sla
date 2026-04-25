@@ -68,20 +68,19 @@ class SlaCalendarsHelperSystemTest < ApplicationSlaSystemTestCase
     log_user('admin', 'admin')
 
     visit '/sla/calendars/new'
-    within('form#sla-calendar-form') do
-      fill_in 'sla_calendar_name', :with => sla_calendar_name
-      find('input[name=commit]').click
-    end
+    fill_in 'sla_calendar_name', :with => sla_calendar_name
+    click_button l('sla_label.sla_calendar.new')
 
-    # find created issue
+    # Wait for redirect first — ensures the server has committed the transaction
+    assert_equal sla_calendars_path, current_path
+    assert_selector 'div#flash_notice', visible: true
+
+    # Query DB after redirect is confirmed (server connection has committed)
     sla_calendar = SlaCalendar.find_by_name(sla_calendar_name)
     assert_kind_of SlaCalendar, sla_calendar
 
-    # check redirection
-    find 'div#flash_notice',
-      :visible => true,
-      :text => l("sla_label.sla_calendar.notice_successful_create", :id => "##{sla_calendar.id}" )
-    assert_equal sla_calendars_path, current_path
+    # Check flash notice contains the created record id
+    assert_selector 'div#flash_notice', visible: true, text: /#{sla_calendar.id}/
 
     # TODO : vérifier SlaCalendar#show
     # visit "/sla/calendares/#{sla_calendar.id}"

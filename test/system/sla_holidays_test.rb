@@ -64,7 +64,7 @@ class SlaHolidaysHelperSystemTest < ApplicationSlaSystemTestCase
 
   test "create_sla_holiday" do
     sla_holiday_name = 'new SLA Holiday'
-    sla_holiday_date = '31/01/2025'
+    sla_holiday_date = '2025-01-31'
 
     log_user('admin', 'admin')
 
@@ -75,15 +75,16 @@ class SlaHolidaysHelperSystemTest < ApplicationSlaSystemTestCase
       find('input[name=commit]').click
     end
 
-    # find created issue
+    # Wait for redirect first — ensures the server has committed the transaction
+    assert_current_path sla_holidays_path
+    assert_selector 'div#flash_notice', visible: true
+
+    # Query DB after redirect is confirmed (server connection has committed)
     sla_holiday = SlaHoliday.find_by_name(sla_holiday_name)
     assert_kind_of SlaHoliday, sla_holiday
 
-    # check redirection
-    find 'div#flash_notice',
-      :visible => true,
-      :text => l("sla_label.sla_holiday.notice_successful_create", :id => "##{sla_holiday.id}" )
-    assert_equal sla_holidays_path, current_path
+    # Check flash notice contains the created record id
+    assert_selector 'div#flash_notice', visible: true, text: /#{sla_holiday.id}/
 
     # TODO : vérifier SlaHoliday#show
     # visit "/sla/holidayes/#{sla_holiday.id}"

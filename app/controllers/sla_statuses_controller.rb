@@ -83,7 +83,7 @@ class SlaStatusesController < ApplicationController
             "sla_label.sla_status.notice_successful_create",
             :id => view_context.link_to(
               "##{@sla_status.id}",
-              sla_path(@sla_status),
+              sla_status_path(@sla_status),
               :title => @sla_status.sla_type.name + " / " + @sla_status.status.name
             )
           )

@@ -38,6 +38,7 @@ module SlasDocumentationTest
       # Take the photo and submit the form
       take_doc_screenshot(format('%02d-01-%02d-01-sla-new.png', id, idx))
       click_button(l('sla_label.sla.new'))
+      assert_current_path slas_path
 
       # Search for the record
       sla = Sla.find_by!(name: sla_name)

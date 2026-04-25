@@ -38,6 +38,7 @@ module SlaTypesDocumentationTest
       # Take the photo and submit the form
       take_doc_screenshot(format("%02d-01-%02d-01-sla_type-new.png", id, idx))
       click_button(l('sla_label.sla_type.new'))
+      assert_current_path sla_types_path
 
       # Search for the record
       sla_type = SlaType.find_by!(name: sla_type_name)

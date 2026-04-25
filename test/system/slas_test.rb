@@ -65,12 +65,13 @@ class SlasHelperSystemTest < ApplicationSlaSystemTestCase
     sla_name = 'new Sla'
     log_user('admin', 'admin')
     visit '/sla/slas/new'
-    within('form#sla-form') do
-      fill_in 'sla_name', :with => sla_name
-      find('input[name=commit]').click
-    end
+    fill_in 'sla_name', :with => sla_name
+    click_button l('sla_label.sla.new')
 
-    # find created issue
+    # Wait for redirect first — ensures the server has committed the transaction
+    assert_current_path slas_path
+
+    # Query DB after redirect is confirmed (server connection has committed)
     sla = Sla.find_by_name(sla_name)
     assert_kind_of Sla, sla
 
@@ -78,7 +79,6 @@ class SlasHelperSystemTest < ApplicationSlaSystemTestCase
     find 'div#flash_notice',
       :visible => true,
       :text => l("sla_label.sla.notice_successful_create", :id => "##{sla.id}" )
-    assert_equal slas_path, current_path
 
     # TODO : check SlaStatus#show
     # visit "/sla/statuses/#{sla_status.id}"
