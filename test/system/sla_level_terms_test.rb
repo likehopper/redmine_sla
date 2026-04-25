@@ -69,19 +69,17 @@ class SlaLevelTermsHelperSystemTest < ApplicationSlaSystemTestCase
     log_user('admin', 'admin')
 
     visit "/sla/levels/#{sla_level.id}/sla_terms"
-    within('form#sla-level-terms-form') do
-      fill_in "sla_level_sla_level_terms_attributes_1_1_term", :with => 60
-      find('input[name=commit]').click
-    end
+    fill_in "sla_level_sla_level_terms_attributes_1_1_term", :with => 60
+    click_button l('sla_label.sla_level_term.save')
 
-    # find created issue
-    sla_level_term = SlaLevelTerm.find_by(sla_level_id: sla_level.id,sla_type_id: 1,sla_priority_id: 1)
-
-    # check redirection
+    # Wait for redirect first — ensures the server has committed the transaction
+    assert_current_path sla_levels_path
     find 'div#flash_notice',
       :visible => true,
       :text => l("sla_label.sla_level.notice_successful_update", :id => "##{sla_level.id}" )
-    assert_equal sla_levels_path, current_path
+
+    # Query DB after redirect is confirmed (server connection has committed)
+    sla_level_term = SlaLevelTerm.find_by(sla_level_id: sla_level.id, sla_type_id: 1, sla_priority_id: 1)
 
     # TODO : vérifier SlaLevelTerm#show
     # visit "/sla/level_termes/#{sla_level_term.id}"

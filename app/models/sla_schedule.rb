@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# File: redmine_sla/app/models/sla_schedule.rb
 # Redmine SLA - Redmine's Plugin 
 #
 # This program is free software; you can redistribute it and/or
@@ -53,10 +54,13 @@ class SlaSchedule < ActiveRecord::Base
 
   safe_attributes *%w[sla_calendar_id dow start_time end_time match]
 
+  # Normalize times to full HH:MM:SS only when the value is already a proper
+  # Time/Date object (i.e. successfully cast by ActiveRecord).
+  # Guards against nil, strings, or failed casts that would raise NoMethodError.
   before_save do
-    self.start_time = self.start_time.strftime("%H:%M:00") if self.start_time.present?
-    self.end_time = self.end_time.strftime("%H:%M:59") if self.end_time.present?
-  end  
+    self.start_time = self.start_time.strftime("%H:%M:00") if self.start_time.is_a?(Time)
+    self.end_time   = self.end_time.strftime("%H:%M:59")   if self.end_time.is_a?(Time)
+  end
 
   # No selection limitations
   def self.visible_condition(user, options = {})
@@ -80,19 +84,18 @@ class SlaSchedule < ActiveRecord::Base
 
   private
   
+  # Validate that start_time < end_time, only when both are valid Time objects.
+  # Uses local variables (not ivars) to avoid polluting instance state.
   def sla_schedules_inconsistency
-    # Format datas
-    @start_time = self.start_time.strftime("%H:%M") if self.start_time.present?
-    @end_time = self.end_time.strftime("%H:%M") if self.end_time.present?
-    # Logs 
-    # "==>> sla_schedules_inconsistency ID=#{self.id}, #{self.sla_calendar_id}, #{self.dow}, #{@start_time} #{@end_time}"
-    #Rails.logger.debug "==>> sla_schedules_inconsistency #{@start_time} < #{@end_time}) = #{@start_time < @end_time}"
-    #Rails.logger.debug "==>> sla_schedules_inconsistency ok? #{self.marked_for_destruction?}"
-    # Start must be strictly before end!
-    if not ( @start_time.present? && @end_time.present? && ( @start_time < @end_time ) ) 
-      #Rails.logger.debug "==>> sla_schedules_inconsistency END ERROR"
-      errors.add(:base,l('sla_label.sla_schedule.inconsistency'))
-    end
+    start_str = start_time.strftime("%H:%M") if start_time.is_a?(Time)
+    end_str   = end_time.strftime("%H:%M")   if end_time.is_a?(Time)
+
+    # Skip comparison if either value is missing — presence validations
+    # will already report the blank field error.
+    return unless start_str.present? && end_str.present?
+
+    # Start must be strictly before end.
+    errors.add(:base, l('sla_label.sla_schedule.inconsistency')) unless start_str < end_str
   end
     
 end
