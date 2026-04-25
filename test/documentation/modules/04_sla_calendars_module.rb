@@ -88,6 +88,7 @@ module SlaCalendarsDocumentationTest
       # Take the photo and submit the form
       take_doc_screenshot(format('%02d-01-%02d-01-sla_calendar-new.png', id, idx))
       click_button l("sla_label.sla_calendar.new")
+      assert_current_path sla_calendars_path
 
       # Search for the record
       sla_calendar = SlaCalendar.find_by(name: sla_calendar_name)

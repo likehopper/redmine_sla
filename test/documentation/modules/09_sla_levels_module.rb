@@ -55,6 +55,7 @@ module SlaLevelsDocumentationTest
       # Take the photo and submit the form
       take_doc_screenshot(format("%02d-01-%02d-01-sla_level-new.png", id, idx))
       click_button l("sla_label.sla_level.new")
+      assert_current_path sla_levels_path
 
       # Search for the record
       sla_level = SlaLevel.find_by!(name: sla_level_name)

@@ -80,7 +80,11 @@ class SlaLevelsController < ApplicationController
         format.html do
           flash[:notice] = l(
             "sla_label.sla_level.notice_successful_create",
-            :id => view_context.link_to("##{@sla_level.id}", sla_level_path(@sla_level), :title => @sla_level.name)
+            :id => view_context.link_to(
+              "##{@sla_level.id}",
+              sla_level_path(@sla_level),
+              :title => @sla_level.name
+            )
           )
           redirect_back_or_default sla_levels_path
         end
