@@ -125,8 +125,10 @@ class SlaCachesControllerTest < ApplicationSlaFunctionalsTestCase
       with_settings :default_language => "en" do
         get :index
         assert_response :success
-        assert_select 'script', false
-        assert_select 'p a[href]', text: 'link'
+        assert_select 'div.title-sla_cache p' do
+          assert_select 'script', false
+          assert_select 'a[href]', text: 'link'
+        end
       end
     ensure
       I18n.backend.store_translations(:en, label_sla_notice: original)
