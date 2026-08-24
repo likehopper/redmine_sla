@@ -117,6 +117,24 @@ class SlaCachesControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
+  test "should sanitize label_sla_notice and strip unsafe HTML as admin" do
+    @request.session[:user_id] = 1
+    original = I18n.backend.send(:translations).dig(:en, :label_sla_notice)
+    begin
+      I18n.backend.store_translations(:en, label_sla_notice: 'Cache <a href="%{url}">link</a><script>alert(1)</script>')
+      with_settings :default_language => "en" do
+        get :index
+        assert_response :success
+        assert_select 'div.title-sla_cache p' do
+          assert_select 'script', false
+          assert_select 'a[href]', text: 'link'
+        end
+      end
+    ensure
+      I18n.backend.store_translations(:en, label_sla_notice: original)
+    end
+  end
+
   test "should success on get new as admin" do
     @request.session[:user_id] = 1
     assert_raises ActionController::UrlGenerationError do
