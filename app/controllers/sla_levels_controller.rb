@@ -36,8 +36,6 @@ class SlaLevelsController < ApplicationController
   before_action :find_sla_level,  only: [:show, :edit, :update, :sla_terms]
   before_action :find_sla_levels, only: [:destroy, :context_menu]
 
-  before_action :authorize_global
-
   helper :sla_levels
   helper :context_menus
 
