@@ -28,14 +28,16 @@ class SlaCustomField < IssueCustomField
 
   # TODO : filter on issue with an other method self.find_by_issue ( issue.available_custom_fields.find { |field| field.id == custom_field_id } )
   def self.find(custom_field_id)
-    # TODO : LOG : ERROR : if nil !!!
-    IssueCustomField.find_by(field_format: :enumeration, multiple: :false, is_required:true, id: custom_field_id)
-  end 
+    field = IssueCustomField.find_by(field_format: :enumeration, multiple: :false, is_required:true, id: custom_field_id)
+    Rails.logger.error "SlaCustomField.find: no matching enumeration custom field for id=#{custom_field_id}" if field.nil?
+    field
+  end
 
   # To only list IssueCustomFields of type "enumeration" with single value in SlaLevel#edit
   def self.all
-    # TODO : LOG : NOTICE : if nil 
-    IssueCustomField.where(field_format: :enumeration, multiple: :false, is_required:true)
+    fields = IssueCustomField.where(field_format: :enumeration, multiple: :false, is_required:true)
+    Rails.logger.warn "SlaCustomField.all: no enumeration custom field available" if fields.empty?
+    fields
   end
 
 end
