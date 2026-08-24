@@ -55,10 +55,10 @@ class CreateSlaCacheSpents < ActiveRecord::Migration[5.2]
         say "Created table sla_cache_spents"
 
         # Non-unique indexes on project and issue for reporting/filtering
-        add_index :sla_caches, [:project_id],
+        add_index :sla_cache_spents, [:project_id],
                   unique: false,
                   name: 'sla_cache_spents_projects_key'
-        add_index :sla_caches, [:issue_id],
+        add_index :sla_cache_spents, [:issue_id],
                   unique: false,
                   name: 'sla_cache_spents_issues_key'
         say "Created index on table sla_cache_spents"
