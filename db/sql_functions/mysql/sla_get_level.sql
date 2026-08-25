@@ -126,21 +126,29 @@ BEGIN
           sla_holiday_match.sla_calendar_id = sla_schedules.sla_calendar_id
           AND sla_holiday_match.`date` = DATE(calendar.minutes)
         )
+      -- Every (calendar, date) excluded by a non-matching holiday, computed
+      -- once instead of as a correlated NOT IN re-scanned per candidate
+      -- minute (~10,000 rows) -- that correlated subquery was the dominant
+      -- cost of this query (see the PostgreSQL port for the full writeup).
+      LEFT JOIN
+        (
+          SELECT DISTINCT sla_calendar_holidays.sla_calendar_id AS sla_calendar_id, sla_holidays.`date` AS `date`
+          FROM sla_holidays
+          INNER JOIN sla_calendar_holidays
+            ON (sla_holidays.id = sla_calendar_holidays.sla_holiday_id)
+          WHERE NOT sla_calendar_holidays.`match`
+        ) AS excluded_holidays
+        ON (
+          excluded_holidays.sla_calendar_id = sla_calendars.id
+          AND excluded_holidays.`date` = DATE(calendar.minutes)
+        )
     WHERE
       -- Must match project and tracker SLA configuration
       sla_project_trackers.project_id = v_issue_project_id
       AND sla_project_trackers.tracker_id = v_issue_tracker_id
 
-      -- Exclude declared "non-matching" holidays
-      AND DATE(calendar.minutes) NOT IN (
-        SELECT sla_holidays.`date`
-        FROM sla_holidays
-        INNER JOIN sla_calendar_holidays
-          ON (sla_holidays.id = sla_calendar_holidays.sla_holiday_id)
-        WHERE
-          sla_calendar_holidays.sla_calendar_id = sla_calendars.id
-          AND NOT sla_calendar_holidays.`match`
-      )
+      -- Exclude declared "non-matching" holidays (anti-join: no match found above)
+      AND excluded_holidays.`date` IS NULL
 
       -- Validate either schedule match OR holiday override
       AND (
