@@ -200,7 +200,7 @@ class Redmine::ApiTest::SlaCacheSpentsTest < ApplicationSlaApiTestCase
 
   test "GET /sla/cache_spents.xml should return sla_cache_spents partial for developer" do
     ['developer'].each do |user|
-      # TODO : issue auquel il a accès trier par ordre id asc ???
+      # TODO : issues the user has access to, sorted by ascending id ???
       sla_cache_spent = SlaCacheSpent.where(project: 1).order(:id).first # project-sla-tests-tma
       get "/projects/project-sla-tests-tma/sla/cache_spents.xml?issue.status_id=*&sort=issue",
         headers: credentials(user)

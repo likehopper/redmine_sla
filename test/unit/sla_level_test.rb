@@ -76,7 +76,7 @@ class SlaLevelTest < ApplicationSlaUnitsTestCase
           #sla_cache_spent = SlaCacheSpent.find_or_new(sla_cache.id,sla_type_id)
           #sla_type_spent_issue = sla_cache_spent[:spent]
           sla_spent = issue.get_sla_spent(sla_type_id)
-          # TODO : SlaLog : si valeur nulle
+          # TODO : SlaLog : if value is nil
           next if ( sla_spent.nil? )
 
           # puts "- - - > found > spent = #{sla_type_spent_issue} for term = #{sla_type_term_issue}"

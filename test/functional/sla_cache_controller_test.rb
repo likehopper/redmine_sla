@@ -26,7 +26,7 @@ class SlaCachesControllerTest < ApplicationSlaFunctionalsTestCase
     User.current = nil
     set_language_if_valid 'en'
     # puts "\n>>> Verification SQL : #{ActiveRecord::Base.connection.execute("SELECT count(*) FROM sla_caches").first}"
-    # # On vérifie si la table est vide OU si c'est le premier passage
+    # # Check if the table is empty OR if this is the first run
     # if !defined?(@@sla_update_done) || !@@sla_update_done || SlaCache.count == 0
     #   RedmineSlaTestBootstrap.ensure_update_sla!
     #   @@sla_update_done = true
