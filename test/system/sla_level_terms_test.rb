@@ -81,7 +81,7 @@ class SlaLevelTermsHelperSystemTest < ApplicationSlaSystemTestCase
     # Query DB after redirect is confirmed (server connection has committed)
     sla_level_term = SlaLevelTerm.find_by(sla_level_id: sla_level.id, sla_type_id: 1, sla_priority_id: 1)
 
-    # TODO : vérifier SlaLevelTerm#show
+    # TODO : check SlaLevelTerm#show
     # visit "/sla/level_termes/#{sla_level_term.id}"
     # compate sla_level_term attributs
 
