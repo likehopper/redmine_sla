@@ -57,7 +57,10 @@ class SlaCache < ActiveRecord::Base
   end
 
   def self.find_by_issue_id(issue_id)
-    ActiveRecord::Base.connection.execute(sanitize_sql(["SELECT sla_get_level(?) ; ", issue_id]))
+    # p_refresh_force is passed explicitly (rather than relying on its
+    # PostgreSQL-side default) because MySQL/MariaDB functions cannot have
+    # default parameter values or be overloaded by argument count.
+    ActiveRecord::Base.connection.execute(sanitize_sql(["SELECT sla_get_level(?, false) ; ", issue_id]))
     self.find_by(issue_id: issue_id)
   end
 
@@ -73,7 +76,21 @@ class SlaCache < ActiveRecord::Base
 
   def self.purge(project)
     if ( project.nil? )
-      ActiveRecord::Base.connection.execute("TRUNCATE sla_caches CASCADE ; ")
+      if RedmineSla::DbDialect.adapter == :mysql
+        # MySQL's TRUNCATE has no CASCADE; sla_cache_spents references
+        # sla_caches via a foreign key, so disable checks for this statement.
+        # Separate execute calls: Rails' mysql2 connections don't enable
+        # multi-statement execution by default.
+        connection = ActiveRecord::Base.connection
+        connection.execute("SET FOREIGN_KEY_CHECKS = 0 ;")
+        begin
+          connection.execute("TRUNCATE TABLE sla_caches ;")
+        ensure
+          connection.execute("SET FOREIGN_KEY_CHECKS = 1 ;")
+        end
+      else
+        ActiveRecord::Base.connection.execute("TRUNCATE sla_caches CASCADE ; ")
+      end
     else
       SlaCache.where(project: project.id).delete_all
     end

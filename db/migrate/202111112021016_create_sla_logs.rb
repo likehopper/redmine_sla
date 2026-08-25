@@ -20,27 +20,37 @@ class CreateSlaLogs < ActiveRecord::Migration[5.2]
     
       dir.up do
 
-        # Create ENUM type only if it does not already exist
-        execute <<~SQL
-          DO $$
-          BEGIN
-            IF NOT EXISTS (
-              SELECT 1 FROM pg_type WHERE typname = 'sla_log_level'
-            ) THEN
-              CREATE TYPE sla_log_level AS ENUM
-                ('log_none', 'log_error', 'log_info', 'log_debug');
-            END IF;
-          END;
-          $$;
-        SQL
-        say "Created enum sla_log_level"
+        # Create ENUM type only if it does not already exist.
+        # PostgreSQL-only: MySQL/MariaDB have no standalone named enum type,
+        # ENUM(...) is declared directly on the column instead (see below).
+        if RedmineSla::DbDialect.adapter == :postgresql
+          execute <<~SQL
+            DO $$
+            BEGIN
+              IF NOT EXISTS (
+                SELECT 1 FROM pg_type WHERE typname = 'sla_log_level'
+              ) THEN
+                CREATE TYPE sla_log_level AS ENUM
+                  ('log_none', 'log_error', 'log_info', 'log_debug');
+              END IF;
+            END;
+            $$;
+          SQL
+          say "Created enum sla_log_level"
+        end
 
         # Create diagnostic log table
         create_table :sla_logs do |t|
 
-          # Optional links to project, issue and SLA level
+          # Optional links to project, issue and SLA level.
+          # type: :integer on the Redmine-core references below: those core
+          # tables predate Rails 5.1's bigint-by-default primary keys and
+          # still use `int` ids. PostgreSQL silently allows a bigint foreign
+          # key to reference an int primary key, but MySQL/InnoDB rejects the
+          # type mismatch outright, so the FK column must match exactly.
           t.belongs_to :project,
                        null: true,
+                       type: :integer,
                        foreign_key: {
                          name: 'sla_logs_projects_fkey',
                          on_delete: :cascade
@@ -48,6 +58,7 @@ class CreateSlaLogs < ActiveRecord::Migration[5.2]
 
           t.belongs_to :issue,
                        null: true,
+                       type: :integer,
                        foreign_key: {
                          name: 'sla_logs_issues_fkey',
                          on_delete: :cascade
@@ -60,8 +71,13 @@ class CreateSlaLogs < ActiveRecord::Migration[5.2]
                          on_delete: :cascade
                        }
 
-          # Severity level based on the PostgreSQL ENUM
-          t.column :log_level, :sla_log_level, null: false
+          # Severity level: the named PostgreSQL ENUM type created above, or
+          # (MySQL/MariaDB) an inline ENUM column type with the same values.
+          if RedmineSla::DbDialect.adapter == :mysql
+            t.column :log_level, "ENUM('log_none','log_error','log_info','log_debug')", null: false
+          else
+            t.column :log_level, :sla_log_level, null: false
+          end
 
           # Log message
           t.text :description, null: false
@@ -77,9 +93,12 @@ class CreateSlaLogs < ActiveRecord::Migration[5.2]
         drop_table :sla_logs
         say "Dropped table sla_logs"
 
-        # Then drop ENUM (only if exists)
-        execute "DROP TYPE IF EXISTS sla_log_level;"
-        say "Dropped enum sla_log_level"
+        # Then drop ENUM (only if exists). PostgreSQL-only: MySQL/MariaDB
+        # have no standalone enum type to drop (it lives on the column).
+        if RedmineSla::DbDialect.adapter == :postgresql
+          execute "DROP TYPE IF EXISTS sla_log_level;"
+          say "Dropped enum sla_log_level"
+        end
         
       end 
 

@@ -1,0 +1,630 @@
+---
+fixture_0001:
+  issue_id: 1
+  sla_types: {}
+fixture_0002:
+  issue_id: 2
+  sla_types: {}
+fixture_0003:
+  issue_id: 3
+  sla_types: {}
+fixture_0004:
+  issue_id: 4
+  sla_types:
+    '1':
+      spent: 150
+      term: 1680
+fixture_0005:
+  issue_id: 5
+  sla_types:
+    '1':
+      spent: 150
+      term: 840
+fixture_0006:
+  issue_id: 6
+  sla_types:
+    '1':
+      spent: 150
+      term: 420
+fixture_0007:
+  issue_id: 7
+  sla_types:
+    '1':
+      spent: 30
+      term: 60
+    '2':
+      spent: 90
+      term: 120
+fixture_0008:
+  issue_id: 8
+  sla_types:
+    '1':
+      spent: 30
+      term: 60
+    '2':
+      spent: 105
+      term: 120
+fixture_0009:
+  issue_id: 9
+  sla_types:
+    '1':
+      spent: 30
+      term: 60
+    '2':
+      spent: 90
+      term: 120
+fixture_0010:
+  issue_id: 10
+  sla_types:
+    '1':
+      spent: 30
+      term: 60
+    '2':
+      spent: 90
+      term: 120
+fixture_0011:
+  issue_id: 11
+  sla_types:
+    '1':
+      spent: 30
+      term: 60
+    '2':
+      spent: 90
+      term: 120
+fixture_0012:
+  issue_id: 12
+  sla_types:
+    '1':
+      spent: 75
+      term: 60
+    '2':
+      spent: 90
+      term: 120
+fixture_0013:
+  issue_id: 13
+  sla_types:
+    '1':
+      spent: 30
+      term: 60
+    '2':
+      spent: 210
+      term: 120
+fixture_0014:
+  issue_id: 14
+  sla_types:
+    '1':
+      spent: 35
+      term: 60
+    '2':
+      spent: 155
+      term: 480
+fixture_0015:
+  issue_id: 15
+  sla_types:
+    '1':
+      spent: 65
+      term: 60
+    '2':
+      spent: 275
+      term: 480
+fixture_0016:
+  issue_id: 16
+  sla_types:
+    '1':
+      spent: 5
+      term: 60
+    '2':
+      spent: 515
+      term: 480
+fixture_0017:
+  issue_id: 17
+  sla_types:
+    '1':
+      spent: 55
+      term: 60
+    '2':
+      spent: 575
+      term: 480
+fixture_0018:
+  issue_id: 18
+  sla_types:
+    '1':
+      spent: 30
+      term: 60
+    '2':
+      spent: 55
+      term: 480
+fixture_0019:
+  issue_id: 19
+  sla_types:
+    '1':
+      spent: 90
+      term: 60
+    '2':
+      spent: 270
+      term: 480
+fixture_0020:
+  issue_id: 20
+  sla_types:
+    '1':
+      spent: 90
+      term: 60
+    '2':
+      spent: 510
+      term: 480
+fixture_0021:
+  issue_id: 21
+  sla_types:
+    '1':
+      spent: 30
+      term: 60
+    '2':
+      spent: 510
+      term: 480
+fixture_0022:
+  issue_id: 22
+  sla_types:
+    '1':
+      spent: 20
+      term: 60
+    '2':
+      spent: 57
+      term: 480
+fixture_0023:
+  issue_id: 23
+  sla_types:
+    '1':
+      spent: 60
+      term: 60
+    '2':
+      spent: 270
+      term: 480
+fixture_0024:
+  issue_id: 24
+  sla_types:
+    '1':
+      spent: 60
+      term: 60
+    '2':
+      spent: 60
+      term: 480
+fixture_0025:
+  issue_id: 25
+  sla_types:
+    '1':
+      term: 60
+    '2':
+      spent: 10
+      term: 480
+fixture_0026:
+  issue_id: 26
+  sla_types:
+    '1':
+      spent: 2
+      term: 60
+    '2':
+      spent: 40
+      term: 480
+fixture_0027:
+  issue_id: 27
+  sla_types:
+    '1':
+      spent: 5
+      term: 60
+    '2':
+      spent: 60
+      term: 480
+fixture_0028:
+  issue_id: 28
+  sla_types:
+    '1':
+      spent: 5
+      term: 60
+    '2':
+      spent: 555
+      term: 480
+fixture_0029:
+  issue_id: 29
+  sla_types:
+    '1':
+      spent: 2
+      term: 60
+    '2':
+      spent: 550
+      term: 480
+fixture_0030:
+  issue_id: 30
+  sla_types:
+    '1':
+      spent: 30
+      term: 60
+    '2':
+      spent: 475
+      term: 480
+fixture_0031:
+  issue_id: 31
+  sla_types:
+    '1':
+      spent: 90
+      term: 60
+    '2':
+      spent: 470
+      term: 480
+fixture_0032:
+  issue_id: 32
+  sla_types:
+    '1':
+      spent: 90
+      term: 60
+    '2':
+      spent: 545
+      term: 480
+fixture_0033:
+  issue_id: 33
+  sla_types:
+    '1':
+      spent: 30
+      term: 60
+    '2':
+      spent: 555
+      term: 480
+fixture_0034:
+  issue_id: 34
+  sla_types:
+    '1':
+      spent: 10
+      term: 15
+    '2':
+      spent: 70
+      term: 240
+fixture_0035:
+  issue_id: 35
+  sla_types:
+    '1':
+      spent: 20
+      term: 15
+    '2':
+      spent: 80
+      term: 240
+fixture_0036:
+  issue_id: 36
+  sla_types:
+    '1':
+      spent: 20
+      term: 15
+    '2':
+      spent: 310
+      term: 240
+fixture_0037:
+  issue_id: 37
+  sla_types:
+    '1':
+      spent: 10
+      term: 15
+    '2':
+      spent: 320
+      term: 240
+fixture_0038:
+  issue_id: 38
+  sla_types:
+    '1':
+      spent: 10
+      term: 15
+    '2':
+      spent: 130
+      term: 240
+fixture_0039:
+  issue_id: 39
+  sla_types:
+    '1':
+      spent: 20
+      term: 15
+    '2':
+      spent: 130
+      term: 240
+fixture_0040:
+  issue_id: 40
+  sla_types:
+    '1':
+      spent: 20
+      term: 15
+    '2':
+      spent: 310
+      term: 240
+fixture_0041:
+  issue_id: 41
+  sla_types:
+    '1':
+      spent: 10
+      term: 15
+    '2':
+      spent: 320
+      term: 240
+fixture_0042:
+  issue_id: 42
+  sla_types:
+    '1':
+      spent: 10
+      term: 15
+    '2':
+      spent: 130
+      term: 240
+fixture_0043:
+  issue_id: 43
+  sla_types:
+    '1':
+      spent: 20
+      term: 15
+    '2':
+      spent: 80
+      term: 240
+fixture_0044:
+  issue_id: 44
+  sla_types:
+    '1':
+      spent: 20
+      term: 15
+    '2':
+      spent: 320
+      term: 240
+fixture_0045:
+  issue_id: 45
+  sla_types:
+    '1':
+      spent: 10
+      term: 15
+    '2':
+      spent: 310
+      term: 240
+fixture_0046:
+  issue_id: 46
+  sla_types:
+    '1':
+      spent: 10
+      term: 15
+    '2':
+      spent: 25
+      term: 240
+fixture_0047:
+  issue_id: 47
+  sla_types:
+    '1':
+      spent: 20
+      term: 15
+    '2':
+      spent: 85
+      term: 240
+fixture_0048:
+  issue_id: 48
+  sla_types:
+    '1':
+      spent: 20
+      term: 15
+    '2':
+      spent: 255
+      term: 240
+fixture_0049:
+  issue_id: 49
+  sla_types:
+    '1':
+      spent: 10
+      term: 15
+    '2':
+      spent: 265
+      term: 240
+fixture_0050:
+  issue_id: 50
+  sla_types:
+    '1':
+      spent: 20
+      term: 30
+    '2':
+      spent: 75
+      term: 240
+fixture_0051:
+  issue_id: 51
+  sla_types:
+    '1':
+      spent: 40
+      term: 30
+    '2':
+      spent: 75
+      term: 240
+fixture_0052:
+  issue_id: 52
+  sla_types:
+    '1':
+      spent: 40
+      term: 30
+    '2':
+      spent: 245
+      term: 240
+fixture_0053:
+  issue_id: 53
+  sla_types:
+    '1':
+      spent: 20
+      term: 30
+    '2':
+      spent: 280
+      term: 240
+fixture_0054:
+  issue_id: 54
+  sla_types:
+    '1':
+      spent: 25
+      term: 15
+    '2':
+      spent: 45
+      term: 240
+fixture_0055:
+  issue_id: 55
+  sla_types:
+    '1':
+      spent: 120
+      term: 60
+    '2':
+      spent: 240
+      term: 240
+fixture_0056:
+  issue_id: 56
+  sla_types:
+    '1':
+      spent: 4
+      term: 60
+    '2':
+      spent: 80
+      term: 240
+fixture_0057:
+  issue_id: 57
+  sla_types:
+    '1':
+      spent: 10
+      term: 60
+    '2':
+      spent: 280
+      term: 240
+fixture_0058:
+  issue_id: 58
+  sla_types:
+    '1':
+      spent: 10
+      term: 60
+    '2':
+      spent: 140
+      term: 240
+fixture_0059:
+  issue_id: 59
+  sla_types:
+    '1':
+      spent: 120
+      term: 60
+    '2':
+      spent: 240
+      term: 240
+fixture_0060:
+  issue_id: 60
+  sla_types:
+    '1':
+      spent: 25
+      term: 15
+    '2':
+      spent: 30
+      term: 30
+fixture_0061:
+  issue_id: 61
+  sla_types:
+    '1':
+      spent: 25
+      term: 30
+    '2':
+      spent: 465
+      term: 60
+fixture_0062:
+  issue_id: 62
+  sla_types:
+    '1':
+      spent: 45
+      term: 30
+    '2':
+      spent: 300
+      term: 60
+fixture_0063:
+  issue_id: 63
+  sla_types: {}
+fixture_0064:
+  issue_id: 64
+  sla_types: {}
+fixture_0065:
+  issue_id: 65
+  sla_types: {}
+fixture_0066:
+  issue_id: 66
+  sla_types:
+    '1':
+      spent: 150
+      term: 1680
+fixture_0067:
+  issue_id: 67
+  sla_types:
+    '1':
+      spent: 150
+      term: 840
+fixture_0068:
+  issue_id: 68
+  sla_types:
+    '1':
+      spent: 150
+      term: 420
+fixture_0069:
+  issue_id: 69
+  sla_types:
+    '1':
+      spent: 30
+      term: 120
+    '2':
+      spent: 90
+      term: 240
+fixture_0070:
+  issue_id: 70
+  sla_types:
+    '1':
+      spent: 30
+      term: 120
+    '2':
+      spent: 105
+      term: 240
+fixture_0071:
+  issue_id: 71
+  sla_types:
+    '1':
+      spent: 30
+      term: 120
+    '2':
+      spent: 90
+      term: 240
+fixture_0072:
+  issue_id: 72
+  sla_types:
+    '1':
+      spent: 30
+      term: 120
+    '2':
+      spent: 90
+      term: 240
+fixture_0073:
+  issue_id: 73
+  sla_types:
+    '1':
+      spent: 30
+      term: 120
+    '2':
+      spent: 90
+      term: 240
+fixture_0074:
+  issue_id: 74
+  sla_types:
+    '1':
+      spent: 75
+      term: 60
+    '2':
+      spent: 90
+      term: 120
+fixture_0075:
+  issue_id: 75
+  sla_types:
+    '1':
+      spent: 30
+      term: 60
+    '2':
+      spent: 210
+      term: 120
+fixture_0076:
+  issue_id: 76
+  sla_types:
+    '1':
+      spent: 90
+      term: 60
+    '2':
+      spent: 360
+      term: 120

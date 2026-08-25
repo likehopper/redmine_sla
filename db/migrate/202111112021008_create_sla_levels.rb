@@ -17,7 +17,9 @@ class CreateSlaLevels < ActiveRecord::Migration[5.2]
     create_table :sla_levels do |t|
 
       # Level name (must be unique)
-      t.text :name, null: false,
+      # (string rather than text: MySQL/MariaDB cannot put a unique index on
+      # a full TEXT column without a key-length prefix)
+      t.string :name, limit: 255, null: false,
                     index: { name: 'sla_levels_name_ukey', unique: true }
 
       # Link to the parent SLA
@@ -34,10 +36,16 @@ class CreateSlaLevels < ActiveRecord::Migration[5.2]
                      on_delete: :cascade
                    }
 
-      # Optional link to a Redmine custom field
+      # Optional link to a Redmine custom field.
+      # type: :integer: custom_fields predates Rails 5.1's bigint-by-default
+      # primary keys and still uses an `int` id. PostgreSQL silently allows a
+      # bigint foreign key to reference an int primary key, but MySQL/InnoDB
+      # rejects the type mismatch outright, so the FK column must match
+      # exactly.
       t.belongs_to :custom_field,
                    default: nil,
                    null: true,
+                   type: :integer,
                    foreign_key: {
                      name: 'sla_levels_custom_fields_fkey',
                      on_delete: :cascade

@@ -37,8 +37,14 @@ class CreateSlaLevelTerms < ActiveRecord::Migration[5.2]
 
       # Optional link to a custom field enumeration.
       # The model ensures cascading deletion when a CF enumeration is removed.
+      # type: :integer: custom_field_enumerations predates Rails 5.1's
+      # bigint-by-default primary keys and still uses an `int` id. PostgreSQL
+      # silently allows a bigint foreign key to reference an int primary key,
+      # but MySQL/InnoDB rejects the type mismatch outright, so the FK column
+      # must match exactly.
       t.belongs_to :custom_field_enumeration,
                    null: true,
+                   type: :integer,
                    foreign_key: {
                      name: 'sla_level_terms_custom_field_enumeration_fkey',
                      on_delete: :cascade
@@ -46,8 +52,11 @@ class CreateSlaLevelTerms < ActiveRecord::Migration[5.2]
 
       # Optional link to a Redmine core enumeration (priority).
       # The model ensures cascading deletion when a priority enumeration is removed.
+      # type: :integer: enumerations predates Rails 5.1's bigint-by-default
+      # primary keys and still uses an `int` id -- see the note above.
       t.belongs_to :priority,
                    null: true,
+                   type: :integer,
                    foreign_key: {
                      name: 'sla_level_terms_priority_id_fkey',
                      on_delete: :cascade,
