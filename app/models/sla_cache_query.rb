@@ -96,7 +96,7 @@ class SlaCacheQuery < Query
         LEFT JOIN sla_level_terms ON ( sla_caches.sla_level_id = sla_level_terms.sla_level_id AND sla_level_terms.sla_type_id = #{tid}
           AND sla_level_terms.sla_priority_id = ( CASE
           WHEN sla_levels.custom_field_id IS NULL THEN sla_issues.priority_id
-          ELSE CAST(custom_values.value AS BIGINT) END
+          ELSE CAST(custom_values.value AS #{RedmineSla::DbDialect.bigint_cast_type}) END
           )
         )
         WHERE sla_caches.issue_id = issues.id
@@ -112,7 +112,7 @@ class SlaCacheQuery < Query
         LEFT JOIN sla_level_terms ON ( sla_caches.sla_level_id = sla_level_terms.sla_level_id AND sla_level_terms.sla_type_id = #{tid}
           AND sla_level_terms.sla_priority_id = ( CASE
           WHEN sla_levels.custom_field_id IS NULL THEN sla_issues.priority_id
-          ELSE CAST(custom_values.value AS BIGINT) END
+          ELSE CAST(custom_values.value AS #{RedmineSla::DbDialect.bigint_cast_type}) END
           )
         )
         WHERE sla_issues.id = issues.id
@@ -131,7 +131,7 @@ class SlaCacheQuery < Query
         LEFT JOIN sla_level_terms ON ( sla_caches.sla_level_id = sla_level_terms.sla_level_id AND sla_level_terms.sla_type_id = #{tid}
           AND sla_level_terms.sla_priority_id = ( CASE
           WHEN sla_levels.custom_field_id IS NULL THEN sla_issues.priority_id
-          ELSE CAST(custom_values.value AS BIGINT) END
+          ELSE CAST(custom_values.value AS #{RedmineSla::DbDialect.bigint_cast_type}) END
           )
         )
         WHERE sla_issues.id = issues.id
@@ -192,7 +192,7 @@ class SlaCacheQuery < Query
       LEFT JOIN sla_level_terms ON ( sla_caches.sla_level_id = sla_level_terms.sla_level_id AND sla_level_terms.sla_type_id = #{sla_type_id}
         AND sla_level_terms.sla_priority_id = ( CASE
         WHEN sla_levels.custom_field_id IS NULL THEN issues.priority_id
-        ELSE CAST(custom_values.value AS BIGINT) END
+        ELSE CAST(custom_values.value AS #{RedmineSla::DbDialect.bigint_cast_type}) END
         )
       )
       WHERE sla_issues.id = issues.id
@@ -206,7 +206,7 @@ class SlaCacheQuery < Query
         ( operator == '!' ? 'sla_caches.sla_level_id IS NULL' : 'sla_caches.sla_level_id IS NOT NULL' )
       else
         is_done_val = value.join == '1' ? self.class.connection.quoted_true : self.class.connection.quoted_false
-        "( ( NOT ( sla_level_terms.term < sla_cache_spents.spent ) ) IS #{is_done_val} )"
+        "( ( NOT ( sla_level_terms.term < sla_cache_spents.spent ) ) = #{is_done_val} )"
       end
     selection = "
       SELECT DISTINCT issues.id
@@ -218,7 +218,7 @@ class SlaCacheQuery < Query
       LEFT JOIN sla_level_terms ON ( sla_caches.sla_level_id = sla_level_terms.sla_level_id AND sla_level_terms.sla_type_id = #{sla_type_id}
         AND sla_level_terms.sla_priority_id = ( CASE
         WHEN sla_levels.custom_field_id IS NULL THEN issues.priority_id
-        ELSE CAST(custom_values.value AS BIGINT) END
+        ELSE CAST(custom_values.value AS #{RedmineSla::DbDialect.bigint_cast_type}) END
         )
       )
       WHERE sla_issues.id = issues.id

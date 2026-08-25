@@ -10,7 +10,9 @@ class CreateSlaCalendars < ActiveRecord::Migration[5.2]
     create_table :sla_calendars do |t|
 
       # Calendar name, must be unique across all calendars
-      t.text :name, null: false, index: { name: 'sla_calendars_name_ukey', unique: true }
+      # (string rather than text: MySQL/MariaDB cannot put a unique index on
+      # a full TEXT column without a key-length prefix)
+      t.string :name, limit: 255, null: false, index: { name: 'sla_calendars_name_ukey', unique: true }
 
       # Standard timestamp fields used across the plugin
       t.datetime :created_on, null: false, default: -> { 'CURRENT_TIMESTAMP' }

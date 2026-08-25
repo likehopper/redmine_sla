@@ -107,17 +107,36 @@ BEGIN
   END IF ;
 	
   -- CORE CALCULATION:
-  -- 1. Generate a 1-minute series between start and end dates.
-  -- 2. Filter minutes based on issue status history (roll_statuses).
-  -- 3. Intersect with Business Hours (schedules) and Calendar rules.
-  -- 4. Exclude public holidays.
+  -- 1. Generate one row per CALENDAR DAY between start and end dates (not per
+  --    minute: a status interval can span years, and PostgreSQL's planner
+  --    already handles per-minute generate_series fairly well, but summing a
+  --    closed-form per-day intersection length is dramatically cheaper for
+  --    long-lived issues while producing the exact same total).
+  -- 2. For each day, intersect that day's business-hours window (schedules)
+  --    with the issue's status-history intervals (roll_statuses) and the
+  --    calculation window itself, and sum the resulting minute counts.
+  -- 3. Exclude public holidays.
   SELECT DISTINCT
     NULL::integer AS "id",
     COALESCE( v_sla_spent."sla_cache_id", v_sla_cache."id" ) AS "sla_cache_id",
     v_issue_project_id AS "sla_project_id",
     p_issue_id AS "issue_id",
     p_sla_type_id AS "sla_type_id",
-    COUNT(*) AS "spent",
+    COALESCE(SUM(
+      GREATEST(0, EXTRACT(EPOCH FROM (
+        LEAST(
+          "sla_view_roll_statuses"."to_status_date",
+          "calendar"."day_date" + "sla_schedules"."end_time" + INTERVAL '1 minute',
+          v_issue_closed_on + INTERVAL '1 minute'
+        )
+        -
+        GREATEST(
+          "sla_view_roll_statuses"."from_status_date",
+          "calendar"."day_date" + "sla_schedules"."start_time",
+          v_issue_created_on
+        )
+      )) / 60)
+    ), 0)::integer AS "spent",
     v_current_timestamp AS "created_on",
     v_current_timestamp AS "updated_on"
   INTO
@@ -127,22 +146,22 @@ BEGIN
   INNER JOIN
     "sla_view_roll_statuses" ON ( "issues"."id" = "sla_view_roll_statuses"."issue_id" )
   INNER JOIN
-    ( SELECT generate_series ( v_issue_created_on, v_issue_closed_on, '1 minute' ) AS minutes ) AS "calendar"
-      ON ( "calendar"."minutes" BETWEEN "sla_view_roll_statuses"."from_status_date" AND "sla_view_roll_statuses"."to_status_date" - INTERVAL '1 minute' )
+    ( SELECT generate_series ( DATE_TRUNC('day', v_issue_created_on), DATE_TRUNC('day', v_issue_closed_on), '1 day' ) AS day_date ) AS "calendar"
+      ON TRUE
   INNER JOIN
     "sla_schedules"
-      ON ( DATE_PART('dow',calendar.minutes) = "sla_schedules"."dow" AND "calendar"."minutes"::TIME BETWEEN "sla_schedules"."start_time" AND "sla_schedules"."end_time" )
+      ON ( DATE_PART('dow', calendar.day_date) = "sla_schedules"."dow" )
   INNER JOIN
     "sla_calendars"
       ON ( "sla_calendars"."id" = "sla_schedules"."sla_calendar_id" )
   INNER JOIN
     "sla_levels"
-      ON ( "sla_levels"."sla_calendar_id" = "sla_calendars"."id" AND "sla_levels"."id" = v_sla_cache.sla_level_id ) 
+      ON ( "sla_levels"."sla_calendar_id" = "sla_calendars"."id" AND "sla_levels"."id" = v_sla_cache.sla_level_id )
   INNER JOIN
     "sla_project_trackers"
       ON ( "sla_project_trackers"."sla_id" = "sla_levels"."sla_id" )
   WHERE
-    "issues"."id" = p_issue_id		
+    "issues"."id" = p_issue_id
   AND
     "sla_view_roll_statuses"."from_status_id" IN ( SELECT DISTINCT "sla_statuses"."status_id" FROM "sla_statuses" WHERE "sla_statuses"."sla_type_id" = p_sla_type_id )
   AND
@@ -151,15 +170,28 @@ BEGIN
     "sla_project_trackers"."tracker_id" = "issues"."tracker_id"
   AND
     -- Exclude dates defined in the holiday calendar
-    DATE_TRUNC('day',"calendar"."minutes") NOT IN ( 
+    "calendar"."day_date"::date NOT IN (
       SELECT "sla_holidays"."date"
       FROM "sla_holidays"
       INNER JOIN "sla_calendar_holidays"
-      ON ( "sla_calendar_holidays"."sla_holiday_id" = "sla_holidays"."id" ) 
+      ON ( "sla_calendar_holidays"."sla_holiday_id" = "sla_holidays"."id" )
       WHERE "sla_calendar_holidays"."sla_calendar_id" = "sla_calendars"."id"
       AND NOT "sla_calendar_holidays"."match"
     )
-  ;  
+  AND
+    -- Only keep (day, schedule, status-interval) triples that actually overlap
+    GREATEST(
+      "sla_view_roll_statuses"."from_status_date",
+      "calendar"."day_date" + "sla_schedules"."start_time",
+      v_issue_created_on
+    )
+    <
+    LEAST(
+      "sla_view_roll_statuses"."to_status_date",
+      "calendar"."day_date" + "sla_schedules"."end_time" + INTERVAL '1 minute',
+      v_issue_closed_on + INTERVAL '1 minute'
+    )
+  ;
 
   -- Safety check: Spent time cannot be negative
   IF ( v_sla_spent."spent" < 0 ) THEN 
