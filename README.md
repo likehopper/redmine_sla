@@ -4,6 +4,8 @@
 ![Ruby](https://img.shields.io/badge/Ruby-2.7+-red)
 ![Rails](https://img.shields.io/badge/Rails-6.1+-brightgreen)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-11+-blue)
+![MySQL](https://img.shields.io/badge/MySQL-8.0+-blue)
+![MariaDB](https://img.shields.io/badge/MariaDB-10.2+-blue)
 ![License](https://img.shields.io/github/license/likehopper/redmine_sla)
 
 ![Redmine SLA - Issue Patch](doc/images/redmine_sla_issue_patch.png)
@@ -30,10 +32,10 @@ It enables precise SLA computation based on:
 -   Working calendars (HO / HNO)
 -   SLA levels and priorities
 -   Response and resolution terms
--   PostgreSQL time-based procedures
+-   Time-based database procedures (PostgreSQL or MySQL/MariaDB)
 
 SLA compliance is calculated directly at the database level using
-PL/pgSQL, ensuring:
+stored procedures (PL/pgSQL or MySQL/MariaDB equivalents), ensuring:
 
 -   Deterministic computation
 -   Accurate working-hours handling
@@ -45,8 +47,8 @@ PL/pgSQL, ensuring:
 
 Many SLA implementations rely exclusively on Ruby time computations.
 
-This plugin delegates SLA calculation to **PostgreSQL stored
-procedures**, allowing:
+This plugin delegates SLA calculation to **database stored
+procedures** (PostgreSQL or MySQL/MariaDB), allowing:
 
 -   Accurate handling of working schedules
 -   Holiday-aware deadlines
@@ -73,7 +75,7 @@ The engine is designed for production environments.
 
 ### Core Engine
 
--   PostgreSQL PL/pgSQL SLA computation
+-   Database-native SLA computation (PostgreSQL PL/pgSQL or MySQL/MariaDB stored functions)
 -   Working calendar awareness (HO / HNO)
 -   Response & resolution deadlines
 -   SLA compliance percentage
@@ -152,36 +154,39 @@ Fully manageable through UI and REST API:
 
 ## Prerequisites
 
-| Name               | requirement                      |
-|--------------------|----------------------------------|
-| `Redmine`          | >= 5.0                           |
-| `Ruby`             | >= 2.7                           |
-| `Rails`            | >= 6.1                           |
-| `Database`         | PostgreSQL >= 11                 |
+| Name               | requirement                                  |
+|--------------------|-----------------------------------------------|
+| `Redmine`          | >= 5.0                                       |
+| `Ruby`             | >= 2.7                                       |
+| `Rails`            | >= 6.1                                       |
+| `Database`         | PostgreSQL >= 11, or MySQL >= 8.0 / MariaDB >= 10.2 |
 
 ------------------------------------------------------------------------
 
-### ⚠ PostgreSQL Requirement
+### ⚠ Database Requirement
 
-This plugin relies heavily on:
-
--   PostgreSQL views
--   PL/pgSQL stored procedures
--   SQL schema format
-
-In `config/application.rb`:
+This plugin relies heavily on database-native views and stored
+procedures (PL/pgSQL on PostgreSQL, stored functions on MySQL/MariaDB)
+and on the SQL schema format. In `config/application.rb`:
 
 ``` ruby
 config.active_record.schema_format = :sql
 ```
 
-This is mandatory for proper installation.
+This is mandatory for proper installation, on both PostgreSQL and
+MySQL/MariaDB.
 
-MySQL and SQLite are **not supported**.
+SQLite is **not supported**.
+
+On MySQL/MariaDB, versions below 8.0 (MySQL) or 10.2 (MariaDB) are
+**not supported**: the SQL functions rely on recursive CTEs and window
+functions that only exist from those versions onward.
 
 ------------------------------------------------------------------------
 
 ### Database Configuration
+
+#### PostgreSQL
 
 Ensure PostgreSQL datestyle is set to ISO:
 
@@ -194,6 +199,33 @@ Recommended configuration:
 ``` ruby
 config.active_record.default_timezone = :local
 ```
+
+Prefer global timezone configuration set to:
+
+    Etc/UTC
+
+#### MySQL / MariaDB
+
+Two server-side prerequisites are required before migrating the
+plugin:
+
+-   **Time zone tables must be loaded**, since SLA calculations
+    convert timestamps through the server's time zone data:
+
+    ``` bash
+    mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p mysql
+    ```
+
+-   **`log_bin_trust_function_creators` must be enabled** if binary
+    logging is active on the server, otherwise creating the plugin's
+    SQL functions fails with error 1418:
+
+    ``` sql
+    SET GLOBAL log_bin_trust_function_creators = 1;
+    ```
+
+    This can also be set permanently in the server's configuration
+    file (`log_bin_trust_function_creators = 1` under `[mysqld]`).
 
 Prefer global timezone configuration set to:
 

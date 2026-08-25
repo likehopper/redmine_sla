@@ -1,5 +1,27 @@
 # Changelog
 
+## Unreleased
+
+### Features
+
+-   Add MySQL 8.0+ / MariaDB 10.2+ support alongside PostgreSQL. SLA
+    computation functions and views are now selected per database
+    adapter via `RedmineSla::DbDialect`, with dedicated
+    `db/sql_functions/{postgresql,mysql}` and
+    `db/sql_views/{postgresql,mysql}` implementations (PR #52).
+
+### Performance
+
+-   Perf: `sla_get_level`/`sla_get_spent` no longer filter out
+    non-matching holidays with a correlated subquery re-evaluated per
+    candidate row; replaced with a precomputed exclusion set joined
+    via an anti-join. PostgreSQL `sla_get_level` also dropped a
+    redundant `DISTINCT` made unnecessary by `LIMIT 1`. Benchmarked on
+    a 20k-issue synthetic dataset: PostgreSQL `sla_get_level` 48.1ms
+    -&gt; 5.6ms avg, `sla_get_spent` 10.6ms -&gt; 3.9ms avg (PR #53).
+
+------------------------------------------------------------------------
+
 ## 2.0.4 (Stable - Redmine 6.x)
 
 ### Security
