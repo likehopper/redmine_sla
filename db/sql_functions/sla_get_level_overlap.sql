@@ -26,12 +26,12 @@ FROM
         NOW() + INTERVAL '7 days',
         '1 minute'
       ) AS minutes
-    ) AS "calendrier"
+    ) AS "calendar"
 
     INNER JOIN "sla_schedules"
       ON (
-        DATE_PART('dow', "calendrier"."minutes") = "sla_schedules"."dow"
-        AND "calendrier"."minutes"::TIME BETWEEN "sla_schedules"."start_time"
+        DATE_PART('dow', "calendar"."minutes") = "sla_schedules"."dow"
+        AND "calendar"."minutes"::TIME BETWEEN "sla_schedules"."start_time"
                                             AND "sla_schedules"."end_time"
       )
 
@@ -52,7 +52,7 @@ WHERE
     AND "sla_schedules"."match"
 
 GROUP BY
-    "calendrier"."minutes"
+    "calendar"."minutes"
 
 HAVING COUNT(*) > 1 ;   -- More than one SLA level applies at the same minute → overlap detected
 
