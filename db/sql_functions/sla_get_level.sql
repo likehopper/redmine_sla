@@ -104,7 +104,7 @@ BEGIN
     "sla_levels"."id" AS "sla_level_id",
 
     -- First matching SLA calendar minute becomes the SLA start date
-    "calendrier"."minutes" AS "start_date",
+    "calendar"."minutes" AS "start_date",
 
     -- Keep original creation date from cache if available
     COALESCE(v_sla_cache.created_on, v_current_timestamp) AS "created_on",
@@ -119,12 +119,12 @@ BEGIN
       v_issue_created_on + INTERVAL '7 days',
       '1 minute'
     ) AS minutes
-  ) AS "calendrier"
+  ) AS "calendar"
 
   INNER JOIN "sla_schedules"
     ON (
-      DATE_PART('dow',"calendrier"."minutes") = "sla_schedules"."dow"
-      AND "calendrier"."minutes"::TIME BETWEEN "sla_schedules"."start_time"
+      DATE_PART('dow',"calendar"."minutes") = "sla_schedules"."dow"
+      AND "calendar"."minutes"::TIME BETWEEN "sla_schedules"."start_time"
                                            AND "sla_schedules"."end_time"
     )
 
@@ -149,7 +149,7 @@ BEGIN
   ) AS "sla_holiday_match"
     ON (
       "sla_holiday_match"."sla_calendar_id" = "sla_schedules"."sla_calendar_id"
-      AND "sla_holiday_match"."date" = "calendrier"."minutes"::DATE
+      AND "sla_holiday_match"."date" = "calendar"."minutes"::DATE
     )
 
   WHERE
@@ -158,7 +158,7 @@ BEGIN
     AND "sla_project_trackers"."tracker_id" = v_issue_tracker_id
 
     -- Exclude declared "non-matching" holidays
-    AND "calendrier"."minutes"::DATE NOT IN (
+    AND "calendar"."minutes"::DATE NOT IN (
       SELECT "sla_holidays"."date"
       FROM "sla_holidays"
       INNER JOIN "sla_calendar_holidays"
@@ -171,10 +171,10 @@ BEGIN
     -- Validate either schedule match OR holiday override
     AND (
       "sla_schedules"."match"
-      OR "sla_holiday_match"."date" = "calendrier"."minutes"::DATE
+      OR "sla_holiday_match"."date" = "calendar"."minutes"::DATE
     )
 
-  ORDER BY "calendrier"."minutes"
+  ORDER BY "calendar"."minutes"
   LIMIT 1 ;
 
   ---------------------------------------------------------------------------
