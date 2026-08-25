@@ -81,7 +81,7 @@ class SlaCalendarsHelperSystemTest < ApplicationSlaSystemTestCase
     # Check flash notice contains the created record id
     assert_selector 'div#flash_notice', visible: true, text: /#{sla_calendar.id}/
 
-    # TODO : vérifier SlaCalendar#show
+    # TODO : check SlaCalendar#show
     # visit "/sla/calendares/#{sla_calendar.id}"
     # compate sla_calendar attributs
 

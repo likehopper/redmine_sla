@@ -13,10 +13,10 @@ sla_info_std_bug:
   name: SLA Managed Services Standard tracker_production_incident
 sla_info_spe_ask:
   id: 5
-  name: SLA Managed Services Spécific tracker_change_request
+  name: SLA Managed Services Specific tracker_change_request
 sla_info_spe_bug:
   id: 6
-  name: SLA Managed Services Spécific tracker_production_incident
+  name: SLA Managed Services Specific tracker_production_incident
 sla_tma_bug_scf:
   id: 7
   name: SLA TMA tracker_bug_request with Sla Custom Field

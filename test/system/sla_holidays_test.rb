@@ -86,7 +86,7 @@ class SlaHolidaysHelperSystemTest < ApplicationSlaSystemTestCase
     # Check flash notice contains the created record id
     assert_selector 'div#flash_notice', visible: true, text: /#{sla_holiday.id}/
 
-    # TODO : vérifier SlaHoliday#show
+    # TODO : check SlaHoliday#show
     # visit "/sla/holidayes/#{sla_holiday.id}"
     # compate sla_holiday attributs
 
