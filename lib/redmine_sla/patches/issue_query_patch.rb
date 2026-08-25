@@ -70,7 +70,7 @@ module RedmineSla
                   self.class.connection.quoted_false
 
                 # Respect = NOT (term < spent)
-                "( ( NOT ( sla_level_terms.term < sla_cache_spents.spent ) ) IS #{is_done_val} )"
+                "( ( NOT ( sla_level_terms.term < sla_cache_spents.spent ) ) = #{is_done_val} )"
               end
 
             # Subquery building full SLA context
@@ -94,7 +94,7 @@ module RedmineSla
                   CASE
                     WHEN sla_levels.custom_field_id IS NULL
                       THEN issues.priority_id
-                    ELSE CAST(custom_values.value AS BIGINT)
+                    ELSE CAST(custom_values.value AS #{RedmineSla::DbDialect.bigint_cast_type})
                   END
                 )
               )
@@ -229,7 +229,7 @@ module RedmineSla
                     LEFT JOIN sla_level_terms ON ( sla_caches.sla_level_id = sla_level_terms.sla_level_id AND sla_level_terms.sla_type_id = #{sla_type.id}
                       AND sla_level_terms.sla_priority_id = ( CASE
                       WHEN sla_levels.custom_field_id IS NULL THEN sla_issues.priority_id
-                      ELSE CAST(custom_values.value AS BIGINT) END
+                      ELSE CAST(custom_values.value AS #{RedmineSla::DbDialect.bigint_cast_type}) END
                       )
                     )
                     WHERE sla_issues.id = issues.id

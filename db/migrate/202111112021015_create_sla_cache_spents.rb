@@ -24,15 +24,20 @@ class CreateSlaCacheSpents < ActiveRecord::Migration[5.2]
                                      on_delete: :cascade
                                    }
 
-          # Redmine project associated with the issue
-          t.belongs_to :project, null: false,
+          # Redmine project associated with the issue.
+          # type: :integer on the Redmine-core references below: those core
+          # tables predate Rails 5.1's bigint-by-default primary keys and
+          # still use `int` ids. PostgreSQL silently allows a bigint foreign
+          # key to reference an int primary key, but MySQL/InnoDB rejects the
+          # type mismatch outright, so the FK column must match exactly.
+          t.belongs_to :project, null: false, type: :integer,
                                  foreign_key: {
-                                   name: 'sla_caches_projects_fkey',
+                                   name: 'sla_cache_spents_projects_fkey',
                                    on_delete: :cascade
                                  }
 
           # Redmine issue itself
-          t.belongs_to :issue, null: false,
+          t.belongs_to :issue, null: false, type: :integer,
                                foreign_key: {
                                  name: 'sla_cache_spents_issues_fkey',
                                  on_delete: :cascade
@@ -71,18 +76,26 @@ class CreateSlaCacheSpents < ActiveRecord::Migration[5.2]
                   name: 'sla_cache_spents_sla_caches_sla_types_ukey'
         say "Created unique index on table sla_cache_spents"
 
-        # Add constraint bound to the previously created unique index
-        execute <<~SQL
-          ALTER TABLE sla_cache_spents
-          ADD CONSTRAINT sla_cache_spents_sla_caches_sla_types_ukey
-          UNIQUE USING INDEX sla_cache_spents_sla_caches_sla_types_ukey;
-        SQL
-        say "Created constraint on table sla_cache_spents"
+        # Add constraint bound to the previously created unique index.
+        # PostgreSQL-only: MySQL's sla_get_spent.sql uses ON DUPLICATE KEY
+        # UPDATE, which works off the unique index created above directly
+        # and has no equivalent of naming a constraint from an index.
+        if RedmineSla::DbDialect.adapter == :postgresql
+          execute <<~SQL
+            ALTER TABLE sla_cache_spents
+            ADD CONSTRAINT sla_cache_spents_sla_caches_sla_types_ukey
+            UNIQUE USING INDEX sla_cache_spents_sla_caches_sla_types_ukey;
+          SQL
+          say "Created constraint on table sla_cache_spents"
+        end
 
-        # Load the function used to calculate SLA spent time
-        execute File.read(
-          File.expand_path('../../sql_functions/sla_get_spent.sql', __FILE__)
-        )
+        # Load the function used to calculate SLA spent time.
+        # MySQL has no CREATE OR REPLACE FUNCTION (unlike PostgreSQL, whose
+        # file already self-contains an equivalent DROP), and Rails' mysql2
+        # driver doesn't support multiple statements in a single execute call,
+        # so the drop is issued separately here.
+        execute "DROP FUNCTION IF EXISTS sla_get_spent ;" if RedmineSla::DbDialect.adapter == :mysql
+        execute RedmineSla::DbDialect.function_sql('sla_get_spent')
         say "Created function sla_get_spent"
 
       end

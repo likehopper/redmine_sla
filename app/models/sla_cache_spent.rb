@@ -77,7 +77,19 @@ class SlaCacheSpent < ActiveRecord::Base
 
   def self.purge(project)
     if ( project.nil? )
-      ActiveRecord::Base.connection.execute("TRUNCATE sla_cache_spents CASCADE ; ")
+      if RedmineSla::DbDialect.adapter == :mysql
+        # MySQL's TRUNCATE has no CASCADE; separate execute calls because
+        # Rails' mysql2 connections don't enable multi-statement execution.
+        connection = ActiveRecord::Base.connection
+        connection.execute("SET FOREIGN_KEY_CHECKS = 0 ;")
+        begin
+          connection.execute("TRUNCATE TABLE sla_cache_spents ;")
+        ensure
+          connection.execute("SET FOREIGN_KEY_CHECKS = 1 ;")
+        end
+      else
+        ActiveRecord::Base.connection.execute("TRUNCATE sla_cache_spents CASCADE ; ")
+      end
     else
       SlaCacheSpent.where(project: project.id).delete_all
     end

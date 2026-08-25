@@ -8,7 +8,7 @@
   </div>
   <div class="title-sla-settings title-sla_cache">
     <%= title (@project.nil? ? l('sla_label.sla_cache.index') : l(:field_slas) ) %>
-    <p><%= sanitize(l(:label_sla_notice, url: sla_caches_url)) %></p>
+    <p><%= l(:label_sla_notice, url: sla_caches_url).html_safe %></p>
   </div>
   <%= form_tag(_sla_caches_path(@project, nil), method: :get, id: 'query_form') do %>
     <%= render partial: 'queries/query_form' %>
