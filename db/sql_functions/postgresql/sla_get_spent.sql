@@ -116,6 +116,18 @@ BEGIN
   --    with the issue's status-history intervals (roll_statuses) and the
   --    calculation window itself, and sum the resulting minute counts.
   -- 3. Exclude public holidays.
+  WITH "excluded_holidays" AS (
+    -- Every (calendar, date) pair excluded by a non-matching holiday,
+    -- materialized once instead of re-evaluated as a correlated NOT IN
+    -- subquery per (day, schedule, status-interval) row below.
+    SELECT DISTINCT
+      "sla_calendar_holidays"."sla_calendar_id",
+      "sla_holidays"."date"
+    FROM "sla_holidays"
+    INNER JOIN "sla_calendar_holidays"
+      ON ( "sla_calendar_holidays"."sla_holiday_id" = "sla_holidays"."id" )
+    WHERE NOT "sla_calendar_holidays"."match"
+  )
   SELECT DISTINCT
     NULL::integer AS "id",
     COALESCE( v_sla_spent."sla_cache_id", v_sla_cache."id" ) AS "sla_cache_id",
@@ -160,6 +172,12 @@ BEGIN
   INNER JOIN
     "sla_project_trackers"
       ON ( "sla_project_trackers"."sla_id" = "sla_levels"."sla_id" )
+  LEFT JOIN
+    "excluded_holidays"
+      ON (
+        "excluded_holidays"."sla_calendar_id" = "sla_calendars"."id"
+        AND "excluded_holidays"."date" = "calendar"."day_date"::date
+      )
   WHERE
     "issues"."id" = p_issue_id
   AND
@@ -169,15 +187,8 @@ BEGIN
   AND
     "sla_project_trackers"."tracker_id" = "issues"."tracker_id"
   AND
-    -- Exclude dates defined in the holiday calendar
-    "calendar"."day_date"::date NOT IN (
-      SELECT "sla_holidays"."date"
-      FROM "sla_holidays"
-      INNER JOIN "sla_calendar_holidays"
-      ON ( "sla_calendar_holidays"."sla_holiday_id" = "sla_holidays"."id" )
-      WHERE "sla_calendar_holidays"."sla_calendar_id" = "sla_calendars"."id"
-      AND NOT "sla_calendar_holidays"."match"
-    )
+    -- Exclude dates defined in the holiday calendar (anti-join: no match found above)
+    "excluded_holidays"."date" IS NULL
   AND
     -- Only keep (day, schedule, status-interval) triples that actually overlap
     GREATEST(

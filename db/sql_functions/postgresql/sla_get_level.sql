@@ -95,7 +95,27 @@ BEGIN
   -- then matches each timestamp against SLA calendars, schedules, holidays,
   -- and project-tracker SLA configuration, to find the first valid SLA start date.
   ---------------------------------------------------------------------------
-  SELECT DISTINCT
+  WITH "excluded_holidays" AS (
+    -- Every (calendar, date) pair excluded by a non-matching holiday.
+    -- Materialized once up front instead of re-evaluated as a correlated
+    -- subquery per candidate minute (see the anti-join below): with 7 days
+    -- of minute granularity there are ~10,000 candidate rows, and a
+    -- correlated NOT IN forced a full per-row re-scan of sla_holidays for
+    -- each of them -- the dominant cost of this query. A single
+    -- pre-computed set turns that into one ordinary hash join.
+    SELECT DISTINCT
+      "sla_calendar_holidays"."sla_calendar_id",
+      "sla_holidays"."date"
+    FROM "sla_holidays"
+    INNER JOIN "sla_calendar_holidays"
+      ON ( "sla_holidays"."id" = "sla_calendar_holidays"."sla_holiday_id" )
+    WHERE NOT "sla_calendar_holidays"."match"
+  )
+  -- No DISTINCT: LIMIT 1 already caps the result to a single row regardless,
+  -- and the MySQL port of this same query (already validated end-to-end
+  -- against the real test suite) never needed one either -- it was pure
+  -- overhead forcing a full dedup pass before the LIMIT could apply.
+  SELECT
     -- Cache record to be written (cache ID is determined at INSERT time)
     NULL::bigint AS "id",
     "v_issue_project_id" AS "project_id",
@@ -152,21 +172,19 @@ BEGIN
       AND "sla_holiday_match"."date" = "calendar"."minutes"::DATE
     )
 
+  LEFT JOIN "excluded_holidays"
+    ON (
+      "excluded_holidays"."sla_calendar_id" = "sla_calendars"."id"
+      AND "excluded_holidays"."date" = "calendar"."minutes"::DATE
+    )
+
   WHERE
     -- Must match project and tracker SLA configuration
     "sla_project_trackers"."project_id" = v_issue_project_id
     AND "sla_project_trackers"."tracker_id" = v_issue_tracker_id
 
-    -- Exclude declared "non-matching" holidays
-    AND "calendar"."minutes"::DATE NOT IN (
-      SELECT "sla_holidays"."date"
-      FROM "sla_holidays"
-      INNER JOIN "sla_calendar_holidays"
-        ON ( "sla_holidays"."id" = "sla_calendar_holidays"."sla_holiday_id" )
-      WHERE
-        "sla_calendar_holidays"."sla_calendar_id" = "sla_calendars"."id"
-        AND NOT "sla_calendar_holidays"."match"
-    )
+    -- Exclude declared "non-matching" holidays (anti-join: no match found above)
+    AND "excluded_holidays"."date" IS NULL
 
     -- Validate either schedule match OR holiday override
     AND (

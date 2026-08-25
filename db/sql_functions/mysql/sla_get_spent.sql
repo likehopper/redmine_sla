@@ -214,6 +214,16 @@ BEGIN
         SELECT 0 AS n
         UNION ALL
         SELECT n + 1 FROM seq WHERE n < v_window_days
+    ),
+    excluded_holidays AS (
+        -- Every (calendar, date) pair excluded by a non-matching holiday,
+        -- materialized once instead of re-evaluated as a correlated NOT IN
+        -- subquery per (day, schedule, status-interval) row below.
+        SELECT DISTINCT sla_calendar_holidays.sla_calendar_id AS sla_calendar_id, sla_holidays.`date` AS `date`
+        FROM sla_holidays
+        INNER JOIN sla_calendar_holidays
+          ON (sla_calendar_holidays.sla_holiday_id = sla_holidays.id)
+        WHERE NOT sla_calendar_holidays.`match`
     )
     SELECT COALESCE(SUM(
       GREATEST(0, TIMESTAMPDIFF(MINUTE,
@@ -240,6 +250,11 @@ BEGIN
       ON (sla_levels.sla_calendar_id = sla_calendars.id AND sla_levels.id = v_cache_sla_level_id)
     INNER JOIN sla_project_trackers
       ON (sla_project_trackers.sla_id = sla_levels.sla_id)
+    LEFT JOIN excluded_holidays
+      ON (
+        excluded_holidays.sla_calendar_id = sla_calendars.id
+        AND excluded_holidays.`date` = calendar.day_date
+      )
     WHERE
       issue_roll_statuses.from_status_id IN (
         SELECT DISTINCT sla_statuses.status_id FROM sla_statuses WHERE sla_statuses.sla_type_id = p_sla_type_id
@@ -249,15 +264,8 @@ BEGIN
     AND
       sla_project_trackers.tracker_id = v_issue_tracker_id
     AND
-      -- Exclude dates defined in the holiday calendar
-      calendar.day_date NOT IN (
-        SELECT sla_holidays.`date`
-        FROM sla_holidays
-        INNER JOIN sla_calendar_holidays
-          ON (sla_calendar_holidays.sla_holiday_id = sla_holidays.id)
-        WHERE sla_calendar_holidays.sla_calendar_id = sla_calendars.id
-          AND NOT sla_calendar_holidays.`match`
-      )
+      -- Exclude dates defined in the holiday calendar (anti-join: no match found above)
+      excluded_holidays.`date` IS NULL
     AND
       -- Only keep (day, schedule, status-interval) triples that actually overlap
       GREATEST(issue_roll_statuses.from_status_date, TIMESTAMP(calendar.day_date, sla_schedules.start_time), v_window_start)
