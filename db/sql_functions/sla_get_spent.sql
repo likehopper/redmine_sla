@@ -127,11 +127,11 @@ BEGIN
   INNER JOIN
     "sla_view_roll_statuses" ON ( "issues"."id" = "sla_view_roll_statuses"."issue_id" )
   INNER JOIN
-    ( SELECT generate_series ( v_issue_created_on, v_issue_closed_on, '1 minute' ) AS minutes ) AS "calendrier"
-      ON ( "calendrier"."minutes" BETWEEN "sla_view_roll_statuses"."from_status_date" AND "sla_view_roll_statuses"."to_status_date" - INTERVAL '1 minute' )
+    ( SELECT generate_series ( v_issue_created_on, v_issue_closed_on, '1 minute' ) AS minutes ) AS "calendar"
+      ON ( "calendar"."minutes" BETWEEN "sla_view_roll_statuses"."from_status_date" AND "sla_view_roll_statuses"."to_status_date" - INTERVAL '1 minute' )
   INNER JOIN
     "sla_schedules"
-      ON ( DATE_PART('dow',calendrier.minutes) = "sla_schedules"."dow" AND "calendrier"."minutes"::TIME BETWEEN "sla_schedules"."start_time" AND "sla_schedules"."end_time" )
+      ON ( DATE_PART('dow',calendar.minutes) = "sla_schedules"."dow" AND "calendar"."minutes"::TIME BETWEEN "sla_schedules"."start_time" AND "sla_schedules"."end_time" )
   INNER JOIN
     "sla_calendars"
       ON ( "sla_calendars"."id" = "sla_schedules"."sla_calendar_id" )
@@ -151,7 +151,7 @@ BEGIN
     "sla_project_trackers"."tracker_id" = "issues"."tracker_id"
   AND
     -- Exclude dates defined in the holiday calendar
-    DATE_TRUNC('day',"calendrier"."minutes") NOT IN ( 
+    DATE_TRUNC('day',"calendar"."minutes") NOT IN ( 
       SELECT "sla_holidays"."date"
       FROM "sla_holidays"
       INNER JOIN "sla_calendar_holidays"
