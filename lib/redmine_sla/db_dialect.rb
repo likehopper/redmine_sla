@@ -44,5 +44,13 @@ module RedmineSla
     def self.bigint_cast_type
       adapter == :mysql ? 'SIGNED' : 'BIGINT'
     end
+
+    # PostgreSQL's default collation compares text byte-for-byte (case
+    # sensitive); MySQL/MariaDB's default collation (*_ai_ci) is case- and
+    # accent-insensitive. Wrap a column reference with this so ORDER BY on
+    # free-text columns sorts consistently across both engines.
+    def self.case_sensitive_order(column_expr)
+      adapter == :mysql ? "BINARY #{column_expr}" : column_expr
+    end
   end
 end
