@@ -15,7 +15,10 @@ CREATE OR REPLACE VIEW sla_view_roll_statuses AS
   SELECT
     issue_id AS issue_id,
     journal_detail_old_value AS from_status_id,
-    LAG(journals_created_on, 1, issue_created_on) OVER window_status AS from_status_date,
+    -- MariaDB has no 3-argument LAG(expr, offset, default) -- only MySQL
+    -- 8.0 does -- so the "no previous row" default is supplied via
+    -- COALESCE instead, which both support.
+    COALESCE(LAG(journals_created_on) OVER window_status, issue_created_on) AS from_status_date,
     journal_detail_value AS to_status_id,
     journals_created_on AS to_status_date
   FROM sla_view_journal_statuses
