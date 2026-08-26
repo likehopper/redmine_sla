@@ -127,10 +127,18 @@ BEGIN
           SET MESSAGE_TEXT = 'sla_get_spent: calculation window exceeds 100000 days, check the issue''s dates';
     END IF;
 
-    -- The recursive CTE below needs its bound raised past MySQL's default
-    -- session recursion-depth limit of 1000 whenever the window is longer
-    -- than that many days.
-    SET SESSION cte_max_recursion_depth = v_window_days + 100;
+    -- The recursive CTE below needs its bound raised past each engine's
+    -- default session recursion-depth limit of 1000 whenever the window is
+    -- longer than that many days. Callers must run
+    -- RedmineSla::DbDialect.ensure_recursion_depth! on the connection before
+    -- calling this function, which raises it to a fixed value already above
+    -- the v_window_days > 100000 sanity ceiling checked above -- no need to
+    -- raise it further here. The session variable controlling the cap is
+    -- named differently per engine, and a stored FUNCTION can't pick between
+    -- them with dynamic SQL (MySQL/MariaDB disallow PREPARE/EXECUTE there)
+    -- -- even a SET naming the other engine's variable inside a dead IF
+    -- branch still fails MariaDB's CREATE FUNCTION, which validates every
+    -- SET target eagerly.
 
     -- CORE CALCULATION:
     -- 1. Take every CALENDAR DAY in the calculation window from a bounded
@@ -194,7 +202,10 @@ BEGIN
             SELECT
                 issue_id,
                 journal_detail_old_value AS from_status_id,
-                LAG(journals_created_on, 1, issue_created_on) OVER w2 AS from_status_date,
+                -- MariaDB has no 3-argument LAG(expr, offset, default) --
+                -- only MySQL 8.0 does -- so the "no previous row" default
+                -- is supplied via COALESCE instead, which both support.
+                COALESCE(LAG(journals_created_on) OVER w2, issue_created_on) AS from_status_date,
                 journal_detail_value AS to_status_id,
                 journals_created_on AS to_status_date
             FROM issue_journal_statuses
