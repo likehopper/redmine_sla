@@ -225,10 +225,14 @@ BEGIN
           ON (sla_calendar_holidays.sla_holiday_id = sla_holidays.id)
         WHERE NOT sla_calendar_holidays.`match`
     )
+    -- sla_schedules.end_time is stored as the last valid SECOND of the last
+    -- valid minute (e.g. "12:29:59"), not a clean top-of-minute boundary.
+    -- +1 second reaches the true exclusive upper bound ("12:30:00"); +1
+    -- minute (the previous bug) overshot by 59s.
     SELECT COALESCE(SUM(
       GREATEST(0, TIMESTAMPDIFF(MINUTE,
         GREATEST(issue_roll_statuses.from_status_date, TIMESTAMP(calendar.day_date, sla_schedules.start_time), v_window_start),
-        LEAST(issue_roll_statuses.to_status_date, TIMESTAMP(calendar.day_date, sla_schedules.end_time) + INTERVAL 1 MINUTE, v_window_end + INTERVAL 1 MINUTE)
+        LEAST(issue_roll_statuses.to_status_date, TIMESTAMP(calendar.day_date, sla_schedules.end_time) + INTERVAL 1 SECOND, v_window_end + INTERVAL 1 MINUTE)
       ))
     ), 0)
     INTO v_new_spent
@@ -270,7 +274,7 @@ BEGIN
       -- Only keep (day, schedule, status-interval) triples that actually overlap
       GREATEST(issue_roll_statuses.from_status_date, TIMESTAMP(calendar.day_date, sla_schedules.start_time), v_window_start)
       <
-      LEAST(issue_roll_statuses.to_status_date, TIMESTAMP(calendar.day_date, sla_schedules.end_time) + INTERVAL 1 MINUTE, v_window_end + INTERVAL 1 MINUTE);
+      LEAST(issue_roll_statuses.to_status_date, TIMESTAMP(calendar.day_date, sla_schedules.end_time) + INTERVAL 1 SECOND, v_window_end + INTERVAL 1 MINUTE);
 
     -- Safety check: Spent time cannot be negative
     IF ( v_new_spent IS NULL OR v_new_spent < 0 ) THEN
