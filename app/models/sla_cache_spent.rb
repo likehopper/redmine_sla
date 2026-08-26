@@ -78,12 +78,16 @@ class SlaCacheSpent < ActiveRecord::Base
   def self.purge(project)
     if ( project.nil? )
       if RedmineSla::DbDialect.adapter == :mysql
-        # MySQL's TRUNCATE has no CASCADE; separate execute calls because
-        # Rails' mysql2 connections don't enable multi-statement execution.
+        # DELETE, not TRUNCATE: on MySQL/InnoDB, TRUNCATE is DDL and causes
+        # an implicit COMMIT, silently ending any enclosing transaction
+        # (breaking transactional test isolation and any caller-managed
+        # transaction). DELETE participates in the transaction normally.
+        # Separate execute calls because Rails' mysql2 connections don't
+        # enable multi-statement execution by default.
         connection = ActiveRecord::Base.connection
         connection.execute("SET FOREIGN_KEY_CHECKS = 0 ;")
         begin
-          connection.execute("TRUNCATE TABLE sla_cache_spents ;")
+          connection.execute("DELETE FROM sla_cache_spents ;")
         ensure
           connection.execute("SET FOREIGN_KEY_CHECKS = 1 ;")
         end
