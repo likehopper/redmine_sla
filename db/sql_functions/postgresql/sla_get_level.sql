@@ -110,6 +110,24 @@ BEGIN
     INNER JOIN "sla_calendar_holidays"
       ON ( "sla_holidays"."id" = "sla_calendar_holidays"."sla_holiday_id" )
     WHERE NOT "sla_calendar_holidays"."match"
+  ),
+  "matched_holidays" AS (
+    -- Every (calendar, date) pair that overrides a normally-excluded
+    -- schedule back to matching. Same rationale as excluded_holidays right
+    -- above: this was previously an inline derived table LEFT JOINed
+    -- straight into the calendar, which the planner evaluated as a
+    -- per-row indexed nested loop (one sla_holidays lookup per one of the
+    -- ~10,000 candidate minutes) instead of hashing it once like its
+    -- excluded_holidays sibling.
+    SELECT DISTINCT
+      "sla_calendar_holidays"."sla_calendar_id",
+      "sla_holidays"."date"
+    FROM "sla_calendar_holidays"
+    INNER JOIN "sla_holidays"
+      ON (
+        "sla_holidays"."id" = "sla_calendar_holidays"."sla_holiday_id"
+        AND "sla_calendar_holidays"."match"
+      )
   )
   -- No DISTINCT: LIMIT 1 already caps the result to a single row regardless,
   -- and the MySQL port of this same query (already validated end-to-end
@@ -157,19 +175,10 @@ BEGIN
   INNER JOIN "sla_project_trackers"
     ON ( "sla_project_trackers"."sla_id" = "sla_levels"."sla_id" )
 
-  LEFT JOIN (
-      -- Fetch holidays that override schedule match behaviour
-      SELECT "date", "sla_calendar_id"
-      FROM "sla_calendar_holidays"
-      INNER JOIN "sla_holidays"
-        ON (
-          "sla_holidays"."id" = "sla_calendar_holidays"."sla_holiday_id"
-          AND "sla_calendar_holidays"."match"
-        )
-  ) AS "sla_holiday_match"
+  LEFT JOIN "matched_holidays"
     ON (
-      "sla_holiday_match"."sla_calendar_id" = "sla_schedules"."sla_calendar_id"
-      AND "sla_holiday_match"."date" = "calendar"."minutes"::DATE
+      "matched_holidays"."sla_calendar_id" = "sla_schedules"."sla_calendar_id"
+      AND "matched_holidays"."date" = "calendar"."minutes"::DATE
     )
 
   LEFT JOIN "excluded_holidays"
@@ -189,7 +198,7 @@ BEGIN
     -- Validate either schedule match OR holiday override
     AND (
       "sla_schedules"."match"
-      OR "sla_holiday_match"."date" = "calendar"."minutes"::DATE
+      OR "matched_holidays"."date" = "calendar"."minutes"::DATE
     )
 
   ORDER BY "calendar"."minutes"

@@ -116,7 +116,65 @@ BEGIN
   --    with the issue's status-history intervals (roll_statuses) and the
   --    calculation window itself, and sum the resulting minute counts.
   -- 3. Exclude public holidays.
-  WITH "excluded_holidays" AS (
+  WITH "issue_journal_statuses" AS (
+    -- Inlined, per-issue copy of sla_view_journal_statuses/sla_view_roll_statuses
+    -- (see db/sql_views/postgresql/) instead of joining those global views.
+    -- Both views are themselves a UNION of two branches, so joining
+    -- sla_view_roll_statuses here meant PostgreSQL re-ran this whole
+    -- window-function computation up to four times (2 branches x 2 nested
+    -- levels) per call, just to read back the status history of the ONE
+    -- issue being processed -- confirmed via EXPLAIN ANALYZE as the
+    -- dominant cost of this function for issues with any journal history.
+    -- Scoping by p_issue_id up front and computing it once in a CTE (which
+    -- PostgreSQL materializes here since it is referenced twice below)
+    -- removes that redundancy entirely.
+    (
+      SELECT DISTINCT issues.id AS issue_id,
+        sla_get_date(first_value(issues.created_on) OVER window_journals) AS issue_created_on,
+        sla_get_date(first_value(issues.closed_on) OVER window_journals) AS issue_closed_on,
+        sla_get_date(first_value(issues.created_on) OVER window_journals) AS journals_created_on,
+        COALESCE(first_value(journal_details.old_value::integer) OVER window_journals, issues.status_id) AS journal_detail_old_value,
+        COALESCE(first_value(journal_details.old_value::integer) OVER window_journals, issues.status_id) AS journal_detail_value
+      FROM issues
+      LEFT JOIN journals ON ( issues.id = journals.journalized_id )
+      LEFT JOIN journal_details ON ( journals.id = journal_details.journal_id AND journal_details.property LIKE 'attr' AND journal_details.prop_key LIKE 'status_id' )
+      WHERE issues.id = p_issue_id
+      WINDOW window_journals AS ( PARTITION BY issues.id ORDER BY journal_details.id ASC NULLS LAST )
+    ) UNION (
+      SELECT issues.id AS issue_id,
+        sla_get_date(issues.created_on) AS issue_created_on,
+        sla_get_date(issues.closed_on) AS issue_closed_on,
+        sla_get_date(journals.created_on) AS journals_created_on,
+        journal_details.old_value::integer AS journal_detail_old_value,
+        journal_details.value::integer AS journal_detail_value
+      FROM issues
+      INNER JOIN journals ON ( issues.id = journals.journalized_id )
+      INNER JOIN journal_details ON ( journals.id = journal_details.journal_id AND journal_details.property LIKE 'attr' AND journal_details.prop_key LIKE 'status_id' )
+      WHERE issues.id = p_issue_id
+    )
+  ),
+  "issue_roll_statuses" AS (
+    (
+      SELECT
+        issue_id AS issue_id,
+        journal_detail_old_value AS from_status_id,
+        LAG(journals_created_on, 1, issue_created_on) OVER window_status AS from_status_date,
+        journal_detail_value AS to_status_id,
+        journals_created_on AS to_status_date
+      FROM issue_journal_statuses
+      WINDOW window_status AS ( PARTITION BY issue_id ORDER BY journals_created_on ASC )
+    ) UNION (
+      SELECT
+        issue_id AS issue_id,
+        FIRST_VALUE(journal_detail_value) OVER window_status AS from_status_id,
+        FIRST_VALUE(journals_created_on) OVER window_status AS from_status_date,
+        FIRST_VALUE(journal_detail_value) OVER window_status AS to_status_id,
+        COALESCE(issue_closed_on, v_current_timestamp) AS to_status_date
+      FROM issue_journal_statuses
+      WINDOW window_status AS ( PARTITION BY issue_id ORDER BY journals_created_on DESC )
+    )
+  ),
+  "excluded_holidays" AS (
     -- Every (calendar, date) pair excluded by a non-matching holiday,
     -- materialized once instead of re-evaluated as a correlated NOT IN
     -- subquery per (day, schedule, status-interval) row below.
@@ -128,7 +186,10 @@ BEGIN
       ON ( "sla_calendar_holidays"."sla_holiday_id" = "sla_holidays"."id" )
     WHERE NOT "sla_calendar_holidays"."match"
   )
-  SELECT DISTINCT
+  -- No DISTINCT: this aggregates (SUM, no GROUP BY) down to a single row
+  -- regardless, so it was pure overhead forcing a pointless dedup pass over
+  -- that one row (see the same cleanup already applied to sla_get_level.sql).
+  SELECT
     NULL::integer AS "id",
     COALESCE( v_sla_spent."sla_cache_id", v_sla_cache."id" ) AS "sla_cache_id",
     v_issue_project_id AS "sla_project_id",
@@ -137,7 +198,7 @@ BEGIN
     COALESCE(SUM(
       GREATEST(0, EXTRACT(EPOCH FROM (
         LEAST(
-          "sla_view_roll_statuses"."to_status_date",
+          "issue_roll_statuses"."to_status_date",
           -- sla_schedules.end_time is stored as the last valid SECOND of the
           -- last valid minute (e.g. "12:29:59"), not a clean top-of-minute
           -- boundary. +1 second reaches the true exclusive upper bound
@@ -149,7 +210,7 @@ BEGIN
         )
         -
         GREATEST(
-          "sla_view_roll_statuses"."from_status_date",
+          "issue_roll_statuses"."from_status_date",
           "calendar"."day_date" + "sla_schedules"."start_time",
           v_issue_created_on
         )
@@ -160,9 +221,7 @@ BEGIN
   INTO
     v_sla_spent
   FROM
-    "issues"
-  INNER JOIN
-    "sla_view_roll_statuses" ON ( "issues"."id" = "sla_view_roll_statuses"."issue_id" )
+    "issue_roll_statuses"
   INNER JOIN
     ( SELECT generate_series ( DATE_TRUNC('day', v_issue_created_on), DATE_TRUNC('day', v_issue_closed_on), '1 day' ) AS day_date ) AS "calendar"
       ON TRUE
@@ -185,26 +244,24 @@ BEGIN
         AND "excluded_holidays"."date" = "calendar"."day_date"::date
       )
   WHERE
-    "issues"."id" = p_issue_id
+    "issue_roll_statuses"."from_status_id" IN ( SELECT DISTINCT "sla_statuses"."status_id" FROM "sla_statuses" WHERE "sla_statuses"."sla_type_id" = p_sla_type_id )
   AND
-    "sla_view_roll_statuses"."from_status_id" IN ( SELECT DISTINCT "sla_statuses"."status_id" FROM "sla_statuses" WHERE "sla_statuses"."sla_type_id" = p_sla_type_id )
+    "sla_project_trackers"."project_id" = v_issue_project_id
   AND
-    "sla_project_trackers"."project_id" = "issues"."project_id"
-  AND
-    "sla_project_trackers"."tracker_id" = "issues"."tracker_id"
+    "sla_project_trackers"."tracker_id" = v_issue_tracker_id
   AND
     -- Exclude dates defined in the holiday calendar (anti-join: no match found above)
     "excluded_holidays"."date" IS NULL
   AND
     -- Only keep (day, schedule, status-interval) triples that actually overlap
     GREATEST(
-      "sla_view_roll_statuses"."from_status_date",
+      "issue_roll_statuses"."from_status_date",
       "calendar"."day_date" + "sla_schedules"."start_time",
       v_issue_created_on
     )
     <
     LEAST(
-      "sla_view_roll_statuses"."to_status_date",
+      "issue_roll_statuses"."to_status_date",
       "calendar"."day_date" + "sla_schedules"."end_time" + INTERVAL '1 minute',
       v_issue_closed_on + INTERVAL '1 minute'
     )
