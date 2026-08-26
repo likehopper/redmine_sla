@@ -68,7 +68,7 @@ module RedmineSla
             end
           end
         end
-      rescue ActiveRecord::NoDatabaseError, PG::ConnectionBad
+      rescue ActiveRecord::NoDatabaseError, ActiveRecord::ConnectionNotEstablished
         # Ignore connection errors at startup when the database is not ready
       end
 

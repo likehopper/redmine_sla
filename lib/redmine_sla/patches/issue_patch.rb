@@ -115,7 +115,7 @@ module RedmineSla
             end
           }
         end
-      rescue ActiveRecord::NoDatabaseError, PG::ConnectionBad
+      rescue ActiveRecord::NoDatabaseError, ActiveRecord::ConnectionNotEstablished
         # Skip the dynamic method definition if the database connection fails
       end
       
