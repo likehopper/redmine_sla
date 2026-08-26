@@ -39,6 +39,13 @@ class SlaTypeQuery < Query
     #  "name" => {:operator => "*", :values => []}
     }
   end
+
+  # Without an explicit default, requests with no `sort` param issue no
+  # ORDER BY at all: row order is then storage-engine-dependent, which
+  # happens to look id-ordered on PostgreSQL but not on MySQL/MariaDB.
+  def default_sort_criteria
+    [['id', 'asc']]
+  end
     
   def default_columns_names
     super.presence || [
