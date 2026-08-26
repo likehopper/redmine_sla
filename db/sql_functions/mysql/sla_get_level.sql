@@ -67,49 +67,62 @@ BEGIN
     WHERE id = p_issue_id;
 
     -- Compute the expected SLA level.
-    -- This generates every minute within a 7-day window starting at issue creation,
-    -- then matches each timestamp against SLA calendars, schedules, holidays,
-    -- and project-tracker SLA configuration, to find the first valid SLA start date.
-    -- MySQL/MariaDB have no generate_series: a bounded recursive CTE stands
-    -- in for it. Two earlier approaches were tried and dropped:
-    --   - a digit cross join computed inline (correct, but ~15-20x slower per
-    --     call: MySQL materializes a fresh 5-way UNION ALL cross join of
-    --     20,000 rows every time instead of a cheap range).
-    --   - a persisted, indexed sla_mysql_numbers sequence table populated by
-    --     a migration (fast, but its *data* -- unlike the schema -- is not
-    --     captured by `rails db:schema:load` from db/structure.sql, which is
-    --     how Rails normally builds a test database; every stored function
-    --     depending on it silently returned NULL there even though it worked
-    --     fine on a directly-migrated database).
-    -- A recursive CTE avoids both problems and needs no persisted state; the
-    -- session recursion-depth cap only needs raising because the 7-day
-    -- window is bigger than the default limit of 1000. Raised from Ruby
-    -- (RedmineSla::DbDialect.ensure_recursion_depth!) before this function
-    -- runs rather than here: the session variable controlling it is named
-    -- differently per engine, and a stored FUNCTION can't pick between them
-    -- with dynamic SQL (MySQL/MariaDB disallow PREPARE/EXECUTE there) --
-    -- even a SET naming the other engine's variable inside a dead IF branch
-    -- still fails MariaDB's CREATE FUNCTION, which validates every SET
-    -- target eagerly.
+    -- Generates one row per CALENDAR DAY in the 7-day window starting at
+    -- issue creation (not per minute -- see sla_get_spent.sql for the same
+    -- rationale), crossed with each candidate schedule, then derives the
+    -- exact starting minute for each valid (day, schedule) pair
+    -- analytically (GREATEST of issue creation and that window's opening
+    -- time) instead of by enumeration. The earliest such minute across all
+    -- valid pairs is the SLA start date -- precision is still to the
+    -- minute, it's just computed at the boundary of each candidate window
+    -- instead of scanned one minute at a time. This needs candidates only
+    -- at day granularity (7 days x a handful of schedules) rather than
+    -- every one of the ~10,000 minutes in the window; MariaDB's optimizer
+    -- in particular badly underestimates the row count of a recursive CTE
+    -- producing a minute-by-minute calendar, which cascades into a poor
+    -- join plan once that many candidate rows are involved. At 7 rows the
+    -- day sequence no longer needs the session recursion-depth cap raised
+    -- at all (well under the default 1000-iteration limit either engine
+    -- starts with).
 
-    SELECT sla_levels.id, calendar.minutes
+    WITH matched_holidays AS (
+      -- Every (calendar, date) pair that overrides a normally-excluded
+      -- schedule back to matching, materialized once instead of joined
+      -- as an inline derived table per candidate day.
+      SELECT sla_holidays.`date` AS `date`, sla_calendar_holidays.sla_calendar_id AS sla_calendar_id
+      FROM sla_calendar_holidays
+      INNER JOIN sla_holidays
+        ON (
+          sla_holidays.id = sla_calendar_holidays.sla_holiday_id
+          AND sla_calendar_holidays.`match`
+        )
+    ),
+    excluded_holidays AS (
+      -- Every (calendar, date) pair excluded by a non-matching holiday,
+      -- same rationale as matched_holidays above.
+      SELECT DISTINCT sla_calendar_holidays.sla_calendar_id AS sla_calendar_id, sla_holidays.`date` AS `date`
+      FROM sla_holidays
+      INNER JOIN sla_calendar_holidays
+        ON (sla_holidays.id = sla_calendar_holidays.sla_holiday_id)
+      WHERE NOT sla_calendar_holidays.`match`
+    )
+    SELECT sla_levels.id, GREATEST(v_issue_created_on, TIMESTAMP(calendar.day_date, sla_schedules.start_time))
     INTO v_result_sla_level_id, v_result_start_date
     FROM
       (
         WITH RECURSIVE seq AS (
           SELECT 0 AS n
           UNION ALL
-          SELECT n + 1 FROM seq WHERE n < 10080
+          SELECT n + 1 FROM seq WHERE n < 7
         )
-        SELECT DATE_ADD(v_issue_created_on, INTERVAL n MINUTE) AS minutes
+        SELECT DATE_ADD(DATE(v_issue_created_on), INTERVAL n DAY) AS day_date
         FROM seq
       ) AS calendar
       INNER JOIN sla_schedules
         ON (
           -- PostgreSQL DATE_PART('dow', ...) is 0=Sunday..6=Saturday.
           -- MySQL DAYOFWEEK() is 1=Sunday..7=Saturday, hence the "- 1".
-          (DAYOFWEEK(calendar.minutes) - 1) = sla_schedules.dow
-          AND TIME(calendar.minutes) BETWEEN sla_schedules.start_time AND sla_schedules.end_time
+          (DAYOFWEEK(calendar.day_date) - 1) = sla_schedules.dow
         )
       INNER JOIN sla_calendars
         ON (sla_calendars.id = sla_schedules.sla_calendar_id)
@@ -117,36 +130,15 @@ BEGIN
         ON (sla_levels.sla_calendar_id = sla_calendars.id)
       INNER JOIN sla_project_trackers
         ON (sla_project_trackers.sla_id = sla_levels.sla_id)
-      LEFT JOIN
-        (
-          -- Fetch holidays that override schedule match behaviour
-          SELECT sla_holidays.`date` AS `date`, sla_calendar_holidays.sla_calendar_id AS sla_calendar_id
-          FROM sla_calendar_holidays
-          INNER JOIN sla_holidays
-            ON (
-              sla_holidays.id = sla_calendar_holidays.sla_holiday_id
-              AND sla_calendar_holidays.`match`
-            )
-        ) AS sla_holiday_match
+      LEFT JOIN matched_holidays
         ON (
-          sla_holiday_match.sla_calendar_id = sla_schedules.sla_calendar_id
-          AND sla_holiday_match.`date` = DATE(calendar.minutes)
+          matched_holidays.sla_calendar_id = sla_schedules.sla_calendar_id
+          AND matched_holidays.`date` = calendar.day_date
         )
-      -- Every (calendar, date) excluded by a non-matching holiday, computed
-      -- once instead of as a correlated NOT IN re-scanned per candidate
-      -- minute (~10,000 rows) -- that correlated subquery was the dominant
-      -- cost of this query (see the PostgreSQL port for the full writeup).
-      LEFT JOIN
-        (
-          SELECT DISTINCT sla_calendar_holidays.sla_calendar_id AS sla_calendar_id, sla_holidays.`date` AS `date`
-          FROM sla_holidays
-          INNER JOIN sla_calendar_holidays
-            ON (sla_holidays.id = sla_calendar_holidays.sla_holiday_id)
-          WHERE NOT sla_calendar_holidays.`match`
-        ) AS excluded_holidays
+      LEFT JOIN excluded_holidays
         ON (
           excluded_holidays.sla_calendar_id = sla_calendars.id
-          AND excluded_holidays.`date` = DATE(calendar.minutes)
+          AND excluded_holidays.`date` = calendar.day_date
         )
     WHERE
       -- Must match project and tracker SLA configuration
@@ -159,10 +151,19 @@ BEGIN
       -- Validate either schedule match OR holiday override
       AND (
         sla_schedules.`match`
-        OR sla_holiday_match.`date` = DATE(calendar.minutes)
+        OR matched_holidays.`date` = calendar.day_date
       )
 
-    ORDER BY calendar.minutes
+      -- Skip windows that had already closed before the issue was even
+      -- created (only possible on the creation day itself: every later
+      -- day's window necessarily opens after issue creation).
+      AND TIMESTAMP(calendar.day_date, sla_schedules.end_time) >= v_issue_created_on
+
+      -- Trim back to the exact 7-day-from-creation bound: generating whole
+      -- calendar days above can otherwise pull in one day too many.
+      AND GREATEST(v_issue_created_on, TIMESTAMP(calendar.day_date, sla_schedules.start_time)) <= DATE_ADD(v_issue_created_on, INTERVAL 7 DAY)
+
+    ORDER BY GREATEST(v_issue_created_on, TIMESTAMP(calendar.day_date, sla_schedules.start_time))
     LIMIT 1;
 
     -- No matching SLA level found within search window → clear cache + return NULL
