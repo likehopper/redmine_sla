@@ -1,6 +1,6 @@
 # redmine_sla
 
-![Redmine Version](https://img.shields.io/badge/Redmine-5.x+-blue)
+![Redmine Version](https://img.shields.io/badge/Redmine-5.x%20%7C%206.x-blue)
 ![Ruby](https://img.shields.io/badge/Ruby-2.7+-red)
 ![Rails](https://img.shields.io/badge/Rails-6.1+-brightgreen)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-11+-blue)
