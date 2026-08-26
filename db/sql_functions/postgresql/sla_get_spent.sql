@@ -138,7 +138,13 @@ BEGIN
       GREATEST(0, EXTRACT(EPOCH FROM (
         LEAST(
           "sla_view_roll_statuses"."to_status_date",
-          "calendar"."day_date" + "sla_schedules"."end_time" + INTERVAL '1 minute',
+          -- sla_schedules.end_time is stored as the last valid SECOND of the
+          -- last valid minute (e.g. "12:29:59"), not a clean top-of-minute
+          -- boundary. +1 second reaches the true exclusive upper bound
+          -- ("12:30:00"); +1 minute (the previous bug) overshot by 59s,
+          -- inflating the SUM by ~1 minute and rounding up on the final
+          -- ::integer cast.
+          "calendar"."day_date" + "sla_schedules"."end_time" + INTERVAL '1 second',
           v_issue_closed_on + INTERVAL '1 minute'
         )
         -
