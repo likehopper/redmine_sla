@@ -34,8 +34,14 @@ BEGIN
     --     fine on a directly-migrated database).
     -- A recursive CTE avoids both problems and needs no persisted state; the
     -- session recursion-depth cap only needs raising because the 7-day
-    -- window is bigger than MySQL's default limit of 1000.
-    SET SESSION cte_max_recursion_depth = 10180;
+    -- window is bigger than the default limit of 1000. Callers must run
+    -- RedmineSla::DbDialect.ensure_recursion_depth! on the connection before
+    -- calling this function: the session variable controlling the cap is
+    -- named differently per engine, and a stored FUNCTION can't pick between
+    -- them with dynamic SQL (MySQL/MariaDB disallow PREPARE/EXECUTE there)
+    -- -- even a SET naming the other engine's variable inside a dead IF
+    -- branch still fails MariaDB's CREATE FUNCTION, which validates every
+    -- SET target eagerly.
 
     SELECT DISTINCT TRUE
     INTO v_overlap

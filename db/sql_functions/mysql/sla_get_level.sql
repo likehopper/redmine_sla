@@ -83,8 +83,14 @@ BEGIN
     --     fine on a directly-migrated database).
     -- A recursive CTE avoids both problems and needs no persisted state; the
     -- session recursion-depth cap only needs raising because the 7-day
-    -- window is bigger than MySQL's default limit of 1000.
-    SET SESSION cte_max_recursion_depth = 10180;
+    -- window is bigger than the default limit of 1000. Raised from Ruby
+    -- (RedmineSla::DbDialect.ensure_recursion_depth!) before this function
+    -- runs rather than here: the session variable controlling it is named
+    -- differently per engine, and a stored FUNCTION can't pick between them
+    -- with dynamic SQL (MySQL/MariaDB disallow PREPARE/EXECUTE there) --
+    -- even a SET naming the other engine's variable inside a dead IF branch
+    -- still fails MariaDB's CREATE FUNCTION, which validates every SET
+    -- target eagerly.
 
     SELECT sla_levels.id, calendar.minutes
     INTO v_result_sla_level_id, v_result_start_date

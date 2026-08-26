@@ -52,5 +52,36 @@ module RedmineSla
     def self.case_sensitive_order(column_expr)
       adapter == :mysql ? "BINARY #{column_expr}" : column_expr
     end
+
+    # Value large enough to cover the widest window the SQL functions'
+    # own sanity ceiling allows (100000 days), with headroom.
+    RECURSION_DEPTH_LIMIT = 100_100
+
+    # MySQL/MariaDB cap recursive CTE depth at 1000 by default: MySQL raises
+    # ER_CTE_RECURSION_LIMIT past that, MariaDB instead silently truncates
+    # the result with only a warning. sla_get_level/sla_get_level_overlap/
+    # sla_get_spent rely on deeper recursion for anything beyond a ~2.7-year
+    # window, so the cap must be raised before they run.
+    #
+    # This can't live inside those stored FUNCTIONs: the session variable
+    # controlling it is named differently per engine (cte_max_recursion_depth
+    # on MySQL, max_recursive_iterations on MariaDB), and picking between
+    # them needs dynamic SQL (PREPARE/EXECUTE), which MySQL/MariaDB disallow
+    # inside a FUNCTION (only a PROCEDURE may use it) -- and even a SET
+    # statement naming the *other* engine's variable inside a dead branch
+    # (`IF ... THEN ... ELSE ... END IF`) still fails MariaDB's CREATE
+    # FUNCTION, which validates every SET target eagerly rather than only
+    # when that branch actually runs. So this is set here instead, from
+    # Ruby, once per physical connection, before any of those functions run.
+    def self.ensure_recursion_depth!
+      return unless adapter == :mysql
+
+      connection = ActiveRecord::Base.connection
+      return if connection.instance_variable_get(:@redmine_sla_recursion_depth_set)
+
+      variable = connection.select_value('SELECT VERSION()').to_s.include?('MariaDB') ? 'max_recursive_iterations' : 'cte_max_recursion_depth'
+      connection.execute("SET SESSION #{variable} = #{RECURSION_DEPTH_LIMIT}")
+      connection.instance_variable_set(:@redmine_sla_recursion_depth_set, true)
+    end
   end
 end

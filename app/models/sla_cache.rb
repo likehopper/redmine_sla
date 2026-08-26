@@ -60,6 +60,7 @@ class SlaCache < ActiveRecord::Base
     # p_refresh_force is passed explicitly (rather than relying on its
     # PostgreSQL-side default) because MySQL/MariaDB functions cannot have
     # default parameter values or be overloaded by argument count.
+    RedmineSla::DbDialect.ensure_recursion_depth!
     ActiveRecord::Base.connection.execute(sanitize_sql(["SELECT sla_get_level(?, false) ; ", issue_id]))
     self.find_by(issue_id: issue_id)
   end
@@ -69,6 +70,7 @@ class SlaCache < ActiveRecord::Base
     # First, delete the entry in the sla_cache
     # SlaCache.where(issue: self.issue_id).destroy_all
     # Let's recalculate the sla_cache
+    RedmineSla::DbDialect.ensure_recursion_depth!
     ActiveRecord::Base.connection.execute(self.class.sanitize_sql(["SELECT sla_get_level(?,true) ; ", self.issue_id]))
     # Then, let's recalculate the sla_cache_spents !
     SlaCacheSpent.refresh_by_issue_id(self.issue_id)
