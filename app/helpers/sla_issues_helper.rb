@@ -47,8 +47,10 @@ module SlaIssuesHelper
         css_type = "sla_pie_modern"
       when "pie - flat"
         css_type = "sla_pie_flat"
+      when "bar - rounded"
+        css_type = "sla_bar sla_bar_rounded"
       else
-        css_type = "sla_bar"
+        css_type = "sla_bar sla_bar_square"
     end
 
     css_class = [ 'sla_display', css_color, css_type ].join(' ')
