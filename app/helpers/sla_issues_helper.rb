@@ -46,7 +46,9 @@ module SlaIssuesHelper
       when "pie - modern"
         css_type = "sla_pie_modern"
       when "pie - flat"
-        css_type = "sla_pie_flat"
+        css_type = "sla_pie_flat_base sla_pie_flat"
+      when "pie - yellow"
+        css_type = "sla_pie_flat_base sla_pie_yellow"
       when "bar - rounded"
         css_type = "sla_bar sla_bar_rounded"
       else

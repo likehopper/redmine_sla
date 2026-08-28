@@ -111,7 +111,7 @@
   }
   /*** Thanks for PieChart to https://www.freecodecamp.org/news/css-only-pie-chart/ ***/
 
-  .sla_pie_flat {
+  .sla_pie_flat_base {
     --p: 50;
     --b: 8px;
     --w: 40px;
@@ -122,18 +122,36 @@
     margin: 1em auto;
     border: var(--b) solid transparent;
     border-radius: 50%;
-    background: conic-gradient(var(--c) calc(var(--p)*1%), var(--r) calc(var(--p)*1%)) border-box;
     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 12px;
+    font-weight: bold;
   }
-  .sla_pie_flat p {
+  .sla_pie_flat_base p {
     position: relative;
     z-index: 1;
     font-size: 12px;
+  }
+
+  /* Classic opaque center -- fine on the default (light) theme, but its
+     fixed color can clash on a different theme background. */
+  .sla_pie_yellow {
+    background: linear-gradient(lightyellow, lightyellow) padding-box,
+      conic-gradient(var(--c) calc(var(--p)*1%), var(--r) calc(var(--p)*1%)) border-box;
+  }
+
+  /* Transparent center so it blends into any theme -- a thinner ring than
+     the other flat style (closer to sla_pie_modern's ring:hole ratio)
+     leaves enough plain space for the label, plus a white halo around the
+     text so it stays legible directly over the ring's colored edge. */
+  .sla_pie_flat {
+    --b: 4px;
+    background: conic-gradient(var(--c) calc(var(--p)*1%), var(--r) calc(var(--p)*1%)) border-box;
+    color: #333;
+    text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 4px #fff, 0 0 5px #fff;
   }
 
 }
