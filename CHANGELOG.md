@@ -1,5 +1,33 @@
 # Changelog
 
+## 2.1.2 (Stable - Redmine 6.x)
+
+### Fixed
+
+-   Fix: `SlaPriority.create(sla_level.custom_field_id).all` used instead of
+    an unconditional `IssuePriority.all.index_by(&:name)` when generating
+    SLA level term documentation fixtures — the previous code coincidentally
+    matched native priority names against custom-field enumeration ids
+    (`PG::ForeignKeyViolation` when the ids don't align), silently producing
+    wrong terms for custom-field-based SLA levels like EXAMPLE-04's.
+
+### Documentation
+
+-   Doc: rewrite EXAMPLE-04 section 5 to reflect the real 3-custom-field
+    scenario (the field actually used for SLA priority, plus two
+    intentional counter-examples showing the "required, single-value"
+    eligibility filter), and fix stale references throughout (old
+    Bronze/Silver/Gold terminology, "SLA Priority" instead of
+    `SlaPriorityScf`).
+-   Doc: regenerate all screenshots in `doc/screenshots/example-{01..05}`
+    now that the capture helper no longer mispositions the sticky header or
+    crops full-page captures (see 2.1.1).
+-   Doc: mention the `documentation` test suite in `doc/TESTING.md` (it was
+    already documented in `doc/TASKS.md` but missing from the test-suite
+    walkthrough).
+
+------------------------------------------------------------------------
+
 ## 2.1.1 (Stable - Redmine 6.x)
 
 ### Added

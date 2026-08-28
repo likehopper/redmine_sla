@@ -28,6 +28,11 @@ But also functionals tests: `bundle exec rake redmine:plugins:test:system NAME=r
 
 > **_TIP:_** Recommended use Chromium ( and chromium-driver ) with these options  `**GOOGLE_CHROME_OPTS_ARGS = ["headless","disable-gpu","no-sandbox","disable-dev-shm-usage"]**` ( in `test/application_system_test_case.rb` file for example ).
 
+### Documentation
+And also documentation tests, which regenerate the screenshots used in `doc/EXAMPLE-*.md`: `bundle exec rake redmine:plugins:test:documentation NAME=redmine_sla RAILS_ENV=test TESTOPTS="-v -w -b" --trace`
+
+> **_NOTE:_** Restrict to a single example with `SUITE=example-05` (see `doc/TASKS.md`). Screenshots are written to `tmp/redmine_sla/screenshots/`.
+
 ### All
 And why not all the tests: `bundle exec rake redmine:plugins:test NAME=redmine_sla RAILS_ENV=testTESTOPTS="-v -w -b" --trace`
 

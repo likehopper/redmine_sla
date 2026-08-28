@@ -3,6 +3,6 @@ sla_level_terms:
     sla_level: "Level Support"
     sla_type: "Response time"
     sla_priority:
-      Low: 1440
-      Normal: 480
-      High: 240
+      Minor: 1440
+      Major: 480
+      Blocking: 240

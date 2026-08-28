@@ -53,9 +53,9 @@ For a support project:
 - the same SLA logic as EXAMPLE-01 applies
 
 Example SLA priority values:
-- Bronze
-- Silver
-- Gold
+- Minor
+- Major
+- Blocking
 
 ---
 
@@ -157,22 +157,62 @@ Go to:
 
 `Administration → Custom fields → Issues`
 
-Create a new custom field:
-- **Name:** SLA Priority
-- **Type:** List (or Key/Value list)
-- **Values:** Bronze / Silver / Gold
+Only a custom field that is **Key/value list**, **required**, and **single-value**
+(not multiple) is eligible to be selected as an SLA priority field on the SLA
+Level form — the dropdown is filtered accordingly. To make that constraint
+visible, this example creates one eligible field and two intentionally
+ineligible ones.
 
-![Create custom field](screenshots/example-04/08-01-01-custom_field-new.png)
+### 5.1) The field actually used for SLA priority
+
+Create a new custom field:
+- **Name:** SlaPriorityScf
+- **Type:** Key/value list
+- **Required:** yes
+- **Multiple:** no
+- **Values:** Minor / Major / Blocking / Immediate (default: Major)
+- **Trackers:** Support request
+- **Projects:** project-support
+
+![Create custom field](screenshots/example-04/08-01-01-01-custom_field-new.png)
+![Custom field created](screenshots/example-04/08-01-01-02-custom_field-created.png)
 
 Define the allowed values:
 
 ![Custom field values](screenshots/example-04/08-02-01-custom_field-values.png)
 
-Finalize the custom field:
+Set the default value:
 
 ![Custom field final](screenshots/example-04/08-03-01-custom_field-final.png)
 
 > This custom field will be referenced later by the SLA Level.
+
+### 5.2) Counter-example: not required
+
+`IsNotRequired` has the same Key/value list format, but **Required** is left
+unchecked. Because it isn't required, it is **not offered** as an SLA priority
+field — an issue could be saved without a value, leaving the SLA priority
+undefined.
+
+![Create custom field (not required)](screenshots/example-04/08-01-02-01-custom_field-new.png)
+![Custom field created](screenshots/example-04/08-01-02-02-custom_field-created.png)
+![Custom field values](screenshots/example-04/08-02-02-custom_field-values.png)
+![Custom field final](screenshots/example-04/08-03-02-custom_field-final.png)
+
+### 5.3) Counter-example: multiple values allowed
+
+`IsMultiple` is required, but **Multiple** is checked. Because an issue could
+then carry more than one value at once, it is also **not offered** as an SLA
+priority field — SLA priority must resolve to exactly one value.
+
+![Create custom field (multiple)](screenshots/example-04/08-01-03-01-custom_field-new.png)
+![Custom field created](screenshots/example-04/08-01-03-02-custom_field-created.png)
+![Custom field values](screenshots/example-04/08-02-03-custom_field-values.png)
+![Custom field final](screenshots/example-04/08-03-03-custom_field-final.png)
+
+### 5.4) The resulting custom fields list
+
+![Custom fields list](screenshots/example-04/08-02-custom_fields-list.png)
 
 ---
 
@@ -201,7 +241,7 @@ Go to:
 Create **Level Support** and configure:
 - **SLA:** SLA Support
 - **Calendar:** Calendar Support
-- **SLA priority custom field:** SLA Priority
+- **SLA priority custom field:** SlaPriorityScf
 
 ![Create SLA Level](screenshots/example-04/09-01-01-01-sla_level-new.png)
 
@@ -220,13 +260,15 @@ Go to:
 
 `Administration → SLA Global settings → SLA Terms`
 
-Create SLA Terms for **Response time**, based on the **custom field values**:
+Create SLA Terms for **Response time**, based on the **custom field values**
+(only the eligible field's values appear here — `SlaPriorityScf`'s "Immediate"
+value is inactive and does not appear either):
 
 | SLA Priority | Target |
 |-------------|--------|
 | Minor | 24h |
 | Major | 8h |
-| Block | 4h |
+| Blocking | 4h |
 
 ![Create SLA Terms](screenshots/example-04/10-01-01-01-sla_level_term-new.png)
 
@@ -254,7 +296,7 @@ Verify the mapping:
 
 ## 10) View SLA behavior on issues
 
-Create issues and set the **SLA Priority** custom field.
+Create issues and set the **SlaPriorityScf** custom field.
 
 The SLA displayed on the issue will now depend on:
 - the custom field value
