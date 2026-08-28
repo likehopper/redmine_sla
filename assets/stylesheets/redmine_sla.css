@@ -151,7 +151,8 @@
     --b: 4px;
     background: conic-gradient(var(--c) calc(var(--p)*1%), var(--r) calc(var(--p)*1%)) border-box;
     color: #333;
-    text-shadow: 0 0 2px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 4px #fff, 0 0 5px #fff;
+    -webkit-text-stroke: 3px #fff;
+    paint-order: stroke fill;
   }
 
 }
