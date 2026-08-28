@@ -34,11 +34,12 @@ class SlaCachesController < ApplicationController
   
   accept_api_auth :index, :show, :refresh, :destroy, :purge
 
-  before_action :require_admin, except: [ :index, :show, :refresh, :destroy, :context_menu ]
+  before_action :require_admin, except: [ :index, :show, :refresh, :destroy, :context_menu, :explain ]
   before_action :authorize_global
-    
-  before_action :find_sla_cache,  only: [ :show ]
-  before_action :find_sla_caches, only: [ :refresh, :destroy, :context_menu ]
+
+  before_action :find_sla_cache,        only: [ :show ]
+  before_action :find_sla_caches,       only: [ :refresh, :destroy, :context_menu ]
+  before_action :find_issue_for_explain, only: [ :explain ]
 
   before_action :find_optional_project, :only => [ :index, :show, :refresh, :destroy, :purge ]
   # before_action :check_routing_users, :only => [ :index, :show, :refresh, :destroy, :purge ]
@@ -154,6 +155,51 @@ class SlaCachesController < ApplicationController
     end
   end
 
+  # Explain the SLA calculation for a single issue, on demand.
+  # Read-only: queries sla_explain_level/sla_explain_spent, which mirror the
+  # production functions but never write to sla_caches/sla_cache_spents.
+  # Works even when the issue has no SlaCache row yet (e.g. to explain why
+  # no SLA level matched at all).
+  def explain
+    # Normalized through the same sla_get_date() timezone conversion as
+    # start_date/from_status_date/etc below, so the two are comparable —
+    # @issue.created_on alone is displayed in Redmine's own timezone
+    # convention, not the SLA plugin's configured sla_time_zone, and the two
+    # can differ by hours with no actual SLA delay involved.
+    @issue_created_on_sla_tz = ActiveRecord::Base.connection.select_value(
+      ActiveRecord::Base.sanitize_sql(["SELECT sla_get_date(?)", @issue.created_on])
+    )
+
+    @sla_level_explanation = ActiveRecord::Base.connection.select_all(
+      ActiveRecord::Base.sanitize_sql(["SELECT * FROM sla_explain_level(?)", @issue.id])
+    )
+
+    # Business hours of the selected level's calendar, shown once at the top
+    # rather than repeated on every day row below.
+    selected_level = @sla_level_explanation.to_a.find { |row| row['selected'] }
+    @sla_schedule_summary = selected_level ?
+      SlaSchedule.where(sla_calendar_id: selected_level['sla_calendar_id'], match: true).order(:dow, :start_time) :
+      SlaSchedule.none
+
+    @sla_spent_explanations = SlaType.all.filter_map { |sla_type|
+      rows = ActiveRecord::Base.connection.select_all(
+        ActiveRecord::Base.sanitize_sql(["SELECT * FROM sla_explain_spent(?, ?)", @issue.id, sla_type.id])
+      ).to_a
+      next if rows.empty?
+
+      # Group day-level rows back under their status interval, so the view
+      # can show a subtotal per interval and the day-by-day detail
+      # underneath (a long-running status doesn't hide a holiday inside it).
+      intervals = rows.group_by { |row| row.values_at('from_status_id', 'to_status_id', 'from_status_date', 'to_status_date') }.map { |_key, day_rows|
+        { days: day_rows, total: day_rows.sum { |row| row['minutes_counted'].to_i } }
+      }
+      [sla_type, intervals] if intervals.any?
+    }.to_h
+    respond_to do |format|
+      format.html { render layout: !request.xhr? }
+    end
+  end
+
   # Build the context menu for one or multiple SLA caches.
   def context_menu
     if @sla_caches.size == 1
@@ -202,6 +248,16 @@ private
     @sla_cache   = @sla_caches.first if @sla_caches.count == 1
     raise Unauthorized unless @sla_caches.all?(&:visible?)
     raise ActiveRecord::RecordNotFound if @sla_caches.empty?
+  rescue ActiveRecord::RecordNotFound
+    render_404
+  end
+
+  # Find the issue to explain (by issue id, not sla_cache id — explain must
+  # work even when the issue has no SlaCache row yet).
+  def find_issue_for_explain
+    @issue = Issue.visible.find(params[:id])
+    @project = @issue.project
+    raise Unauthorized unless User.current.allowed_to?(:manage_sla, @project)
   rescue ActiveRecord::RecordNotFound
     render_404
   end

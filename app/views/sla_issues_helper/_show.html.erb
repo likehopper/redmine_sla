@@ -1,15 +1,32 @@
-<% 
+<%
 if User.current.allowed_to?(:view_sla, @project, :global => true)
 
   sla_cache = issue.get_sla_cache
+  can_explain = User.current.allowed_to?(:manage_sla, @project)
 
-  if ( !sla_cache.nil? && sla_cache.sla_level_id > 0  )
-
+  if ( sla_cache.nil? || sla_cache.sla_level_id.nil? || sla_cache.sla_level_id <= 0 )
+    if can_explain
 %>
 <hr />
 <div class="sla attribute">
-  
   <div class="label"><%= l('sla_label.sla.plural') -%></div>
+  <div class="value">
+    <%= link_to l(:button_sla_explain), sla_explain_issue_path(issue), class: 'icon icon-help' -%>
+  </div>
+</div>
+<%
+    end # if can_explain
+  else
+%>
+<hr />
+<div class="sla attribute">
+
+  <div class="label">
+    <%= l('sla_label.sla.plural') -%>
+    <% if can_explain %>
+      &nbsp;<%= link_to l(:button_sla_explain), sla_explain_issue_path(issue), class: 'icon icon-help' -%>
+    <% end %>
+  </div>
 
   <div class="value">
 
@@ -24,11 +41,9 @@ if User.current.allowed_to?(:view_sla, @project, :global => true)
     SlaType.all.each { |sla_type| 
 
       sla_term = issue.get_sla_term(sla_type.id)
-      # TODO : SlaLog : no sla_level
       next if ( sla_term.nil? )
 
       sla_spent = issue.get_sla_spent(sla_type.id)
-      # TODO : SlaLog : no sla_cache_term > no priority ?
       next if ( sla_spent.nil? )
         
       if ( !sla_spent.nil? && !sla_term.nil? ) 
