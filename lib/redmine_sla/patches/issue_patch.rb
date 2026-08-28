@@ -97,23 +97,22 @@ module RedmineSla
         end
       end
 
-      # For SlaCacheQuery#group_by:
-      # Dynamically define convenience methods on Issue such as:
+      # For SlaCacheQuery#group_by: convenience methods on Issue such as
       #   get_sla_respect_1, get_sla_respect_2, ...
-      # one per SLA type, to simplify grouping and display logic.
-      #
-      # Database access is wrapped in a begin/rescue to avoid errors when
-      # the database is not yet available (e.g. during installation).
-      begin
-        if ActiveRecord::Base.connection.table_exists? 'sla_types'
-          SlaType.all.each { |sla_type|
-            define_method("get_sla_respect_#{sla_type.id}") do 
-              self.get_sla_respect(sla_type.id)
-            end
-          }
+      # one per SLA type, to simplify grouping and display logic. Resolved
+      # generically rather than defined per existing SlaType, so a SlaType
+      # created (or deleted) after the server started works immediately.
+      SLA_RESPECT_METHOD = /\Aget_sla_respect_(\d+)\z/
+
+      def method_missing(method_name, *args, &block)
+        if (match = SLA_RESPECT_METHOD.match(method_name.to_s))
+          return get_sla_respect(match[1].to_i)
         end
-      rescue ActiveRecord::NoDatabaseError, PG::ConnectionBad
-        # Skip the dynamic method definition if the database connection fails
+        super
+      end
+
+      def respond_to_missing?(method_name, include_private = false)
+        SLA_RESPECT_METHOD.match?(method_name.to_s) || super
       end
       
       # Trigger to update sla_cache when necessary.
