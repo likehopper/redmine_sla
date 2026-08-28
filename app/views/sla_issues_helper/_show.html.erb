@@ -58,7 +58,7 @@ if User.current.allowed_to?(:view_sla, @project, :global => true)
           <table>
             <tr>
               <td  style="vertical-align: middle" rowspan="2">
-                <%= sla_display sla_percent, issue.status.is_closed, Setting.plugin_redmine_sla["sla_display"] || 'bar' -%>
+                <%= sla_display sla_percent, issue.status.is_closed, Setting.plugin_redmine_sla["sla_display"] || 'bar - simple' -%>
               </td>
               <td style="vertical-align: bottom">
                 <strong><%= sla_type.name -%></strong>

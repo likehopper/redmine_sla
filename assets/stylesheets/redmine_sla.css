@@ -120,9 +120,7 @@
     width: var(--w);
     height: var(--w);
     margin: 1em auto;
-    border: var(--b) solid transparent;
     border-radius: 50%;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     position: relative;
     display: flex;
     justify-content: center;
@@ -137,22 +135,42 @@
   }
 
   /* Classic opaque center -- fine on the default (light) theme, but its
-     fixed color can clash on a different theme background. */
+     fixed color can clash on a different theme background. The ring itself
+     is drawn directly on the element via the (invisible) border trick, so
+     the conic-gradient painted "behind" it (border-box) only shows through
+     that border band -- the padding-box layer on top opaquely covers the
+     center where the label sits. */
   .sla_pie_yellow {
+    border: var(--b) solid transparent;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     background: linear-gradient(lightyellow, lightyellow) padding-box,
       conic-gradient(var(--c) calc(var(--p)*1%), var(--r) calc(var(--p)*1%)) border-box;
   }
 
-  /* Transparent center so it blends into any theme -- a thinner ring than
-     the other flat style (closer to sla_pie_modern's ring:hole ratio)
-     leaves enough plain space for the label, plus a white halo around the
-     text so it stays legible directly over the ring's colored edge. */
+  /* Transparent center so it blends into any theme. Without an opaque
+     padding-box layer to carve out the ring band (see sla_pie_yellow
+     above), painting the conic-gradient directly on the element would just
+     fill the whole disc solid. So the ring is drawn on a ::before instead
+     (same technique as sla_pie_modern) and mask cuts the center hole,
+     leaving a real see-through ring with the label floating over it. A
+     slightly bigger circle than the other flat style makes room for
+     longer labels like ">100%". */
   .sla_pie_flat {
     --b: 4px;
-    background: conic-gradient(var(--c) calc(var(--p)*1%), var(--r) calc(var(--p)*1%)) border-box;
+    --w: 50px;
     color: #333;
     -webkit-text-stroke: 3px #fff;
     paint-order: stroke fill;
+  }
+  .sla_pie_flat::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(var(--c) calc(var(--p)*1%), var(--r) calc(var(--p)*1%));
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(99% - var(--b)), #000 calc(100% - var(--b)));
+            mask: radial-gradient(farthest-side, transparent calc(99% - var(--b)), #000 calc(100% - var(--b)));
   }
 
 }
