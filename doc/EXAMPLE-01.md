@@ -310,6 +310,35 @@ You can see:
 
 ---
 
+## 11. Understanding a calculation: the “Explain” button
+
+Sometimes the number shown on the issue isn't enough — you want to know **why**
+the SLA was calculated this way: which level and calendar were matched, and
+exactly how the elapsed time was accumulated day by day.
+
+Next to the SLA block, a manager (anyone with the `manage_sla` permission on
+the project, plus administrators) can click **Explain**.
+
+For **issue_past_1**, the tracked status (“New”) starts and ends on the same
+day, but crosses the **midday break** (12:29 → 14:00). The explanation
+confirms the matched level and calendar, then breaks the elapsed time down
+day by day — with no persistence involved, the page is recomputed on every
+visit:
+
+![Explain: status change within the same day](screenshots/example-01/12-02-01-issue_past_1-issue-explain.png)
+
+For **issue_past_2**, the tracked status spans **two calendar days**, with the
+**overnight closure** (17:59 → 09:30) in between. The day-by-day breakdown
+makes it clear that only the working-hours portion of each day is counted,
+not the raw wall-clock duration between the two timestamps:
+
+![Explain: status change spanning two days](screenshots/example-01/12-02-02-issue_past_2-issue-explain.png)
+
+➡️ “Explain” never changes the SLA cache — it's a **read-only diagnostic
+view**, always safe to open.
+
+---
+
 ## What you learned in this example
 
 With this first example, you learned:

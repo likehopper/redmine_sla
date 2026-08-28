@@ -83,7 +83,7 @@ Redmine::Plugin.register :redmine_sla do
     permission :manage_sla, {
       sla_project_trackers: [:index, :new, :create, :edit, :update, :destroy, :context_menu],
       sla_cache_spents:     [:index, :show, :refresh, :destroy, :purge, :context_menu],
-      sla_caches:           [:index, :show, :refresh, :destroy, :purge, :context_menu]
+      sla_caches:           [:index, :show, :refresh, :destroy, :purge, :context_menu, :explain]
     }, require: :member
   end
 

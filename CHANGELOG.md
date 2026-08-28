@@ -1,5 +1,37 @@
 # Changelog
 
+## 2.1.1 (Stable - Redmine 6.x)
+
+### Added
+
+-   Add: on-demand "Explain" diagnostic view for a single issue's SLA
+    calculation (`sla_caches#explain`, linked from the issue's SLA block to
+    users with `manage_sla`). Shows which SLA level/calendar matched (or why
+    none did), a recap of the calendar's business hours, and a day-by-day
+    breakdown of time spent per SLA type — surfacing holidays/weekends
+    hidden inside a long-running status interval. Read-only, dedicated SQL
+    functions (`sla_explain_level`, `sla_explain_spent`), nothing persisted,
+    never called from the normal calculation path.
+
+### Fixed
+
+-   Fix: the day-by-day breakdown in "Explain" no longer explodes into one
+    row per calendar day for an untracked trailing status interval (e.g. a
+    long-closed issue, whose last interval extends to now) — collapsed to a
+    single summary row since an untracked interval always contributes 0
+    minutes regardless of length.
+-   Fix: documentation screenshot capture (`take_doc_screenshot`) no longer
+    mispositions Redmine's sticky "Jump to a project..." header or crops
+    the bottom of full-page captures — the emulated viewport is now sized
+    to the page's actual content height, measured at capture width.
+
+### Documentation
+
+-   Doc: new "Explain" section in EXAMPLE-01 with screenshots illustrating
+    a same-day and a cross-day status change.
+
+------------------------------------------------------------------------
+
 ## 2.1.0 (Stable - Redmine 6.x)
 
 ### Removed

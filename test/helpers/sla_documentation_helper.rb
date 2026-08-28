@@ -57,22 +57,55 @@ module SlaDocumentationHelperTest
     driver = page.driver.browser
 
     # 1) Force viewport
+    #
+    # For full-page captures, resize the emulated viewport to the page's
+    # actual content height instead of relying on captureBeyondViewport.
+    # Chrome's "capture beyond viewport" mode renders position: sticky/fixed
+    # elements (e.g. Redmine's "Jump to a project..." top bar) at whatever
+    # position they'd occupy in a virtual scroll -- which strands them
+    # mid-page instead of pinned at the top. Sizing the viewport to fit the
+    # whole page up front means nothing needs to scroll during capture, so
+    # the sticky header renders correctly.
+    height =
+      if full_page
+        # Measuring scrollHeight must happen at the SAME width that will be
+        # used for capture -- content can wrap/reflow differently at a
+        # different width, under- or over-estimating the real height. So
+        # pin the width (an arbitrary height is fine here, it gets replaced
+        # below) before measuring, then reset scroll to the top before the
+        # real resize -- the browser keeps whatever scrollTop the page had
+        # at the smaller viewport (e.g. after filling in a field further
+        # down a long form), which would otherwise crop the top once the
+        # viewport is enlarged to fit everything.
+        driver.execute_cdp(
+          'Emulation.setDeviceMetricsOverride',
+          **{ width: viewport[:width], height: viewport[:height], deviceScaleFactor: viewport[:scale], mobile: false }
+        )
+        page.execute_script('window.scrollTo(0, 0)')
+        content_height = page.evaluate_script('document.documentElement.scrollHeight').to_i
+        [content_height, viewport[:height]].max
+      else
+        viewport[:height]
+      end
+
     driver.execute_cdp(
       'Emulation.setDeviceMetricsOverride',
       **{
         width: viewport[:width],
-        height: viewport[:height],
+        height: height,
         deviceScaleFactor: viewport[:scale],
         mobile: false
       }
     )
+    page.execute_script('window.scrollTo(0, 0)') if full_page
 
-    # 2) Capture
+    # 2) Capture (no need for captureBeyondViewport now that the emulated
+    # viewport already matches the full page height)
     result = driver.execute_cdp(
       'Page.captureScreenshot',
       **{
         fromSurface: true,
-        captureBeyondViewport: full_page
+        captureBeyondViewport: false
       }
     )
 

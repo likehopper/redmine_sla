@@ -119,6 +119,10 @@ end
 # context_menu : bulk_destroy
 match 'sla/caches', :controller => 'sla_caches', :action => 'destroy', :via => :delete
 
+# On-demand SLA explanation for a single issue (works even without an
+# existing sla_caches row, e.g. to explain why no SLA level matched).
+get 'issues/:id/sla_explain', :controller => 'sla_caches', :action => 'explain', :as => 'sla_explain_issue'
+
 # SLA Global settings - Sla Cache Spents
 resources :sla_cache_spents, path: "sla/cache_spents", except: [:new, :create, :edit, :update] do
   member do

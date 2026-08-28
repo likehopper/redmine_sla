@@ -584,7 +584,98 @@ class SlaCachesControllerTest < ApplicationSlaFunctionalsTestCase
   end
 
 
-  ### As other #6 ###
+  ### explain ###
+  # Tests for the explain action. Unlike show/refresh/context_menu (gated on
+  # visible?, i.e. :view_sla), explain is gated on :manage_sla scoped to the
+  # issue's own project (find_issue_for_explain's explicit
+  # User.current.allowed_to?(:manage_sla, @project) check) -- so a user with
+  # only :view_sla (developer on project 1, sysadmin on project 2) must be
+  # forbidden here even though they can see the SLA block itself.
+
+  test "should redirect on get explain as anonymous" do
+    issue_id = SlaCache.first.issue_id
+    with_settings :default_language => "en" do
+      get :explain, params: { id: issue_id }
+      assert_response :redirect
+      assert_redirected_to %r{#{signin_path}}
+    end
+  end
+
+  test "should success on get explain as admin" do
+    issue_id = SlaCache.first.issue_id
+    @request.session[:user_id] = 1
+    with_settings :default_language => "en" do
+      get :explain, params: { id: issue_id }
+      assert_response :success
+    end
+  end
+
+  test "should success on get explain as manager on project 1" do
+    issue_id = SlaCache.where(project: 1).order(:id).first.issue_id
+    @request.session[:user_id] = 2
+    with_settings :default_language => "en" do
+      get :explain, params: { id: issue_id }
+      assert_response :success
+    end
+  end
+
+  test "should success on get explain as manager on project 2" do
+    issue_id = SlaCache.where(project: 2).order(:id).first.issue_id
+    @request.session[:user_id] = 2
+    with_settings :default_language => "en" do
+      get :explain, params: { id: issue_id }
+      assert_response :success
+    end
+  end
+
+  test "should forbidden on get explain as developper (view_sla only, no manage_sla)" do
+    issue_id = SlaCache.where(project: 1).order(:id).first.issue_id
+    @request.session[:user_id] = 3
+    with_settings :default_language => "en" do
+      get :explain, params: { id: issue_id }
+      assert_response :forbidden
+    end
+  end
+
+  test "should forbidden on get explain as sysadmin (view_sla only, no manage_sla)" do
+    issue_id = SlaCache.where(project: 2).order(:id).first.issue_id
+    @request.session[:user_id] = 4
+    with_settings :default_language => "en" do
+      get :explain, params: { id: issue_id }
+      assert_response :forbidden
+    end
+  end
+
+  test "should forbidden on get explain as reporter" do
+    issue_id = SlaCache.first.issue_id
+    @request.session[:user_id] = 5
+    with_settings :default_language => "en" do
+      get :explain, params: { id: issue_id }
+      assert_response :forbidden
+    end
+  end
+
+  test "should forbidden on get explain as other" do
+    issue_id = SlaCache.first.issue_id
+    @request.session[:user_id] = 6
+    with_settings :default_language => "en" do
+      get :explain, params: { id: issue_id }
+      assert_response :forbidden
+    end
+  end
+
+  test "should success on get explain as admin for an issue with no matching SLA level" do
+    issue = Issue.where(project_id: 1, tracker_id: 2).first # tracker with no sla_project_trackers association
+    @request.session[:user_id] = 1
+    with_settings :default_language => "en" do
+      get :explain, params: { id: issue.id }
+      assert_response :success
+      assert_select 'p.nodata'
+    end
+  end
+
+  ### As other #6 ###
+
 
   test "should forbidden on get index as other" do
     @request.session[:user_id] = 6

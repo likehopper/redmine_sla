@@ -349,6 +349,28 @@ fr:
   label_sla_notice: Les SLA sont tous stockés dans un <a href="%{url}">cache</a>. Les SLA sont générés à l'affichage des valeurs dans les demandes.
   label_sla_warning: Les changements (%{changes}) ont impliqués une mise à jour des SLA !
   label_sla_term: Délais
+
+  button_sla_explain: Expliquer
+  label_sla_explain_title: Explication du SLA
+  label_sla_explain_level: Sélection du niveau SLA
+  label_sla_explain_no_level: Aucun SLA n'est configuré pour ce projet/tracker, ou aucun horaire correspondant n'a été trouvé dans la fenêtre de recherche.
+  label_sla_explain_matched: Correspond
+  label_sla_explain_selected: Retenu
+  label_sla_explain_issue_created_on: "Ticket créé le :"
+  label_sla_explain_spent: Temps passé, par type de SLA
+  label_sla_explain_no_term: Aucun niveau SLA ne s'applique à ce ticket, le temps passé ne peut donc pas être calculé.
+  label_sla_explain_from_status: Statut de départ
+  label_sla_explain_to_status: Statut d'arrivée
+  label_sla_explain_from_date: Du
+  label_sla_explain_to_date: Au
+  label_sla_explain_tracked: Suivi
+  label_sla_explain_day: Jour
+  label_sla_explain_day_note: Remarque
+  label_sla_explain_no_schedule: Hors horaires
+  label_sla_explain_schedule_summary: "Horaires ouvrés :"
+  label_sla_explain_minutes: Minutes comptées
+  label_sla_explain_total_minutes: Total des minutes comptées
+
   label_sla_spent: Temps
   label_sla_remain: Restant
   label_sla_respect: Respect

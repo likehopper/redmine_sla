@@ -41,6 +41,11 @@ module IssuesDocumentationTest
     created_issues.each do |issue_key, issue, idx|
       visit "/issues/#{issue.id}"
       take_doc_screenshot(format('%02d-01-%02d-%s-issue-show.png', id, idx, issue_key))
+
+      # "Explain" the SLA calculation for this issue (link next to the SLA
+      # block, visible here since we're logged in as admin).
+      click_link l(:button_sla_explain)
+      take_doc_screenshot(format('%02d-02-%02d-%s-issue-explain.png', id, idx, issue_key))
     end
   end
 

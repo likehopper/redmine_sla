@@ -349,6 +349,27 @@ en:
   label_sla_notice: SLA are all stored in a <a href="%{url}">cache</a>. SLA are generated when values ​​are displayed in issues.
   label_sla_warning: The changes (%{changes}) involved an update of the SLA!
   label_sla_term: Term
+
+  button_sla_explain: Explain
+  label_sla_explain_title: SLA explanation
+  label_sla_explain_level: SLA level selection
+  label_sla_explain_no_level: No SLA is configured for this project/tracker, or no matching schedule was found within the search window.
+  label_sla_explain_matched: Matched
+  label_sla_explain_selected: Selected
+  label_sla_explain_issue_created_on: "Ticket created on:"
+  label_sla_explain_spent: Time spent, by SLA type
+  label_sla_explain_no_term: No SLA level applies to this issue, so no time spent can be computed.
+  label_sla_explain_from_status: From status
+  label_sla_explain_to_status: To status
+  label_sla_explain_from_date: From
+  label_sla_explain_to_date: To
+  label_sla_explain_tracked: Tracked
+  label_sla_explain_day: Day
+  label_sla_explain_day_note: Note
+  label_sla_explain_no_schedule: No schedule
+  label_sla_explain_schedule_summary: "Business hours:"
+  label_sla_explain_minutes: Minutes counted
+  label_sla_explain_total_minutes: Total minutes counted
   label_sla_spent: Spent
   label_sla_remain: Remain
   label_sla_respect: Respect

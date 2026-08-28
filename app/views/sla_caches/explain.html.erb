@@ -1,0 +1,102 @@
+<% html_title(l(:label_sla_explain_title)) %>
+<h2><%= l(:label_sla_explain_title) %> — <%= link_to "##{@issue.id} #{@issue.subject}", issue_path(@issue) -%></h2>
+
+<p><%= l(:label_sla_explain_issue_created_on) %> <strong><%= format_time(@issue_created_on_sla_tz) %></strong></p>
+
+<% if @sla_schedule_summary.any? %>
+  <p>
+    <%= l(:label_sla_explain_schedule_summary) %>
+    <% @sla_schedule_summary.group_by(&:dow).each do |dow, schedules| %>
+      <strong><%= I18n.t('date.day_names')[dow] %></strong>
+      <%= schedules.map { |s| "#{s.start_time.strftime('%H:%M')}-#{s.end_time.strftime('%H:%M')}" }.join(', ') %><%= '; ' unless dow == @sla_schedule_summary.map(&:dow).uniq.last %>
+    <% end %>
+  </p>
+<% end %>
+
+<h3><%= l(:label_sla_explain_level) %></h3>
+<% if @sla_level_explanation.empty? %>
+  <p class="nodata"><%= l(:label_sla_explain_no_level) %></p>
+<% else %>
+  <table class="list">
+    <thead>
+      <tr>
+        <th><%= l(:field_sla_level) %></th>
+        <th><%= l('sla_label.sla_calendar.singular') %></th>
+        <th><%= l(:label_sla_explain_matched) %></th>
+        <th><%= l(:field_start_date) %></th>
+        <th><%= l(:label_sla_explain_selected) %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @sla_level_explanation.each do |row| %>
+        <tr class="<%= cycle('odd', 'even') %><%= ' sla-explain-selected' if row['selected'] %>">
+          <td><%= row['sla_level_name'] %></td>
+          <td><%= row['sla_calendar_name'] %></td>
+          <td class="center"><%= row['matched'] ? l(:general_text_yes) : l(:general_text_no) %></td>
+          <td><%= row['start_date'] ? format_time(row['start_date']) : '-' %></td>
+          <td class="center"><%= row['selected'] ? l(:general_text_yes) : '' %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<h3><%= l(:label_sla_explain_spent) %></h3>
+<% if @sla_spent_explanations.empty? %>
+  <p class="nodata"><%= l(:label_sla_explain_no_term) %></p>
+<% else %>
+  <% @sla_spent_explanations.each do |sla_type, intervals| %>
+    <h4><%= sla_type.name %></h4>
+    <table class="list">
+      <thead>
+        <tr>
+          <th><%= l(:label_sla_explain_from_status) %> / <%= l(:label_sla_explain_to_status) %></th>
+          <th><%= l(:label_sla_explain_day) %></th>
+          <th><%= l(:label_sla_explain_day_note) %></th>
+          <th><%= l(:label_sla_explain_tracked) %></th>
+          <th><%= l(:label_sla_explain_minutes) %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% total_minutes = 0 %>
+        <% intervals.each do |interval| %>
+          <% total_minutes += interval[:total] %>
+          <% first = interval[:days].first %>
+          <tr class="sla-explain-interval">
+            <td colspan="5">
+              <strong><%= first['from_status_name'] %> → <%= first['to_status_name'] %></strong>
+              (<%= format_time(first['from_status_date']) %> — <%= format_time(first['to_status_date']) %>,
+              <%= l(:label_sla_explain_tracked) %>: <%= first['tracked'] ? l(:general_text_yes) : l(:general_text_no) %>,
+              <%= l(:label_sla_explain_total_minutes) %>: <strong><%= interval[:total] %></strong>)
+            </td>
+          </tr>
+          <% if first['tracked'] %>
+            <% interval[:days].each do |row| %>
+              <tr class="<%= cycle('odd', 'even') %><%= ' sla-explain-holiday' if row['is_holiday'] %><%= ' sla-explain-no-schedule' if !row['is_holiday'] && !row['has_schedule'] %>">
+                <td></td>
+                <td><%= format_date(row['day']) %></td>
+                <td>
+                  <% if row['is_holiday'] %>
+                    <%= row['holiday_name'] %>
+                  <% elsif !row['has_schedule'] %>
+                    <%= l(:label_sla_explain_no_schedule) %>
+                  <% else %>
+                    -
+                  <% end %>
+                </td>
+                <td class="center"><%= row['tracked'] ? l(:general_text_yes) : l(:general_text_no) %></td>
+                <td class="center"><%= row['minutes_counted'] %></td>
+              </tr>
+            <% end %>
+          <% end %>
+        <% end %>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4"><strong><%= l(:label_sla_explain_total_minutes) %></strong></td>
+          <td class="center"><strong><%= total_minutes %></strong></td>
+        </tr>
+      </tfoot>
+    </table>
+  <% end %>
+<% end %>
