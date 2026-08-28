@@ -55,21 +55,21 @@ module RedmineSla
       #   issue.get_sla_respect(sla_type_id)
       # end
       
-      # FIX: Wrap database access in a begin/rescue block to prevent crashes
-      # during `rake db:create` or application load when the database is not
-      # yet available or the connection is not ready.
-      begin
-        if ActiveRecord::Base.connection.table_exists?('sla_types')
-          SlaType.all.each do |sla_type|
-            define_method("get_sla_respect_#{sla_type.id}") do
-              # Delegation to the associated issue. This calls the corrected
-              # method implementation in issue_patch.rb.
-              self.issue.get_sla_respect(sla_type.id)
-            end
-          end
+      # get_sla_respect_1, get_sla_respect_2, ... one per SLA type, delegating
+      # to the associated issue. Resolved generically rather than defined per
+      # existing SlaType, so a SlaType created (or deleted) after the server
+      # started works immediately.
+      SLA_RESPECT_METHOD = /\Aget_sla_respect_(\d+)\z/
+
+      def method_missing(method_name, *args, &block)
+        if (match = SLA_RESPECT_METHOD.match(method_name.to_s))
+          return issue.get_sla_respect(match[1].to_i)
         end
-      rescue ActiveRecord::NoDatabaseError, PG::ConnectionBad
-        # Ignore connection errors at startup when the database is not ready
+        super
+      end
+
+      def respond_to_missing?(method_name, include_private = false)
+        SLA_RESPECT_METHOD.match?(method_name.to_s) || super
       end
 
     end
