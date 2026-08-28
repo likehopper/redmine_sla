@@ -48,8 +48,6 @@ Redmine::Plugin.register :redmine_sla do
   # Global plugin settings (default values + configuration partial)
   settings(
     default: {
-      'sla_log_level' => '1',
-      'sla_cache_ttl' => '1',
       'sla_time_zone' => 'Etc/UTC',
       'sla_display'   => 'bar'
     },

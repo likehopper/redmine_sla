@@ -2,7 +2,7 @@
 
 ## Overview
 
-During installation, thirteen plugin-specific tables are created:
+During installation, twelve plugin-specific tables are created:
 
 -   **slas** : all SLA definitions
 -   **sla_calendars** : calendars attached to an SLA
@@ -20,7 +20,6 @@ During installation, thirteen plugin-specific tables are created:
     `sla_get_level`)
 -   **sla_cache_spents** : cache of computed spent time (via
     `sla_get_spent`)
--   **sla_logs** : internal logging table (currently not actively used)
 
 ------------------------------------------------------------------------
 
@@ -118,7 +117,6 @@ A unique index ensures one term per:
 
 -   sla_caches
 -   sla_cache_spents
--   sla_logs
 
 ------------------------------------------------------------------------
 
