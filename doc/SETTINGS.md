@@ -14,4 +14,4 @@ Default: Etc/UTC
 
 Allows you to choose between displaying the as a bar or as a pie chart.
 
-Default: bar
+Default: bar - simple
