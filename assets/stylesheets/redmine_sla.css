@@ -77,8 +77,8 @@
 
   .sla_pie_modern {
     --p:50;
-    --b:5px;
-    --w:50px;
+    --b:6px;
+    --w:56px;
     --c:green;
     width: var(--w);
     aspect-ratio: 1;
@@ -113,8 +113,8 @@
 
   .sla_pie_flat_base {
     --p: 50;
-    --b: 8px;
-    --w: 40px;
+    --b: 6px;
+    --w: 56px;
     --c: green;
     --r: darkgrey;
     width: var(--w);
@@ -127,6 +127,9 @@
     align-items: center;
     font-size: 12px;
     font-weight: bold;
+    color: #333;
+    -webkit-text-stroke: 3px #fff;
+    paint-order: stroke fill;
   }
   .sla_pie_flat_base p {
     position: relative;
@@ -134,34 +137,21 @@
     font-size: 12px;
   }
 
-  /* Classic opaque center -- fine on the default (light) theme, but its
-     fixed color can clash on a different theme background. The ring itself
-     is drawn directly on the element via the (invisible) border trick, so
-     the conic-gradient painted "behind" it (border-box) only shows through
-     that border band -- the padding-box layer on top opaquely covers the
-     center where the label sits. */
-  .sla_pie_yellow {
-    border: var(--b) solid transparent;
+  /* Solid disc, filled proportionally to the percentage (classic pie-chart
+     wedge) instead of a ring -- no center hole to keep clear, so it's the
+     simplest of the flat styles. Transparent everywhere the fill doesn't
+     reach, so it blends into any theme background. */
+  .sla_pie_plain {
+    background: conic-gradient(var(--c) calc(var(--p)*1%), var(--r) calc(var(--p)*1%));
     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-    background: linear-gradient(lightyellow, lightyellow) padding-box,
-      conic-gradient(var(--c) calc(var(--p)*1%), var(--r) calc(var(--p)*1%)) border-box;
   }
 
-  /* Transparent center so it blends into any theme. Without an opaque
-     padding-box layer to carve out the ring band (see sla_pie_yellow
-     above), painting the conic-gradient directly on the element would just
-     fill the whole disc solid. So the ring is drawn on a ::before instead
-     (same technique as sla_pie_modern) and mask cuts the center hole,
-     leaving a real see-through ring with the label floating over it. A
-     slightly bigger circle than the other flat style makes room for
-     longer labels like ">100%". */
-  .sla_pie_flat {
-    --b: 4px;
-    --w: 50px;
-    color: #333;
-    -webkit-text-stroke: 3px #fff;
-    paint-order: stroke fill;
-  }
+  /* Transparent center so it blends into any theme. Painting the
+     conic-gradient directly on the element (like sla_pie_plain above)
+     would fill the whole disc solid -- there'd be nothing carving a hole
+     out for the label. So the ring is drawn on a ::before instead (same
+     technique as sla_pie_modern) and mask cuts the center hole, leaving a
+     real see-through ring with the label floating over it. */
   .sla_pie_flat::before {
     content: "";
     position: absolute;

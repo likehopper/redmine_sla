@@ -1,5 +1,5 @@
 <p>
   <label for="settings_sla_display"><%= l(:label_display) %></label>
-  <%= select_tag 'settings[sla_display]', options_for_select(['none','bar - simple','bar - rounded','pie - flat','pie - yellow','pie - modern'],
+  <%= select_tag 'settings[sla_display]', options_for_select(['none','bar - simple','bar - rounded','pie - flat','pie - plain','pie - modern'],
     @settings["sla_display"]) %>
 </p>
