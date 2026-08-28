@@ -95,6 +95,9 @@ RedmineApp::Application.config.after_initialize do
   # Load helper modules ( to display respect boolean in lists )
   ActionView::Base.send(:include, RedmineSla::Helpers::SlaRenderingHelper)
 
+  # Load SlaIssuesHelper ( sla_display, used by sla_issues_helper/_show )
+  ActionView::Base.send(:include, SlaIssuesHelper)
+
   # Adds Project-level SLA helpers
   unless ProjectsController.included_modules.include? RedmineSla::Patches::ProjectsHelperPatch
     ProjectsController.helper(RedmineSla::Patches::ProjectsHelperPatch)
