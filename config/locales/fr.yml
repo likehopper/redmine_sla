@@ -9,11 +9,6 @@ fr:
   notice_successful_refresh: L'actualisation est terminée
   notice_successful_purge: La purge est terminée
 
-  sla_log_level_none: Aucun
-  sla_log_level_error: Erreurs
-  sla_log_level_info: Informations
-  sla_log_level_debug: Deboguage  
-
   sla_dictionary:
     sla: &sla Niveau de service
     slas: &slas Niveaux de service
@@ -144,11 +139,6 @@ fr:
   sla_label_project_settings: Configuration des SLA du projet
 
   sla_label:
-
-    # SlaLog
-    sla_log:
-      error_logs: Journaux d'erreurs des SLA
-      error_level: Niveau d'erreur des SLA
 
     # Sla
     sla:
@@ -337,8 +327,6 @@ fr:
       delete: Supprimer de Cache de SLA
       purge: Purge de Cache de SLA
       miss: Cache de SLA manquant
-      manage: Gestion de Cache de SLA
-      ttl: Durée de vie de Cache de SLA (en minutes) 
 
     # SlaCacheSpent
     sla_cache_spent:

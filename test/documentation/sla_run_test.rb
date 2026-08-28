@@ -28,7 +28,6 @@ module SlaDocumentationFixtureHelpers
   # CORE_FIXTURES (users, trackers, roles, issue_statuses, …) are intentionally
   # excluded — they must remain intact between suites.
   DOC_TEST_TABLES = %w[
-    sla_logs
     sla_caches
     sla_cache_spents
     sla_project_trackers

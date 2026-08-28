@@ -1,5 +1,29 @@
 # Changelog
 
+## 2.1.0 (Stable - Redmine 6.x)
+
+### Removed
+
+-   Remove: the never-implemented `SlaLog` logging subsystem — model,
+    `sla_log_level` setting and settings tab, `sla_log_levels` enum on
+    `Sla`, and the `sla_logs`/`sla_log_level` database objects (migration
+    `202111112021018`). Scaffolded in 2.0.4 but never wired to any
+    calculation path.
+-   Remove: the unused `sla_cache_ttl` setting and its settings tab — never
+    read anywhere in the codebase.
+
+### Documentation
+
+-   Doc: drop the "SLA Error logs" and "SLA Cache management" sections from
+    `doc/SETTINGS.md` (settings removed above).
+-   Doc: update the README roadmap — remove items already implemented
+    ("Group issues by SLA compliance", "Column visibility based on module
+    access") and clarify that SLA export is already available (only import
+    remains open).
+-   Doc: remove `sla_logs` references from `doc/MCD.md`.
+
+------------------------------------------------------------------------
+
 ## 2.0.4 (Stable - Redmine 6.x)
 
 ### Security

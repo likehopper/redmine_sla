@@ -9,11 +9,6 @@ en:
   notice_successful_refresh: Refresh is done
   notice_successful_purge: Purge is done
 
-  sla_log_level_none: None
-  sla_log_level_error: Errors
-  sla_log_level_info: Informations
-  sla_log_level_debug: Debug
-
   sla_dictionary:
     sla: &sla Service Level Agreement
     slas: &slas Service Levels Agreement
@@ -145,11 +140,6 @@ en:
 
   sla_label:
   
-    # SlaLog
-    sla_log:
-      error_logs: SLA Error logs
-      error_level: SLA Error level
-
     # Sla
     sla:
       singular: *sla
@@ -337,8 +327,6 @@ en:
       delete: Destroy SLA Cache
       purge: Purge SLA Cache
       miss: Miss SLA Cache
-      manage: SLA Cache management
-      ttl: SLA Cache Lifetime (in minutes) 
 
     # SlaCacheSpent
     sla_cache_spent:

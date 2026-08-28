@@ -130,21 +130,19 @@ Fully manageable through UI and REST API:
 
 -   Graphical schedule editor
 -   Tabular SLA term editor
--   Group issues by SLA compliance
 -   Improved calendar visualization
 
 ### Functional Extensions
 
 -   Per-project time zone
 -   Alert thresholds & notifications
--   SLA export/import
+-   SLA import (CSV export already available)
 -   SLA summary in issue reports
 
 ### Technical Improvements
 
 -   Cache invalidation strategy
 -   Full functional test coverage
--   Column visibility based on module access
 
 ------------------------------------------------------------------------
 

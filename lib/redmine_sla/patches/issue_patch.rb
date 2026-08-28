@@ -70,10 +70,7 @@ module RedmineSla
       # Used in IssueQueryPatch to display SLA remaining time in list columns.
       def get_sla_remain(sla_type_id)
         sla_term = self.get_sla_term(sla_type_id)
-        # TODO: SlaLog: handle missing sla_level
-
         sla_spent = self.get_sla_spent(sla_type_id)
-        # TODO: SlaLog: handle nil/zero spent values
 
         ( sla_term - sla_spent ) if sla_term && sla_spent
       end
