@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.1.5 (Stable - Redmine 6.x)
+
+### Fixed
+
+-   Fix: `bar - rounded` gauge fill rendered as a near-perfect circle
+    around ~20% (its 12px `border-radius` and the filled width both
+    landing close to half the bar's height at that point) — lowered the
+    radius to 8px so it stays visibly rounded without ever fully closing
+    into a circle. Added a 12px `min-width` floor so the fill stays a
+    visible rounded pill below ~16px, and hides the fill outright under
+    4% instead of showing a disproportionate sliver.
+-   Fix: `pie - flat` ring widened from 6px to 10px (disc grown from 56px
+    to 64px to compensate) for legibility — the narrower ring cramped the
+    label, most noticeably the longer `>100%` text.
+
+------------------------------------------------------------------------
+
 ## 2.1.4 (Stable - Redmine 6.x)
 
 ### Performance
