@@ -75,12 +75,12 @@ class SlaCache < ActiveRecord::Base
     if ( project.nil? )
       ActiveRecord::Base.connection.execute("TRUNCATE sla_caches CASCADE ; ")
     else
-      SlaCache.where(project: project.id).destroy_all
+      SlaCache.where(project: project.id).delete_all
     end
   end
     
   def self.destroy_by_issue_id(issue_id)
-    SlaCache.where(issue: issue_id).destroy_all
+    SlaCache.where(issue: issue_id).delete_all
   end              
 
   # For SlaCacheQuery#GroupBy
