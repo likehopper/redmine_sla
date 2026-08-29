@@ -1,5 +1,73 @@
 # Changelog
 
+## 2.1.7 (Stable - Redmine 6.x)
+
+### Refactoring
+
+-   Refactor: `SlaCache`, `Issue` and `TimeEntry` each defined a
+    `get_sla_respect_<id>` accessor (and `SlaCache` also
+    `get_sla_remain/spent/term_<id>`) per `SlaType`, via `define_method`
+    loops run once at boot and patched on creation through
+    `SlaTypesController#post_create`/`post_destroy` — except
+    `post_destroy` was never actually called from `destroy`, leaving
+    dangling accessor methods on all three classes after deleting a
+    SlaType. Replaced with a generic `method_missing`/`respond_to_missing?`
+    on each class that resolves `get_sla_*_<id>` for any id without
+    predefining it, so a SlaType works immediately whether created before
+    or after the server booted.
+
+------------------------------------------------------------------------
+
+## 2.1.6 (Stable - Redmine 6.x)
+
+### Documentation
+
+-   Doc: replace `doc/images/redmine_sla_issue_patch.png`, which no longer
+    matched the plugin's current rendering, with an up-to-date capture.
+
+------------------------------------------------------------------------
+
+## 2.1.5 (Stable - Redmine 6.x)
+
+### Fixed
+
+-   Fix: `bar - rounded` gauge fill rendered as a near-perfect circle
+    around ~20% (its 12px `border-radius` and the filled width both
+    landing close to half the bar's height at that point) — lowered the
+    radius to 8px so it stays visibly rounded without ever fully closing
+    into a circle. Added a 12px `min-width` floor so the fill stays a
+    visible rounded pill below ~16px, and hides the fill outright under
+    4% instead of showing a disproportionate sliver.
+-   Fix: `pie - flat` ring widened from 6px to 10px (disc grown from 56px
+    to 64px to compensate) for legibility — the narrower ring cramped the
+    label, most noticeably the longer `>100%` text.
+
+------------------------------------------------------------------------
+
+## 2.1.4 (Stable - Redmine 6.x)
+
+### Performance
+
+-   Perf: `SlaCache.purge`/`SlaCacheSpent.purge` (project-scoped branch) and
+    `SlaCache.destroy_by_issue_id` now use `delete_all` instead of
+    `destroy_all` — neither model has callbacks, and
+    `sla_cache_spents.sla_cache_id` has an `ON DELETE CASCADE` foreign key,
+    so a single `DELETE` statement is equivalent and considerably faster on
+    large volumes.
+
+------------------------------------------------------------------------
+
+## 2.1.3 (Stable - Redmine 6.x)
+
+### Fixed
+
+-   Fix: `IssueQueryPatch#available_filters_with_sla_issue` logged three
+    routine execution traces at `error` level, polluting production logs
+    with non-error noise every time the issue list filters are built.
+    Downgraded to `debug`.
+
+------------------------------------------------------------------------
+
 ## 2.1.2 (Stable - Redmine 6.x)
 
 ### Fixed

@@ -41,10 +41,32 @@
   .sla_bar_square { border-radius: 5%; }
   .sla_bar_square::after { border-radius: 5%; }
   .sla_bar_rounded {
-    border-radius: 12px;
+    /* Kept well under half the bar's 25px height: at 12px (~half), a fill
+       whose width happens to land near 25px (e.g. ~20% of the 125px bar)
+       turns into a near-perfect circle -- reading as "done" instead of a
+       partial fill. 8px still looks rounded at any width without ever
+       fully closing into a circle/pill at some unlucky percentage. */
+    border-radius: 8px;
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.15);
   }
-  .sla_bar_rounded::after { border-radius: 12px; }
+  .sla_bar_rounded::after {
+    border-radius: 8px;
+    /* Below ~2x the radius, the browser clamps the corner curvature down
+       to fit the box, so at very low percentages (a couple of px wide)
+       the curve shrinks to sub-pixel and the fill reads as a straight
+       edge instead of rounded. A floor on the width keeps it a visible
+       small pill once it's shown at all (see .sla_bar_no_fill below for
+       the even-smaller values where nothing is shown instead). */
+    min-width: 12px;
+  }
+  /* Below 5px (4% of the 125px bar) the sla_display helper adds this
+     class instead of letting min-width force a fill: at that point the
+     floor above would be pure invention relative to the real value, so
+     showing no fill at all reads better than an arbitrary-looking nub.
+     Two classes (not one) so this reliably outranks .sla_bar:after's
+     `display: block` below regardless of source order -- same specificity
+     there would make the later rule in the file win. */
+  .sla_bar.sla_bar_no_fill::after { display: none; }
 
   .sla_bar::before,
   .sla_bar::after {
@@ -152,6 +174,16 @@
      out for the label. So the ring is drawn on a ::before instead (same
      technique as sla_pie_modern) and mask cuts the center hole, leaving a
      real see-through ring with the label floating over it. */
+  .sla_pie_flat {
+    /* Wider ring than the shared --b:6px default (only affects this
+       variant -- sla_pie_plain doesn't use --b, it's a solid disc). */
+    --b: 10px;
+    /* Grow the whole disc to compensate: the ring eats into the center
+       hole (hole radius = w/2 - b), so widening the ring alone shrank the
+       hole from ~44px to ~36px, cramping longer labels like ">100%".
+       64px restores roughly the original hole size at the new thickness. */
+    --w: 64px;
+  }
   .sla_pie_flat::before {
     content: "";
     position: absolute;
