@@ -8,7 +8,7 @@
       <% end %>
       <% if sla_level_term.safe_attribute?('sla_type_id') %>
       <p>
-        <%= f.select :sla_type_id, SlaType.all.collect { |p| [ p.name, p.id ] }, :include_blank => (f.object.new_record??true:false), :required => true %>
+        <%= f.select :sla_type_id, SlaType.sorted.collect { |p| [ p.name, p.id ] }, :include_blank => (f.object.new_record??true:false), :required => true %>
       </p>
       <% end %>
       <% if sla_level_term.safe_attribute?('sla_priority_id') %>

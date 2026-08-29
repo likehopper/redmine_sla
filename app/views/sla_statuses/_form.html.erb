@@ -5,8 +5,8 @@
       <p>
         <% if SlaType.all.blank? then %>
           <label><%= l('sla_label.sla_type.singular') %></label><%= l('sla_label.sla_type.miss') %>
-        <% else %>        
-          <%= f.select :sla_type_id, SlaType.all.collect { |p| [ p.name, p.id ] }, :include_blank => (f.object.new_record??true:false), :required => true %>
+        <% else %>
+          <%= f.select :sla_type_id, SlaType.sorted.collect { |p| [ p.name, p.id ] }, :include_blank => (f.object.new_record??true:false), :required => true %>
         <% end %>
       </p>
       <% end %>
