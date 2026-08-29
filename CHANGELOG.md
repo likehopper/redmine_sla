@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.1.4 (Stable - Redmine 6.x)
+
+### Performance
+
+-   Perf: `SlaCache.purge`/`SlaCacheSpent.purge` (project-scoped branch) and
+    `SlaCache.destroy_by_issue_id` now use `delete_all` instead of
+    `destroy_all` — neither model has callbacks, and
+    `sla_cache_spents.sla_cache_id` has an `ON DELETE CASCADE` foreign key,
+    so a single `DELETE` statement is equivalent and considerably faster on
+    large volumes.
+
+------------------------------------------------------------------------
+
 ## 2.1.3 (Stable - Redmine 6.x)
 
 ### Fixed
