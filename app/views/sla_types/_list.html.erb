@@ -1,7 +1,7 @@
 <%= form_tag({}, data: {cm_url: context_menu_sla_types_path}) do %>
   <%= hidden_field_tag 'back_url', url_for(params: request.query_parameters), id: nil %>
   <div class="autoscroll">
-    <table class="list odd-even entities">
+    <table class="list odd-even entities sla_types">
       <thead>
         <tr>
           <th class="checkbox hide-when-print">
@@ -15,28 +15,14 @@
         </tr>
       </thead>
       <tbody>
-        <% grouped_query_results(entities, @query) do |entity, group_name, group_count, group_totals| %>
-          <% if group_name %>
-            <% reset_cycle %>
-            <tr class="group open">
-              <td colspan="<%= @query.inline_columns.size + 2 %>">
-                <span class="expander icon icon-expanded" onclick="toggleRowGroup(this);">&nbsp;</span>
-                <span class="name"><%= group_name %></span>
-                <% if group_count %>
-                <span class="badge badge-count count"><%= group_count %></span>
-                <% end %>
-                <span class="totals"><%= group_totals %></span>
-                <%= link_to_function("#{l(:button_collapse_all)}/#{l(:button_expand_all)}",
-                'toggleAllRowGroups(this)', class: 'toggle-all') %>
-              </td>
-            </tr>
-          <% end %>
+        <% entities.each do |entity| %>
           <tr id="entity_id_<%= entity.id %>" class="entity <%= cycle('odd', 'even') %> hascontextmenu">
             <td class="checkbox hide-when-print"><%= check_box_tag('ids[]', entity.id, false, id: nil) %></td>
             <% @query.inline_columns.each do |column| %>
               <%= content_tag('td', column_content(column, entity), class: column.css_classes) %>
             <% end %>
             <td class="buttons">
+              <%= reorder_handle(entity) if @can_reorder -%>
               <%= if entity.visible?
                     link_to l(:button_show), sla_type_path(entity),
                             title: l(:button_show), class: 'icon-only icon-magnifier'
@@ -47,26 +33,19 @@
                   end -%>
               <%= if entity.deletable?
                     link_to l(:button_delete), sla_type_path(entity),
-                            data: {confirm: l(:text_are_you_sure)},method: :delete,
+                            data: {confirm: l(:text_are_you_sure)}, method: :delete,
                             title: l(:button_delete), class: 'icon-only icon-del'
                   end -%>
             </td>
           </tr>
-          <% @query.block_columns.each do |column| %>
-            <% if (text = column_content(column, entity)) && text.present? %>
-              <tr class="<%= current_cycle %>">
-                <td colspan="<%= @query.inline_columns.size + 1 %>" class="<%= column.css_classes %>">
-                  <% if query.block_columns.count > 1 %>
-                  <span><%= column.caption %></span>
-                  <% end %>
-                  <%= text %>
-                </td>
-              </tr>
-            <% end %>
-          <% end %>
         <% end %>
       </tbody>
     </table>
   </div>
 <% end %>
 <%= context_menu %>
+<% if @can_reorder -%>
+  <%= javascript_tag do %>
+    $(function() { $("table.sla_types tbody").positionedItems(); });
+  <% end %>
+<% end -%>
