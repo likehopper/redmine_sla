@@ -51,6 +51,10 @@ module SlaIssuesHelper
         css_type = "sla_pie_flat_base sla_pie_plain"
       when "bar - rounded"
         css_type = "sla_bar sla_bar_rounded"
+        # Below 5px (4% of the 125px bar), even the floored min-width would
+        # force a visible fill out of a value that's really "barely started" --
+        # clearer to show no fill at all than an arbitrarily-sized nub.
+        css_type += " sla_bar_no_fill" if percent < 4
       else
         css_type = "sla_bar sla_bar_square"
     end
