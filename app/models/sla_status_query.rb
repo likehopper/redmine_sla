@@ -76,7 +76,7 @@ class SlaStatusQuery < Query
     return @all_sla_types_values if @all_sla_types_values
 
     values ||= []
-    SlaType.pluck(:name,:id).map { |name,id|
+    SlaType.sorted.pluck(:name,:id).map { |name,id|
       values << [name.to_s,id.to_s]
     }
     @all_sla_types_values = values

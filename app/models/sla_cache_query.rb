@@ -322,8 +322,9 @@ class SlaCacheQuery < Query
     @sla_types_for_project ||= SlaType
       .joins(:sla_project_trackers)
       .where("sla_project_trackers.project_id = ?", project.id)
-      .select("sla_types.id, sla_types.name")
+      .select("sla_types.id, sla_types.name, sla_types.position")
       .distinct
+      .order(:position)
       .to_a
   end
 

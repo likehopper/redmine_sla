@@ -181,7 +181,7 @@ class SlaCachesController < ApplicationController
       SlaSchedule.where(sla_calendar_id: selected_level['sla_calendar_id'], match: true).order(:dow, :start_time) :
       SlaSchedule.none
 
-    @sla_spent_explanations = SlaType.all.filter_map { |sla_type|
+    @sla_spent_explanations = SlaType.sorted.filter_map { |sla_type|
       rows = ActiveRecord::Base.connection.select_all(
         ActiveRecord::Base.sanitize_sql(["SELECT * FROM sla_explain_spent(?, ?)", @issue.id, sla_type.id])
       ).to_a
