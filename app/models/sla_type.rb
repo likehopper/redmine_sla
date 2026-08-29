@@ -27,15 +27,22 @@ class SlaType < ActiveRecord::Base
 
   include Redmine::SafeAttributes
 
-  scope :visible, ->(*args) { where(SlaType.visible_condition(args.shift || User.current, *args)) }
+  # Redmine models normally get this for free through ApplicationRecord (see
+  # lib/redmine/preparation.rb), but this plugin's models inherit directly
+  # from ActiveRecord::Base, so it needs including explicitly here.
+  include Redmine::Acts::Positioned
+  acts_as_positioned
 
-  default_scope { }  
+  scope :visible, ->(*args) { where(SlaType.visible_condition(args.shift || User.current, *args)) }
+  scope :sorted, -> { order(:position) }
+
+  default_scope { }
 
   validates_presence_of :name
-  
+
   validates_uniqueness_of :name, :case_sensitive => false
 
-  safe_attributes *%w[name]
+  safe_attributes *%w[name position]
 
   # No selection limitations
   def self.visible_condition(user, options = {})
