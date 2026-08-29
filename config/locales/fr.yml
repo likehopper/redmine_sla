@@ -301,6 +301,7 @@ fr:
       miss: Engagement de SLA absent
       exists: Cet engagement existe déjà
       negative: Un engagement négatif est impossible
+      show_hidden_types: Afficher les types de SLA masqués
 
     # SlaProjectTracker
     sla_project_tracker:
