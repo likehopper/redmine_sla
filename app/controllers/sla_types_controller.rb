@@ -6,7 +6,6 @@
 #   (e.g. Resolution time, Response time). Supports:
 #     - listing via SlaTypeQuery
 #     - creation/update/deletion
-#     - dynamic creation of SLA helper methods (post_create / post_destroy)
 #     - bulk actions through context_menu
 #     - API access for index/show/create/update/destroy
 #
@@ -75,8 +74,6 @@ class SlaTypesController < ApplicationController
     @sla_type.safe_attributes = params[:sla_type]
 
     if @sla_type.save
-      post_create
-
       respond_to do |format|
         format.html do
           flash[:notice] = l(
@@ -226,37 +223,6 @@ class SlaTypesController < ApplicationController
   def query_error(exception)
     session.delete(:sla_type_query)
     super
-  end
-
-  # After creating a new SLA type, dynamically define SLA accessor methods
-  def post_create
-    sla_type = @sla_type
-
-    RedmineSla::Patches::TimeEntryPatch.define_method("get_sla_respect_#{sla_type.id}") do
-      issue.get_sla_respect(sla_type.id)
-    end
-
-    RedmineSla::Patches::IssuePatch.define_method("get_sla_respect_#{sla_type.id}") do
-      get_sla_respect(sla_type.id)
-    end
-
-    SlaCache.define_method("get_sla_respect_#{sla_type.id}") { issue.get_sla_respect(sla_type.id) }
-    SlaCache.define_method("get_sla_remain_#{sla_type.id}")  { issue.get_sla_remain(sla_type.id) }
-    SlaCache.define_method("get_sla_spent_#{sla_type.id}")   { issue.get_sla_spent(sla_type.id) }
-    SlaCache.define_method("get_sla_term_#{sla_type.id}")    { issue.get_sla_term(sla_type.id) }
-  end
-
-  # After deleting an SLA type, remove dynamically created methods
-  def post_destroy
-    sla_type = @sla_type
-
-    RedmineSla::Patches::TimeEntryPatch.class_eval { remove_method "get_sla_respect_#{sla_type.id}" }
-    RedmineSla::Patches::IssuePatch.class_eval     { remove_method "get_sla_respect_#{sla_type.id}" }
-
-    SlaCache.class_eval { remove_method "get_sla_respect_#{sla_type.id}" }
-    SlaCache.class_eval { remove_method "get_sla_remain_#{sla_type.id}" }
-    SlaCache.class_eval { remove_method "get_sla_spent_#{sla_type.id}" }
-    SlaCache.class_eval { remove_method "get_sla_term_#{sla_type.id}" }
   end
 
 end
