@@ -31,5 +31,5 @@ module Queries::SlaTypesQueriesHelper
       end
     end
   end
-  
+
 end

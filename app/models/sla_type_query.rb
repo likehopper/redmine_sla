@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # File: redmine_sla/app/models/sla_type_query.rb
-# Redmine SLA - Redmine's Plugin 
+# Redmine SLA - Redmine's Plugin
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -28,8 +28,13 @@ class SlaTypeQuery < Query
   def available_columns
     return @available_columns if @available_columns
     @available_columns = []
-    @available_columns << QueryColumn.new(:id, :sortable => "#{SlaType.table_name}.id", :default_order => :asc, :groupable => false )
-    @available_columns << QueryColumn.new(:name, :sortable => "#{SlaType.table_name}.name", :default_order => :asc, :groupable => false )
+    @available_columns << QueryColumn.new(:id, :sortable => "#{SlaType.table_name}.id", :groupable => false )
+    @available_columns << QueryColumn.new(:name, :sortable => "#{SlaType.table_name}.name", :groupable => false )
+    # No :default_order here -- position is the only column that declares one
+    # (see default_sort_criteria below), so drag-and-drop reordering on the
+    # list (see sla_types/_list.html.erb) stays meaningful as long as nobody
+    # has explicitly clicked another column header to sort by it instead.
+    @available_columns << QueryColumn.new(:position, :caption => :label_position, :sortable => "#{SlaType.table_name}.position", :default_order => :asc, :groupable => false )
     @available_columns
   end
 
@@ -39,13 +44,20 @@ class SlaTypeQuery < Query
     #  "name" => {:operator => "*", :values => []}
     }
   end
-    
+
   def default_columns_names
     super.presence || [
       "name"
     ].flat_map{|c| [c.to_s, c.to_sym]}
   end
-  
+
+  # Sort by position unless the user explicitly picked a different column --
+  # matches the id/name-sortable list this replaces, but defaults to the
+  # order set from the SLA types list's own drag-and-drop instead of id.
+  def default_sort_criteria
+    [['position', 'asc']]
+  end
+
   def sla_types(options={})
     order_option = [group_by_sort_order, (options[:order] || sort_clause)].flatten.reject(&:blank?)
 
