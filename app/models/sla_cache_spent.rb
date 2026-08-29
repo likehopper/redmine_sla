@@ -79,8 +79,8 @@ class SlaCacheSpent < ActiveRecord::Base
     if ( project.nil? )
       ActiveRecord::Base.connection.execute("TRUNCATE sla_cache_spents CASCADE ; ")
     else
-      SlaCacheSpent.where(project: project.id).destroy_all
+      SlaCacheSpent.where(project: project.id).delete_all
     end
-  end  
+  end
     
 end
