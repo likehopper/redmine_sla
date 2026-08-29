@@ -1,5 +1,23 @@
 # Changelog
 
+## 2.1.7 (Stable - Redmine 6.x)
+
+### Refactoring
+
+-   Refactor: `SlaCache`, `Issue` and `TimeEntry` each defined a
+    `get_sla_respect_<id>` accessor (and `SlaCache` also
+    `get_sla_remain/spent/term_<id>`) per `SlaType`, via `define_method`
+    loops run once at boot and patched on creation through
+    `SlaTypesController#post_create`/`post_destroy` — except
+    `post_destroy` was never actually called from `destroy`, leaving
+    dangling accessor methods on all three classes after deleting a
+    SlaType. Replaced with a generic `method_missing`/`respond_to_missing?`
+    on each class that resolves `get_sla_*_<id>` for any id without
+    predefining it, so a SlaType works immediately whether created before
+    or after the server booted.
+
+------------------------------------------------------------------------
+
 ## 2.1.6 (Stable - Redmine 6.x)
 
 ### Documentation
