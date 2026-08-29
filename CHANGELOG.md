@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.1.6 (Stable - Redmine 6.x)
+
+### Documentation
+
+-   Doc: replace `doc/images/redmine_sla_issue_patch.png`, which no longer
+    matched the plugin's current rendering, with an up-to-date capture.
+
+------------------------------------------------------------------------
+
 ## 2.1.5 (Stable - Redmine 6.x)
 
 ### Fixed
