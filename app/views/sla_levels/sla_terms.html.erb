@@ -1,5 +1,5 @@
 <% html_title(l(:sla_label_global_settings)) -%>
-<div class="content"> 
+<div class="content">
   <div class="contextual">
     <% if User.current.admin? -%>
       <%= link_to l('sla_label.sla_level.plural'), sla_levels_path, class: 'icon icon-cancel' -%>
@@ -9,51 +9,68 @@
   </div>
   <div class="title-sla-settings title-sla_level">
     <%= title l('sla_label.sla_level_term.edit') -%>
-  </div>  
+  </div>
 
   <h3><%= l('sla_label.sla_level.singular') -%> : <%= link_to @sla_level.name, edit_sla_level_path(@sla_level), title: l(:button_show) -%></h3></h3>
   <p>
     <b><%= l('sla_label.sla_calendar.singular') -%> : </b><%=  -%>
-    <%= link_to @sla_level.sla_calendar.name, sla_calendar_path(@sla_level.sla_calendar), title: l(:button_show) -%> 
+    <%= link_to @sla_level.sla_calendar.name, sla_calendar_path(@sla_level.sla_calendar), title: l(:button_show) -%>
   </p>
   <p>
     <b><%= l('sla_label.sla.singular') -%> : </b><%=  -%>
-    <%= link_to @sla_level.sla.name, sla_path(@sla_level.sla), title: l(:button_show) -%> 
-  </p>  
-  <% i=0 %>
-  <%= form_tag sla_level_path, method: :patch, id: "sla-level-terms-form" do %>
-  <table style="border: none:" margin="8px">
-  <tr>
-    <th width="240px" colspan="2" style="border-top: solid darkgrey; border-left: solid darkgrey; border-right: solid darkgrey; text-align: right;"><%= l("sla_label.sla_level.plural") -%>&nbsp;<%= image_tag("arrow_right.png") -%></th>
-    <% 
-      SlaType.all.each do |sla_type|        
-    -%>
-      <th width="120px" rowspan="2" style="border: solid darkgrey;"><%= sla_type[:name] -%></th>
-    <% end -%>
-  </tr>
-  <tr>
-    <th width="240px" colspan="2" style="border-bottom: solid darkgrey; border-left: solid darkgrey; border-right: solid darkgrey; text-align: left;"><%= image_tag("arrow_down.png") -%>&nbsp;<%= l(:enumeration_issue_priorities) -%></th>
-  </tr>
+    <%= link_to @sla_level.sla.name, sla_path(@sla_level.sla), title: l(:button_show) -%>
+  </p>
   <%
-    SlaPriority.create(@sla_level.custom_field_id).all.each do |sla_priority_id|
+    sla_types = SlaType.sorted.to_a
+    # A level with no terms yet is being set up for the first time: show every
+    # type so there's something to fill in. Once it has at least one term,
+    # only show the types it actually uses -- the rest collapse behind the
+    # toggle below instead of cluttering the matrix with columns nobody
+    # filled in for this level.
+    types_with_data = SlaLevelTerm.where(sla_level_id: @sla_level.id).distinct.pluck(:sla_type_id)
+    hidden_type_ids = types_with_data.any? ? (sla_types.map(&:id) - types_with_data) : []
   -%>
-  <tr>
-    <th colspan="2" style="border: solid darkgrey;"><%= sla_priority_id.name -%></th>
-      <% SlaType.all.each do |sla_type| -%>
-        <td style="border: solid darkgrey; text-align: right;"><%
-            sla_level_term = SlaLevelTerm.find_by_level_type_priority(@sla_level.id,sla_type[:id],sla_priority_id.id)
-            i = sla_type[:id] 
-            j = sla_priority_id.id
-          -%>
-          <%= hidden_field_tag "sla_level[sla_level_terms_attributes][#{i}][#{j}][id]", sla_level_term[:id] if ! sla_level_term.nil? -%>
-          <%= text_field_tag "sla_level[sla_level_terms_attributes][#{i}][#{j}][term]", ( sla_level_term.nil? ? "" : sla_level_term[:term] ) -%>
-        </td>
-    <% end -%>
-  </tr>
-<% end -%>
-</table>
-<%= submit_tag l('sla_label.sla_level_term.save') %>
-<% end -%>
+  <% if hidden_type_ids.any? -%>
+    <p>
+      <%= link_to_function l('sla_label.sla_level_term.show_hidden_types'),
+            "$('#sla-level-terms-table').toggleClass('sla-types-all-visible'); return false;",
+            class: 'icon icon-reload' -%>
+    </p>
+  <% end -%>
+  <%= form_tag sla_level_path, method: :patch, id: "sla-level-terms-form" do %>
+  <div class="autoscroll">
+  <table class="list" id="sla-level-terms-table">
+    <thead>
+      <tr>
+        <th><%= l(:enumeration_issue_priorities) -%></th>
+        <% sla_types.each do |sla_type| -%>
+          <th class="<%= 'sla-type-hidden' if hidden_type_ids.include?(sla_type[:id]) -%>"><%= sla_type[:name] -%></th>
+        <% end -%>
+      </tr>
+    </thead>
+    <tbody>
+      <%
+        SlaPriority.create(@sla_level.custom_field_id).all.each do |sla_priority_id|
+      -%>
+      <tr>
+        <th><%= sla_priority_id.name -%></th>
+        <% sla_types.each do |sla_type| -%>
+          <td class="<%= 'sla-type-hidden' if hidden_type_ids.include?(sla_type[:id]) -%>"><%
+              sla_level_term = SlaLevelTerm.find_by_level_type_priority(@sla_level.id,sla_type[:id],sla_priority_id.id)
+              i = sla_type[:id]
+              j = sla_priority_id.id
+            -%>
+            <%= hidden_field_tag "sla_level[sla_level_terms_attributes][#{i}][#{j}][id]", sla_level_term[:id] if ! sla_level_term.nil? -%>
+            <%= text_field_tag "sla_level[sla_level_terms_attributes][#{i}][#{j}][term]", ( sla_level_term.nil? ? "" : sla_level_term[:term] ) -%>
+          </td>
+        <% end -%>
+      </tr>
+      <% end -%>
+    </tbody>
+  </table>
+  </div>
+  <%= submit_tag l('sla_label.sla_level_term.save') %>
+  <% end -%>
 </div>
 <% content_for :sidebar do -%>
   <% render partial: 'slas/sidebar' -%>

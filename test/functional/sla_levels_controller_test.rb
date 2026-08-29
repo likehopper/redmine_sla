@@ -80,6 +80,29 @@ class SlaLevelsControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
+  test "should show every sla type with no toggle when the level has no terms yet" do
+    @request.session[:user_id] = 1
+    empty_level = SlaLevel.create!(name: "Empty level for masking test", sla_id: 3, sla_calendar_id: 1)
+
+    get(:sla_terms, :params => {:id => empty_level.id})
+    assert_response :success
+    assert_select 'a', :text => l('sla_label.sla_level_term.show_hidden_types'), :count => 0
+    assert_select '.sla-type-hidden', :count => 0
+    assert_select '#sla-level-terms-table thead th', :text => 'GTI'
+    assert_select '#sla-level-terms-table thead th', :text => 'GTR'
+  end
+
+  test "should hide sla types with no terms behind a toggle" do
+    @request.session[:user_id] = 1
+    # Fixture level 2 ("TMA - Support HO") only has terms for GTI (sla_type_id 1);
+    # GTR (sla_type_id 2) has none and should collapse behind the toggle.
+    get(:sla_terms, :params => {:id => 2})
+    assert_response :success
+    assert_select 'a', :text => l('sla_label.sla_level_term.show_hidden_types'), :count => 1
+    assert_select '#sla-level-terms-table thead th.sla-type-hidden', :text => 'GTR'
+    assert_select '#sla-level-terms-table thead th:not(.sla-type-hidden)', :text => 'GTI'
+  end
+
   ### As manager #2 ###
 
   test "should return 403 on get index as manager" do

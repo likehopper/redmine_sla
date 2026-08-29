@@ -301,6 +301,7 @@ en:
       miss: Miss SLA Term
       exists: This term alredy exists
       negative: Negative term is impossible
+      show_hidden_types: Show hidden SLA types
 
     # SlaProjectTracker
     sla_project_tracker:
