@@ -259,3 +259,7 @@ tr.sla-explain-selected { background-color: #e3f3d3; }
 tr.sla-explain-interval { background-color: #f0f0f0; font-weight: bold; }
 tr.sla-explain-holiday td { color: #a04040; }
 tr.sla-explain-no-schedule td { color: #999; font-style: italic; }
+
+/*** SLA Level Terms matrix: per-level SLA type masking ***/
+#sla-level-terms-table .sla-type-hidden { display: none; }
+#sla-level-terms-table.sla-types-all-visible .sla-type-hidden { display: table-cell; }

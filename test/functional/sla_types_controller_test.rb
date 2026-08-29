@@ -110,6 +110,50 @@ class SlaTypesControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
+  test "should reorder via format.js as admin" do
+    @request.session[:user_id] = 1
+    put :update, params: { id: 1, sla_type: { position: 2 }, format: :js }
+    assert_response :success
+    assert_equal 2, SlaType.find(1).position
+  end
+
+  test "should return 422 on format.js with invalid data as admin" do
+    @request.session[:user_id] = 1
+    put :update, params: { id: 1, sla_type: { name: "" }, format: :js }
+    assert_response :unprocessable_content
+  end
+
+  test "should list sla types ordered by position on index" do
+    @request.session[:user_id] = 1
+    SlaType.find(2).update!(position: 1)
+    SlaType.find(1).update!(position: 2)
+
+    get :index
+    assert_response :success
+    assert_operator response.body.index('GTR'), :<, response.body.index('GTI')
+  end
+
+  test "should show reorder handles on the natural (unfiltered, position-sorted) index" do
+    @request.session[:user_id] = 1
+    get :index
+    assert_response :success
+    assert_select '.sort-handle', count: SlaType.count
+  end
+
+  test "should hide reorder handles when a name filter is active" do
+    @request.session[:user_id] = 1
+    get :index, params: { set_filter: 1, f: ['name'], op: { 'name' => '=' }, v: { 'name' => ['GTI'] } }
+    assert_response :success
+    assert_select '.sort-handle', count: 0
+  end
+
+  test "should hide reorder handles when sorted by a column other than position" do
+    @request.session[:user_id] = 1
+    get :index, params: { sort: 'name' }
+    assert_response :success
+    assert_select '.sort-handle', count: 0
+  end
+
   ### As manager #2 ###
 
   test "should return 403 on get index as manager" do

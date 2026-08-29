@@ -4,7 +4,9 @@
 # Purpose:
 #   Manage SLA Types, the root definition of each SLA category
 #   (e.g. Resolution time, Response time). Supports:
-#     - listing via SlaTypeQuery
+#     - listing via SlaTypeQuery (filter/sort/CSV export/pagination),
+#       reorderable via drag-and-drop when shown in its natural
+#       (unfiltered, position-sorted, single-page) order
 #     - creation/update/deletion
 #     - bulk actions through context_menu
 #     - API access for index/show/create/update/destroy
@@ -43,11 +45,12 @@ class SlaTypesController < ApplicationController
   include QueriesHelper
 
   helper Queries::SlaTypesQueriesHelper
-  include Queries::SlaTypesQueriesHelper   
+  include Queries::SlaTypesQueriesHelper
 
   # List all SLA types through query / filter / pagination
   def index
-    retrieve_query(SlaTypeQuery)
+    use_session = !request.format.csv?
+    retrieve_query(SlaTypeQuery, use_session)
 
     @entity_count = @query.sla_types.count
     @entity_pages = Paginator.new @entity_count, per_page_option, params['page']
@@ -56,9 +59,28 @@ class SlaTypesController < ApplicationController
       limit:  @entity_pages.per_page
     )
 
+    # Dragging a row only makes sense while the list is shown in its natural
+    # order: no active filter, sorted by position (the default), and not
+    # split across pages (a drag would only ever reorder within the visible
+    # page). Any other view (name filtered, sorted by id/name, page 2...)
+    # falls back to a plain read-only list -- filtering/sorting/CSV export
+    # still work, they just don't show reorder handles.
+    @can_reorder = @query.statement.blank? &&
+      [nil, 'position'].include?(@query.sort_criteria_key(0)) &&
+      @entity_count <= @entity_pages.per_page
+
     respond_to do |format|
       format.html
       format.api { @offset, @limit = api_offset_and_limit }
+      format.csv do
+        # Export all entities matching the current filters (no pagination)
+        @entities = @query.sla_types
+        send_data(
+          query_to_csv(@entities, @query, params),
+          :type => 'text/csv; header=present',
+          :filename => "#{filename_for_export(@query, 'sla_types')}.csv"
+        )
+      end
     end
   end
 
@@ -114,12 +136,17 @@ class SlaTypesController < ApplicationController
           redirect_back_or_default sla_types_path
         end
         format.api { render_api_ok }
+        # Drag-and-drop reordering on the SLA types list PUTs here with just
+        # {position: N} (see reorder_handle in sla_types/index.html.erb and
+        # Redmine core's own $.fn.positionedItems).
+        format.js { head :ok }
       end
 
     else
       respond_to do |format|
         format.html { render :edit }
         format.api  { render_validation_errors(@sla_type) }
+        format.js   { head :unprocessable_content }
       end
     end
   end

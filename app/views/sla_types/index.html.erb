@@ -1,5 +1,5 @@
 <% html_title(l(:sla_label_global_settings)) %>
-<div class="content"> 
+<div class="content">
   <div class="contextual">
     <%= link_to l('sla_label.sla_type.new'), new_sla_type_path, class: 'icon icon-add' if User.current.allowed_to?(:manage_sla, nil, global: true) %>
   </div>
@@ -19,4 +19,25 @@
     <% end %>
   <% end %>
 </div>
+
+<% other_formats_links do |f| %>
+  <%= f.link_to_with_query_parameters 'CSV', {}, :onclick => "showModal('csv-export-options', '330px'); return false;" %>
+<% end %>
+
+<div id="csv-export-options" style="display:none;">
+  <h3 class="title"><%= l(:label_export_options, :export_format => 'CSV') %></h3>
+  <%= form_tag(sla_types_path(:format => 'csv'), :method => :get, :id => 'csv-export-form') do %>
+  <%= query_as_hidden_field_tags @query %>
+  <%= hidden_field_tag('query_name', @query.name) %>
+  <%= export_csv_encoding_select_tag %>
+  <% if ( Redmine::VERSION::MAJOR > 5 || ( Redmine::VERSION::MAJOR == 5 && Redmine::VERSION::MINOR >= 1 ) ) %>
+  <%= export_csv_separator_select_tag %>
+  <% end %>
+  <p class="buttons">
+    <%= submit_tag l(:button_export), :name => nil, :onclick => "hideModal(this);", :data => { :disable_with => false } %>
+    <%= link_to_function l(:button_cancel), "hideModal(this);" %>
+  </p>
+  <% end %>
+</div>
+
 <%= render partial: 'slas/sidebar' -%>

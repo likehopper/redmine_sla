@@ -1,6 +1,8 @@
 GTI:
   id: 1
   name: GTI
+  position: 1
 GTR:
   id: 2
   name: GTR
+  position: 2

@@ -1,5 +1,40 @@
 # Changelog
 
+## 2.2.0 (Stable - Redmine 6.x)
+
+### Added
+
+-   Add: SLA types can now be reordered from a dedicated, drag-and-drop
+    `/sla/types` list (Redmine core's own `reorder_handle`/
+    `positionedItems`, the same mechanism used for Tracker/IssueStatus).
+    The order now applies everywhere a SLA type is displayed: issue
+    gauges, the "Explain" view, issue/time-entry columns, and the SLA
+    Level Terms editing matrix — previously always shown in creation
+    (id) order. Reordering is active only when the list is in its
+    natural state (no filter, sorted by position, single page); filtering,
+    sorting and CSV export keep working the rest of the time.
+-   Add: the SLA Level Terms matrix now masks SLA types that have no term
+    yet for the current level once it has at least one — a level being
+    set up for the first time still shows every type, but a populated one
+    only shows its used types by default, with a "Show hidden SLA types"
+    toggle to reveal the rest.
+
+### Changed
+
+-   Change: rewrite the SLA Level Terms matrix to Redmine's native
+    `table.list` look, dropping the hand-rolled inline-style borders and a
+    colspan/rowspan corner-label trick.
+
+### Documentation
+
+-   Doc: documentation screenshots no longer include Redmine's `#header`/
+    `#footer` chrome and are auto-trimmed to their actual content instead
+    of the blank space Redmine reserves below short forms — cuts
+    `doc/screenshots` from 19MB to 16MB despite adding 10 previously
+    missing "Explain" screenshots.
+
+------------------------------------------------------------------------
+
 ## 2.1.7 (Stable - Redmine 6.x)
 
 ### Refactoring

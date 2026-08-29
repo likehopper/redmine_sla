@@ -58,6 +58,12 @@ module SlaLevelTermsDocumentationTest
       # Open and fill out the form
       visit "/sla/levels/#{sla_level.id}/sla_terms"
 
+      # A type added after this level already has at least one other term is
+      # hidden by default (see sla_terms.html.erb) -- reveal it first, same
+      # as a real admin completing a level would need to.
+      show_hidden_types_link = l('sla_label.sla_level_term.show_hidden_types')
+      click_link show_hidden_types_link if page.has_link?(show_hidden_types_link)
+
       sla_priorities.each do |priority_name, value|
 
         # Resolve names -> records
