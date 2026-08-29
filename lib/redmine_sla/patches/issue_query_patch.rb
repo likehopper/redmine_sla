@@ -133,7 +133,7 @@ module RedmineSla
       #   - adds SLA respect filters + columns per SLA type
       def available_filters_with_sla_issue
         # Debug tracing
-        Rails.logger.error "--- REDMINE_SLA TRACE: available_filters_with_sla_issue CALL ---"
+        Rails.logger.debug "--- REDMINE_SLA TRACE: available_filters_with_sla_issue CALL ---"
 
         is_filters_blank = @available_filters.blank?
         is_module_enabled = project&.module_enabled?(:sla)
@@ -244,11 +244,11 @@ module RedmineSla
             end
 
           else
-            Rails.logger.error "--- REDMINE_SLA TRACE: 'sla_types' table missing, skipping SLA columns ---"
+            Rails.logger.debug "--- REDMINE_SLA TRACE: 'sla_types' table missing, skipping SLA columns ---"
           end
 
         else
-          Rails.logger.error "--- REDMINE_SLA TRACE: EXIT: filters not initialized. ---"
+          Rails.logger.debug "--- REDMINE_SLA TRACE: EXIT: filters not initialized. ---"
           return available_filters_without_sla_issue
         end
 
