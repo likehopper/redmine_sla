@@ -83,22 +83,22 @@ class SlaCache < ActiveRecord::Base
     SlaCache.where(issue: issue_id).delete_all
   end              
 
-  # For SlaCacheQuery#GroupBy
-  if ActiveRecord::Base.connection.table_exists? 'sla_types'
-    SlaType.all.each { |sla_type|
-      define_method("get_sla_respect_#{sla_type.id}") do 
-        self.issue.get_sla_respect(sla_type.id)
-      end
-      define_method("get_sla_remain_#{sla_type.id}") do 
-        self.issue.get_sla_remain(sla_type.id)
-      end
-      define_method("get_sla_spent_#{sla_type.id}") do 
-        self.issue.get_sla_spent(sla_type.id)
-      end
-      define_method("get_sla_term_#{sla_type.id}") do 
-        self.issue.get_sla_term(sla_type.id)
-      end
-    }
+  # For SlaCacheQuery#GroupBy: get_sla_respect_N / get_sla_remain_N / get_sla_spent_N /
+  # get_sla_term_N, one per SlaType id N. Resolved generically instead of being
+  # defined per existing SlaType at boot time, so a SlaType created (or deleted)
+  # after the server started works immediately, with no dynamic define_method
+  # bookkeeping to keep in sync.
+  SLA_DYNAMIC_METHOD = /\Aget_sla_(respect|remain|spent|term)_(\d+)\z/
+
+  def method_missing(method_name, *args, &block)
+    if (match = SLA_DYNAMIC_METHOD.match(method_name.to_s))
+      return issue.public_send("get_sla_#{match[1]}", match[2].to_i)
+    end
+    super
   end
-    
+
+  def respond_to_missing?(method_name, include_private = false)
+    SLA_DYNAMIC_METHOD.match?(method_name.to_s) || super
+  end
+
 end
