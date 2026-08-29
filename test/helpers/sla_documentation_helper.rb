@@ -56,6 +56,19 @@ module SlaDocumentationHelperTest
 
     driver = page.driver.browser
 
+    # 0) Hide Redmine's top "#header" bar (logo, quick-search, "Jump to a
+    # project..." combobox, mobile flyout toggle) and the "#footer" bar
+    # (Powered by Redmine...) -- documentation screenshots are meant to focus
+    # on the plugin's own screens, not Redmine's chrome. Done before measuring
+    # scrollHeight below so the page's real (shorter) height is used, instead
+    # of leaving a blank gap where they used to be.
+    page.execute_script(<<~JS)
+      ['header', 'footer'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+    JS
+
     # 1) Force viewport
     #
     # For full-page captures, resize the emulated viewport to the page's
@@ -111,8 +124,22 @@ module SlaDocumentationHelperTest
 
     File.binwrite(path, Base64.decode64(result['data']))
 
-    # 3) Resize + compress
+    # 3) Crop the surrounding whitespace down to the actual content (Redmine's
+    # #content area reserves a fixed min-height to keep the footer pinned to
+    # the bottom of the viewport, which otherwise leaves a large blank strip
+    # below short forms), then resize + compress. A small fuzz tolerates the
+    # anti-aliased pixels at the edge of the content box instead of leaving a
+    # sliver of them behind; a fixed white border is added back afterwards so
+    # the trimmed content isn't flush against the image edge.
     image = MiniMagick::Image.open(path.to_s)
+    image.combine_options do |c|
+      c.fuzz "3%"
+      c.trim
+    end
+    image.combine_options do |c|
+      c.bordercolor "white"
+      c.border "12"
+    end
     image.resize resize_to if resize_to
     image.quality quality.to_s
     image.write(path.to_s)
