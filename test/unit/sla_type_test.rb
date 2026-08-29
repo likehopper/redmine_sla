@@ -58,4 +58,27 @@ class SlaTypeTest < ApplicationSlaUnitsTestCase
     assert SlaType.new(name: "GTR_PREMIUM").valid?
   end
 
+  # --- Ordering ---
+
+  test "sorted orders by position" do
+    gti = SlaType.find(1)
+    gtr = SlaType.find(2)
+    assert_equal [gti, gtr], SlaType.sorted.to_a
+
+    gtr.update!(position: 1)
+    gti.update!(position: 2)
+    assert_equal [gtr, gti], SlaType.sorted.to_a
+  end
+
+  test "a new sla_type is appended after the existing ones by default" do
+    t = SlaType.create!(name: "NEW_TYPE_TEST")
+    assert_equal 3, t.position
+  end
+
+  test "position is a safe attribute" do
+    t = SlaType.find(1)
+    t.safe_attributes = {"position" => "2"}
+    assert_equal 2, t.position
+  end
+
 end
