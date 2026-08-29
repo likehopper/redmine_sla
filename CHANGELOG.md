@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.1.3 (Stable - Redmine 6.x)
+
+### Fixed
+
+-   Fix: `IssueQueryPatch#available_filters_with_sla_issue` logged three
+    routine execution traces at `error` level, polluting production logs
+    with non-error noise every time the issue list filters are built.
+    Downgraded to `debug`.
+
+------------------------------------------------------------------------
+
 ## 2.1.2 (Stable - Redmine 6.x)
 
 ### Fixed
