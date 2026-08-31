@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.2.1 (Stable - Redmine 6.x)
+
+### Fixed
+
+-   Fix upgrades from versions created before SLA type ordering: existing
+    `sla_types` now receive deterministic positions from `1` to `N` in their
+    previous creation order, and the resulting column is enforced as non-null.
+-   Make the position backfill work across PostgreSQL, MySQL/MariaDB and SQLite
+    instead of relying on PostgreSQL-specific SQL.
+
+------------------------------------------------------------------------
+
 ## 2.2.0 (Stable - Redmine 6.x)
 
 ### Added
