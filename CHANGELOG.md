@@ -1,5 +1,30 @@
 # Changelog
 
+## 3.0.0
+
+### Added
+
+-   Add MySQL 8.0+ and MariaDB 10.2+ support alongside PostgreSQL. Database
+    views and SLA calculation functions are selected through an explicit
+    adapter dialect.
+-   Provide an adapter-neutral Ruby service for the on-demand SLA explanation
+    view, preserving the same diagnostic output on every supported database.
+
+### Performance
+
+-   Reduce repeated holiday lookups in SLA level and spent-time calculations,
+    and enumerate level candidates day by day to avoid recursive CTE limits on
+    long-running issues.
+-   Keep cache purges efficient and portable with scoped `DELETE` operations.
+
+### Compatibility
+
+-   Preserve the 2.2.x cache permissions and PATCH-only mutation routes.
+-   Preserve and validate the ordered, non-null `sla_types.position` migration
+    on PostgreSQL, MySQL and MariaDB.
+
+------------------------------------------------------------------------
+
 ## 2.2.2 (Stable - Redmine 6.x)
 
 ### Security

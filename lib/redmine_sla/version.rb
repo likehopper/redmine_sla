@@ -25,5 +25,5 @@
 module RedmineSla
   # Current plugin version.
   # This is the value displayed in Redmine's plugin administration screen.
-  Version = '2.2.2'.freeze
+  Version = '3.0.0'.freeze
 end
