@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.2.2 (Stable - Redmine 6.x)
+
+### Security
+
+-   Require `manage_sla` on every affected project before refreshing,
+    deleting or purging SLA caches; users with `view_sla` keep read-only
+    access to caches belonging to issues they can see.
+-   Keep global cache purges restricted to administrators and prevent a
+    project-scoped request from mutating caches belonging to another project.
+-   Replace state-changing cache refresh and purge `GET` routes with `PATCH`
+    routes so Rails applies its normal CSRF protection.
+
+------------------------------------------------------------------------
+
 ## 2.2.1 (Stable - Redmine 6.x)
 
 ### Fixed
