@@ -350,6 +350,7 @@ en:
   label_sla_notice: SLA are all stored in a <a href="%{url}">cache</a>. SLA are generated when values ​​are displayed in issues.
   label_sla_warning: The changes (%{changes}) involved an update of the SLA!
   label_sla_term: Term
+  label_sla_icons_credit: Icons created by
 
   button_sla_explain: Explain
   label_sla_explain_title: SLA explanation
