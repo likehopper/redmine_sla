@@ -17,9 +17,15 @@ class SlaCalculationPerformanceTest < ApplicationSlaUnitsTestCase
 
     RedmineSla::DbDialect.ensure_recursion_depth!
 
-    level_timings = issue_ids.map do |issue_id|
+    forced_level_timings = issue_ids.map do |issue_id|
       measure_ms do
         connection.execute(SlaCache.sanitize_sql(["SELECT sla_get_level(?, true);", issue_id]))
+      end
+    end
+
+    cached_level_timings = issue_ids.map do |issue_id|
+      measure_ms do
+        connection.execute(SlaCache.sanitize_sql(["SELECT sla_get_level(?, false);", issue_id]))
       end
     end
 
@@ -34,10 +40,12 @@ class SlaCalculationPerformanceTest < ApplicationSlaUnitsTestCase
       end
     end
 
-    assert_equal issue_ids.size, level_timings.size
+    assert_equal issue_ids.size, forced_level_timings.size
+    assert_equal issue_ids.size, cached_level_timings.size
     assert_equal issue_ids.size * sla_type_ids.size, spent_timings.size
 
-    report_timings('sla_get_level', level_timings)
+    report_timings('sla_get_level_forced', forced_level_timings)
+    report_timings('sla_get_level_cached', cached_level_timings)
     report_timings('sla_get_spent', spent_timings)
   end
 
