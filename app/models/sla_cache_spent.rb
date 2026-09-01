@@ -57,12 +57,14 @@ class SlaCacheSpent < ActiveRecord::Base
   end
   
   def self.find_by_issue_and_type_id(issue,sla_type_id)
+    RedmineSla::DbDialect.ensure_recursion_depth!
     ActiveRecord::Base.connection.execute(sanitize_sql(["SELECT sla_get_spent(?,?) ; ", issue.id, sla_type_id]))
     self.find_by(issue_id: issue.id,sla_type_id: sla_type_id)
   end
 
   # Class method for refresh cache
   def self.refresh_by_issue_id(issue_id)
+    RedmineSla::DbDialect.ensure_recursion_depth!
     SlaType.all.each do |sla_type|
       ActiveRecord::Base.connection.execute(sanitize_sql(["SELECT sla_get_spent(?,?) ; ", issue_id, sla_type.id]))
     rescue ActiveRecord::StatementInvalid => e
@@ -72,12 +74,29 @@ class SlaCacheSpent < ActiveRecord::Base
 
   # Class method for refresh cache
   def refresh
+    RedmineSla::DbDialect.ensure_recursion_depth!
     ActiveRecord::Base.connection.execute(self.class.sanitize_sql(["SELECT sla_get_spent(?,?) ; ", self.sla_cache.issue_id, self.sla_type.id]))
   end
 
   def self.purge(project)
     if ( project.nil? )
-      ActiveRecord::Base.connection.execute("TRUNCATE sla_cache_spents CASCADE ; ")
+      if RedmineSla::DbDialect.adapter == :mysql
+        # DELETE, not TRUNCATE: on MySQL/InnoDB, TRUNCATE is DDL and causes
+        # an implicit COMMIT, silently ending any enclosing transaction
+        # (breaking transactional test isolation and any caller-managed
+        # transaction). DELETE participates in the transaction normally.
+        # Separate execute calls because Rails' mysql2 connections don't
+        # enable multi-statement execution by default.
+        connection = ActiveRecord::Base.connection
+        connection.execute("SET FOREIGN_KEY_CHECKS = 0 ;")
+        begin
+          connection.execute("DELETE FROM sla_cache_spents ;")
+        ensure
+          connection.execute("SET FOREIGN_KEY_CHECKS = 1 ;")
+        end
+      else
+        ActiveRecord::Base.connection.execute("TRUNCATE sla_cache_spents CASCADE ; ")
+      end
     else
       SlaCacheSpent.where(project: project.id).delete_all
     end

@@ -91,11 +91,62 @@ BEGIN
 
   ---------------------------------------------------------------------------
   -- Compute the expected SLA level.
-  -- This generates every minute within a 7-day window starting at issue creation,
-  -- then matches each timestamp against SLA calendars, schedules, holidays,
-  -- and project-tracker SLA configuration, to find the first valid SLA start date.
+  -- Generates one row per CALENDAR DAY in the 7-day window starting at issue
+  -- creation (not per minute -- see sla_get_spent.sql for the same
+  -- rationale), crossed with each candidate schedule, then derives the
+  -- exact starting minute for each valid (day, schedule) pair analytically
+  -- (GREATEST of issue creation and that window's opening time) instead of
+  -- by enumeration. The earliest such minute across all valid pairs is the
+  -- SLA start date -- precision is still to the minute, it's just computed
+  -- at the boundary of each candidate window instead of scanned one minute
+  -- at a time. This needs candidates only at day granularity (~7 days x a
+  -- handful of schedules) rather than every one of the ~10,000 minutes in
+  -- the window; MariaDB's optimizer in particular badly underestimates the
+  -- row count of the recursive CTE producing a minute-by-minute calendar,
+  -- which cascades into a poor join plan once that many candidate rows are
+  -- involved.
   ---------------------------------------------------------------------------
-  SELECT DISTINCT
+  WITH "excluded_holidays" AS (
+    -- Every (calendar, date) pair excluded by a non-matching holiday.
+    -- Materialized once up front instead of re-evaluated as a correlated
+    -- subquery per candidate day.
+    SELECT DISTINCT
+      "sla_calendar_holidays"."sla_calendar_id",
+      "sla_holidays"."date"
+    FROM "sla_holidays"
+    INNER JOIN "sla_calendar_holidays"
+      ON ( "sla_holidays"."id" = "sla_calendar_holidays"."sla_holiday_id" )
+    WHERE NOT "sla_calendar_holidays"."match"
+  ),
+  "matched_holidays" AS (
+    -- Every (calendar, date) pair that overrides a normally-excluded
+    -- schedule back to matching. Same rationale as excluded_holidays.
+    SELECT DISTINCT
+      "sla_calendar_holidays"."sla_calendar_id",
+      "sla_holidays"."date"
+    FROM "sla_calendar_holidays"
+    INNER JOIN "sla_holidays"
+      ON (
+        "sla_holidays"."id" = "sla_calendar_holidays"."sla_holiday_id"
+        AND "sla_calendar_holidays"."match"
+      )
+  ),
+  "calendar" AS (
+    -- One row per CALENDAR DAY covering the 7-day search window (truncated
+    -- to day boundaries, so this can include up to one extra day on each
+    -- end versus the exact instant range -- the WHERE clause below trims
+    -- candidates back to the precise [issue creation, +7 days] bound).
+    SELECT generate_series(
+      DATE_TRUNC('day', v_issue_created_on),
+      DATE_TRUNC('day', v_issue_created_on) + INTERVAL '7 days',
+      '1 day'
+    ) AS day_date
+  )
+  -- No DISTINCT: LIMIT 1 already caps the result to a single row regardless,
+  -- and the MySQL port of this same query (already validated end-to-end
+  -- against the real test suite) never needed one either -- it was pure
+  -- overhead forcing a full dedup pass before the LIMIT could apply.
+  SELECT
     -- Cache record to be written (cache ID is determined at INSERT time)
     NULL::bigint AS "id",
     "v_issue_project_id" AS "project_id",
@@ -103,8 +154,10 @@ BEGIN
     "v_issue_tracker_id" AS "tracker_id",
     "sla_levels"."id" AS "sla_level_id",
 
-    -- First matching SLA calendar minute becomes the SLA start date
-    "calendar"."minutes" AS "start_date",
+    -- Exact starting minute for this (day, schedule) pair: either the
+    -- issue's own creation instant, if it already falls inside this
+    -- window, or the window's opening time that day.
+    GREATEST(v_issue_created_on, "calendar"."day_date" + "sla_schedules"."start_time") AS "start_date",
 
     -- Keep original creation date from cache if available
     COALESCE(v_sla_cache.created_on, v_current_timestamp) AS "created_on",
@@ -112,21 +165,10 @@ BEGIN
     -- Always refresh updated_on
     v_current_timestamp AS "updated_on"
   INTO v_sla_cache
-  FROM (
-    -- Generate a minute-by-minute calendar for the next 7 days
-    SELECT generate_series(
-      v_issue_created_on,
-      v_issue_created_on + INTERVAL '7 days',
-      '1 minute'
-    ) AS minutes
-  ) AS "calendar"
+  FROM "calendar"
 
   INNER JOIN "sla_schedules"
-    ON (
-      DATE_PART('dow',"calendar"."minutes") = "sla_schedules"."dow"
-      AND "calendar"."minutes"::TIME BETWEEN "sla_schedules"."start_time"
-                                           AND "sla_schedules"."end_time"
-    )
+    ON ( DATE_PART('dow',"calendar"."day_date") = "sla_schedules"."dow" )
 
   INNER JOIN "sla_calendars"
     ON ( "sla_calendars"."id" = "sla_schedules"."sla_calendar_id" )
@@ -137,19 +179,16 @@ BEGIN
   INNER JOIN "sla_project_trackers"
     ON ( "sla_project_trackers"."sla_id" = "sla_levels"."sla_id" )
 
-  LEFT JOIN (
-      -- Fetch holidays that override schedule match behaviour
-      SELECT "date", "sla_calendar_id"
-      FROM "sla_calendar_holidays"
-      INNER JOIN "sla_holidays"
-        ON (
-          "sla_holidays"."id" = "sla_calendar_holidays"."sla_holiday_id"
-          AND "sla_calendar_holidays"."match"
-        )
-  ) AS "sla_holiday_match"
+  LEFT JOIN "matched_holidays"
     ON (
-      "sla_holiday_match"."sla_calendar_id" = "sla_schedules"."sla_calendar_id"
-      AND "sla_holiday_match"."date" = "calendar"."minutes"::DATE
+      "matched_holidays"."sla_calendar_id" = "sla_schedules"."sla_calendar_id"
+      AND "matched_holidays"."date" = "calendar"."day_date"::DATE
+    )
+
+  LEFT JOIN "excluded_holidays"
+    ON (
+      "excluded_holidays"."sla_calendar_id" = "sla_calendars"."id"
+      AND "excluded_holidays"."date" = "calendar"."day_date"::DATE
     )
 
   WHERE
@@ -157,24 +196,25 @@ BEGIN
     "sla_project_trackers"."project_id" = v_issue_project_id
     AND "sla_project_trackers"."tracker_id" = v_issue_tracker_id
 
-    -- Exclude declared "non-matching" holidays
-    AND "calendar"."minutes"::DATE NOT IN (
-      SELECT "sla_holidays"."date"
-      FROM "sla_holidays"
-      INNER JOIN "sla_calendar_holidays"
-        ON ( "sla_holidays"."id" = "sla_calendar_holidays"."sla_holiday_id" )
-      WHERE
-        "sla_calendar_holidays"."sla_calendar_id" = "sla_calendars"."id"
-        AND NOT "sla_calendar_holidays"."match"
-    )
+    -- Exclude declared "non-matching" holidays (anti-join: no match found above)
+    AND "excluded_holidays"."date" IS NULL
 
     -- Validate either schedule match OR holiday override
     AND (
       "sla_schedules"."match"
-      OR "sla_holiday_match"."date" = "calendar"."minutes"::DATE
+      OR "matched_holidays"."date" = "calendar"."day_date"::DATE
     )
 
-  ORDER BY "calendar"."minutes"
+    -- Skip windows that had already closed before the issue was even
+    -- created (only possible on the creation day itself: every later
+    -- day's window necessarily opens after issue creation).
+    AND "calendar"."day_date" + "sla_schedules"."end_time" >= v_issue_created_on
+
+    -- Trim back to the exact 7-day-from-creation bound: generating whole
+    -- calendar days above can otherwise pull in one day too many.
+    AND GREATEST(v_issue_created_on, "calendar"."day_date" + "sla_schedules"."start_time") <= v_issue_created_on + INTERVAL '7 days'
+
+  ORDER BY GREATEST(v_issue_created_on, "calendar"."day_date" + "sla_schedules"."start_time")
   LIMIT 1 ;
 
   ---------------------------------------------------------------------------

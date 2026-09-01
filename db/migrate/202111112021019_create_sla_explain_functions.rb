@@ -14,6 +14,11 @@ class CreateSlaExplainFunctions < ActiveRecord::Migration[5.2]
 
       dir.up do
 
+        # MySQL/MariaDB do not support table-valued functions. Their
+        # diagnostic queries are executed through the adapter-neutral Ruby
+        # explanation service instead.
+        next unless RedmineSla::DbDialect.adapter == :postgresql
+
         execute File.read(
           File.expand_path('../../sql_functions/sla_explain_level.sql', __FILE__)
         )
@@ -27,6 +32,8 @@ class CreateSlaExplainFunctions < ActiveRecord::Migration[5.2]
       end
 
       dir.down do
+
+        next unless RedmineSla::DbDialect.adapter == :postgresql
 
         execute "DROP FUNCTION IF EXISTS sla_explain_spent(INTEGER, INTEGER) ;"
         say "Dropped function sla_explain_spent"

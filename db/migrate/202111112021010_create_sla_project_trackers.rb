@@ -14,8 +14,14 @@ class CreateSlaProjectTrackers < ActiveRecord::Migration[5.2]
   def change
     create_table :sla_project_trackers do |t|
 
-      # Link to the Redmine project
+      # Link to the Redmine project.
+      # type: :integer on the Redmine-core references below: those core
+      # tables predate Rails 5.1's bigint-by-default primary keys and still
+      # use `int` ids. PostgreSQL silently allows a bigint foreign key to
+      # reference an int primary key, but MySQL/InnoDB rejects the type
+      # mismatch outright, so the FK column must match exactly.
       t.belongs_to :project,
+                   type: :integer,
                    foreign_key: {
                      name: 'sla_project_trackers_projects_fkey',
                      on_delete: :cascade
@@ -23,6 +29,7 @@ class CreateSlaProjectTrackers < ActiveRecord::Migration[5.2]
 
       # Link to the Redmine tracker
       t.belongs_to :tracker,
+                   type: :integer,
                    foreign_key: {
                      name: 'sla_project_trackers_trackers_fkey',
                      on_delete: :cascade

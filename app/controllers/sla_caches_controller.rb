@@ -161,18 +161,15 @@ class SlaCachesController < ApplicationController
   # Works even when the issue has no SlaCache row yet (e.g. to explain why
   # no SLA level matched at all).
   def explain
+    explanation = RedmineSla::SlaExplanation.new(@issue)
     # Normalized through the same sla_get_date() timezone conversion as
     # start_date/from_status_date/etc below, so the two are comparable —
     # @issue.created_on alone is displayed in Redmine's own timezone
     # convention, not the SLA plugin's configured sla_time_zone, and the two
     # can differ by hours with no actual SLA delay involved.
-    @issue_created_on_sla_tz = ActiveRecord::Base.connection.select_value(
-      ActiveRecord::Base.sanitize_sql(["SELECT sla_get_date(?)", @issue.created_on])
-    )
+    @issue_created_on_sla_tz = explanation.issue_created_on
 
-    @sla_level_explanation = ActiveRecord::Base.connection.select_all(
-      ActiveRecord::Base.sanitize_sql(["SELECT * FROM sla_explain_level(?)", @issue.id])
-    )
+    @sla_level_explanation = explanation.levels
 
     # Business hours of the selected level's calendar, shown once at the top
     # rather than repeated on every day row below.
@@ -182,9 +179,7 @@ class SlaCachesController < ApplicationController
       SlaSchedule.none
 
     @sla_spent_explanations = SlaType.sorted.filter_map { |sla_type|
-      rows = ActiveRecord::Base.connection.select_all(
-        ActiveRecord::Base.sanitize_sql(["SELECT * FROM sla_explain_spent(?, ?)", @issue.id, sla_type.id])
-      ).to_a
+      rows = explanation.spent(sla_type.id)
       next if rows.empty?
 
       # Group day-level rows back under their status interval, so the view

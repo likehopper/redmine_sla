@@ -10,9 +10,15 @@ class CreateSlaStatuses < ActiveRecord::Migration[5.2]
   def change
     create_table :sla_statuses do |t|
 
-      # Reference to the Redmine issue status (from `issue_statuses` table)
+      # Reference to the Redmine issue status (from `issue_statuses` table).
+      # type: :integer: issue_statuses predates Rails 5.1's bigint-by-default
+      # primary keys and still uses an `int` id. PostgreSQL silently allows a
+      # bigint foreign key to reference an int primary key, but MySQL/InnoDB
+      # rejects the type mismatch outright, so the FK column must match
+      # exactly.
       t.belongs_to :status,
         references: :IssueStatuses,
+        type: :integer,
         foreign_key: {
           name: 'sla_statuses_issue_statuses_fkey',
           on_delete: :cascade,

@@ -24,20 +24,25 @@ class CreateSlaCaches < ActiveRecord::Migration[5.2]
         create_table :sla_caches, id: false do |t|
           t.bigint :id, null: false
 
-          # Associations
-          t.belongs_to :project, null: false,
+          # Associations.
+          # type: :integer on the Redmine-core references below: those core
+          # tables predate Rails 5.1's bigint-by-default primary keys and
+          # still use `int` ids. PostgreSQL silently allows a bigint foreign
+          # key to reference an int primary key, but MySQL/InnoDB rejects the
+          # type mismatch outright, so the FK column must match exactly.
+          t.belongs_to :project, null: false, type: :integer,
                                  foreign_key: {
                                    name: 'sla_caches_projects_fkey',
                                    on_delete: :cascade
                                  }
 
-          t.belongs_to :issue, null: false,
+          t.belongs_to :issue, null: false, type: :integer,
                                foreign_key: {
                                  name: 'sla_caches_issues_fkey',
                                  on_delete: :cascade
                                }
 
-          t.belongs_to :tracker, null: false,
+          t.belongs_to :tracker, null: false, type: :integer,
                                  foreign_key: {
                                    name: 'sla_caches_trackers_fkey',
                                    on_delete: :cascade
@@ -71,23 +76,32 @@ class CreateSlaCaches < ActiveRecord::Migration[5.2]
                   name: 'sla_caches_issues_ukey'
         say "Created unique index on table sla_caches"
 
-        # Constraint ensuring ON CONFLICT updates use the unique index
-        execute <<~SQL
-          ALTER TABLE sla_caches
-          ADD CONSTRAINT sla_caches_issues_ukey
-          UNIQUE USING INDEX sla_caches_issues_ukey;
-        SQL
-        say "Created constraints on table sla_caches"
+        # Constraint ensuring ON CONFLICT updates use the unique index.
+        # PostgreSQL-only: MySQL's sla_get_level.sql uses ON DUPLICATE KEY
+        # UPDATE, which works off the unique index created above directly
+        # and has no equivalent of naming a constraint from an index.
+        if RedmineSla::DbDialect.adapter == :postgresql
+          execute <<~SQL
+            ALTER TABLE sla_caches
+            ADD CONSTRAINT sla_caches_issues_ukey
+            UNIQUE USING INDEX sla_caches_issues_ukey;
+          SQL
+          say "Created constraints on table sla_caches"
+        end
 
-        # Load supporting SQL functions
-        execute File.read(
-          File.expand_path('../../sql_functions/sla_get_level_overlap.sql', __FILE__)
-        )
+        # Load supporting SQL functions.
+        # MySQL has no CREATE OR REPLACE FUNCTION (unlike PostgreSQL, whose
+        # files already self-contain an equivalent DROP), and Rails' mysql2
+        # driver doesn't support multiple statements in a single execute call,
+        # so the drops are issued separately here.
+        if RedmineSla::DbDialect.adapter == :mysql
+          execute "DROP FUNCTION IF EXISTS sla_get_level_overlap ;"
+        end
+        execute RedmineSla::DbDialect.function_sql('sla_get_level_overlap')
         say "Created function sla_get_level_overlap"
 
-        execute File.read(
-          File.expand_path('../../sql_functions/sla_get_level.sql', __FILE__)
-        )
+        execute "DROP FUNCTION IF EXISTS sla_get_level ;" if RedmineSla::DbDialect.adapter == :mysql
+        execute RedmineSla::DbDialect.function_sql('sla_get_level')
         say "Created function sla_get_level"
 
       end
