@@ -4,6 +4,8 @@
 ![Ruby](https://img.shields.io/badge/Ruby-2.7+-red)
 ![Rails](https://img.shields.io/badge/Rails-6.1+-brightgreen)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-11+-blue)
+![MySQL](https://img.shields.io/badge/MySQL-8.0+-blue)
+![MariaDB](https://img.shields.io/badge/MariaDB-10.2+-blue)
 ![License](https://img.shields.io/github/license/likehopper/redmine_sla)
 
 ![Redmine SLA - Issue Patch](doc/images/redmine_sla_issue_patch.png)
@@ -30,10 +32,10 @@ It enables precise SLA computation based on:
 -   Working calendars (HO / HNO)
 -   SLA levels and priorities
 -   Response and resolution terms
--   PostgreSQL time-based procedures
+-   Database-native time-based procedures
 
 SLA compliance is calculated directly at the database level using
-PL/pgSQL, ensuring:
+PostgreSQL or MySQL/MariaDB stored procedures, ensuring:
 
 -   Deterministic computation
 -   Accurate working-hours handling
@@ -45,7 +47,7 @@ PL/pgSQL, ensuring:
 
 Many SLA implementations rely exclusively on Ruby time computations.
 
-This plugin delegates SLA calculation to **PostgreSQL stored
+This plugin delegates SLA calculation to **database stored
 procedures**, allowing:
 
 -   Accurate handling of working schedules
@@ -73,7 +75,7 @@ The engine is designed for production environments.
 
 ### Core Engine
 
--   PostgreSQL PL/pgSQL SLA computation
+-   PostgreSQL PL/pgSQL or MySQL/MariaDB SLA computation
 -   Working calendar awareness (HO / HNO)
 -   Response & resolution deadlines
 -   SLA compliance percentage
@@ -150,36 +152,33 @@ Fully manageable through UI and REST API:
 
 ## Prerequisites
 
-| Name               | requirement                      |
-|--------------------|----------------------------------|
-| `Redmine`          | >= 5.0                           |
-| `Ruby`             | >= 2.7                           |
-| `Rails`            | >= 6.1                           |
-| `Database`         | PostgreSQL >= 11                 |
+| Name               | requirement                                       |
+|--------------------|---------------------------------------------------|
+| `Redmine`          | >= 5.0                                            |
+| `Ruby`             | >= 2.7                                            |
+| `Rails`            | >= 6.1                                            |
+| `Database`         | PostgreSQL >= 11, MySQL >= 8.0 or MariaDB >= 10.2 |
 
 ------------------------------------------------------------------------
 
-### ⚠ PostgreSQL Requirement
+### ⚠ Database Requirement
 
-This plugin relies heavily on:
-
--   PostgreSQL views
--   PL/pgSQL stored procedures
--   SQL schema format
-
-In `config/application.rb`:
+This plugin relies on database-native views and stored procedures, and
+therefore requires the SQL schema format. In `config/application.rb`:
 
 ``` ruby
 config.active_record.schema_format = :sql
 ```
 
-This is mandatory for proper installation.
+This is mandatory for every supported database.
 
-MySQL and SQLite are **not supported**.
+SQLite is **not supported**.
 
 ------------------------------------------------------------------------
 
 ### Database Configuration
+
+#### PostgreSQL
 
 Ensure PostgreSQL datestyle is set to ISO:
 
@@ -196,6 +195,29 @@ config.active_record.default_timezone = :local
 Prefer global timezone configuration set to:
 
     Etc/UTC
+
+#### MySQL / MariaDB
+
+Before migrating the plugin:
+
+-   Load the server time-zone tables, which are required by SLA timestamp
+    conversions:
+
+    ``` bash
+    mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p mysql
+    ```
+
+-   If binary logging is enabled, allow the migration to create stored
+    functions:
+
+    ``` sql
+    SET GLOBAL log_bin_trust_function_creators = 1;
+    ```
+
+    The setting can be made persistent with
+    `log_bin_trust_function_creators = 1` under `[mysqld]`.
+
+Use `Etc/UTC` as the server-wide time zone where possible.
 
 ------------------------------------------------------------------------
 
