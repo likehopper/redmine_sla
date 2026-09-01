@@ -27,14 +27,13 @@ class SlaCacheSpentsController < ApplicationController
 
   # Only administrators can manage SLA cache spents through the UI/API,
   # except for a few read actions.
-  before_action :require_admin, except: [:index, :show, :refresh, :destroy, :context_menu]
+  before_action :require_admin, except: [:index, :show, :refresh, :destroy, :purge, :context_menu]
   before_action :authorize_global
 
+  before_action :find_optional_project, only: [:index, :show, :refresh, :destroy, :purge, :context_menu]
   before_action :find_sla_cache_spent, only: [:show]
   before_action :find_sla_cache_spents, only: [:refresh, :destroy, :context_menu]
-
-  # Project is optional: when present, restricts scope to a single project.
-  before_action :find_optional_project, only: [:index, :show, :refresh, :destroy, :purge]
+  before_action :authorize_cache_management, only: [:refresh, :destroy, :purge]
 
   rescue_from Query::StatementInvalid, with: :query_statement_invalid
   rescue_from Query::QueryError, with: :query_error
@@ -154,7 +153,7 @@ class SlaCacheSpentsController < ApplicationController
     @sla_cache_spent = @sla_cache_spents.first if @sla_cache_spents.size == 1
 
     can_show    = @sla_cache_spents.detect { |c| !c.visible? }.nil?
-    can_refresh = @sla_cache_spents.detect { |c| !c.visible? }.nil?
+    can_refresh = @sla_cache_spents.all?(&:deletable?)
     can_delete  = @sla_cache_spents.detect { |c| !c.deletable? }.nil?
 
     @can = { show: can_show, refresh: can_refresh, delete: can_delete }
@@ -181,6 +180,20 @@ class SlaCacheSpentsController < ApplicationController
   end
 
   private
+
+  def authorize_cache_management
+    return if User.current.admin?
+
+    projects = if action_name == 'purge'
+                 [@project].compact
+               else
+                 @sla_cache_spents.map(&:project).uniq
+               end
+
+    raise Unauthorized if projects.empty?
+    raise Unauthorized unless projects.all? { |project| User.current.allowed_to?(:manage_sla, project) }
+    raise Unauthorized if @project && projects.any? { |project| project != @project }
+  end
 
   # Find a single SlaCacheSpent by id
   def find_sla_cache_spent

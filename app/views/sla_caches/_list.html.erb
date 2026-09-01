@@ -37,9 +37,9 @@
               <%= content_tag('td', column_content(column, entity), class: column.css_classes) %>
             <% end %>
             <td class="buttons">
-              <%= if entity.visible?
+              <%= if entity.deletable?
                       link_to l(:button_refresh), ( @project.nil? ? refresh_sla_cache_path(entity) : refresh_project_sla_cache_path(@project,entity) ),
-                              title: l(:button_refresh), class: 'icon-only icon-sla_cache_refresh'
+                              method: :patch, title: l(:button_refresh), class: 'icon-only icon-sla_cache_refresh'
                   end -%>
               <%= if User.current.admin?
                       link_to l(:button_show),

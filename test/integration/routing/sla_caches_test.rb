@@ -39,9 +39,9 @@ class RoutingSlaCachesTest < ApplicationSlaRoutingTestCase
     # !should_route 'PUT /sla/caches/1' => 'sla_caches#update', :id => '1'
     should_route 'DELETE /sla/caches/1' => 'sla_caches#destroy', :id => '1'
 
-    should_route 'GET /sla/caches/1/refresh' => 'sla_caches#refresh', :id => '1'
-    should_route 'GET /sla/caches/refresh' => 'sla_caches#refresh'
-    should_route 'GET /sla/caches/purge' => 'sla_caches#purge'
+    should_route 'PATCH /sla/caches/1/refresh' => 'sla_caches#refresh', :id => '1'
+    should_route 'PATCH /sla/caches/refresh' => 'sla_caches#refresh'
+    should_route 'PATCH /sla/caches/purge' => 'sla_caches#purge'
 
     should_route 'GET /issues/1/sla_explain' => 'sla_caches#explain', :id => '1'
   end
