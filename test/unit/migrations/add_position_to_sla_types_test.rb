@@ -32,5 +32,6 @@ class AddPositionToSlaTypesTest < ApplicationSlaUnitsTestCase
     assert_not connection.columns(:sla_types).find { |column| column.name == 'position' }.null
   ensure
     migration&.migrate(:up) unless connection&.column_exists?(:sla_types, :position)
+    SlaType.unscoped.where(name: names).delete_all if names
   end
 end

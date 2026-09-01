@@ -616,43 +616,51 @@ class Redmine::ApiTest::SlaCacheSpentsTest < ApplicationSlaApiTestCase
 
   test "DELETE /sla/cache_spents/:id.xml should missing|success the sla cache for admin" do
     ['admin'].each do |user|
-      sla_cache_spent_id = SlaCacheSpent.find_by(project: 1).id # project-sla-tests-tma
+      sla_cache_spent = SlaCacheSpent.find_by(project: 1) # project-sla-tests-tma
+      sla_cache_spent_id = sla_cache_spent.id
+      issue_id = sla_cache_spent.issue_id
       delete "/projects/project-sla-tests-tma/sla/cache_spents/#{sla_cache_spent_id}.xml",
         headers: credentials(user)
       assert_response :missing
       delete "/sla/cache_spents/#{sla_cache_spent_id}.xml",
         headers: credentials(user)
       assert_response :success
-      renew_issue(sla_cache_spent_id)
-      sla_cache_spent_id = SlaCacheSpent.find_by(project: 2).id # project-sla-tests-std
+      renew_issue(issue_id)
+      sla_cache_spent = SlaCacheSpent.find_by(project: 2) # project-sla-tests-std
+      sla_cache_spent_id = sla_cache_spent.id
+      issue_id = sla_cache_spent.issue_id
       delete "/projects/project-sla-tests-std/sla/cache_spents/#{sla_cache_spent_id}.xml",
         headers: credentials(user)
       assert_response :missing
       delete "/sla/cache_spents/#{sla_cache_spent_id}.xml",
         headers: credentials(user)
       assert_response :success
-      renew_issue(sla_cache_spent_id)
+      renew_issue(issue_id)
     end
   end
 
   test "DELETE /sla/cache_spents/:id.xml should missing|success the sla cache for manager" do
     ['manager'].each do |user|
-      sla_cache_spent_id = SlaCacheSpent.find_by(project: 1).id # project-sla-tests-tma
+      sla_cache_spent = SlaCacheSpent.find_by(project: 1) # project-sla-tests-tma
+      sla_cache_spent_id = sla_cache_spent.id
+      issue_id = sla_cache_spent.issue_id
       delete "/projects/project-sla-tests-tma/sla/cache_spents/#{sla_cache_spent_id}.xml",
         headers: credentials(user)
       assert_response :missing
       delete "/sla/cache_spents/#{sla_cache_spent_id}.xml",
         headers: credentials(user)
       assert_response :success
-      renew_issue(sla_cache_spent_id)
-      sla_cache_spent_id = SlaCacheSpent.find_by(project: 2).id # project-sla-tests-std
+      renew_issue(issue_id)
+      sla_cache_spent = SlaCacheSpent.find_by(project: 2) # project-sla-tests-std
+      sla_cache_spent_id = sla_cache_spent.id
+      issue_id = sla_cache_spent.issue_id
       delete "/projects/project-sla-tests-std/sla/cache_spents/#{sla_cache_spent_id}.xml",
         headers: credentials(user)
       assert_response :missing
       delete "/sla/cache_spents/#{sla_cache_spent_id}.xml",
         headers: credentials(user)
       assert_response :success
-      renew_issue(sla_cache_spent_id)
+      renew_issue(issue_id)
     end
   end
 
