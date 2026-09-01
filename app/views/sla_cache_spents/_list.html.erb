@@ -37,9 +37,9 @@
               <%= content_tag('td', column_content(column, entity), class: column.css_classes) %>
             <% end %>
             <td class="buttons">
-              <%= if entity.visible?
+              <%= if entity.deletable?
                     link_to l(:button_refresh), refresh_sla_cache_spent_path(entity),
-                            title: l(:button_refresh), class: 'icon-only icon-sla_cache_spent_refresh'
+                            method: :patch, title: l(:button_refresh), class: 'icon-only icon-sla_cache_spent_refresh'
                   end -%>
               <%= if entity.deletable?
                     link_to l(:button_delete), sla_cache_spent_path(entity),

@@ -34,14 +34,14 @@ class SlaCachesController < ApplicationController
   
   accept_api_auth :index, :show, :refresh, :destroy, :purge
 
-  before_action :require_admin, except: [ :index, :show, :refresh, :destroy, :context_menu, :explain ]
+  before_action :require_admin, except: [ :index, :show, :refresh, :destroy, :purge, :context_menu, :explain ]
   before_action :authorize_global
 
+  before_action :find_optional_project, only: [ :index, :show, :refresh, :destroy, :purge, :context_menu ]
   before_action :find_sla_cache,        only: [ :show ]
   before_action :find_sla_caches,       only: [ :refresh, :destroy, :context_menu ]
   before_action :find_issue_for_explain, only: [ :explain ]
-
-  before_action :find_optional_project, :only => [ :index, :show, :refresh, :destroy, :purge ]
+  before_action :authorize_cache_management, only: [ :refresh, :destroy, :purge ]
   # before_action :check_routing_users, :only => [ :index, :show, :refresh, :destroy, :purge ]
   
   rescue_from Query::StatementInvalid, :with => :query_statement_invalid
@@ -206,7 +206,7 @@ class SlaCachesController < ApplicationController
       @sla_cache = @sla_caches.first
     end
     can_show    = @sla_caches.detect { |c| !c.visible? }.nil?
-    can_refresh = @sla_caches.detect { |c| !c.visible? }.nil?
+    can_refresh = @sla_caches.all?(&:deletable?)
     can_delete  = @sla_caches.detect { |c| !c.deletable? }.nil?
     @can = { show: can_show, refresh: can_refresh, delete: can_delete }
 
@@ -231,6 +231,23 @@ class SlaCachesController < ApplicationController
   end
 
 private
+
+  # Reading cache data requires :view_sla (enforced by authorize_global and
+  # visible?). Mutating it requires :manage_sla on every affected project.
+  # Only an administrator may purge all projects at once.
+  def authorize_cache_management
+    return if User.current.admin?
+
+    projects = if action_name == 'purge'
+                 [@project].compact
+               else
+                 @sla_caches.map(&:project).uniq
+               end
+
+    raise Unauthorized if projects.empty?
+    raise Unauthorized unless projects.all? { |project| User.current.allowed_to?(:manage_sla, project) }
+    raise Unauthorized if @project && projects.any? { |project| project != @project }
+  end
 
   # Find a single SLA cache and check visibility.
   def find_sla_cache

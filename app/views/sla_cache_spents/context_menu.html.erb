@@ -1,7 +1,7 @@
 <ul>
   <li><%= context_menu_link l(:button_refresh),
             refresh_sla_cache_spents_path(ids: @sla_cache_spent_ids, back_url: @back),
-            class: 'icon icon-sla_cache_spent_refresh', disabled: !@can[:show]
+            method: :patch, class: 'icon icon-sla_cache_spent_refresh', disabled: !@can[:refresh]
   %></li>
   <li><%= context_menu_link l(:button_delete),
             sla_cache_spents_path(ids: @sla_cache_spent_ids, back_url: @back),

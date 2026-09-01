@@ -5,10 +5,11 @@
 resources :projects do
   resources :sla_caches, path: "sla/caches", :only => [ :index, :show, :destroy ] do
     member do
-      get 'refresh'
+      patch 'refresh'
     end
     collection do
-      get 'context_menu', 'purge'
+      get 'context_menu'
+      patch 'purge'
     end    
   end
   resources :sla_project_trackers, path: "sla/trackers", :only => [ :index, :new, :create, :update, :edit, :destroy]
@@ -110,10 +111,11 @@ match 'sla/calendar_holidays', :controller => 'sla_calendar_holidays', :action =
 # SLA Global settings - Sla Caches
 resources :sla_caches, path: "sla/caches", except: [:new, :create, :edit, :update] do
   member do
-    get 'refresh'
+    patch 'refresh'
   end
   collection do
-    get 'context_menu', 'refresh', 'purge'
+    get 'context_menu'
+    patch 'refresh', 'purge'
   end
 end
 # context_menu : bulk_destroy
@@ -126,10 +128,11 @@ get 'issues/:id/sla_explain', :controller => 'sla_caches', :action => 'explain',
 # SLA Global settings - Sla Cache Spents
 resources :sla_cache_spents, path: "sla/cache_spents", except: [:new, :create, :edit, :update] do
   member do
-    get 'refresh'
+    patch 'refresh'
   end
   collection do
-    get 'context_menu', 'refresh', 'purge'
+    get 'context_menu'
+    patch 'refresh', 'purge'
   end
 end
 # context_menu : bulk_destroy

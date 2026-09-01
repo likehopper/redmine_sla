@@ -495,79 +495,79 @@ class Redmine::ApiTest::SlaCacheSpentsTest < ApplicationSlaApiTestCase
 
   # Sla#refresh in JSON
 
-  test "GET /sla/cache_spents/:id/refresh.json should return missing|success on the sla cache for admin" do
+  test "PATCH /sla/cache_spents/:id/refresh.json should return missing|success on the sla cache for admin" do
     ['admin'].each do |user|
       sla_cache_spent = SlaCacheSpent.find_by(project: 1) # project-sla-tests-tma
-      get "/projects/project-sla-tests-tma/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
+      patch "/projects/project-sla-tests-tma/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
         headers: credentials(user)
       assert_response :missing
       sla_cache_spent = SlaCacheSpent.find_by(project: 2) # project-sla-tests-std
-      get "/projects/project-sla-tests-std/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
+      patch "/projects/project-sla-tests-std/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
         headers: credentials(user)
       assert_response :missing            
       sla_cache_spent = SlaCacheSpent.first
-      get "/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
+      patch "/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
         headers: credentials(user)
       assert_response :success
     end
   end
 
-  test "GET /sla/cache_spents/:id/refresh.json should return missing on the sla cache for manager" do
+  test "PATCH /sla/cache_spents/:id/refresh.json should return missing on the sla cache for manager" do
     ['manager'].each do |user|
       sla_cache_spent = SlaCacheSpent.find_by(project: 1) # project-sla-tests-tma
-      get "/projects/project-sla-tests-tma/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
+      patch "/projects/project-sla-tests-tma/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
         headers: credentials(user)
       assert_response :missing
       sla_cache_spent = SlaCacheSpent.find_by(project: 2) # project-sla-tests-std
-      get "/projects/project-sla-tests-std/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
+      patch "/projects/project-sla-tests-std/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
         headers: credentials(user)
       assert_response :missing            
       sla_cache_spent = SlaCacheSpent.first
-      get "/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
+      patch "/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
         headers: credentials(user)
       assert_response :success
     end
   end
 
-  test "GET /sla/cache_spents/:id/refresh.json should return forbidden on sla cache for developer" do
+  test "PATCH /sla/cache_spents/:id/refresh.json should return forbidden on sla cache for developer" do
     ['developer'].each do |user|
       sla_cache_spent = SlaCacheSpent.find_by(project: 1) # project-sla-tests-tma
-      get "/projects/project-sla-tests-tma/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
+      patch "/projects/project-sla-tests-tma/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
         headers: credentials(user)
       assert_response :missing
-      get "/projects/project-sla-tests-std/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
+      patch "/projects/project-sla-tests-std/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
         headers: credentials(user)
       assert_response :missing
-      get "/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
+      patch "/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
         headers: credentials(user)
-      assert_response :success
+      assert_response :forbidden
       sla_cache_spent = SlaCacheSpent.find_by(project: 2) # project-sla-tests-std
-      get "/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
+      patch "/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
         headers: credentials(user)
       assert_response :forbidden
     end
   end  
 
-  test "GET /sla/cache_spents/:id/refresh.json should return forbidden on sla cache for sysadmin" do
+  test "PATCH /sla/cache_spents/:id/refresh.json should return forbidden on sla cache for sysadmin" do
     ['sysadmin'].each do |user|
       sla_cache_spent = SlaCacheSpent.find_by(project: 1) # project-sla-tests-tma
-      get "/projects/project-sla-tests-std/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
+      patch "/projects/project-sla-tests-std/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
         headers: credentials(user)
       assert_response :missing
-      get "/projects/project-sla-tests-std/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
+      patch "/projects/project-sla-tests-std/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
         headers: credentials(user)
       assert_response :missing
-      get "/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
+      patch "/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
         headers: credentials(user)
       assert_response :forbidden
       sla_cache_spent = SlaCacheSpent.find_by(project: 2) # project-sla-tests-std
-      get "/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
+      patch "/sla/cache_spents/#{sla_cache_spent.id}/refresh.json",
         headers: credentials(user)
-      assert_response :success
+      assert_response :forbidden
     end
   end
 
-  test "GET /sla/cache_spents/:id/refresh.json should forbidden the sla cache for others" do
+  test "PATCH /sla/cache_spents/:id/refresh.json should forbidden the sla cache for others" do
     sla_cache_spent = SlaCacheSpent.first
     ['reporter','other'].each do |user|
       get "/sla/cache_spents/#{sla_cache_spent.id}.json",
@@ -576,7 +576,7 @@ class Redmine::ApiTest::SlaCacheSpentsTest < ApplicationSlaApiTestCase
     end
   end
  
-  test "GET /sla/cache_spents/:id/refresh.json should unauthorized the sla cache withtout credentials" do
+  test "PATCH /sla/cache_spents/:id/refresh.json should unauthorized the sla cache withtout credentials" do
     sla_cache_spent = SlaCacheSpent.first
     get "/sla/cache_spents/#{sla_cache_spent.id}.json"
     assert_response :unauthorized

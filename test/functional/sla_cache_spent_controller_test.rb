@@ -80,17 +80,17 @@ class SlaCacheSpentsControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end  
 
-  test "should redirect on get purge as anonymous" do
+  test "should redirect on patch purge as anonymous" do
     with_settings :default_language => "en" do
-      get :purge
+      patch :purge
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}
     end
   end  
 
-  test "should redirect on get refresh as anonymous" do
+  test "should redirect on patch refresh as anonymous" do
     with_settings :default_language => "en" do
-      get :refresh
+      patch :refresh
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}
     end
@@ -153,19 +153,19 @@ class SlaCacheSpentsControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
-  test "should redirect on get purge as admin" do
+  test "should redirect on patch purge as admin" do
     @request.session[:user_id] = 1
     with_settings :default_language => "en" do
-      get :purge, params: { sla_cache_spent: { id: 1 } }
+      patch :purge, params: { sla_cache_spent: { id: 1 } }
       assert_response :redirect 
       assert_redirected_to sla_cache_spents_path  
     end
   end  
   
-  test "should redirect on get refresh as admin" do
+  test "should redirect on patch refresh as admin" do
     @request.session[:user_id] = 1
     with_settings :default_language => "en" do
-      get :refresh, params: { id: 1 }
+      patch :refresh, params: { id: 1 }
       assert_response :redirect
       assert_redirected_to sla_cache_spents_path      
     end
@@ -230,18 +230,18 @@ class SlaCacheSpentsControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
-  test "should forbidden on get purge as manager" do
+  test "should forbidden on patch purge as manager" do
     @request.session[:user_id] = 2
     with_settings :default_language => "en" do
-      get :purge, params: { id: 1 }
+      patch :purge, params: { id: 1 }
       assert_response :forbidden      
     end
   end  
   
-  test "should redirect on get refresh as manager" do
+  test "should redirect on patch refresh as manager" do
     @request.session[:user_id] = 2
     with_settings :default_language => "en" do
-      get :refresh, params: { id: 1 } 
+      patch :refresh, params: { id: 1 }
       assert_response :redirect 
       assert_redirected_to sla_cache_spents_path   
     end
@@ -305,20 +305,19 @@ class SlaCacheSpentsControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
-  test "should forbidden on get purge as developper" do
+  test "should forbidden on patch purge as developper" do
     @request.session[:user_id] = 3
     with_settings :default_language => "en" do
-      get :purge, params: { id: 1 }
+      patch :purge, params: { id: 1 }
       assert_response :forbidden      
     end
   end  
   
-  test "should redirect on get refresh as developper" do
+  test "should redirect on patch refresh as developper" do
     @request.session[:user_id] = 3
     with_settings :default_language => "en" do
-      get :refresh, params: { id: 1 } 
-      assert_response :redirect 
-      assert_redirected_to sla_cache_spents_path      
+      patch :refresh, params: { id: 1 }
+      assert_response :forbidden
     end
   end        
 
@@ -372,18 +371,18 @@ class SlaCacheSpentsControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end  
 
-  test "should forbidden on get purge as sysadmin" do
+  test "should forbidden on patch purge as sysadmin" do
     @request.session[:user_id] = 4
     with_settings :default_language => "en" do
-      get :purge, params: { id: 1 }
+      patch :purge, params: { id: 1 }
       assert_response :forbidden      
     end
   end  
   
-  test "should forbidden on get refresh as sysadmin" do
+  test "should forbidden on patch refresh as sysadmin" do
     @request.session[:user_id] = 4
     with_settings :default_language => "en" do
-      get :refresh, params: { id: 1 } 
+      patch :refresh, params: { id: 1 }
       assert_response :forbidden     
     end
   end
@@ -438,18 +437,18 @@ class SlaCacheSpentsControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
-  test "should forbidden on get purge as reporter" do
+  test "should forbidden on patch purge as reporter" do
     @request.session[:user_id] = 5
     with_settings :default_language => "en" do
-      get :purge, params: { id: 1 }
+      patch :purge, params: { id: 1 }
       assert_response :forbidden      
     end
   end  
   
-  test "should forbidden on get refresh as reporter" do
+  test "should forbidden on patch refresh as reporter" do
     @request.session[:user_id] = 5
     with_settings :default_language => "en" do
-      get :refresh, params: { id: 1 } 
+      patch :refresh, params: { id: 1 }
       assert_response :forbidden     
     end
   end
@@ -504,21 +503,20 @@ class SlaCacheSpentsControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
   
-  test "should forbidden on get purge as other" do
+  test "should forbidden on patch purge as other" do
     @request.session[:user_id] = 6
     with_settings :default_language => "en" do
-      get :purge, params: { id: 1 }
+      patch :purge, params: { id: 1 }
       assert_response :forbidden      
     end
   end  
   
-  test "should forbidden on get refresh as other" do
+  test "should forbidden on patch refresh as other" do
     @request.session[:user_id] = 6
     with_settings :default_language => "en" do
-      get :refresh, params: { id: 1 } 
+      patch :refresh, params: { id: 1 }
       assert_response :forbidden
     end
   end
 
 end
-

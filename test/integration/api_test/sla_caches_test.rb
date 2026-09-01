@@ -487,83 +487,83 @@ class Redmine::ApiTest::SlaCachesTest < ApplicationSlaApiTestCase
 
   # Sla#refresh in JSON
 
-  test "GET /sla/caches/:id/refresh.json should return success on the sla cache for admin" do
+  test "PATCH /sla/caches/:id/refresh.json should return success on the sla cache for admin" do
     ['admin'].each do |user|
       sla_cache = SlaCache.find_by(project: 1) # project-sla-tests-tma
-      get "/projects/project-sla-tests-tma/sla/caches/#{sla_cache.id}/refresh.json",
+      patch "/projects/project-sla-tests-tma/sla/caches/#{sla_cache.id}/refresh.json",
         headers: credentials(user)
       assert_response :success
       sla_cache = SlaCache.find_by(project: 2) # project-sla-tests-std
-      get "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}/refresh.json",
+      patch "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}/refresh.json",
         headers: credentials(user)
       assert_response :success            
       sla_cache = SlaCache.first
-      get "/sla/caches/#{sla_cache.id}/refresh.json",
+      patch "/sla/caches/#{sla_cache.id}/refresh.json",
         headers: credentials(user)
       assert_response :success
     end
   end
 
-  test "GET /sla/caches/:id/refresh.json should return success on the sla cache for manager" do
+  test "PATCH /sla/caches/:id/refresh.json should return success on the sla cache for manager" do
     ['manager'].each do |user|
       sla_cache = SlaCache.find_by(project: 1) # project-sla-tests-tma
-      get "/projects/project-sla-tests-tma/sla/caches/#{sla_cache.id}/refresh.json",
+      patch "/projects/project-sla-tests-tma/sla/caches/#{sla_cache.id}/refresh.json",
         headers: credentials(user)
       assert_response :success
       sla_cache = SlaCache.find_by(project: 2) # project-sla-tests-std
-      get "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}/refresh.json",
+      patch "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}/refresh.json",
         headers: credentials(user)
       assert_response :success            
       sla_cache = SlaCache.first
-      get "/sla/caches/#{sla_cache.id}/refresh.json",
+      patch "/sla/caches/#{sla_cache.id}/refresh.json",
         headers: credentials(user)
       assert_response :success
     end
   end
 
-  test "GET /sla/caches/:id/refresh.json should return forbidden on sla cache for developer" do
+  test "PATCH /sla/caches/:id/refresh.json should return forbidden on sla cache for developer" do
     ['developer'].each do |user|
       sla_cache = SlaCache.find_by(project: 1) # project-sla-tests-tma
-      get "/projects/project-sla-tests-tma/sla/caches/#{sla_cache.id}/refresh.json",
+      patch "/projects/project-sla-tests-tma/sla/caches/#{sla_cache.id}/refresh.json",
         headers: credentials(user)
-      assert_response :success
+      assert_response :forbidden
       sla_cache = SlaCache.find_by(project: 2) # project-sla-tests-std
-      get "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}/refresh.json",
+      patch "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}/refresh.json",
         headers: credentials(user)
       assert_response :forbidden
       sla_cache = SlaCache.find_by(project: 1) # project-sla-tests-tma
-      get "/sla/caches/#{sla_cache.id}/refresh.json",
+      patch "/sla/caches/#{sla_cache.id}/refresh.json",
         headers: credentials(user)
-      assert_response :success
+      assert_response :forbidden
       sla_cache = SlaCache.find_by(project: 2) # project-sla-tests-std
-      get "/sla/caches/#{sla_cache.id}/refresh.json",
+      patch "/sla/caches/#{sla_cache.id}/refresh.json",
         headers: credentials(user)
       assert_response :forbidden
     end
   end  
 
-  test "GET /sla/caches/:id/refresh.json should return forbidden on sla cache for sysadmin" do
+  test "PATCH /sla/caches/:id/refresh.json should return forbidden on sla cache for sysadmin" do
     ['sysadmin'].each do |user|
       sla_cache = SlaCache.find_by(project: 1) # project-sla-tests-tma
-      get "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}/refresh.json",
+      patch "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}/refresh.json",
         headers: credentials(user)
       assert_response :forbidden
       sla_cache = SlaCache.find_by(project: 2) # project-sla-tests-std
-      get "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}/refresh.json",
+      patch "/projects/project-sla-tests-std/sla/caches/#{sla_cache.id}/refresh.json",
         headers: credentials(user)
-      assert_response :success
+      assert_response :forbidden
       sla_cache = SlaCache.find_by(project: 1) # project-sla-tests-tma
-      get "/sla/caches/#{sla_cache.id}/refresh.json",
+      patch "/sla/caches/#{sla_cache.id}/refresh.json",
         headers: credentials(user)
       assert_response :forbidden
       sla_cache = SlaCache.find_by(project: 2) # project-sla-tests-std
-      get "/sla/caches/#{sla_cache.id}/refresh.json",
+      patch "/sla/caches/#{sla_cache.id}/refresh.json",
         headers: credentials(user)
-      assert_response :success
+      assert_response :forbidden
     end
   end
 
-  test "GET /sla/caches/:id/refresh.json should forbidden the sla cache for others" do
+  test "PATCH /sla/caches/:id/refresh.json should forbidden the sla cache for others" do
     sla_cache = SlaCache.first
     ['reporter','other'].each do |user|
       get "/sla/caches/#{sla_cache.id}.json",
@@ -572,7 +572,7 @@ class Redmine::ApiTest::SlaCachesTest < ApplicationSlaApiTestCase
     end
   end
  
-  test "GET /sla/caches/:id/refresh.json should unauthorized the sla cache withtout credentials" do
+  test "PATCH /sla/caches/:id/refresh.json should unauthorized the sla cache withtout credentials" do
     sla_cache = SlaCache.first
     get "/sla/caches/#{sla_cache.id}.json"
     assert_response :unauthorized
@@ -595,6 +595,24 @@ class Redmine::ApiTest::SlaCachesTest < ApplicationSlaApiTestCase
         headers: credentials(user)
       assert_response :missing
     end
+  end
+
+  test "PATCH project cache purge should require manage_sla" do
+    patch "/projects/project-sla-tests-tma/sla/caches/purge.json",
+      headers: credentials('manager')
+    assert_response :success
+
+    patch "/projects/project-sla-tests-tma/sla/caches/purge.json",
+      headers: credentials('developer')
+    assert_response :forbidden
+  end
+
+  test "PATCH global cache purge should remain admin only" do
+    patch "/sla/caches/purge.json", headers: credentials('manager')
+    assert_response :forbidden
+
+    patch "/sla/caches/purge.json", headers: credentials('admin')
+    assert_response :success
   end
  
   test "PUT /sla/caches/:id.xml should missing the sla cache withtout credentials" do
