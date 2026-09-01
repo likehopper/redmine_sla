@@ -1,1 +1,1 @@
-Icons created by Freepik - Flaticon : <https://www.flaticon.com/authors/freepik>
+Icons created by [Magnific](https://www.flaticon.com/fr/auteurs/magnific)

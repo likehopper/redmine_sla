@@ -350,6 +350,7 @@ fr:
   label_sla_notice: Les SLA sont tous stockés dans un <a href="%{url}">cache</a>. Les SLA sont générés à l'affichage des valeurs dans les demandes.
   label_sla_warning: Les changements (%{changes}) ont impliqués une mise à jour des SLA !
   label_sla_term: Délais
+  label_sla_icons_credit: Icônes réalisées par
 
   button_sla_explain: Expliquer
   label_sla_explain_title: Explication du SLA

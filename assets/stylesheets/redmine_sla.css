@@ -253,6 +253,7 @@
 .icon-sla_cache_spent_refresh { background-image:url('../images/sla_cache_spent_refresh_16.png'); }
 
 .redmine_sla_footer { border-top: 1px solid#bbb; font-size: 0.9em; color: #aaa; padding: 5px; text-align:center;}
+.redmine_sla_flaticon_logo { width: 16px; height: 16px; margin-right: 3px; vertical-align: text-bottom; }
 
 /*** SLA Explain view ***/
 tr.sla-explain-selected { background-color: #e3f3d3; }
