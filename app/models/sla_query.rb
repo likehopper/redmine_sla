@@ -30,7 +30,7 @@ class SlaQuery < Query
     return @available_columns if @available_columns
     @available_columns = []
     @available_columns << QueryColumn.new(:id, :sortable => "#{Sla.table_name}.id", :default_order => :asc, :groupable => false )
-    @available_columns << QueryColumn.new(:name, :sortable => "#{Sla.table_name}.name", :default_order => :asc, :groupable => false )
+    @available_columns << QueryColumn.new(:name, :sortable => RedmineSla::DbDialect.case_sensitive_order("#{Sla.table_name}.name"), :default_order => :asc, :groupable => false )
     @available_columns
   end
 
@@ -39,6 +39,13 @@ class SlaQuery < Query
     self.filters ||= {
     #  "name" => {:operator => "*", :values => []}
     }
+  end
+
+  # Without an explicit default, requests with no `sort` param issue no
+  # ORDER BY at all: row order is then storage-engine-dependent, which
+  # happens to look id-ordered on PostgreSQL but not on MySQL/MariaDB.
+  def default_sort_criteria
+    [['id', 'asc']]
   end
  
   def default_columns_names

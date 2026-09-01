@@ -38,9 +38,7 @@ class SlaExplainTest < ApplicationSlaUnitsTestCase
 
       sla_cache = SlaCache.find_by_issue_id(issue_id)
 
-      level_rows = ActiveRecord::Base.connection.select_all(
-        ActiveRecord::Base.sanitize_sql(["SELECT * FROM sla_explain_level(?)", issue_id])
-      ).to_a
+      level_rows = RedmineSla::SlaExplanation.new(Issue.find(issue_id)).levels
 
       if ( sla_cache.nil? || sla_cache.sla_level_id.nil? )
         assert level_rows.none? { |r| r['selected'] },
@@ -77,9 +75,7 @@ class SlaExplainTest < ApplicationSlaUnitsTestCase
         sla_spent = issue.get_sla_spent(sla_type_id)
         next if ( sla_spent.nil? )
 
-        spent_rows = ActiveRecord::Base.connection.select_all(
-          ActiveRecord::Base.sanitize_sql(["SELECT * FROM sla_explain_spent(?, ?)", issue_id, sla_type_id])
-        ).to_a
+        spent_rows = RedmineSla::SlaExplanation.new(issue).spent(sla_type_id)
 
         explained_total = spent_rows.sum { |r| r['minutes_counted'].to_i }
 

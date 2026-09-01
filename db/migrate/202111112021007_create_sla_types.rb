@@ -10,7 +10,9 @@ class CreateSlaTypes < ActiveRecord::Migration[5.2]
     create_table :sla_types do |t|
 
       # SLA type name, must be unique across all SLA types
-      t.text :name, null: false,
+      # (string rather than text: MySQL/MariaDB cannot put a unique index on
+      # a full TEXT column without a key-length prefix)
+      t.string :name, limit: 255, null: false,
                     index: { name: 'sla_types_name_ukey', unique: true }
     end
 

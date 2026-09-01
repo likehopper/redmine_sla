@@ -17,31 +17,36 @@ class DropSlaLogs < ActiveRecord::Migration[5.2]
         drop_table :sla_logs
         say "Dropped table sla_logs"
 
-        execute "DROP TYPE IF EXISTS sla_log_level;"
-        say "Dropped enum sla_log_level"
+        if RedmineSla::DbDialect.adapter == :postgresql
+          execute "DROP TYPE IF EXISTS sla_log_level;"
+          say "Dropped enum sla_log_level"
+        end
 
       end
 
       dir.down do
 
-        execute <<~SQL
-          DO $$
-          BEGIN
-            IF NOT EXISTS (
-              SELECT 1 FROM pg_type WHERE typname = 'sla_log_level'
-            ) THEN
-              CREATE TYPE sla_log_level AS ENUM
-                ('log_none', 'log_error', 'log_info', 'log_debug');
-            END IF;
-          END;
-          $$;
-        SQL
-        say "Created enum sla_log_level"
+        if RedmineSla::DbDialect.adapter == :postgresql
+          execute <<~SQL
+            DO $$
+            BEGIN
+              IF NOT EXISTS (
+                SELECT 1 FROM pg_type WHERE typname = 'sla_log_level'
+              ) THEN
+                CREATE TYPE sla_log_level AS ENUM
+                  ('log_none', 'log_error', 'log_info', 'log_debug');
+              END IF;
+            END;
+            $$;
+          SQL
+          say "Created enum sla_log_level"
+        end
 
         create_table :sla_logs do |t|
 
           t.belongs_to :project,
                        null: true,
+                       type: :integer,
                        foreign_key: {
                          name: 'sla_logs_projects_fkey',
                          on_delete: :cascade
@@ -49,6 +54,7 @@ class DropSlaLogs < ActiveRecord::Migration[5.2]
 
           t.belongs_to :issue,
                        null: true,
+                       type: :integer,
                        foreign_key: {
                          name: 'sla_logs_issues_fkey',
                          on_delete: :cascade
@@ -61,7 +67,11 @@ class DropSlaLogs < ActiveRecord::Migration[5.2]
                          on_delete: :cascade
                        }
 
-          t.column :log_level, :sla_log_level, null: false
+          if RedmineSla::DbDialect.adapter == :mysql
+            t.column :log_level, "ENUM('log_none','log_error','log_info','log_debug')", null: false
+          else
+            t.column :log_level, :sla_log_level, null: false
+          end
 
           t.text :description, null: false
         end

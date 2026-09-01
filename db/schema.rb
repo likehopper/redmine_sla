@@ -31,6 +31,7 @@ ActiveRecord::Schema.define(version: 20211111111111) do
 
   # Database extensions that must be enabled for PostgreSQL, especially 'plpgsql'
   # which is required for stored functions written in PL/pgSQL.
-  enable_extension "plpgsql"
+  # `enable_extension` doesn't exist on the MySQL/MariaDB adapter.
+  enable_extension "plpgsql" if ActiveRecord::Base.connection.adapter_name =~ /postgresql/i
 
 end
