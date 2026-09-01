@@ -16,12 +16,13 @@ Now, you can run the units tests: `bundle exec rake redmine:plugins:test:units N
 
 > **_NOTE:_** Unit tests are such as controller actions or SLA calculations.
 
-The unit suite also runs the real `sla_get_level` and `sla_get_spent`
-functions against every SLA issue/type in the test fixtures. It prints an
-informational line for each function with the database name, call count and
-`min`/`median`/`p95`/`max`/`avg` duration in milliseconds. Timings deliberately
-have no pass or fail threshold because they depend on the database host and CI
-load; correctness assertions remain mandatory.
+The unit suite also runs the real `sla_get_level` (forced recalculation and
+cached lookup) and `sla_get_spent` functions against every SLA issue/type in
+the test fixtures. It prints an informational line for each path with the
+database name, call count and `min`/`median`/`p95`/`max`/`avg` duration in
+milliseconds. Timings deliberately have no pass or fail threshold because they
+depend on the database host and CI load; correctness assertions remain
+mandatory.
 
 ### Functionals
 But also functionals tests: `bundle exec rake redmine:plugins:test:functionals NAME=redmine_sla RAILS_ENV=test TESTOPTS="-v -w -b" --trace`

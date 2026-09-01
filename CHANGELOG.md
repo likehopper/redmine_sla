@@ -4,10 +4,10 @@
 
 ### Testing
 
--   Report real `sla_get_level` and `sla_get_spent` calculation durations
-    (`min`, `median`, `p95`, `max` and `avg`) during the unit suite, labelled
-    by database engine, without imposing environment-dependent performance
-    thresholds.
+-   Report real `sla_get_level` forced/cached and `sla_get_spent` calculation
+    durations (`min`, `median`, `p95`, `max` and `avg`) during the unit suite,
+    labelled by database engine, without imposing environment-dependent
+    performance thresholds.
 
 ------------------------------------------------------------------------
 
