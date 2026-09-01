@@ -51,16 +51,24 @@ class SlaCalculationPerformanceTest < ApplicationSlaUnitsTestCase
 
   def report_timings(operation, timings)
     average = timings.sum / timings.size
+    sorted = timings.sort
     puts format(
       '[SLA timing] database=%<database>s operation=%<operation>s calls=%<calls>d ' \
-      'min=%<min>.3fms max=%<max>.3fms avg=%<average>.3fms',
+      'min=%<min>.3fms median=%<median>.3fms p95=%<p95>.3fms ' \
+      'max=%<max>.3fms avg=%<average>.3fms',
       database: database_name,
       operation: operation,
       calls: timings.size,
       min: timings.min,
+      median: percentile(sorted, 0.50),
+      p95: percentile(sorted, 0.95),
       max: timings.max,
       average: average
     )
+  end
+
+  def percentile(sorted_timings, ratio)
+    sorted_timings[((sorted_timings.size - 1) * ratio).round]
   end
 
   def database_name
