@@ -31,6 +31,7 @@ require "chronic_duration"
 
 # Load database-specific SQL helpers before models and migrations reference them
 require_relative "lib/redmine_sla/db_dialect"
+require_relative "lib/redmine_sla/invalidates_sla_cache"
 
 # Load custom pluralization rules (e.g., "sla_cache" → "sla_caches")
 require_relative "config/initializers/inflections.rb"

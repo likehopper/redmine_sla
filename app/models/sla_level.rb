@@ -30,6 +30,7 @@ class SlaLevel < ActiveRecord::Base
   has_many :sla_project_trackers, through: :sla
 
   include Redmine::SafeAttributes
+  include RedmineSla::InvalidatesSlaCache
 
   accepts_nested_attributes_for :sla_level_terms, allow_destroy: true
   validate :sla_level_terms_greater_than_or_equal_to_zero
@@ -86,6 +87,10 @@ class SlaLevel < ActiveRecord::Base
   end 
 
   private
+
+  def sla_cache_level_ids_for_invalidation
+    [id].compact
+  end
 
   def sla_level_terms_greater_than_or_equal_to_zero
     sla_level_terms.each do |child|
