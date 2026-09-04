@@ -20,6 +20,7 @@
 class SlaHoliday < ActiveRecord::Base
 
   include Redmine::SafeAttributes
+  include RedmineSla::InvalidatesSlaCache
 
   scope :visible, ->(*args) { where(SlaHoliday.visible_condition(args.shift || User.current, *args)) }
 
@@ -58,6 +59,13 @@ class SlaHoliday < ActiveRecord::Base
   # Print text for link objects
   def to_s
     name.to_s
+  end
+
+  private
+
+  def sla_cache_level_ids_for_invalidation
+    calendar_ids = SlaCalendarHoliday.unscoped.where(sla_holiday_id: id).pluck(:sla_calendar_id)
+    SlaLevel.unscoped.where(sla_calendar_id: calendar_ids).pluck(:id)
   end
 
 end

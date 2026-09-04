@@ -23,6 +23,7 @@ class SlaCalendar < ActiveRecord::Base
   has_many :sla_schedules, inverse_of: :sla_calendar, :dependent => :destroy
 
   include Redmine::SafeAttributes
+  include RedmineSla::InvalidatesSlaCache
 
   accepts_nested_attributes_for :sla_schedules, allow_destroy: true, :reject_if => proc { |attributes| attributes.any? {|k,v| v.blank?} } # :any_blank
 
@@ -62,6 +63,12 @@ class SlaCalendar < ActiveRecord::Base
   # Print text for link objects
   def to_s
     name.to_s
+  end
+
+  private
+
+  def sla_cache_level_ids_for_invalidation
+    SlaLevel.unscoped.where(sla_calendar_id: id).pluck(:id)
   end
 
 end

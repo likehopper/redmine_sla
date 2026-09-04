@@ -26,6 +26,7 @@ class SlaLevelTerm < ActiveRecord::Base
   
   extend Redmine::I18n
   include Redmine::SafeAttributes
+  include RedmineSla::InvalidatesSlaCache
 
   scope :visible, ->(*args) { where(SlaLevelTerm.visible_condition(args.shift || User.current, *args)) }
 
@@ -91,6 +92,12 @@ class SlaLevelTerm < ActiveRecord::Base
     sla_level_id, custom_field_id = result.values_at(:id, :custom_field_id) 
     sla_priority_id = SlaPriority.create_by_issue(issue)
     self.find_by( sla_level_id: sla_level_id, sla_type_id: sla_type_id, sla_priority_id: sla_priority_id.id ) if ! sla_priority_id.nil?
+  end
+
+  private
+
+  def sla_cache_level_ids_for_invalidation
+    [sla_level_id, attribute_in_database("sla_level_id")].compact.uniq
   end
 
 end

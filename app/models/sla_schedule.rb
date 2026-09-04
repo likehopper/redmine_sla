@@ -24,6 +24,7 @@ class SlaSchedule < ActiveRecord::Base
   extend Redmine::I18n
   include Redmine::I18n
   include Redmine::SafeAttributes
+  include RedmineSla::InvalidatesSlaCache
 
   scope :visible, ->(*args) { where(SlaSchedule.visible_condition(args.shift || User.current, *args)) }
 
@@ -90,6 +91,11 @@ class SlaSchedule < ActiveRecord::Base
   end
 
   private
+
+  def sla_cache_level_ids_for_invalidation
+    calendar_ids = [sla_calendar_id, attribute_in_database("sla_calendar_id")].compact.uniq
+    SlaLevel.unscoped.where(sla_calendar_id: calendar_ids).pluck(:id)
+  end
   
   # Validate that start_time < end_time, only when both are valid Time objects.
   # Uses local variables (not ivars) to avoid polluting instance state.

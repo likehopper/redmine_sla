@@ -24,6 +24,7 @@ class SlaCalendarHoliday < ActiveRecord::Base
 
   extend Redmine::I18n
   include Redmine::SafeAttributes
+  include RedmineSla::InvalidatesSlaCache
 
   scope :visible, ->(*args) { where(SlaCalendarHoliday.visible_condition(args.shift || User.current, *args)) }
 
@@ -62,6 +63,13 @@ class SlaCalendarHoliday < ActiveRecord::Base
   # For destroy
   def deletable?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
+  end
+
+  private
+
+  def sla_cache_level_ids_for_invalidation
+    calendar_ids = [sla_calendar_id, attribute_in_database("sla_calendar_id")].compact.uniq
+    SlaLevel.unscoped.where(sla_calendar_id: calendar_ids).pluck(:id)
   end
 
 end
