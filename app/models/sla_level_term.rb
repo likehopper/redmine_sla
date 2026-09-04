@@ -34,11 +34,10 @@ class SlaLevelTerm < ActiveRecord::Base
 
   validates_presence_of :sla_level
   validates_presence_of :sla_type
-  # Todo : validate priority presence with SlaPriority ?
-  #validates_presence_of :sla_priority_id, :if => Proc.new {|sla_level_term| sla_level_term.new_record? || sla_level_term.sla_priority_id_changed?}
   validates_presence_of :sla_priority_id
   validates_presence_of :term
   validates :term, numericality: { greater_than_or_equal_to: 0 }
+  validate :sla_priority_must_exist
 
   validates_associated :sla_level
   validates_associated :sla_type
@@ -95,6 +94,17 @@ class SlaLevelTerm < ActiveRecord::Base
   end
 
   private
+
+  def sla_priority_must_exist
+    return if sla_level.nil? || sla_priority_id.blank?
+
+    priority_scope = if sla_level.custom_field_id.nil?
+                       IssuePriority
+                     else
+                       CustomFieldEnumeration.where(custom_field_id: sla_level.custom_field_id)
+                     end
+    errors.add(:sla_priority_id, :invalid) unless priority_scope.exists?(sla_priority_id)
+  end
 
   def sla_cache_level_ids_for_invalidation
     [sla_level_id, attribute_in_database("sla_level_id")].compact.uniq

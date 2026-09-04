@@ -38,6 +38,7 @@
     </p>
   <% end -%>
   <%= form_tag sla_level_path, method: :patch, id: "sla-level-terms-form" do %>
+  <%= error_messages_for @sla_level %>
   <div class="autoscroll">
   <table class="list" id="sla-level-terms-table">
     <thead>

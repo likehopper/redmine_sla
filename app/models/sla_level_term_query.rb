@@ -17,6 +17,21 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+class SlaPriorityQueryColumn < QueryColumn
+  def group_by_statement
+    sortable
+  end
+
+  def group_value(term)
+    priority = if term.sla_level.custom_field_id.nil?
+                 IssuePriority.find_by(id: term.sla_priority_id)
+               else
+                 CustomFieldEnumeration.find_by(id: term.sla_priority_id)
+               end
+    priority&.name
+  end
+end
+
 class SlaLevelTermQuery < Query
 
   self.queried_class = SlaLevelTerm
@@ -36,15 +51,14 @@ class SlaLevelTermQuery < Query
     @available_columns << QueryColumn.new(:id, :sortable => "#{SlaLevelTerm.table_name}.id", :default_order => :asc, :groupable => false)
     @available_columns << QueryColumn.new(:sla_level, :sortable => "#{SlaLevel.table_name}.name", :default_order => :asc, :groupable => true)
     @available_columns << QueryColumn.new(:sla_type, :sortable => "#{SlaType.table_name}.name", :default_order => :asc, :groupable => true)
-    # TODO : display enumerations' text in columns/groups
-    @available_columns << QueryColumn.new(:sla_priority_id, :sortable => "(
+    @available_columns << SlaPriorityQueryColumn.new(:sla_priority_id, :sortable => "(
       SELECT DISTINCT CASE WHEN sub_sla_levels.custom_field_id IS NULL THEN sub_enumerations.name ELSE sub_custom_field_enumerations.name END
       FROM sla_levels AS sub_sla_levels
       INNER JOIN sla_level_terms AS sub_sla_level_terms ON ( sub_sla_levels.id = sub_sla_level_terms.sla_level_id )
       LEFT JOIN enumerations AS sub_enumerations ON ( sub_sla_level_terms.sla_priority_id = sub_enumerations.id )
       LEFT JOIN custom_field_enumerations AS sub_custom_field_enumerations ON ( sub_sla_level_terms.custom_field_enumeration_id = sub_custom_field_enumerations.id )
       WHERE sla_level_terms.id = sub_sla_level_terms.id
-    )", :default_order => :asc, :groupable => false)
+    )", :default_order => :asc, :groupable => true)
     # WHERE sla_level_terms.sla_priority_id = sub_sla_level_terms.sla_priority_id
     @available_columns << QueryColumn.new(:term, :sortable => "#{SlaLevelTerm.table_name}.term", :default_order => nil, :groupable => false)
     @available_columns

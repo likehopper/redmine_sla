@@ -103,6 +103,24 @@ class SlaLevelsControllerTest < ApplicationSlaFunctionalsTestCase
     assert_select '#sla-level-terms-table thead th:not(.sla-type-hidden)', :text => 'GTI'
   end
 
+  test "should display nested term validation errors" do
+    @request.session[:user_id] = 1
+
+    patch :update, params: {
+      id: 1,
+      sla_level: {
+        sla_level_terms_attributes: {
+          "1" => {
+            "1" => { id: 1, term: "-1" }
+          }
+        }
+      }
+    }
+
+    assert_response :success
+    assert_select "#errorExplanation"
+  end
+
   ### As manager #2 ###
 
   test "should return 403 on get index as manager" do
