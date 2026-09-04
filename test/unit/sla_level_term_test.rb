@@ -21,14 +21,12 @@ require File.expand_path('../../application_sla_units_test_case', __FILE__)
 
 class SlaLevelTermTest < ApplicationSlaUnitsTestCase
 
-  # Fixture: (sla_level_id: 1, sla_type_id: 1, sla_priority_id: 1, term: 120) already exists.
-  # Use sla_priority_id: 999 to avoid conflicts when creating new records.
-
   def valid_term(overrides = {})
+    sla_level = SlaLevel.create!(name: "Level for term validation", sla_id: 3, sla_calendar_id: 1)
     SlaLevelTerm.new({
-      sla_level_id:    1,
+      sla_level_id:    sla_level.id,
       sla_type_id:     1,
-      sla_priority_id: 999,
+      sla_priority_id: IssuePriority.first.id,
       term:            60
     }.merge(overrides))
   end
@@ -81,13 +79,33 @@ class SlaLevelTermTest < ApplicationSlaUnitsTestCase
   # The fixture already has (1, 1, 1); creating another with those values must fail.
 
   test "should reject duplicate (sla_level, sla_type, sla_priority_id)" do
-    duplicate = valid_term(sla_priority_id: 1)
+    duplicate = SlaLevelTerm.new(
+      sla_level_id: 1,
+      sla_type_id: 1,
+      sla_priority_id: 1,
+      term: 60
+    )
     assert_not duplicate.valid?, "Duplicate (level, type, priority) should be rejected"
     assert duplicate.errors[:sla_level].present?
   end
 
   test "same level+type with a different priority_id is valid" do
-    assert valid_term(sla_priority_id: 999).valid?
+    assert valid_term.valid?
+  end
+
+  test "should reject a missing issue priority" do
+    term = valid_term(sla_priority_id: 999_999)
+
+    assert_not term.valid?
+    assert term.errors[:sla_priority_id].present?
+  end
+
+  test "should reject a missing custom field enumeration" do
+    level = SlaLevel.find(9)
+    term = valid_term(sla_level_id: level.id, sla_priority_id: 999_999)
+
+    assert_not term.valid?
+    assert term.errors[:sla_priority_id].present?
   end
 
 end

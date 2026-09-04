@@ -94,8 +94,8 @@ class SlaLevel < ActiveRecord::Base
 
   def sla_level_terms_greater_than_or_equal_to_zero
     sla_level_terms.each do |child|
-      if child.term.negative?
-        errors.add(:base, l('sla_label.sla_level_term.negative'))
+      if child.term.present? && child.term.negative?
+        errors.add(:base, I18n.t('sla_label.sla_level_term.negative'))
         return
       end
     end
