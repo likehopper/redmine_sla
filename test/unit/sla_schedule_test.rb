@@ -56,6 +56,76 @@ class SlaScheduleTest < ApplicationSlaUnitsTestCase
     assert other.valid?, "Same times on a different calendar should be valid"
   end
 
+  test "should reject an overlapping schedule saved directly" do
+    assert valid_schedule(start_time: "09:00:00", end_time: "12:00:00").save
+
+    overlapping = valid_schedule(start_time: "11:00:00", end_time: "13:00:00")
+    assert_not overlapping.save
+    assert_includes overlapping.errors[:base], I18n.t('sla_label.sla_schedule.overlaps')
+  end
+
+  test "should accept non-overlapping schedules on the same day" do
+    assert valid_schedule(start_time: "09:00:00", end_time: "12:00:00").save
+    assert valid_schedule(start_time: "13:00:00", end_time: "17:00:00").save
+  end
+
+  test "same times on different days are valid" do
+    assert valid_schedule(dow: 0).save
+    assert valid_schedule(dow: 6).save
+  end
+
+  test "should reject a schedule fully contained in another" do
+    assert valid_schedule(start_time: "09:00:00", end_time: "17:00:00").save
+
+    contained = valid_schedule(start_time: "10:00:00", end_time: "12:00:00")
+    assert_not contained.valid?
+    assert_includes contained.errors[:base], I18n.t('sla_label.sla_schedule.overlaps')
+  end
+
+  test "should reject a schedule that fully contains another" do
+    assert valid_schedule(start_time: "10:00:00", end_time: "12:00:00").save
+
+    containing = valid_schedule(start_time: "09:00:00", end_time: "17:00:00")
+    assert_not containing.valid?
+    assert_includes containing.errors[:base], I18n.t('sla_label.sla_schedule.overlaps')
+  end
+
+  test "should reject schedules sharing a boundary minute" do
+    assert valid_schedule(start_time: "09:00:00", end_time: "12:00:00").save
+
+    touching = valid_schedule(start_time: "12:00:00", end_time: "13:00:00")
+    assert_not touching.valid?
+    assert_includes touching.errors[:base], I18n.t('sla_label.sla_schedule.overlaps')
+  end
+
+  test "failed overlap update should preserve persisted times" do
+    first = valid_schedule(start_time: "09:00:00", end_time: "11:00:00")
+    second = valid_schedule(start_time: "13:00:00", end_time: "17:00:00")
+    assert first.save
+    assert second.save
+
+    assert_not second.update(start_time: "10:00:00", end_time: "12:00:00")
+    assert_equal "13:00", second.reload.start_time.strftime("%H:%M")
+    assert_equal "17:00", second.end_time.strftime("%H:%M")
+  end
+
+  test "nested overlapping schedules should not persist a calendar" do
+    calendar = SlaCalendar.new(
+      name: "Atomic overlap test",
+      sla_schedules_attributes: [
+        { dow: 0, start_time: "09:00", end_time: "12:00", match: true },
+        { dow: 0, start_time: "11:00", end_time: "13:00", match: true }
+      ]
+    )
+
+    assert_no_difference "SlaCalendar.count" do
+      assert_no_difference "SlaSchedule.count" do
+        assert_not calendar.save
+      end
+    end
+    assert calendar.sla_schedules.any? { |schedule| schedule.errors[:base].present? }
+  end
+
   # --- Presence validations ---
 
   test "should not save without sla_calendar" do

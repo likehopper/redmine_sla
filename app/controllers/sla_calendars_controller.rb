@@ -9,9 +9,8 @@
 #     - deletion and context menu actions,
 #     - API access for index/show/create/update/destroy.
 #
-#   Important:
-#   - The method `sla_schedules_overlapless` ensures schedules do not overlap.
-#   - All modifications preserve the original functional behavior.
+#   Schedule consistency and overlap validation live in SlaSchedule so direct
+#   and nested writes share the same transactional guarantees.
 #
 # Redmine SLA - Redmine's Plugin 
 #
@@ -70,14 +69,12 @@ class SlaCalendarsController < ApplicationController
     @sla_calendar.safe_attributes = params[:sla_calendar]
   end
 
-  # Create a new SLA Calendar, then validate schedule overlaps.
+  # Create a calendar and its nested schedules atomically.
   def create
     @sla_calendar = SlaCalendar.new
     @sla_calendar.safe_attributes = params[:sla_calendar]
 
-    if @sla_calendar.save &&
-       @sla_calendar.update(sla_calendar_params) &&
-       sla_schedules_overlapless
+    if @sla_calendar.update(sla_calendar_params)
 
       respond_to do |format|
         format.html do
@@ -106,13 +103,11 @@ class SlaCalendarsController < ApplicationController
     end
   end
 
-  # Update an SLA Calendar (same logic as create).
+  # Update a calendar and its nested schedules atomically.
   def update
     @sla_calendar.safe_attributes = params[:sla_calendar]
 
-    if @sla_calendar.save &&
-       @sla_calendar.update(sla_calendar_params) &&
-       sla_schedules_overlapless
+    if @sla_calendar.update(sla_calendar_params)
 
       respond_to do |format|
         format.html do
@@ -211,44 +206,6 @@ class SlaCalendarsController < ApplicationController
       sla_schedules_attributes: SlaSchedule.attribute_names.map(&:to_sym).push(:_destroy)
     )
   end   
-
-  # Validates that schedules do not overlap for a given calendar.
-  # The original logic is preserved unchanged.
-  def sla_schedules_overlapless
-    sla_schedules_nodestroy = params.to_unsafe_h[:sla_calendar][:sla_schedules_attributes]
-
-    if sla_schedules_nodestroy.present?
-      sla_schedules_nodestroy = sla_schedules_nodestroy.select { |_k, v| v[:_destroy] != 1 }
-
-      if sla_schedules_nodestroy.count > 1
-        sla_schedules_nodestroy.each do |key, value|
-          start_time = sla_schedules_nodestroy.select do |_k, v|
-            key != _k &&
-            value[:dow] == v[:dow] &&
-            v[:start_time].delete('^0-9') <= value[:start_time].delete('^0-9') &&
-            value[:start_time].delete('^0-9') <= v[:end_time].delete('^0-9')
-          end
-          if start_time.count > 0
-            @sla_calendar.errors.add(:base, l('sla_label.sla_schedule.overlaps'))
-            return false
-          end
-
-          end_time = sla_schedules_nodestroy.select do |_k, v|
-            key != _k &&
-            value[:dow] == v[:dow] &&
-            v[:start_time].delete('^0-9') <= value[:end_time].delete('^0-9') &&
-            value[:end_time].delete('^0-9') <= v[:end_time].delete('^0-9')
-          end
-          if end_time.count > 0
-            @sla_calendar.errors.add(:base, l('sla_label.sla_schedule.overlaps'))
-            return false
-          end
-        end
-      end
-    end
-
-    true
-  end
 
   # Load default query when no custom filter is selected.
   def retrieve_default_query(use_session)

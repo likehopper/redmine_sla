@@ -57,6 +57,7 @@ class SlaSchedule < ActiveRecord::Base
     :message => l('sla_label.sla_schedule.exists')
 
   validate :sla_schedules_inconsistency
+  validate :sla_schedules_overlapless
 
   safe_attributes *%w[sla_calendar_id dow start_time end_time match]
 
@@ -102,6 +103,24 @@ class SlaSchedule < ActiveRecord::Base
 
     # Start must be strictly before end.
     errors.add(:base, l('sla_label.sla_schedule.inconsistency')) unless start_str < end_str
+  end
+
+  # Reject overlaps regardless of whether a schedule is saved directly or
+  # through SlaCalendar's nested form. The calendar association contains both
+  # persisted schedules and unsaved nested siblings during validation.
+  def sla_schedules_overlapless
+    return unless sla_calendar && dow.present?
+    return unless start_time.is_a?(Time) && end_time.is_a?(Time)
+
+    overlapping = sla_calendar.sla_schedules.any? do |other|
+      next false if other.equal?(self) || (persisted? && other.id == id) || other.marked_for_destruction?
+      next false unless other.dow == dow
+      next false unless other.start_time.is_a?(Time) && other.end_time.is_a?(Time)
+
+      other.start_time <= end_time && start_time <= other.end_time
+    end
+
+    errors.add(:base, l('sla_label.sla_schedule.overlaps')) if overlapping
   end
     
 end
