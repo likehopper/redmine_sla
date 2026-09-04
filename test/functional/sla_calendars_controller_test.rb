@@ -80,6 +80,48 @@ class SlaCalendarsControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
+  test "should create calendar and non-overlapping schedules atomically" do
+    @request.session[:user_id] = 1
+
+    assert_difference "SlaCalendar.count", 1 do
+      assert_difference "SlaSchedule.count", 2 do
+        post :create, params: {
+          sla_calendar: {
+            name: "Functional atomic calendar",
+            sla_schedules_attributes: {
+              "0" => { dow: "0", start_time: "09:00", end_time: "12:00", match: "1" },
+              "1" => { dow: "0", start_time: "13:00", end_time: "17:00", match: "1" }
+            }
+          }
+        }
+      end
+    end
+
+    assert_response :redirect
+    assert_redirected_to sla_calendars_path
+  end
+
+  test "should not persist calendar or schedules when nested schedules overlap" do
+    @request.session[:user_id] = 1
+
+    assert_no_difference "SlaCalendar.count" do
+      assert_no_difference "SlaSchedule.count" do
+        post :create, params: {
+          sla_calendar: {
+            name: "Rejected overlapping calendar",
+            sla_schedules_attributes: {
+              "0" => { dow: "0", start_time: "09:00", end_time: "12:00", match: "1" },
+              "1" => { dow: "0", start_time: "11:00", end_time: "13:00", match: "1" }
+            }
+          }
+        }
+      end
+    end
+
+    assert_response :success
+    assert_select "#errorExplanation"
+  end
+
   ### As manager #2 ###
 
   test "should return 403 on get index as manager" do
