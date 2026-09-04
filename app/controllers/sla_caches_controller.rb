@@ -35,9 +35,9 @@ class SlaCachesController < ApplicationController
   accept_api_auth :index, :show, :refresh, :destroy, :purge
 
   before_action :require_admin, except: [ :index, :show, :refresh, :destroy, :purge, :context_menu, :explain ]
-  before_action :authorize_global
-
+  before_action :authorize_global, only: [ :explain ]
   before_action :find_optional_project, only: [ :index, :show, :refresh, :destroy, :purge, :context_menu ]
+  before_action :authorize_cache_read, only: [ :index, :show, :refresh, :destroy, :purge, :context_menu ]
   before_action :find_sla_cache,        only: [ :show ]
   before_action :find_sla_caches,       only: [ :refresh, :destroy, :context_menu ]
   before_action :find_issue_for_explain, only: [ :explain ]
@@ -227,8 +227,20 @@ class SlaCachesController < ApplicationController
 
 private
 
-  # Reading cache data requires :view_sla (enforced by authorize_global and
-  # visible?). Mutating it requires :manage_sla on every affected project.
+  # Global reads are filtered by SlaCache.visible_condition. An explicit
+  # project context additionally requires :view_sla on that exact project.
+  def authorize_cache_read
+    return if User.current.admin?
+
+    if @project
+      raise Unauthorized unless User.current.allowed_to?(:view_sla, @project)
+    else
+      raise Unauthorized unless User.current.allowed_to?(:view_sla, nil, global: true)
+    end
+  end
+
+  # Reading cache data requires :view_sla on each returned project. Mutating
+  # it requires :manage_sla on every affected project.
   # Only an administrator may purge all projects at once.
   def authorize_cache_management
     return if User.current.admin?
@@ -247,6 +259,7 @@ private
   # Find a single SLA cache and check visibility.
   def find_sla_cache
     @sla_cache = SlaCache.find(params[:id])
+    raise Unauthorized if @project && @sla_cache.project != @project
     raise Unauthorized unless @sla_cache.visible?
     raise ActiveRecord::RecordNotFound if @sla_cache.nil?
   rescue ActiveRecord::RecordNotFound
@@ -258,6 +271,7 @@ private
     params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]]
     @sla_caches  = SlaCache.find(params[:ids]).to_a
     @sla_cache   = @sla_caches.first if @sla_caches.count == 1
+    raise Unauthorized if @project && @sla_caches.any? { |sla_cache| sla_cache.project != @project }
     raise Unauthorized unless @sla_caches.all?(&:visible?)
     raise ActiveRecord::RecordNotFound if @sla_caches.empty?
   rescue ActiveRecord::RecordNotFound
@@ -325,7 +339,8 @@ private
 
   # Returns the SlaCacheQuery scope for index and report actions.
   def sla_cache_scope(options = {})
-    @query.results_scope(options)
+    scope = @query.results_scope(options)
+    @project ? scope.where(project_id: @project.id) : scope
   end
 
   # Initialize or restore the SlaCacheQuery from params or session.

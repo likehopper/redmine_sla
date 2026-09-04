@@ -62,9 +62,12 @@ class SlaLevel < ActiveRecord::Base
 
   # For index and show
   def visible?(user=User.current)
-    # TODO : permissions : user.allowed_to?(:view_sla, self.project, global: true) ???
-    # TODO : permissions : only calendar of sla_project_trackers if ! project.nil?    
-    user.allowed_to?(:view_sla, nil, global: true)
+    return false unless user
+    return true if user.admin?
+
+    sla_project_trackers.any? do |sla_project_tracker|
+      user.allowed_to?(:view_sla, sla_project_tracker.project)
+    end
   end
 
   # For create and update

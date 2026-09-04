@@ -21,6 +21,13 @@ require File.expand_path('../../application_sla_units_test_case', __FILE__)
 
 class SlaCalendarTest < ApplicationSlaUnitsTestCase
 
+  test "visible? is scoped to projects where the Resolver has view_sla" do
+    resolver = User.find(3)
+
+    assert SlaCalendar.find(1).visible?(resolver)
+    assert_not SlaCalendar.find(2).visible?(resolver)
+  end
+
   test "Just initialize" do
     sla_calendar = SlaCalendar.new
     assert_nil sla_calendar.name

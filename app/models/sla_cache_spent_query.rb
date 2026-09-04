@@ -23,7 +23,7 @@ class SlaCacheSpentQuery < Query
   self.view_permission = :view_sla
 
   def initialize_available_filters
-    add_available_filter 'project_id', type: :list, :name => :project, values: lambda {project_values}
+    add_available_filter 'project_id', type: :list, :name => :project, values: lambda {project_values} if project.nil?
     add_available_filter 'issue_id', type: :integer, :name => :issue
     add_available_filter 'sla_level_id', :type => :list, :values => lambda {all_sla_level_values}
     add_available_filter 'sla_type_id', type: :list, values: lambda {all_sla_type_values}

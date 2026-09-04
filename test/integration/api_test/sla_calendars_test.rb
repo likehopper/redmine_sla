@@ -77,7 +77,7 @@ class Redmine::ApiTest::SlaCalendarsTest < ApplicationSlaApiTestCase
 
   test "GET /sla/calendars/:id.xml should success for admin" do
     sla_calendar = SlaCalendar.first
-    ['admin','manager','developer','sysadmin'].each do |user|
+    ['admin','manager','developer'].each do |user|
       get "/sla/calendars/#{sla_calendar.id}.xml",
         :headers=>credentials(user)
       assert_response :success
@@ -87,7 +87,7 @@ class Redmine::ApiTest::SlaCalendarsTest < ApplicationSlaApiTestCase
 
   test "GET /sla/calendars/:id.xml should forbidden for other users" do
     sla_calendar = SlaCalendar.first
-    ['reporter','other'].each do |user|
+    ['sysadmin','reporter','other'].each do |user|
       get "/sla/calendars/#{sla_calendar.id}.xml",
         :headers=>credentials(user)
       assert_response :forbidden
@@ -104,7 +104,7 @@ class Redmine::ApiTest::SlaCalendarsTest < ApplicationSlaApiTestCase
 
   test "GET /sla/calendars/:id.json should success for admin" do
     sla_calendar = SlaCalendar.first
-    ['admin','manager','developer','sysadmin'].each do |user|
+    ['admin','manager','developer'].each do |user|
       get "/sla/calendars/#{sla_calendar.id}.json",
         :headers => credentials(user)
       assert_response :success
@@ -114,7 +114,7 @@ class Redmine::ApiTest::SlaCalendarsTest < ApplicationSlaApiTestCase
 
   test "GET /sla/calendars/:id.json should forbidden for ohter users" do
     sla_calendar = SlaCalendar.first
-    ['reporter','other'].each do |user|
+    ['sysadmin','reporter','other'].each do |user|
       get "/sla/calendars/#{sla_calendar.id}.json",
         :headers=>credentials(user)
       assert_response :forbidden

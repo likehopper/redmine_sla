@@ -38,7 +38,9 @@ class SlaCache < ActiveRecord::Base
 
   # Selection limitations for users based on access issues
   def self.visible_condition(user=User.current, options = {})
-    Issue.visible_condition(user, options = {})
+    issue_condition = Issue.visible_condition(user, options)
+    project_condition = Project.allowed_to_condition(user, :view_sla, options)
+    "(#{issue_condition}) AND (#{project_condition})"
   end
 
   # For index and refresh
