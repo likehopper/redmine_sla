@@ -28,9 +28,8 @@ class SlaCacheSpentsController < ApplicationController
   # Only administrators can manage SLA cache spents through the UI/API,
   # except for a few read actions.
   before_action :require_admin, except: [:index, :show, :refresh, :destroy, :purge, :context_menu]
-  before_action :authorize_global
-
   before_action :find_optional_project, only: [:index, :show, :refresh, :destroy, :purge, :context_menu]
+  before_action :authorize_cache_read, only: [:index, :show, :refresh, :destroy, :purge, :context_menu]
   before_action :find_sla_cache_spent, only: [:show]
   before_action :find_sla_cache_spents, only: [:refresh, :destroy, :context_menu]
   before_action :authorize_cache_management, only: [:refresh, :destroy, :purge]
@@ -181,6 +180,18 @@ class SlaCacheSpentsController < ApplicationController
 
   private
 
+  # Global reads are filtered by SlaCacheSpent.visible_condition. An explicit
+  # project context additionally requires :view_sla on that exact project.
+  def authorize_cache_read
+    return if User.current.admin?
+
+    if @project
+      raise Unauthorized unless User.current.allowed_to?(:view_sla, @project)
+    else
+      raise Unauthorized unless User.current.allowed_to?(:view_sla, nil, global: true)
+    end
+  end
+
   def authorize_cache_management
     return if User.current.admin?
 
@@ -198,6 +209,7 @@ class SlaCacheSpentsController < ApplicationController
   # Find a single SlaCacheSpent by id
   def find_sla_cache_spent
     @sla_cache_spent = SlaCacheSpent.find(params[:id])
+    raise Unauthorized if @project && @sla_cache_spent.project != @project
     raise Unauthorized unless @sla_cache_spent.visible?
     raise ActiveRecord::RecordNotFound if @sla_cache_spent.nil?
   rescue ActiveRecord::RecordNotFound
@@ -209,6 +221,7 @@ class SlaCacheSpentsController < ApplicationController
     params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]]
     @sla_cache_spents = SlaCacheSpent.find(params[:ids]).to_a
     @sla_cache_spent = @sla_cache_spents.first if @sla_cache_spents.count == 1
+    raise Unauthorized if @project && @sla_cache_spents.any? { |sla_cache_spent| sla_cache_spent.project != @project }
     raise Unauthorized unless @sla_cache_spents.all?(&:visible?)
     raise ActiveRecord::RecordNotFound if @sla_cache_spents.empty?
   rescue ActiveRecord::RecordNotFound
@@ -238,7 +251,8 @@ class SlaCacheSpentsController < ApplicationController
 
   # Returns the SlaCacheSpentQuery scope for index and report actions
   def sla_cache_spent_scope(options = {})
-    @query.results_scope(options)
+    scope = @query.results_scope(options)
+    @project ? scope.where(project_id: @project.id) : scope
   end
 
   def retrieve_sla_cache_spent_query

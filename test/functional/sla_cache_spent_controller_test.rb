@@ -37,6 +37,26 @@ class SlaCacheSpentsControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
+  test "Resolver should only read cache spents from its projects" do
+    resolver = User.find(3)
+    assert_equal "Resolver", resolver.roles_for_project(Project.find(1)).first.name
+    @request.session[:user_id] = resolver.id
+
+    get :index, params: { "issue.status_id" => "*" }
+    assert_response :success
+    entities = @controller.instance_variable_get(:@entities)
+    assert_not_empty entities
+    assert entities.all? { |spent| [1, 4].include?(spent.project_id) }
+  end
+
+  test "Resolver cannot read a cache spent from another project" do
+    @request.session[:user_id] = 3
+    foreign_spent = SlaCacheSpent.where(project_id: 2).first
+
+    get :show, params: { id: foreign_spent.id }
+    assert_response :forbidden
+  end
+
   test "should NoRoute on get new as anonymous" do
     assert_raises ActionController::UrlGenerationError do
       get :new
@@ -226,7 +246,7 @@ class SlaCacheSpentsControllerTest < ApplicationSlaFunctionalsTestCase
     with_settings :default_language => "en" do
       delete :destroy, :params => { id: 1 }
       assert_response :redirect 
-      assert_redirected_to sla_cache_spents_path 
+      assert_redirected_to sla_cache_spents_path
     end
   end
 
@@ -243,7 +263,7 @@ class SlaCacheSpentsControllerTest < ApplicationSlaFunctionalsTestCase
     with_settings :default_language => "en" do
       patch :refresh, params: { id: 1 }
       assert_response :redirect 
-      assert_redirected_to sla_cache_spents_path   
+      assert_redirected_to sla_cache_spents_path
     end
   end      
 

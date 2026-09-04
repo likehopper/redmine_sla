@@ -43,7 +43,10 @@ class SlaCalendar < ActiveRecord::Base
 
   # For index and show
   def visible?(user=User.current)
-    user.allowed_to?(:view_sla, nil, global: true)
+    return false unless user
+    return true if user.admin?
+
+    sla_levels.any? { |sla_level| sla_level.visible?(user) }
   end
 
   # For create and update

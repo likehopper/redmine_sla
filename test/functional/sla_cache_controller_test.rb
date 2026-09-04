@@ -44,6 +44,43 @@ class SlaCachesControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
+  test "should redirect project index as anonymous" do
+    with_settings :default_language => "en" do
+      get :index, params: { project_id: "project-sla-tests-tma" }
+      assert_response :redirect
+      assert_redirected_to %r{#{signin_path}}
+    end
+  end
+
+  test "Resolver should only read caches from its projects" do
+    resolver = User.find(3)
+    assert_equal "Resolver", resolver.roles_for_project(Project.find(1)).first.name
+    @request.session[:user_id] = resolver.id
+
+    get :index, params: { project_id: "project-sla-tests-tma", "issue.status_id" => "*" }
+    assert_response :success
+    entities = @controller.instance_variable_get(:@entities)
+    assert_not_empty entities
+    assert entities.all? { |cache| cache.project_id == 1 }
+
+    get :index, params: { project_id: "project-sla-tests-std" }
+    assert_response :forbidden
+
+    get :index, params: { "issue.status_id" => "*" }
+    assert_response :success
+    entities = @controller.instance_variable_get(:@entities)
+    assert_not_empty entities
+    assert entities.all? { |cache| [1, 4].include?(cache.project_id) }
+  end
+
+  test "Resolver cannot read a cache through another project context" do
+    @request.session[:user_id] = 3
+    foreign_cache = SlaCache.where(project_id: 2).first
+
+    get :show, params: { project_id: "project-sla-tests-tma", id: foreign_cache.id }
+    assert_response :forbidden
+  end
+
   test "should NoRoute on get new as anonymous" do
     assert_raises ActionController::UrlGenerationError do
       get :new
@@ -212,7 +249,6 @@ class SlaCachesControllerTest < ApplicationSlaFunctionalsTestCase
     @request.session[:user_id] = 2
     with_settings :default_language => "en" do
       get :index
-      assert_response 200
       assert_response :success
     end
   end
@@ -235,7 +271,7 @@ class SlaCachesControllerTest < ApplicationSlaFunctionalsTestCase
     sla_cache = SlaCache.first
     @request.session[:user_id] = 2
     with_settings :default_language => "en" do
-      get :show, :params => { id: sla_cache.id }
+      get :show, :params => { project_id: "project-sla-tests-tma", id: sla_cache.id }
       assert_response :redirect 
       assert_redirected_to sla_caches_path
     end
@@ -264,9 +300,9 @@ class SlaCachesControllerTest < ApplicationSlaFunctionalsTestCase
     sla_cache = SlaCache.first
     @request.session[:user_id] = 2
     with_settings :default_language => "en" do
-      delete :destroy, :params => { id: sla_cache.id }
+      delete :destroy, :params => { project_id: "project-sla-tests-tma", id: sla_cache.id }
       assert_response :redirect 
-      assert_redirected_to sla_caches_path
+      assert_redirected_to project_sla_caches_path(Project.find(1))
     end
   end
 
@@ -283,9 +319,9 @@ class SlaCachesControllerTest < ApplicationSlaFunctionalsTestCase
     sla_cache = SlaCache.first
     @request.session[:user_id] = 2
     with_settings :default_language => "en" do
-      patch :refresh, params: { id: sla_cache.id }
+      patch :refresh, params: { project_id: "project-sla-tests-tma", id: sla_cache.id }
       assert_response :redirect 
-      assert_redirected_to sla_caches_path      
+      assert_redirected_to project_sla_caches_path(Project.find(1))
     end
   end      
 
@@ -295,7 +331,6 @@ class SlaCachesControllerTest < ApplicationSlaFunctionalsTestCase
     @request.session[:user_id] = 3
     with_settings :default_language => "en" do
       get :index
-      assert_response 200
       assert_response :success
     end
   end
@@ -311,7 +346,7 @@ class SlaCachesControllerTest < ApplicationSlaFunctionalsTestCase
     sla_cache = SlaCache.where(project: 1).order(:id).first # project-sla-tests-tma
     @request.session[:user_id] = 3
     with_settings :default_language => "en" do
-      get :show, :params => { id: sla_cache.id }
+      get :show, :params => { project_id: "project-sla-tests-tma", id: sla_cache.id }
       assert_response :redirect 
       assert_redirected_to sla_caches_path
     end
@@ -376,7 +411,6 @@ class SlaCachesControllerTest < ApplicationSlaFunctionalsTestCase
     @request.session[:user_id] = 4
     with_settings :default_language => "en" do
       get :index
-      assert_response 200
       assert_response :success
     end
   end
@@ -392,7 +426,7 @@ class SlaCachesControllerTest < ApplicationSlaFunctionalsTestCase
     sla_cache = SlaCache.where(project: 2).order(:id).first # project-sla-tests-std
     @request.session[:user_id] = 4
     with_settings :default_language => "en" do
-      get :show, :params => { id: sla_cache.id }
+      get :show, :params => { project_id: "project-sla-tests-std", id: sla_cache.id }
       assert_response :redirect 
       assert_redirected_to sla_caches_path 
     end
@@ -525,7 +559,7 @@ class SlaCachesControllerTest < ApplicationSlaFunctionalsTestCase
   test "should redirect on get context_menu as anonymous" do
     sla_cache = SlaCache.first
     with_settings :default_language => "en" do
-      get :context_menu, params: { ids: [sla_cache.id] }
+      get :context_menu, params: { project_id: "project-sla-tests-tma", ids: [sla_cache.id] }
       assert_response :redirect
       assert_redirected_to %r{#{signin_path}}
     end
@@ -535,7 +569,7 @@ class SlaCachesControllerTest < ApplicationSlaFunctionalsTestCase
     sla_cache = SlaCache.first
     @request.session[:user_id] = 1
     with_settings :default_language => "en" do
-      get :context_menu, params: { ids: [sla_cache.id] }
+      get :context_menu, params: { project_id: "project-sla-tests-tma", ids: [sla_cache.id] }
       assert_response :success
       assert_select 'a.icon-magnifier'
     end
@@ -547,7 +581,7 @@ class SlaCachesControllerTest < ApplicationSlaFunctionalsTestCase
     sla_cache = SlaCache.first
     @request.session[:user_id] = 2
     with_settings :default_language => "en" do
-      get :context_menu, params: { ids: [sla_cache.id] }
+      get :context_menu, params: { project_id: "project-sla-tests-tma", ids: [sla_cache.id] }
       assert_response :success
       assert_select 'a.icon-magnifier'
     end
@@ -557,7 +591,7 @@ class SlaCachesControllerTest < ApplicationSlaFunctionalsTestCase
     sla_cache = SlaCache.where(project: 1).order(:id).first
     @request.session[:user_id] = 3
     with_settings :default_language => "en" do
-      get :context_menu, params: { ids: [sla_cache.id] }
+      get :context_menu, params: { project_id: "project-sla-tests-tma", ids: [sla_cache.id] }
       assert_response :success
       assert_select 'a.icon-magnifier'
     end

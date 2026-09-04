@@ -165,11 +165,11 @@ class SlaLevelsControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
-  test "should return success on get show as sysadmin" do
+  test "should return 403 on get show as sysadmin" do
     @request.session[:user_id] = 4
     with_settings :default_language => "en" do
       get(:show, :params => {:id => 1})
-      assert_response :success
+      assert_response 403
     end
   end
 

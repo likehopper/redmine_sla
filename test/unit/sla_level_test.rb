@@ -28,6 +28,13 @@ class SlaLevelTest < ApplicationSlaUnitsTestCase
   # Load yml config
   @@array_fixtures_issues = YAML.load_file(Dir.pwd+"/plugins/redmine_sla/test/config/fixtures.yml")
 
+  test "visible? is scoped to projects where the Resolver has view_sla" do
+    resolver = User.find(3)
+
+    assert SlaLevel.find(1).visible?(resolver)
+    assert_not SlaLevel.find(3).visible?(resolver)
+  end
+
 
   test "#SlaLevelTest SLA for issues from fixtures" do
 

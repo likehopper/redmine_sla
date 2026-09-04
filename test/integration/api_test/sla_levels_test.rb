@@ -77,7 +77,7 @@ class Redmine::ApiTest::SlaLevelsTest < ApplicationSlaApiTestCase
 
   test "GET /sla/levels/:id.xml should success for admin" do
     sla_level = SlaLevel.order(:id).first
-    ['admin','manager','developer','sysadmin'].each do |user|
+    ['admin','manager','developer'].each do |user|
       get "/sla/levels/#{sla_level.id}.xml",
         :headers=>credentials(user)
       assert_response :success
@@ -87,7 +87,7 @@ class Redmine::ApiTest::SlaLevelsTest < ApplicationSlaApiTestCase
 
   test "GET /sla/levels/:id.xml should forbidden for other users" do
     sla_level = SlaLevel.order(:id).first
-    ['reporter','other'].each do |user|
+    ['sysadmin','reporter','other'].each do |user|
       get "/sla/levels/#{sla_level.id}.xml",
         :headers=>credentials(user)
       assert_response :forbidden
@@ -114,7 +114,7 @@ class Redmine::ApiTest::SlaLevelsTest < ApplicationSlaApiTestCase
 
   test "GET /sla/levels/:id.json should success for users with view_sla permission" do
     sla_level = SlaLevel.first
-    ['manager','developer','sysadmin'].each do |user|
+    ['manager','developer'].each do |user|
       get "/sla/levels/#{sla_level.id}.json",
         :headers=>credentials(user)
       assert_response :success
@@ -124,7 +124,7 @@ class Redmine::ApiTest::SlaLevelsTest < ApplicationSlaApiTestCase
 
   test "GET /sla/levels/:id.json should forbidden for ohter users" do
     sla_level = SlaLevel.first
-    ['reporter','other'].each do |user|
+    ['sysadmin','reporter','other'].each do |user|
       get "/sla/levels/#{sla_level.id}.json",
         :headers=>credentials(user)
       assert_response :forbidden
