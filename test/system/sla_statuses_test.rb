@@ -117,7 +117,6 @@ class SlaStatusesHelperSystemTest < ApplicationSlaSystemTestCase
       :text => l("sla_label.sla_status.notice_successful_update", :id => "##{sla_status.id}" )
     assert_equal sla_type.id, sla_status.reload.sla_type.id
     assert_equal 'New', sla_status.reload.status.name
-    # TODO : check in SlaStatus#index after filtering
   end
 
   test "destroy_sla_status" do 
@@ -131,7 +130,6 @@ class SlaStatusesHelperSystemTest < ApplicationSlaSystemTestCase
     assert page.has_css?('#flash_notice'),
       :visible => true,
       :text => l(:notice_successful_delete)       
-    # TODO : check in SlaStatus#index after filtering
   end
 
 end

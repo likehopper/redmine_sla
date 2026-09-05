@@ -24,7 +24,6 @@ class SlaLevelTest < ApplicationSlaUnitsTestCase
   setup do
   end
 
-  # TODO: put array_fixtures_issues in setup ?
   # Load yml config
   @@array_fixtures_issues = YAML.load_file(Dir.pwd+"/plugins/redmine_sla/test/config/fixtures.yml")
 
@@ -61,40 +60,22 @@ class SlaLevelTest < ApplicationSlaUnitsTestCase
 
           sla_type_name = SlaType.find(sla_type_id).name
 
-          if ( sla_type_name.nil? )
-            # puts "- - - sla_type_id = #{sla_type_id} NOT FOUND"
-            assert false
-          end
-
-          # puts "- - - > expected > spent = #{spent} for term = #{term}"
+          assert_not_nil sla_type_name, "SLA type #{sla_type_id} was not found"
 
           sla_cache = SlaCache.find_by_issue_id(issue_id)
           
-          # TODO : SLA PRIORITY
-          #sla_level_term = SlaLevelTerm.find_by_level_type_priority(sla_cache.sla_level_id,sla_type_id,@issue.priority_id)
-          #if ( sla_level_term.nil? )
-          #  next
-          #end          
-          #sla_type_term_issue = sla_level_term[:term]
           sla_term = issue.get_sla_term(sla_type_id)
           next if ( sla_term.nil? )
 
-          #sla_cache_spent = SlaCacheSpent.find_or_new(sla_cache.id,sla_type_id)
-          #sla_type_spent_issue = sla_cache_spent[:spent]
           sla_spent = issue.get_sla_spent(sla_type_id)
           next if ( sla_spent.nil? )
 
           # puts "- - - > found > spent = #{sla_type_spent_issue} for term = #{sla_type_term_issue}"
 
-          if ( sla_term != term )
-            # puts "- - - => DELAY #{sla_type_name} FAILED ==>> expected #{term} vs #{sla_type_term_issue} found"
-            assert false
-          end
-
-          if ( sla_spent != spent )
-            # puts "- - - => SPENT #{sla_type_name} FAILED ==>> expected #{spent} vs #{sla_type_spent_issue} found"
-            assert false
-          end
+          assert_equal term, sla_term,
+            "Unexpected #{sla_type_name} term for issue #{issue_id}"
+          assert_equal spent, sla_spent,
+            "Unexpected #{sla_type_name} spent time for issue #{issue_id}"
 
         }
       end

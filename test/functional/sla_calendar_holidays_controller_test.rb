@@ -55,7 +55,7 @@ class SlaCalendarHolidaysControllerTest < ApplicationSlaFunctionalsTestCase
   test "should get success on index as admin" do
     @request.session[:user_id] = 1
     with_settings :default_language => "en" do
-      get(:index, :params =>  {:per_page => 100})
+      get(:index, :params => {:per_page => 100, :sort => 'id:asc'})
       assert_response :success
       # links to visible issues
       assert_select 'a[href="/sla/calendar_holidays/1"]', :title => "Show"

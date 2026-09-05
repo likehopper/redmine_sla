@@ -197,7 +197,6 @@ private
     params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]] 
     @sla_project_trackers = SlaProjectTracker.visible.find(params[:ids])
     @sla_project_tracker  = @sla_project_trackers.first if @sla_project_trackers.count == 1
-    # raise Unauthorized unless @sla_project_trackers.all?(&:visible?)
     raise ActiveRecord::RecordNotFound if @sla_project_trackers.empty?
   rescue ActiveRecord::RecordNotFound
     render_404

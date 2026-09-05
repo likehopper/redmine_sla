@@ -36,25 +36,6 @@ module RedmineSla
         issue.get_sla_level
       end
 
-      # The following methods are intentionally commented out.
-      # They illustrate potential delegation to the issue for SLA-related data.
-      #
-      # def get_sla_cache
-      #   issue.get_sla_cache
-      # end
-      #
-      # def get_sla_term(sla_type_id)
-      #   issue.get_sla_respect(sla_type_id)
-      # end
-      #
-      # def get_sla_spent(sla_type_id)
-      #   issue.get_sla_respect(sla_type_id)
-      # end
-      #
-      # def get_sla_respect(sla_type_id)
-      #   issue.get_sla_respect(sla_type_id)
-      # end
-      
       # get_sla_respect_1, get_sla_respect_2, ... one per SLA type, delegating
       # to the associated issue. Resolved generically rather than defined per
       # existing SlaType, so a SlaType created (or deleted) after the server

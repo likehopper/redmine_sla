@@ -25,15 +25,9 @@
 base_url = File.dirname(__FILE__)
 
 # Hooks
-# require base_url + '/redmine_sla/hooks/helpers_queries_hook'
-# (commented out, presumably unused)
 require base_url + '/redmine_sla/hooks/views_layouts_hook'
 require base_url + '/redmine_sla/hooks/views_issues_hook'
 
 module RedmineSla
   # This module acts as the main namespace for the plugin.
-  #
-  # QueriesHelper may be extended via Hooks::HelpersQueriesHook (if uncommented):
-  #
-  # QueriesHelper.send(:include, RedmineSla::Hooks::HelpersQueriesHook)
 end

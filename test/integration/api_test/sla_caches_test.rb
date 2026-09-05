@@ -201,7 +201,6 @@ class Redmine::ApiTest::SlaCachesTest < ApplicationSlaApiTestCase
 
   test "GET /sla/caches.xml should return sla_caches partial for developer" do
     ['developer'].each do |user|
-      # TODO : issues the user has access to, sorted by ascending id ???
       sla_cache = SlaCache.where(project: 1).order(:id).first # project-sla-tests-tma
       get "/projects/project-sla-tests-tma/sla/caches.xml?issue.status_id=*&sort=issue",
         headers: credentials(user)
@@ -698,9 +697,6 @@ class Redmine::ApiTest::SlaCachesTest < ApplicationSlaApiTestCase
     assert_response :unauthorized
   end    
 
-
-  # TODO : Sla Caches Test +purge
-  # TODO : Sla Caches Test +refresh
 
   private
 

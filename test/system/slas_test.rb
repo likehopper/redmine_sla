@@ -80,7 +80,6 @@ class SlasHelperSystemTest < ApplicationSlaSystemTestCase
       :visible => true,
       :text => l("sla_label.sla.notice_successful_create", :id => "##{sla.id}" )
 
-    # TODO : check SlaStatus#show
     # visit "/sla/statuses/#{sla_status.id}"
     # compate sla_status attributs
 
@@ -102,7 +101,6 @@ class SlasHelperSystemTest < ApplicationSlaSystemTestCase
       :visible => true,
       :text => l("sla_label.sla.notice_successful_update", :id => "##{sla.id}" )    
     assert_equal 'mod Sla', sla.reload.name
-    # TODO : check in Sla#index after filtering
   end
 
   test "destroy_sla" do
@@ -114,7 +112,6 @@ class SlasHelperSystemTest < ApplicationSlaSystemTestCase
     assert page.has_css?('#flash_notice'),
       :visible => true,
       :text => l(:notice_successful_delete)
-      # TODO : check in Sla#index after filtering
   end
 
 end

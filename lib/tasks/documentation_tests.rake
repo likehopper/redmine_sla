@@ -18,9 +18,7 @@ namespace :redmine do
 
         # Variable preparation
         name       = ENV['NAME'] || ENV['PLUGIN'] || 'redmine_sla'
-        # suite      = ENV['SUITE'] || '**'
         directory  = Rails.root.join('plugins', name).join("test/documentation")
-        # test_files = Dir["#{directory}/#{suite}/*_test.rb"]
         test_files = Dir["#{directory}/*_test.rb"]
 
         # Require the original ApplicationSystemTestCase from Redmine core

@@ -225,8 +225,6 @@ test "POST /sla/schedules.xml with valid parameters should success for admin" do
     assert_select 'errors', :text => "Dow cannot be blank"
   end
 
-  # TODO: test "PUT /sla/schedules/:id.xml with invalid parameters should unprocessable_entity for admin" do
-
   test "PUT /sla/schedules/:id.xml with valid parameters should update the sla_schedule" do
     sla_schedule = SlaSchedule.first
     assert_no_difference 'SlaSchedule.count' do

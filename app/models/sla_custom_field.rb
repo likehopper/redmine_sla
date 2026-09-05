@@ -26,7 +26,7 @@ class SlaCustomField < IssueCustomField
     "IssueCustomField"
   end
 
-  # TODO : filter on issue with an other method self.find_by_issue ( issue.available_custom_fields.find { |field| field.id == custom_field_id } )
+  # Only required, single-value enumeration fields can define SLA priorities.
   def self.find(custom_field_id)
     field = IssueCustomField.find_by(field_format: :enumeration, multiple: :false, is_required:true, id: custom_field_id)
     Rails.logger.error "SlaCustomField.find: no matching enumeration custom field for id=#{custom_field_id}" if field.nil?

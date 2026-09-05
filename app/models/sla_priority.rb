@@ -60,7 +60,8 @@ class SlaPriority
     IssuePriority.active.order(position: :asc) { |id,name| self.create_value(id,name) }
   end
 
-  # TODO : all ( IssuePriority + ScfPriority ) use in SlaLevel for make filter !!!
+  # Return every priority referenced by a level term, regardless of whether it
+  # comes from Redmine's issue priorities or an SLA custom field.
   def self.all
     pairs = SlaLevel.joins(:sla_level_terms).distinct.pluck(:custom_field_id, :sla_priority_id)
 
