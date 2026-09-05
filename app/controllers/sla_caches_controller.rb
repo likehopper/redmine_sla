@@ -288,34 +288,6 @@ private
     render_404
   end
 
-  # Force users through project context for access control (optional).
-  # If enabled, this restricts which routes can be used to access SLA caches,
-  # depending on the current user and project.
-  #
-  # def check_routing_users
-  #   unless User.current.admin? && @project.nil?
-  #     valid_routes = []
-  #     valid_routes += [
-  #       context_menu_project_sla_caches_path(@project),
-  #       purge_project_sla_caches_path(@project),
-  #       purge_project_sla_caches_path(@project)+".xml",
-  #       purge_project_sla_caches_path(@project)+".json",
-  #       project_sla_caches_path(@project),
-  #       project_sla_caches_path(@project)+".xml",
-  #       project_sla_caches_path(@project)+".json",
-  #     ] unless @project.nil?
-  #     valid_routes += [
-  #       project_sla_cache_path(@project,@sla_cache),
-  #       project_sla_cache_path(@project,@sla_cache)+".xml",
-  #       project_sla_cache_path(@project,@sla_cache)+".json",
-  #       refresh_project_sla_cache_path(@project,@sla_cache),
-  #       refresh_project_sla_cache_path(@project,@sla_cache)+".xml",
-  #       refresh_project_sla_cache_path(@project,@sla_cache)+".json",
-  #     ] unless @project.nil? || @sla_cache.nil?
-  #     raise Unauthorized unless valid_routes.include?(request.path)
-  #   end
-  # end  
-
   # Retrieve the default SlaCacheQuery if no query is selected by the user.
   def retrieve_default_query(use_session)
     return if params[:query_id].present?

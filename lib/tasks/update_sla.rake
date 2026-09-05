@@ -20,8 +20,6 @@ namespace :sla do
     case scope
     when "inprogress"
       Rails.logger.info "rake redmine:plugins:redmine_sla:update START whith SCOPE 'inprogress' (default)"
-    #when "miss"
-    #    Rails.logger.info "rake redmine:plugins:redmine_sla:update START with SCOPE 'miss'" 
     when "all"
       Rails.logger.info "rake redmine:plugins:redmine_sla:update START with SCOPE 'all'" 
     else
@@ -46,10 +44,7 @@ namespace :sla do
 
       # IF project without sla THEN pass
       if ( ! project.module_enabled?(:sla) ) then
-        # Clear cache
-        # SlaCache.where(issue_id: project.issues.map(&:id)).destroy_all
         SlaCache.where(project_id: project.id).destroy_all
-        #Rails.logger.info "rake redmine:plugins:redmine_sla:update Project n°#{project.id.to_s} [#{project.identifier}] CLEAR CACHE & PASS PROJECT WITHOUT SLA..."
         next
       end
 
@@ -63,10 +58,6 @@ namespace :sla do
           issue.get_sla_spent(sla_type.id)
         }
           
-        # Rails.logger.info "rake redmine:plugins:redmine_sla:update Issue n°#{issue.id.to_s} [ tracker_id = #{issue.tracker_id.to_s} ] [ status_id = #{issue.status_id.to_s} ] TODO #{issue.subject}  "
-        # SlaCacheSpent.update_by_issue_id(issue.id)
-        # Rails.logger.info "rake redmine:plugins:redmine_sla:update Issue n°#{issue.id.to_s} CACHE UPDATE"
-
       end
 
     end

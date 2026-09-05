@@ -48,7 +48,6 @@ if User.current.allowed_to?(:view_sla, @project, :global => true)
         
       if ( !sla_spent.nil? && !sla_term.nil? ) 
 
-        # TODO: to define the duration in hours of a day, you must fork this project : https://github.com/henrypoydar/chronic_duration/blob/master/lib/chronic_duration.rb 
         sla_spent_txt = ChronicDuration.output(sla_spent*60, :format => :short, :limit_to_hours => true, :units => 2, :joiner => '', :keep_zero => true )
         sla_term_txt = ChronicDuration.output(sla_term*60, :format => :short, :limit_to_hours => true, :units => 2, :joiner => '')
 

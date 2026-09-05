@@ -170,7 +170,6 @@ class SlaCalendarHolidaysController < ApplicationController
   def find_sla_calendar_holidays
     @sla_calendar_holidays = SlaCalendarHoliday.visible.where(id: (params[:id] || params[:ids])).to_a
     raise ActiveRecord::RecordNotFound if @sla_calendar_holidays.empty?
-    # raise Unauthorized unless @sla_calendar_holidays.all?(&:visible?)
   rescue ActiveRecord::RecordNotFound
     render_404
   end

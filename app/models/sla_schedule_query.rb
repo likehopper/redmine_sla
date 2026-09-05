@@ -24,9 +24,6 @@ class SlaScheduleQuery < Query
   def initialize_available_filters
     add_available_filter 'sla_calendar_id', :type => :list, :values => lambda {all_sla_calendar_values}
     add_available_filter 'dow', type: :list, :values => I18n.t('date.day_names').map.with_index{|name,id| [name.to_s, id.to_s] } 
-    # TODO : type time need to override query class ;(
-    # add_available_filter 'start_time', type: :time
-    # add_available_filter 'end_time', type: :time
     add_available_filter 'match', :type => :list, :values => [[l(:general_text_yes), "1"], [l(:general_text_no), "0"]]
   end
 
@@ -36,10 +33,7 @@ class SlaScheduleQuery < Query
     @available_columns << QueryColumn.new(:id, :sortable => "#{SlaSchedule.table_name}.id", :default_order => nil, :groupable => false )
     @available_columns << QueryColumn.new(:sla_calendar, :sortable => "#{SlaCalendar.table_name}.name", :default_order => :asc, :groupable => true)
     @available_columns << QueryColumn.new(:dow, :sortable => "#{SlaSchedule.table_name}.dow", :default_order => nil, :groupable => true )
-    # TODO : type time need to override query class ;(
-    #@available_columns << QueryColumn.new(:start_time, :sortable => "#{SlaSchedule.table_name}.start_time", :default_order => :desc, :groupable => false )
-    #@available_columns << QueryColumn.new(:end_time, :sortable => "#{SlaSchedule.table_name}.end_time", :default_order => :desc, :groupable => false )
-    @available_columns << QueryColumn.new(:match, :sortable => "#{SlaSchedule.table_name}.match", :default_order => nil, :groupableupable => true )
+    @available_columns << QueryColumn.new(:match, :sortable => "#{SlaSchedule.table_name}.match", :default_order => nil, :groupable => true)
     @available_columns
   end
 

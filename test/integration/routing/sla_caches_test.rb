@@ -31,12 +31,6 @@ class RoutingSlaCachesTest < ApplicationSlaRoutingTestCase
     !should_route 'GET /sla/caches/1.pdf' => 'sla_caches#show', :id => '1', :format => 'pdf'
     !should_route 'GET /sla/caches/1.atom' => 'sla_caches#show', :id => '1', :format => 'atom'
 
-    # TODO : test miss routes
-    # !should_route 'GET /sla/caches/new' => 'sla_caches#new'
-    # !should_route 'POST /sla/caches' => 'sla_caches#create'
-
-    # !should_route 'GET /sla/caches/1/edit' => 'sla_caches#edit', :id => '1'
-    # !should_route 'PUT /sla/caches/1' => 'sla_caches#update', :id => '1'
     should_route 'DELETE /sla/caches/1' => 'sla_caches#destroy', :id => '1'
 
     should_route 'PATCH /sla/caches/1/refresh' => 'sla_caches#refresh', :id => '1'

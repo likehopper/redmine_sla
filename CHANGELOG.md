@@ -2,12 +2,42 @@
 
 ## Unreleased
 
+------------------------------------------------------------------------
+
+## 3.0.1 - 2026-09-05
+
+### Security
+
+-   Scope SLA cache visibility and mutations to projects where the user has
+    the corresponding `view_sla` or `manage_sla` permission, while keeping
+    global purge restricted to administrators.
+
+### Fixed
+
+-   Validate schedule overlaps in the model so direct and nested writes are
+    rejected atomically on every supported database.
+-   Invalidate only the affected SLA caches after calendar, schedule, holiday,
+    level or term configuration changes.
+-   Reject SLA terms referencing missing issue priorities or custom-field
+    enumerations.
+-   Display negative-term validation errors instead of raising from a model
+    translation call.
+-   Restore SLA term grouping by priority label and align calendar-holiday
+    ordering with holiday dates.
+
+### Maintenance
+
+-   Remove obsolete commented implementations and inline TODO markers; ongoing
+    feature work remains tracked in the project backlog.
+
 ### Testing
 
 -   Report real `sla_get_level` forced/cached and `sla_get_spent` calculation
     durations (`min`, `median`, `p95`, `max` and `avg`) during the unit suite,
     labelled by database engine, without imposing environment-dependent
     performance thresholds.
+-   Cover project-scoped anonymous/member access, atomic calendar validation,
+    cache invalidation and SLA priority reference validation.
 
 ------------------------------------------------------------------------
 

@@ -38,7 +38,6 @@ class SlaHolidayQuery < Query
   def initialize(attributes=nil, *args)
     super attributes
     self.filters ||= {
-      # TODO : filter not apply on first time
       "date" => { :operator => "y", :values => [] } 
     }
   end

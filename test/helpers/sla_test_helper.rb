@@ -92,21 +92,30 @@ module RedmineSlaTestBootstrap
     # Allow SLA update to be skipped explicitly
     return if ENV['SKIP_SLA_UPDATE'] == '1'
 
+    # Load Rake tasks if not already loaded
+    require 'rake'
+    task_name = 'redmine:plugins:redmine_sla:update_sla'
+    Rails.application.load_tasks unless Rake::Task.task_defined?(task_name)
+
+    # Reset and calculate the shared cache exactly once per test process.
+    task = Rake::Task[task_name]
+    return if task.already_invoked
+
     # Detect whether a transaction is currently open
     had_transaction = ActiveRecord::Base.connection.transaction_open?
 
-    # Close the transaction to allow persistent writes
-    ActiveRecord::Base.connection.commit_db_transaction if had_transaction
-
     begin
-      # Load Rake tasks if not already loaded
-      require 'rake'
-      task_name = 'redmine:plugins:redmine_sla:update_sla'
-      Rails.application.load_tasks unless Rake::Task.task_defined?(task_name)
+      # Keep cache calculations deterministic even when another test suite
+      # previously changed the persisted plugin settings or populated caches.
+      settings = Setting.plugin_redmine_sla.merge('sla_time_zone' => 'Etc/UTC')
+      Setting.plugin_redmine_sla = settings
+      SlaCache.delete_all
+
+      # Close the transaction to allow persistent cache writes.
+      ActiveRecord::Base.connection.commit_db_transaction if had_transaction
 
       # Run the SLA cache update task once
-      task = Rake::Task[task_name]
-      task.invoke unless task.already_invoked
+      task.invoke
     rescue => e
       # Do not fail the test suite on SLA update errors
       warn "[redmine_sla] SLA cache update failed: #{e.message}"

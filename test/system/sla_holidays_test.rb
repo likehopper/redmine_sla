@@ -86,7 +86,6 @@ class SlaHolidaysHelperSystemTest < ApplicationSlaSystemTestCase
     # Check flash notice contains the created record id
     assert_selector 'div#flash_notice', visible: true, text: /#{sla_holiday.id}/
 
-    # TODO : check SlaHoliday#show
     # visit "/sla/holidayes/#{sla_holiday.id}"
     # compate sla_holiday attributs
 
@@ -110,7 +109,6 @@ class SlaHolidaysHelperSystemTest < ApplicationSlaSystemTestCase
       :visible => true,
       :text => l('sla_label.sla_holiday.notice_successful_update', :id => "##{sla_holiday.id}" )    
     assert_equal 'mod SLA Calendar', sla_holiday.reload.name
-    # TODO : check in SlaHoliday#index after filtering
   end
 
   test "destroy_sla_holiday" do
@@ -124,7 +122,6 @@ class SlaHolidaysHelperSystemTest < ApplicationSlaSystemTestCase
     assert page.has_css?('#flash_notice'),
       :visible => true,
       :text => l(:notice_successful_delete)
-    # TODO : check in SlaHoliday#index after filtering
   end
 
 end
