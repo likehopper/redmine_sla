@@ -30,9 +30,9 @@ class SlasController < ApplicationController
   # It's possible to view and manage SLA via API
   accept_api_auth :index, :create, :show, :update, :destroy
   
-  # Only global administrators are allowed to view and manage SLAs.
-  before_action :require_admin
-  before_action :authorize_global
+  before_action :require_admin, except: [:index, :show]
+  before_action :find_optional_project, only: [:index, :show]
+  before_action :authorize_global, except: [:index, :show]
 
   before_action :find_sla,  only: [:show, :edit, :update]
   before_action :find_slas, only: [:destroy, :context_menu]
@@ -195,6 +195,7 @@ class SlasController < ApplicationController
   # Load a single SLA and ensure it is visible to the current user.
   def find_sla
     @sla = Sla.find(params[:id])
+    raise Unauthorized if @project && !@sla.sla_project_trackers.exists?(project_id: @project.id)
     raise Unauthorized unless @sla.visible?
     raise ActiveRecord::RecordNotFound if @sla.nil?
   rescue ActiveRecord::RecordNotFound

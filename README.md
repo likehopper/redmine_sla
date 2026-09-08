@@ -69,6 +69,40 @@ The engine is designed for production environments.
      │     └── Holidays
      └── SLA Status Mapping
 
+An **SLA** is the top-level contract (e.g. "Gold Support", "Standard
+Support"). It is assigned to one or more **project / tracker** pairs, so
+the same SLA definition can be reused across several projects.
+
+An SLA is broken down into one or more **SLA Levels**. Each level pairs
+the SLA with a single **SLA Calendar** and groups the actual **SLA
+Terms**: for every combination of **SLA Type** (e.g. Response,
+Resolution) and **priority** — either a native Redmine issue priority or
+a custom field value — a term defines the committed duration, in
+minutes.
+
+An **SLA Calendar** describes when the clock actually runs:
+
+-   **Weekly Schedule**: working hours per day of week (HO / HNO),
+    used to suspend or resume the countdown outside business hours.
+-   **Holidays**: non-working days shared across calendars. The
+    `match` flag decides whether time is simply suspended on that
+    day, or whether an SLA already running is allowed to continue
+    through it.
+
+**SLA Status Mapping** links each **SLA Type** to the Redmine issue
+statuses it should track — for instance "Response" usually maps to the
+"New" status only, while "Resolution" maps to every status prior to
+closure ("New", "Assigned", "Feedback", ...). This mapping tells the
+database procedures which time ranges to accumulate for each type of
+commitment, independently of any particular SLA, and is what the
+diagram's "SLA Status Mapping" branch and "SLA Calendar" branch stand
+for: both are reusable building blocks referenced by SLA Levels/Types
+rather than data private to a single SLA.
+
+At runtime, the calculation engine combines Terms + Calendar + Status
+Mapping to compute compliance for every issue in scope — see [SLA
+Compute Explanation](doc/COMPUTE.md) for the underlying algorithm.
+
 ------------------------------------------------------------------------
 
 ## Features

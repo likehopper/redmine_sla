@@ -123,11 +123,11 @@ class SlaLevelsControllerTest < ApplicationSlaFunctionalsTestCase
 
   ### As manager #2 ###
 
-  test "should return 403 on get index as manager" do
+  test "should return success on get index as manager" do
     @request.session[:user_id] = 2
     with_settings :default_language => "en" do
       get :index
-      assert_response 403
+      assert_response :success
     end
   end
 
@@ -149,11 +149,11 @@ class SlaLevelsControllerTest < ApplicationSlaFunctionalsTestCase
 
   ### As developper #3 ###
 
-  test "should return 403 on get index as developper" do
+  test "should return success on get index as developper" do
     @request.session[:user_id] = 3
     with_settings :default_language => "en" do
       get :index
-      assert_response 403
+      assert_response :success
     end
   end
 
@@ -175,11 +175,11 @@ class SlaLevelsControllerTest < ApplicationSlaFunctionalsTestCase
 
   ### As sysadmin #4 ###
 
-  test "should return 403 on get index as sysadmin" do
+  test "should return success on get index as sysadmin" do
     @request.session[:user_id] = 4
     with_settings :default_language => "en" do
       get :index
-      assert_response 403
+      assert_response :success
     end
   end
 
@@ -249,6 +249,34 @@ class SlaLevelsControllerTest < ApplicationSlaFunctionalsTestCase
       get(:edit, :params => {:id => 1})
       assert_response 403
     end
+  end
+
+  test "should scope project index to SLA levels used by a Resolver project" do
+    @request.session[:user_id] = 3
+
+    get :index, params: {project_id: "project-sla-tests-tma"}
+
+    assert_response :success
+    assert_select "#entity_id_1", count: 1
+    assert_select "#entity_id_2", count: 1
+    assert_select "#entity_id_3", count: 0
+    assert_select 'a[href="/projects/project-sla-tests-tma/sla/levels/1"]', title: "Show"
+  end
+
+  test "should forbid Resolver access to another project SLA level index" do
+    @request.session[:user_id] = 3
+
+    get :index, params: {project_id: "project-sla-tests-std"}
+
+    assert_response :forbidden
+  end
+
+  test "should forbid showing a SLA level outside the requested project" do
+    @request.session[:user_id] = 3
+
+    get :show, params: {project_id: "project-sla-tests-tma", id: 3}
+
+    assert_response :forbidden
   end
 
 end

@@ -33,8 +33,9 @@ class SlaCalendarsController < ApplicationController
 
   accept_api_auth :index, :create, :show, :update, :destroy
 
-  before_action :require_admin, except: [:show]
-  before_action :authorize_global
+  before_action :require_admin, except: [:index, :show]
+  before_action :find_optional_project, only: [:index, :show]
+  before_action :authorize_global, except: [:index, :show]
 
   before_action :find_sla_calendar,  only: [:show, :edit, :update]
   before_action :find_sla_calendars, only: [:destroy, :context_menu]
@@ -182,6 +183,7 @@ class SlaCalendarsController < ApplicationController
   # Load a single SLA Calendar.
   def find_sla_calendar
     @sla_calendar = SlaCalendar.find(params[:id])
+    raise Unauthorized if @project && !@sla_calendar.sla_levels.in_project(@project).exists?
     raise Unauthorized unless @sla_calendar.visible?
     raise ActiveRecord::RecordNotFound if @sla_calendar.nil?
   rescue ActiveRecord::RecordNotFound

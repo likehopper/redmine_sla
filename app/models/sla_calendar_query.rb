@@ -56,7 +56,7 @@ class SlaCalendarQuery < Query
   def sla_calendars(options={})
     order_option = [group_by_sort_order, (options[:order] || sort_clause)].flatten.reject(&:blank?)
 
-    scope = self.queried_class.visible.where(statement).
+    scope = base_scope.
         includes(((options[:include] || [])).uniq).
         where(options[:conditions]).
         order(order_option).
@@ -72,7 +72,14 @@ class SlaCalendarQuery < Query
 
   # For Query Class
   def base_scope
-    self.queried_class.visible.where(statement)
+    scope = self.queried_class.visible
+    scope = scope.in_project(project) if project
+    scope.where(statement)
+  end
+
+  # Project filtering is handled through levels and SLA project tracker links.
+  def project_statement
+    nil
   end
 
 end

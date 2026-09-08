@@ -38,7 +38,8 @@
             <% end %>
             <td class="buttons">
               <%= if entity.visible?
-                    link_to l(:button_show), sla_calendar_path(entity),
+                    show_path = @project ? project_sla_calendar_path(@project, entity) : sla_calendar_path(entity)
+                    link_to l(:button_show), show_path,
                             title: l(:button_show), class: 'icon-only icon-magnifier'
                   end -%>
               <%= if entity.editable?
