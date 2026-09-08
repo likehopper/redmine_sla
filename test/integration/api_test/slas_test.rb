@@ -35,7 +35,7 @@ class Redmine::ApiTest::SlasTest < ApplicationSlaApiTestCase
   end
 
   test "GET /sla/slas.xml should forbidden for other users" do
-    ['manager','developer','sysadmin','reporter','other'].each do |user|
+    ['reporter','other'].each do |user|
       get "/sla/slas.xml",
         :headers=>credentials(user)
       assert_response :forbidden
@@ -61,7 +61,7 @@ class Redmine::ApiTest::SlasTest < ApplicationSlaApiTestCase
   end
 
   test "GET /sla/slas.json should forbidden for other users" do
-    ['manager','developer','sysadmin','reporter','other'].each do |user|
+    ['reporter','other'].each do |user|
       get "/sla/slas.json",
         :headers => credentials(user)
       assert_response :forbidden
@@ -77,7 +77,7 @@ class Redmine::ApiTest::SlasTest < ApplicationSlaApiTestCase
 
   test "GET /sla/slas/:id.xml should success for admin" do
     sla = Sla.first
-    ['admin'].each do |user|
+    ['admin','manager','developer'].each do |user|
       get "/sla/slas/#{sla.id}.xml",
         :headers=>credentials(user)
       assert_response :success
@@ -87,7 +87,7 @@ class Redmine::ApiTest::SlasTest < ApplicationSlaApiTestCase
 
   test "GET /sla/slas/:id.xml should forbidden for other users" do
     sla = Sla.first
-    ['manager','developer','sysadmin','reporter','other'].each do |user|
+    ['sysadmin','reporter','other'].each do |user|
       get "/sla/slas/#{sla.id}.xml",
         :headers=>credentials(user)
       assert_response :forbidden
@@ -104,7 +104,7 @@ class Redmine::ApiTest::SlasTest < ApplicationSlaApiTestCase
 
   test "GET /sla/slas/:id.json should success for admin" do
     sla = Sla.first
-    ['admin'].each do |user|
+    ['admin','manager','developer'].each do |user|
       get "/sla/slas/#{sla.id}.json",
         :headers => credentials(user)
       assert_response :success
@@ -114,7 +114,7 @@ class Redmine::ApiTest::SlasTest < ApplicationSlaApiTestCase
 
   test "GET /sla/slas/:id.json should forbidden for other users" do
     sla = Sla.first
-    ['manager','developer','sysadmin','reporter','other'].each do |user|
+    ['sysadmin','reporter','other'].each do |user|
       get "/sla/slas/#{sla.id}.json",
         :headers=>credentials(user)
       assert_response :forbidden
@@ -126,6 +126,21 @@ class Redmine::ApiTest::SlasTest < ApplicationSlaApiTestCase
     get "/sla/slas/#{sla.id}.json"
     assert_response :unauthorized
   end  
+
+  test "GET project SLAs JSON should be scoped for Resolver" do
+    get "/projects/project-sla-tests-tma/sla/slas.json",
+      headers: credentials('developer')
+
+    assert_response :success
+    assert_equal [1, 2], response.parsed_body.fetch('slas').pluck('id').sort
+  end
+
+  test "GET project SLAs JSON should forbid another project for Resolver" do
+    get "/projects/project-sla-tests-std/sla/slas.json",
+      headers: credentials('developer')
+
+    assert_response :forbidden
+  end
 
   # Sla#create in XML
 

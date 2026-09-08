@@ -162,11 +162,11 @@ class SlasControllerTest < ApplicationSlaFunctionalsTestCase
 
   ### As manager #2 ###
 
-  test "should forbidden on get index as manager" do
+  test "should get scoped index as manager" do
     @request.session[:user_id] = 2
     with_settings :default_language => "en" do
       get :index
-      assert_response :forbidden
+      assert_response :success
     end
   end
 
@@ -186,11 +186,11 @@ class SlasControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
-  test "should forbidden on get show as manager" do
+  test "should get visible SLA as manager" do
     @request.session[:user_id] = 2
     with_settings :default_language => "en" do
       get(:show, :params => {:id => 1})
-      assert_response :forbidden
+      assert_response :success
     end
   end
 
@@ -222,11 +222,11 @@ class SlasControllerTest < ApplicationSlaFunctionalsTestCase
 
   ### As developper #3 ###
 
-  test "should forbidden on get index as developper" do
+  test "should get scoped index as developper" do
     @request.session[:user_id] = 3
     with_settings :default_language => "en" do
       get :index
-      assert_response :forbidden
+      assert_response :success
     end
   end
 
@@ -246,11 +246,11 @@ class SlasControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
-  test "should forbidden on get show as developper" do
+  test "should get visible SLA as developper" do
     @request.session[:user_id] = 3
     with_settings :default_language => "en" do
       get(:show, :params => {:id => 1})
-      assert_response :forbidden
+      assert_response :success
     end
   end
 
@@ -282,11 +282,11 @@ class SlasControllerTest < ApplicationSlaFunctionalsTestCase
 
   ### As sysadmin #4 ###
 
-  test "should forbidden on get index as sysadmin" do
+  test "should get scoped index as sysadmin" do
     @request.session[:user_id] = 4
     with_settings :default_language => "en" do
       get :index
-      assert_response :forbidden
+      assert_response :success
     end
   end
 
@@ -458,6 +458,34 @@ class SlasControllerTest < ApplicationSlaFunctionalsTestCase
       delete(:destroy, :params => {:id => 1})
       assert_response :forbidden
     end
-  end  
+  end
+
+  test "should scope project index to SLAs used by a Resolver project" do
+    @request.session[:user_id] = 3
+
+    get :index, params: {project_id: "project-sla-tests-tma"}
+
+    assert_response :success
+    assert_select "#entity_id_1", count: 1
+    assert_select "#entity_id_2", count: 1
+    assert_select "#entity_id_3", count: 0
+    assert_select 'a[href="/projects/project-sla-tests-tma/sla/slas/1"]', title: "Show"
+  end
+
+  test "should forbid Resolver access to another project SLA index" do
+    @request.session[:user_id] = 3
+
+    get :index, params: {project_id: "project-sla-tests-std"}
+
+    assert_response :forbidden
+  end
+
+  test "should forbid showing a SLA outside the requested project" do
+    @request.session[:user_id] = 3
+
+    get :show, params: {project_id: "project-sla-tests-tma", id: 3}
+
+    assert_response :forbidden
+  end
 
 end

@@ -27,7 +27,10 @@ class SlaCalendar < ActiveRecord::Base
 
   accepts_nested_attributes_for :sla_schedules, allow_destroy: true, :reject_if => proc { |attributes| attributes.any? {|k,v| v.blank?} } # :any_blank
 
-  scope :visible, ->(*args) { where(SlaCalendar.visible_condition(args.shift || User.current, *args)) }
+  scope :in_project, ->(project) {
+    joins(sla_levels: {sla: :sla_project_trackers}).
+      where(sla_project_trackers: {project_id: project.id}).distinct
+  }
   
   default_scope { } 
 
@@ -37,9 +40,13 @@ class SlaCalendar < ActiveRecord::Base
 
   safe_attributes *%w[name]
 
-  # No selection limitations
-  def self.visible_condition(user, options = {})
-    '1=1'
+  def self.visible(user=User.current)
+    return all if user&.admin?
+    return none unless user
+
+    allowed_projects = Project.where(Project.allowed_to_condition(user, :view_sla)).select(:id)
+    joins(sla_levels: {sla: :sla_project_trackers}).
+      where(sla_project_trackers: {project_id: allowed_projects}).distinct
   end
 
   # For index and show
