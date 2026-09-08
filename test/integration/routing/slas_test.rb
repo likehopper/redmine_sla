@@ -39,4 +39,11 @@ class RoutingSlasTest < ApplicationSlaRoutingTestCase
     should_route 'DELETE /sla/slas/1' => 'slas#destroy', :id => '1'
   end
 
+  def test_project_slas
+    should_route 'GET /projects/project-sla-tests-tma/sla/slas' =>
+      'slas#index', project_id: 'project-sla-tests-tma'
+    should_route 'GET /projects/project-sla-tests-tma/sla/slas/1' =>
+      'slas#show', project_id: 'project-sla-tests-tma', id: '1'
+  end
+
 end

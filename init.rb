@@ -77,14 +77,18 @@ Redmine::Plugin.register :redmine_sla do
 
     # Read-only SLA access
     permission :view_sla, {
-      sla_levels:        [:show],
-      sla_calendars:     [:show],
+      slas:              [:index, :show],
+      sla_levels:        [:index, :show],
+      sla_calendars:     [:index, :show],
       sla_caches:        [:index, :show, :refresh, :context_menu],
       sla_cache_spents:  [:index, :show, :refresh, :context_menu]
     }, require: :member
 
     # Full SLA management
     permission :manage_sla, {
+      slas:                    [:index, :show],
+      sla_levels:              [:index, :show],
+      sla_calendars:           [:index, :show],
       sla_project_trackers: [:index, :new, :create, :edit, :update, :destroy, :context_menu],
       sla_cache_spents:     [:index, :show, :refresh, :destroy, :purge, :context_menu],
       sla_caches:           [:index, :show, :refresh, :destroy, :purge, :context_menu, :explain]

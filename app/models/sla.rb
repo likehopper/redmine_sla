@@ -26,7 +26,10 @@ class Sla < ActiveRecord::Base
 
   include Redmine::SafeAttributes
 
-  scope :visible, ->(*args) { where(Sla.visible_condition(args.shift || User.current, *args)) }
+  scope :in_project, ->(project) {
+    joins(:sla_project_trackers).
+      where(sla_project_trackers: {project_id: project.id}).distinct
+  }
 
   default_scope { }  
 
@@ -36,14 +39,18 @@ class Sla < ActiveRecord::Base
 
   safe_attributes *%w[name]
 
-  # No selection limitations
-  def self.visible_condition(user, options = {})
-    '1=1'
+  def self.visible(user=User.current)
+    return all if user&.admin?
+    return none unless user
+
+    allowed_projects = Project.where(Project.allowed_to_condition(user, :view_sla)).select(:id)
+    joins(:sla_project_trackers).
+      where(sla_project_trackers: {project_id: allowed_projects}).distinct
   end
 
   # For index and show
   def visible?(user=User.current)
-    user.allowed_to?(:manage_sla, nil, global: true)
+    user && (user.admin? || sla_project_trackers.any? { |link| user.allowed_to?(:view_sla, link.project) })
   end
 
   # For create and update

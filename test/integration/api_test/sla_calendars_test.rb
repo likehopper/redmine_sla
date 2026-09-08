@@ -35,7 +35,7 @@ class Redmine::ApiTest::SlaCalendarsTest < ApplicationSlaApiTestCase
   end
 
   test "GET /sla/calendars.xml should forbidden for other users" do
-    ['manager','developer','sysadmin','reporter','other'].each do |user|
+    ['reporter','other'].each do |user|
       get "/sla/calendars.xml",
         :headers=>credentials(user)
       assert_response :forbidden
@@ -61,7 +61,7 @@ class Redmine::ApiTest::SlaCalendarsTest < ApplicationSlaApiTestCase
   end
 
   test "GET /sla/calendars.json should forbidden for other users" do
-    ['manager','developer','sysadmin','reporter','other'].each do |user|
+    ['reporter','other'].each do |user|
       get "/sla/calendars.json",
         :headers => credentials(user)
       assert_response :forbidden
@@ -126,6 +126,21 @@ class Redmine::ApiTest::SlaCalendarsTest < ApplicationSlaApiTestCase
     get "/sla/calendars/#{sla_calendar.id}.json"
     assert_response :unauthorized
   end  
+
+  test "GET project SLA calendars JSON should be scoped for Resolver" do
+    get "/projects/project-sla-tests-tma/sla/calendars.json",
+      headers: credentials('developer')
+
+    assert_response :success
+    assert_equal [1], response.parsed_body.fetch('sla_calendars').pluck('id').sort
+  end
+
+  test "GET project SLA calendars JSON should forbid another project for Resolver" do
+    get "/projects/project-sla-tests-std/sla/calendars.json",
+      headers: credentials('developer')
+
+    assert_response :forbidden
+  end
 
   # SlaCalendar#create in XML
 

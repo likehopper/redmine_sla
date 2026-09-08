@@ -83,14 +83,23 @@ class SlaLevelQuery < Query
 
   # For Query Class
   def base_scope
-    self.queried_class.visible.where(statement)
+    scope = self.queried_class.visible
+    scope = scope.in_project(project) if project
+    scope.where(statement)
   end  
+
+  # Project filtering is handled through the SLA's project tracker links.
+  def project_statement
+    nil
+  end
 
   def all_sla_values
     return @all_sla_values if @all_sla_values
 
     values ||= []
-    Sla.pluck(:name,:id).map { |name,id|
+    scope = Sla.visible
+    scope = scope.in_project(project) if project
+    scope.pluck(:name,:id).map { |name,id|
       values << [name.to_s,id.to_s]
     }
     @all_sla_values = values
@@ -100,7 +109,9 @@ class SlaLevelQuery < Query
     return @all_sla_calendar_values if @all_sla_calendar_values
 
     values ||= []
-    SlaCalendar.pluck(:name,:id).map { |name,id|
+    scope = SlaCalendar.visible
+    scope = scope.in_project(project) if project
+    scope.pluck(:name,:id).map { |name,id|
       values << [name.to_s,id.to_s]
     }
     @all_sla_calendar_values = values
@@ -110,7 +121,9 @@ class SlaLevelQuery < Query
     return @all_sla_custom_fields_values if @all_sla_custom_fields_values
 
     values ||= []
-    SlaCustomField.pluck(:name,:id).map { |name,id|
+    levels = SlaLevel.visible
+    levels = levels.in_project(project) if project
+    SlaCustomField.visible.where(id: levels.reselect(:custom_field_id)).pluck(:name,:id).map { |name,id|
       values << [name.to_s,id.to_s]
     }
     @all_sla_custom_fields_values = values
