@@ -73,7 +73,14 @@ class SlaQuery < Query
 
   # For Query Class
   def base_scope
-    self.queried_class.visible.where(statement)
+    scope = self.queried_class.visible
+    scope = scope.in_project(project) if project
+    scope.where(statement)
+  end
+
+  # Project filtering is handled through sla_project_trackers, not projects.
+  def project_statement
+    nil
   end
 
 end

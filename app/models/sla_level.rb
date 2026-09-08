@@ -35,7 +35,10 @@ class SlaLevel < ActiveRecord::Base
   accepts_nested_attributes_for :sla_level_terms, allow_destroy: true
   validate :sla_level_terms_greater_than_or_equal_to_zero
 
-  scope :visible, ->(*args) { where(SlaLevel.visible_condition(args.shift || User.current, *args)) }
+  scope :in_project, ->(project) {
+    joins(sla: :sla_project_trackers).
+      where(sla_project_trackers: {project_id: project.id}).distinct
+  }
 
   default_scope { joins(:sla,:sla_calendar).left_joins(:custom_field) }
   
@@ -56,9 +59,13 @@ class SlaLevel < ActiveRecord::Base
     SlaLevelTerm.where(sla_level_id: self.id).destroy_all if attribute_changed?(:custom_field_id)
   end
 
-  # No selection limitations
-  def self.visible_condition(user, options = {})
-    '1=1'
+  def self.visible(user=User.current)
+    return all if user&.admin?
+    return none unless user
+
+    allowed_projects = Project.where(Project.allowed_to_condition(user, :view_sla)).select(:id)
+    joins(sla: :sla_project_trackers).
+      where(sla_project_trackers: {project_id: allowed_projects}).distinct
   end
 
   # For index and show

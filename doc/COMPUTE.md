@@ -76,3 +76,12 @@ The notion carried by the “match” boolean:
 With the SLA Schedules, it is possible to determine the ranges of working hours.
 
 We find the same concept with "match" booleann, this allows you to define the non-working hours during which you must continue to solve the ticket.
+
+
+## Implementation Note (Optimization)
+
+The principle above still holds, but the actual stored procedures no longer generate one row per minute.
+
+Instead, `generate_series` produces one row per **calendar day** between the issue's creation and its closing (or the current timestamp). For each day, the working-hours window (schedule), the status interval (roll status) and the calculation window are intersected using a closed-form `GREATEST` / `LEAST` computation on timestamps, and the resulting overlap is summed directly in seconds/minutes -- instead of counting one row per elapsed minute.
+
+This produces the exact same total as the minute-by-minute principle described above, but scales to issues open for months or years without generating millions of rows.

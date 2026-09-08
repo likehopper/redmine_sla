@@ -1,6 +1,19 @@
 # Changelog
 
-## Unreleased
+## 3.0.2 - 2026-09-08
+
+### Security
+
+-   Add project-scoped read-only routes for SLAs, levels and calendars, and
+    restrict their HTML and API results to projects where the user has
+    `view_sla` permission.
+-   Restrict the SLA level custom-field filter to visible fields referenced
+    by authorized SLA levels, respecting the requested project.
+
+### Removed
+
+-   Remove the unused `SlaViewJournal` model and its four skipped tests.
+    Its SQL view was replaced in 2023; current SLA SQL views remain unchanged.
 
 ------------------------------------------------------------------------
 

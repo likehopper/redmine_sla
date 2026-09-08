@@ -3,6 +3,9 @@
 
 # SLAs project configuration ( activation of SLAs by trackers : sla_project_trackers )
 resources :projects do
+  resources :slas, path: "sla/slas", only: [:index, :show]
+  resources :sla_levels, path: "sla/levels", only: [:index, :show]
+  resources :sla_calendars, path: "sla/calendars", only: [:index, :show]
   resources :sla_caches, path: "sla/caches", :only => [ :index, :show, :destroy ] do
     member do
       patch 'refresh'

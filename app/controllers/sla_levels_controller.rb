@@ -30,8 +30,9 @@ class SlaLevelsController < ApplicationController
 
   accept_api_auth :index, :create, :show, :update, :destroy
   
-  before_action :require_admin, except: [:show]
-  before_action :authorize_global
+  before_action :require_admin, except: [:index, :show]
+  before_action :find_optional_project, only: [:index, :show]
+  before_action :authorize_global, except: [:index, :show]
 
   before_action :find_sla_level,  only: [:show, :edit, :update, :sla_terms]
   before_action :find_sla_levels, only: [:destroy, :context_menu]
@@ -200,6 +201,7 @@ class SlaLevelsController < ApplicationController
   # Find a single SLA Level and ensure it is visible.
   def find_sla_level
     @sla_level = SlaLevel.find(params[:id])
+    raise Unauthorized if @project && !@sla_level.sla_project_trackers.exists?(project_id: @project.id)
     raise Unauthorized unless @sla_level.visible?
     raise ActiveRecord::RecordNotFound if @sla_level.nil?
   rescue ActiveRecord::RecordNotFound

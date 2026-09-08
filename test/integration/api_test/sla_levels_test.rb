@@ -35,7 +35,7 @@ class Redmine::ApiTest::SlaLevelsTest < ApplicationSlaApiTestCase
   end
 
   test "GET /sla/levels.xml should forbidden for other users" do
-    ['manager','developer','sysadmin','reporter','other'].each do |user|
+    ['reporter','other'].each do |user|
       get "/sla/levels.xml",
         :headers=>credentials(user)
       assert_response :forbidden
@@ -61,7 +61,7 @@ class Redmine::ApiTest::SlaLevelsTest < ApplicationSlaApiTestCase
   end
 
   test "GET /sla/levels.json should forbidden for other users" do
-    ['manager','developer','sysadmin','reporter','other'].each do |user|
+    ['reporter','other'].each do |user|
       get "/sla/levels.json",
         :headers => credentials(user)
       assert_response :forbidden
@@ -136,6 +136,21 @@ class Redmine::ApiTest::SlaLevelsTest < ApplicationSlaApiTestCase
     get "/sla/levels/#{sla_level.id}.json"
     assert_response :unauthorized
   end  
+
+  test "GET project SLA levels JSON should be scoped for Resolver" do
+    get "/projects/project-sla-tests-tma/sla/levels.json",
+      headers: credentials('developer')
+
+    assert_response :success
+    assert_equal [1, 2], response.parsed_body.fetch('sla_levels').pluck('id').sort
+  end
+
+  test "GET project SLA levels JSON should forbid another project for Resolver" do
+    get "/projects/project-sla-tests-std/sla/levels.json",
+      headers: credentials('developer')
+
+    assert_response :forbidden
+  end
 
   # SlaLevel#create in XML
 
