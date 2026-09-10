@@ -189,7 +189,9 @@ class SlaCacheSpentQuery < Query
     return @all_sla_level_values if @all_sla_level_values
 
     values ||= []
-    SlaLevel.pluck(:name,:id).map { |name,id|
+    scope = SlaLevel.visible
+    scope = scope.in_project(project) if project
+    scope.pluck(:name,:id).map { |name,id|
       values << [name.to_s,id.to_s]
     }
     @all_sla_level_values = values
