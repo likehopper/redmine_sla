@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+### Security
+
+-   Restrict SLA level filter options in both cache queries to authorized
+    projects, including global and project-specific views.
+
+------------------------------------------------------------------------
+
 ## 3.0.2 - 2026-09-08
 
 ### Security

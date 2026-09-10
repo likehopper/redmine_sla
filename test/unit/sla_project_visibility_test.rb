@@ -77,4 +77,30 @@ class SlaProjectVisibilityTest < ApplicationSlaUnitsTestCase
                  SlaLevelQuery.new(project: Project.find(2)).all_sla_custom_fields_values
   end
 
+  test "cache level filters respect global and project permissions" do
+    [SlaCacheQuery, SlaCacheSpentQuery].each do |klass|
+      assert_equal [1, 2, 9, 10], klass.new.all_sla_level_values.map { |_, id| id.to_i }.sort
+      assert_equal [1, 2], klass.new(project: Project.find(1)).all_sla_level_values.map { |_, id| id.to_i }.sort
+      assert_empty klass.new(project: Project.find(2)).all_sla_level_values
+    end
+  end
+
+  test "cache level filters do not expose catalogs without SLA permission" do
+    [User.find(5), User.anonymous].each do |user|
+      User.current = user
+      [SlaCacheQuery, SlaCacheSpentQuery].each do |klass|
+        assert_empty klass.new.all_sla_level_values
+        assert_empty klass.new(project: Project.find(1)).all_sla_level_values
+      end
+    end
+  end
+
+  test "administrator cache level filters still respect project context" do
+    User.current = User.find(1)
+    [SlaCacheQuery, SlaCacheSpentQuery].each do |klass|
+      assert_equal (1..10).to_a, klass.new.all_sla_level_values.map { |_, id| id.to_i }.sort
+      assert_equal [1, 2], klass.new(project: Project.find(1)).all_sla_level_values.map { |_, id| id.to_i }.sort
+    end
+  end
+
 end
