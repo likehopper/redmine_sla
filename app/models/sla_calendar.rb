@@ -32,8 +32,6 @@ class SlaCalendar < ActiveRecord::Base
       where(sla_project_trackers: {project_id: project.id}).distinct
   }
   
-  default_scope { } 
-
   validates_presence_of :name
   
   validates_uniqueness_of :name, :case_sensitive => false

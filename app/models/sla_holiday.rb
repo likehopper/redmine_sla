@@ -24,8 +24,6 @@ class SlaHoliday < ActiveRecord::Base
 
   scope :visible, ->(*args) { where(SlaHoliday.visible_condition(args.shift || User.current, *args)) }
 
-  default_scope { }
-
   validates_presence_of :name
   validates_presence_of :date
 
