@@ -7,6 +7,10 @@
 -   Restrict SLA level filter options in both cache queries to authorized
     projects, including global and project-specific views.
 
+### Maintenance
+
+-   Remove empty default scopes from SLA, type, calendar and holiday models.
+
 ------------------------------------------------------------------------
 
 ## 3.0.2 - 2026-09-08
