@@ -68,7 +68,7 @@ class SlaScheduleQuery < Query
   def sla_schedules(options={})
     order_option = [group_by_sort_order, (options[:order] || sort_clause)].flatten.reject(&:blank?)
 
-    scope = self.queried_class.visible.where(statement).
+    scope = base_scope.
         includes(((options[:include] || [])).uniq).
         where(options[:conditions]).
         order(order_option).
@@ -84,7 +84,7 @@ class SlaScheduleQuery < Query
 
   # For Query Class
   def base_scope
-    self.queried_class.visible.where(statement)
+    self.queried_class.visible.with_calendar.where(statement)
   end  
 
   def all_sla_calendar_values

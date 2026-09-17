@@ -111,6 +111,15 @@ class SlaSchedulesControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
+  test "should list schedules sorted by calendar name as admin" do
+    @request.session[:user_id] = 1
+    with_settings :default_language => "en" do
+      get :index, params: { sort: "sla_calendar:asc" }
+      assert_response :success
+      assert_equal SlaSchedule.with_calendar.count, @controller.instance_variable_get(:@entity_count)
+    end
+  end
+
   test "should success on get new as admin" do
     @request.session[:user_id] = 1
     with_settings :default_language => "en" do
