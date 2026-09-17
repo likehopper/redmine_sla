@@ -10,6 +10,7 @@
 ### Maintenance
 
 -   Remove empty default scopes from SLA, type, calendar and holiday models.
+-   Remove the shadowed `SlaProjectTracker#visible?` definition.
 
 ------------------------------------------------------------------------
 
