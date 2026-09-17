@@ -26,7 +26,8 @@ class SlaStatus < ActiveRecord::Base
 
   scope :visible, ->(*args) { where(SlaStatus.visible_condition(args.shift || User.current, *args)) }
 
-  default_scope { joins(:sla_type,:status) }
+  # The list query needs both tables for its sortable columns.
+  scope :with_references, -> { joins(:sla_type, :status) }
 
   validates_presence_of :sla_type
   validates_presence_of :status
