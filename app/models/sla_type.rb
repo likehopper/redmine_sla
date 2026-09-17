@@ -36,8 +36,6 @@ class SlaType < ActiveRecord::Base
   scope :visible, ->(*args) { where(SlaType.visible_condition(args.shift || User.current, *args)) }
   scope :sorted, -> { order(:position) }
 
-  default_scope { }
-
   validates_presence_of :name
 
   validates_uniqueness_of :name, :case_sensitive => false
