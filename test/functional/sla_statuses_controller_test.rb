@@ -64,6 +64,17 @@ class SlaStatusesControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
+  test "should sort status rules by associated columns as admin" do
+    @request.session[:user_id] = 1
+    with_settings :default_language => "en" do
+      %w[sla_type status].each do |column|
+        get :index, params: { sort: "#{column}:asc" }
+        assert_response :success
+        assert_equal SlaStatus.with_references.count, @controller.instance_variable_get(:@entity_count)
+      end
+    end
+  end
+
   test "should return success on get show as admin" do
     @request.session[:user_id] = 1
     with_settings :default_language => "en" do
