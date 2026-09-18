@@ -67,11 +67,6 @@ class SlaProjectTracker < ActiveRecord::Base
     Project.allowed_to_condition(user,:manage_sla,options)
   end
 
-  # For index and refresh
-  def visible?(user=User.current)
-    !user.nil? && user.allowed_to?(:manage_sla, project)
-  end
-
   # For index and show
   def visible?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
