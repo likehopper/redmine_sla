@@ -294,6 +294,9 @@ Restart application server.
 
 # Documentation
 
+-   [Contributing](CONTRIBUTING.md)
+-   [Code of Conduct](CODE_OF_CONDUCT.md)
+-   [Security policy](SECURITY.md)
 -   [Functional tests](doc/TESTING.md)
 -   [Conceptual Data Model](doc/MCD.md)
 -   [Step-by-step use case](doc/USECASE.md)
