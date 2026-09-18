@@ -7,6 +7,11 @@
 -   Restrict SLA level filter options in both cache queries to authorized
     projects, including global and project-specific views.
 
+### Fixed
+
+-   Remove spent rows, including existing orphans, during global MySQL/MariaDB
+    cache purges without disabling foreign keys.
+
 ### Maintenance
 
 -   Remove empty default scopes from SLA, type, calendar and holiday models.
