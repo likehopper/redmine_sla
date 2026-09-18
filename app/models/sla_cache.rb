@@ -88,7 +88,7 @@ class SlaCache < ActiveRecord::Base
         # left by older purges that disabled foreign-key checks. Keep both
         # deletes atomic and leave foreign-key checks enabled.
         connection = ActiveRecord::Base.connection
-        connection.transaction do
+        connection.transaction(requires_new: true) do
           connection.execute("DELETE FROM sla_cache_spents ;")
           connection.execute("DELETE FROM sla_caches ;")
         end

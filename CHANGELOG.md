@@ -10,7 +10,8 @@
 ### Fixed
 
 -   Remove spent rows, including existing orphans, during global MySQL/MariaDB
-    cache purges without disabling foreign keys.
+    cache purges without disabling foreign keys. Keep foreign-key checks enabled
+    for spent-only purges as well.
 
 ### Maintenance
 

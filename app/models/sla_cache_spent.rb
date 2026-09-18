@@ -87,15 +87,7 @@ class SlaCacheSpent < ActiveRecord::Base
         # an implicit COMMIT, silently ending any enclosing transaction
         # (breaking transactional test isolation and any caller-managed
         # transaction). DELETE participates in the transaction normally.
-        # Separate execute calls because Rails' mysql2 connections don't
-        # enable multi-statement execution by default.
-        connection = ActiveRecord::Base.connection
-        connection.execute("SET FOREIGN_KEY_CHECKS = 0 ;")
-        begin
-          connection.execute("DELETE FROM sla_cache_spents ;")
-        ensure
-          connection.execute("SET FOREIGN_KEY_CHECKS = 1 ;")
-        end
+        ActiveRecord::Base.connection.execute("DELETE FROM sla_cache_spents ;")
       else
         ActiveRecord::Base.connection.execute("TRUNCATE sla_cache_spents CASCADE ; ")
       end
