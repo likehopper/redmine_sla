@@ -1,6 +1,3 @@
 /test/fixtures/*
 /.*
 !/.github/
-
-# Local SQL comparison drafts
-/db/sql_functions/sla_get_level_overlap.v*.mysql
