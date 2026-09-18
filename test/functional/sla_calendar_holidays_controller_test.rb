@@ -64,6 +64,17 @@ class SlaCalendarHolidaysControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
+  test "should sort calendar holidays by associated columns as admin" do
+    @request.session[:user_id] = 1
+    with_settings :default_language => "en" do
+      %w[sla_calendar date].each do |column|
+        get :index, params: { sort: "#{column}:asc" }
+        assert_response :success
+        assert_equal SlaCalendarHoliday.with_references.count, @controller.instance_variable_get(:@entity_count)
+      end
+    end
+  end
+
   test "should return success on get show as admin" do
     @request.session[:user_id] = 1
     with_settings :default_language => "en" do

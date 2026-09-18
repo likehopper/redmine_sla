@@ -28,12 +28,9 @@ class SlaSchedule < ActiveRecord::Base
 
   scope :visible, ->(*args) { where(SlaSchedule.visible_condition(args.shift || User.current, *args)) }
 
-  # No explicit select() here: Rails already selects "sla_schedules.*" by
-  # default for a plain joins(). An explicit select("sla_schedules.*") makes
-  # ActiveRecord#count reuse it as the COUNT() argument (COUNT(sla_schedules.*)),
-  # which PostgreSQL accepts (row-wildcard extension) but MySQL rejects with a
-  # syntax error -- breaking every paginated/API index action on this model.
-  default_scope { joins(:sla_calendar) }
+  # The query list joins calendars to sort by their names. Keep this explicit
+  # so association reads and validation do not silently require a calendar row.
+  scope :with_calendar, -> { joins(:sla_calendar) }
 
   # It is important not to convert times based on time zone !
   # ( cf. https://api.rubyonrails.org/classes/ActiveRecord/Timestamp.html )
