@@ -13,6 +13,7 @@
 -   Remove the shadowed `SlaProjectTracker#visible?` definition.
 -   Make the schedule calendar join explicit in schedule queries.
 -   Make SLA status associations explicit in status queries.
+-   Make calendar and holiday joins explicit in calendar holiday queries.
 
 ------------------------------------------------------------------------
 
