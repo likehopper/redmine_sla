@@ -48,6 +48,34 @@ class SlaCacheTest < ApplicationSlaUnitsTestCase
     assert_nil SlaCache.find_by_issue_id(999_999)
   end
 
+  test "global purge removes caches and their spent rows" do
+    assert SlaCache.unscoped.exists?
+    assert SlaCacheSpent.unscoped.exists?
+
+    if RedmineSla::DbDialect.adapter == :mysql
+      connection = ActiveRecord::Base.connection
+      orphan_cache_id = 999_999_999
+      assert_not SlaCache.unscoped.where(id: orphan_cache_id).exists?
+
+      connection.execute("SET FOREIGN_KEY_CHECKS = 0")
+      begin
+        connection.execute(<<~SQL)
+          INSERT INTO sla_cache_spents (sla_cache_id, sla_type_id, project_id, issue_id, spent)
+          SELECT #{orphan_cache_id}, sla_type_id, project_id, issue_id, spent
+          FROM sla_cache_spents LIMIT 1
+        SQL
+      ensure
+        connection.execute("SET FOREIGN_KEY_CHECKS = 1")
+      end
+      assert SlaCacheSpent.unscoped.where(sla_cache_id: orphan_cache_id).exists?
+    end
+
+    SlaCache.purge(nil)
+
+    assert_not SlaCache.unscoped.exists?
+    assert_not SlaCacheSpent.unscoped.exists?
+  end
+
   # --- Visibility ---
   # visible? calls issue.visible? without a user argument, so it falls back to
   # User.current. We must set User.current to a user that has :view_issues on
