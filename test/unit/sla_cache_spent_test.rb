@@ -25,6 +25,28 @@ class SlaCacheSpentTest < ApplicationSlaUnitsTestCase
     assert_not SlaCacheSpent.count.zero?
   end
 
+  test "global spent purge keeps cache rows" do
+    cache_ids = SlaCache.unscoped.order(:id).pluck(:id)
+    assert_not_empty cache_ids
+    assert SlaCacheSpent.unscoped.exists?
+
+    if RedmineSla::DbDialect.adapter == :mysql
+      connection = ActiveRecord::Base.connection
+      original_checks = connection.select_value("SELECT @@SESSION.foreign_key_checks").to_i
+      connection.execute("SET FOREIGN_KEY_CHECKS = 0")
+    end
+
+    begin
+      SlaCacheSpent.purge(nil)
+      assert_equal 0, connection.select_value("SELECT @@SESSION.foreign_key_checks").to_i if connection
+    ensure
+      connection.execute("SET FOREIGN_KEY_CHECKS = #{original_checks}") if connection
+    end
+
+    assert_not SlaCacheSpent.unscoped.exists?
+    assert_equal cache_ids, SlaCache.unscoped.order(:id).pluck(:id)
+  end
+
   # --- Finder ---
 
   test "find_by_issue_and_type_id returns a record for a known issue+type" do

@@ -84,17 +84,13 @@ class SlaCache < ActiveRecord::Base
         # DELETE, not TRUNCATE: on MySQL/InnoDB, TRUNCATE is DDL and causes
         # an implicit COMMIT, silently ending any enclosing transaction
         # (breaking transactional test isolation and any caller-managed
-        # transaction). DELETE participates in the transaction normally.
-        # sla_cache_spents references sla_caches via a foreign key, so
-        # disable checks for this statement. Separate execute calls:
-        # Rails' mysql2 connections don't enable multi-statement execution
-        # by default.
+        # transaction). Delete spent rows explicitly to clear any orphans
+        # left by older purges that disabled foreign-key checks. Keep both
+        # deletes atomic and leave foreign-key checks enabled.
         connection = ActiveRecord::Base.connection
-        connection.execute("SET FOREIGN_KEY_CHECKS = 0 ;")
-        begin
+        connection.transaction(requires_new: true) do
+          connection.execute("DELETE FROM sla_cache_spents ;")
           connection.execute("DELETE FROM sla_caches ;")
-        ensure
-          connection.execute("SET FOREIGN_KEY_CHECKS = 1 ;")
         end
       else
         ActiveRecord::Base.connection.execute("TRUNCATE sla_caches CASCADE ; ")
