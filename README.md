@@ -14,6 +14,8 @@
 
 ## Overview
 
+Current version: **3.0.4**. See the [changelog](CHANGELOG.md) for release details.
+
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
 -   Redmine plugins directory:
@@ -276,6 +278,19 @@ Plugin is ready to use.
 
 ------------------------------------------------------------------------
 
+## Upgrade to 3.0.4
+
+Update the plugin files and restart Redmine. This release introduces no new
+schema migration relative to 3.0.3; when upgrading from an older version, run
+the plugin migration command from the installation instructions as usual.
+
+This maintenance release fixes spent-cache grouping by SLA level on strict
+MySQL and ensures project cache purges also remove historical orphan rows.
+Project permissions remain unchanged. Custom Ruby integrations that relied on
+implicit model joins should follow the [query scope guide](doc/DEVELOPMENT.md).
+
+------------------------------------------------------------------------
+
 ## Uninstall
 
 ``` bash
@@ -297,7 +312,8 @@ Restart application server.
 -   [Contributing](CONTRIBUTING.md)
 -   [Code of Conduct](CODE_OF_CONDUCT.md)
 -   [Security policy](SECURITY.md)
--   [Functional tests](doc/TESTING.md)
+-   [Testing](doc/TESTING.md)
+-   [Query scopes and Ruby integrations](doc/DEVELOPMENT.md)
 -   [Conceptual Data Model](doc/MCD.md)
 -   [Step-by-step use case](doc/USECASE.md)
     -   [Example 01](doc/EXAMPLE-01.md)
