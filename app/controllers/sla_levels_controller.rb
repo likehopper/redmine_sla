@@ -200,7 +200,7 @@ class SlaLevelsController < ApplicationController
 
   # Find a single SLA Level and ensure it is visible.
   def find_sla_level
-    @sla_level = SlaLevel.find(params[:id])
+    @sla_level = SlaLevel.with_references.find(params[:id])
     raise Unauthorized if @project && !@sla_level.sla_project_trackers.exists?(project_id: @project.id)
     raise Unauthorized unless @sla_level.visible?
     raise ActiveRecord::RecordNotFound if @sla_level.nil?
@@ -211,7 +211,7 @@ class SlaLevelsController < ApplicationController
   # Find multiple SLA Levels for bulk actions.
   def find_sla_levels
     params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]]
-    @sla_levels  = SlaLevel.find(params[:ids]).to_a
+    @sla_levels  = SlaLevel.with_references.find(params[:ids]).to_a
     @sla_level   = @sla_levels.first if @sla_levels.count == 1
     raise Unauthorized unless @sla_levels.all?(&:visible?)
     raise ActiveRecord::RecordNotFound if @sla_levels.empty?

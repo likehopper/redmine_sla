@@ -110,8 +110,8 @@ class Redmine::ApiTest::SlaCacheSpentsTest < ApplicationSlaApiTestCase
   end
 
   test "GET /sla/cache_spents.xml should return sla_cache_spents issue.tracker_id first" do
-    sla_cache_spent = SlaCacheSpent.where("issues.tracker_id=1").order(:id).first
-    sla_cache_spent_count = SlaCacheSpent.where("issues.tracker_id=1").count
+    sla_cache_spent = SlaCacheSpent.joins(:issue).where(issues: {tracker_id: 1}).order(:id).first
+    sla_cache_spent_count = SlaCacheSpent.joins(:issue).where(issues: {tracker_id: 1}).count
     ['admin','manager'].each do |user|
       get "/sla/cache_spents.xml?issue.status_id=*&issue.tracker_id=1&sort=issue_id",
         headers: credentials(user)
@@ -133,8 +133,8 @@ class Redmine::ApiTest::SlaCacheSpentsTest < ApplicationSlaApiTestCase
   end    
 
   test "GET /sla/cache_spents.xml should return sla_cache_spents sla_level_id first" do
-    sla_cache_spent = SlaCacheSpent.where("sla_caches.sla_level_id = 1").order(:id).first
-    sla_cache_spent_count = SlaCacheSpent.order(:id).where("sla_caches.sla_level_id = 1").count
+    sla_cache_spent = SlaCacheSpent.joins(:sla_cache).where(sla_caches: {sla_level_id: 1}).order(:id).first
+    sla_cache_spent_count = SlaCacheSpent.joins(:sla_cache).where(sla_caches: {sla_level_id: 1}).count
     ['admin','manager'].each do |user|
       get "/sla/cache_spents.xml?issue.status_id=*&sla_level_id=1",
         headers: credentials(user)
@@ -169,29 +169,29 @@ class Redmine::ApiTest::SlaCacheSpentsTest < ApplicationSlaApiTestCase
   end
 
   test "GET /sla/cache_spents.json should return sla_cache_spents full" do
-    sla_cache_spent = SlaCacheSpent.order(:issue_id).first
+    sla_cache_spent = SlaCacheSpent.order(:issue_id, :id).first
     ['admin'].each { |user|
-      get "/sla/cache_spents.json?issue.status_id=*&sort=issue",
+      get "/sla/cache_spents.json?issue.status_id=*&sort=issue:asc,id:asc",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_spent_index_json(sla_cache_spent,item_for_all)
     }
     ['manager'].each { |user|
-      get "/sla/cache_spents.json?issue.status_id=*&sort=issue",
+      get "/sla/cache_spents.json?issue.status_id=*&sort=issue:asc,id:asc",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_spent_index_json(sla_cache_spent,item_for_all)
     }
-    sla_cache_spent = SlaCacheSpent.where(project: 1).order(:id).first # project-sla-tests-tma
+    sla_cache_spent = SlaCacheSpent.where(project: 1).order(:issue_id, :id).first # project-sla-tests-tma
     ['developer'].each { |user|
-      get "/sla/cache_spents.json?issue.status_id=*&sort=issue",
+      get "/sla/cache_spents.json?issue.status_id=*&sort=issue:asc,id:asc",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_spent_index_json(sla_cache_spent,item_for_dev)
     }    
-    sla_cache_spent = SlaCacheSpent.where(project: 2).order(:id).first # project-sla-tests-tma
+    sla_cache_spent = SlaCacheSpent.where(project: 2).order(:issue_id, :id).first # project-sla-tests-tma
     ['sysadmin'].each { |user|
-      get "/sla/cache_spents.json?issue.status_id=*&sort=issue",
+      get "/sla/cache_spents.json?issue.status_id=*&sort=issue:asc,id:asc",
         headers: credentials(user)
       assert_response :success
       assert_sla_cache_spent_index_json(sla_cache_spent,item_for_sys)

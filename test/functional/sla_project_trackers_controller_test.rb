@@ -37,6 +37,18 @@ class SlaProjectTrackersControllerTest < ApplicationSlaFunctionalsTestCase
     { project_id: 1, tracker_id: 2, sla_id: 1 }
   end
 
+  test "should sort project trackers by associated columns and count all results" do
+    @request.session[:user_id] = 1
+    %w[project tracker sla].each do |column|
+      get :index, params: { sort: "#{column}:asc", per_page: 100 }
+      assert_response :success
+      entities = @controller.instance_variable_get(:@entities)
+      assert_equal SlaProjectTracker.count, @controller.instance_variable_get(:@entity_count)
+      values = entities.map { |record| column == 'tracker' ? record.tracker.position : record.public_send(column).name }
+      assert_equal values.sort, values
+    end
+  end
+
   ### As anonymous ###
 
   test "should redirect on get index as anonymous" do

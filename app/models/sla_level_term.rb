@@ -30,7 +30,7 @@ class SlaLevelTerm < ActiveRecord::Base
 
   scope :visible, ->(*args) { where(SlaLevelTerm.visible_condition(args.shift || User.current, *args)) }
 
-  default_scope { joins(:sla_level,:sla_type) }
+  scope :with_references, -> { joins(:sla_level, :sla_type) }
 
   validates_presence_of :sla_level
   validates_presence_of :sla_type

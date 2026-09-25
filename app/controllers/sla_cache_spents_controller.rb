@@ -208,7 +208,7 @@ class SlaCacheSpentsController < ApplicationController
 
   # Find a single SlaCacheSpent by id
   def find_sla_cache_spent
-    @sla_cache_spent = SlaCacheSpent.find(params[:id])
+    @sla_cache_spent = SlaCacheSpent.with_references.find(params[:id])
     raise Unauthorized if @project && @sla_cache_spent.project != @project
     raise Unauthorized unless @sla_cache_spent.visible?
     raise ActiveRecord::RecordNotFound if @sla_cache_spent.nil?
@@ -219,7 +219,7 @@ class SlaCacheSpentsController < ApplicationController
   # Find a collection of SlaCacheSpent for mass-actions
   def find_sla_cache_spents
     params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]]
-    @sla_cache_spents = SlaCacheSpent.find(params[:ids]).to_a
+    @sla_cache_spents = SlaCacheSpent.with_references.find(params[:ids]).to_a
     @sla_cache_spent = @sla_cache_spents.first if @sla_cache_spents.count == 1
     raise Unauthorized if @project && @sla_cache_spents.any? { |sla_cache_spent| sla_cache_spent.project != @project }
     raise Unauthorized unless @sla_cache_spents.all?(&:visible?)

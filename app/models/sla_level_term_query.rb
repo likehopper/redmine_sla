@@ -105,7 +105,7 @@ class SlaLevelTermQuery < Query
 
   # For Query Class
   def base_scope
-    self.queried_class.visible.where(statement)
+    self.queried_class.visible.with_references.where(statement)
   end  
 
   def all_sla_level_values

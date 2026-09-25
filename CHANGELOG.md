@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   Fix spent-cache grouping by SLA level on strict MySQL and align group
+    labels with their counts.
+-   Make project cache purges remove historical orphan rows while preserving
+    other projects and foreign-key checks.
+
+### Maintenance
+
+-   Replace the remaining joined default scopes on levels, terms, project
+    trackers and caches with explicit reference scopes for queries and direct
+    controller lookups; keep permission joins in visibility scopes.
+-   Remove a duplicate project-tracker query scope and unused spent-cache
+    filter-value code.
+
 ## 3.0.3 - 2026-09-20
 
 ### Security

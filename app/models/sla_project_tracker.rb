@@ -53,14 +53,14 @@ class SlaProjectTracker < ActiveRecord::Base
   #   eager_load(:project)
   # }
 
-  default_scope { joins(:sla,:tracker,:project) }
+  scope :with_references, -> { joins(:sla, :tracker, :project) }
 
   # define a scope to search by project
   scope :in_project, ->(project_id) { where(project_id: project_id) }
   # scope :for_tracker_id, lambda { |tracker_id| where(:tracker_id => tracker_id) }  
   # scope :for_sla_id, lambda { |sla_id| where(:sla_id => sla_id) }  
 
-  scope :visible, ->(*args) { where(SlaProjectTracker.visible_condition(args.shift || User.current, *args)) }
+  scope :visible, ->(*args) { joins(:project).where(SlaProjectTracker.visible_condition(args.shift || User.current, *args)) }
 
   # Selection limitations for users based on access issues
   def self.visible_condition(user=User.current, options = {})

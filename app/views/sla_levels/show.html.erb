@@ -18,7 +18,7 @@
     <% 
 
         sla_types = @sla_level.sla_level_terms
-          #.unscoped # To view all sla_types
+          .joins(:sla_type)
           .select("sla_level_terms.sla_type_id AS id, sla_types.name AS name")
           .order("sla_types.name")
           .uniq.each do |sla_type|

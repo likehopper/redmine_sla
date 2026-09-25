@@ -40,9 +40,12 @@ class SlaCacheSpentQuery < Query
     @available_columns << QueryColumn.new(:id, :sortable => "#{SlaCacheSpent.table_name}.id", :default_order => nil, :groupable => false )
     @available_columns << QueryColumn.new(:project, :sortable => "#{Project.table_name}.name", :default_order => nil, :groupable => true)
     @available_columns << QueryColumn.new(:issue, :sortable => "#{Issue.table_name}.id", :default_order => :desc, :groupable => true)
-    sla_level_columns = QueryColumn.new(:sla_level, :sortable => "( SELECT DISTINCT #{SlaLevel.table_name}.name FROM #{SlaLevel.table_name} WHERE ( #{SlaCache.table_name}.sla_level_id = #{SlaLevel.table_name}.id ) )", :default_order => nil, :groupable => true )
+    sla_level_columns = QueryColumn.new(:sla_level, :sortable => "#{SlaLevel.table_name}.name", :default_order => nil, :groupable => true )
     def sla_level_columns.group_by_statement
       self.sortable
+    end
+    def sla_level_columns.group_value(record)
+      record.sla_level.name
     end
     @available_columns << sla_level_columns
     @available_columns << QueryColumn.new(:sla_type, :sortable => "#{SlaType.table_name}.name", :default_order => nil, :groupable => true )
@@ -108,11 +111,10 @@ class SlaCacheSpentQuery < Query
     raise StatementInvalid.new(e.message)
   end
 
-   # For Query Class
-   def base_scope
-    self.queried_class.visible.
-    joins(:sla_cache,:project,:issue).
-    where(statement)
+  # For Query Class
+  def base_scope
+    self.queried_class.visible.with_references.
+      where(statement)
   end
 
   def results_scope(options={})
@@ -163,16 +165,6 @@ class SlaCacheSpentQuery < Query
 
     joins.compact!
     joins.any? ? joins.join(' ') : nil
-  end
-
-  def all_sla_cache_spent_values
-    return @all_sla_cache_spent_values if @all_sla_cache_spent_values
-
-    values ||= []
-    SlaCache.pluck(:subject,:id).map { |subject,id|
-      values << [subject.to_s,id.to_s]
-    }
-    @all_sla_cache_spent_values = values
   end
 
   def all_sla_type_values
