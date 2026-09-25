@@ -258,7 +258,7 @@ private
 
   # Find a single SLA cache and check visibility.
   def find_sla_cache
-    @sla_cache = SlaCache.find(params[:id])
+    @sla_cache = SlaCache.with_references.find(params[:id])
     raise Unauthorized if @project && @sla_cache.project != @project
     raise Unauthorized unless @sla_cache.visible?
     raise ActiveRecord::RecordNotFound if @sla_cache.nil?
@@ -269,7 +269,7 @@ private
   # Find a collection of SLA caches (used in bulk actions).
   def find_sla_caches
     params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]]
-    @sla_caches  = SlaCache.find(params[:ids]).to_a
+    @sla_caches  = SlaCache.with_references.find(params[:ids]).to_a
     @sla_cache   = @sla_caches.first if @sla_caches.count == 1
     raise Unauthorized if @project && @sla_caches.any? { |sla_cache| sla_cache.project != @project }
     raise Unauthorized unless @sla_caches.all?(&:visible?)

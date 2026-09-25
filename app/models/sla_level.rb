@@ -40,7 +40,7 @@ class SlaLevel < ActiveRecord::Base
       where(sla_project_trackers: {project_id: project.id}).distinct
   }
 
-  default_scope { joins(:sla,:sla_calendar).left_joins(:custom_field) }
+  scope :with_references, -> { joins(:sla, :sla_calendar).left_joins(:custom_field) }
   
   validates_presence_of :name
   validates_presence_of :sla

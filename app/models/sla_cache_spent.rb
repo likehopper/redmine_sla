@@ -30,11 +30,9 @@ class SlaCacheSpent < ActiveRecord::Base
   #safe_attributes *%w[sla_cache_id sla_type_id updated_on spent]
   safe_attributes *%w[]
 
-  # Join order is important
-  # default_scope { joins(:project,:issue,sla_cache: :sla_level) }
-  default_scope { joins(:project,:issue,:sla_cache,:sla_type) }
+  scope :with_references, -> { joins(:project, :issue, :sla_type, sla_cache: :sla_level) }
 
-  scope :visible, ->(*args) { where(SlaCacheSpent.visible_condition(args.shift || User.current, *args)) }
+  scope :visible, ->(*args) { joins(:project, :issue).where(SlaCacheSpent.visible_condition(args.shift || User.current, *args)) }
 
   # Selection limitations for users based on access issues
   def self.visible_condition(user=User.current, options = {})

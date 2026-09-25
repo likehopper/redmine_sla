@@ -252,9 +252,7 @@ class SlaCacheQuery < Query
 
   # For Query Class
   def base_scope
-    # self.queried_class.visible.where(statement)
-    self.queried_class.visible.
-    joins(:project,:issue).
+    self.queried_class.visible.with_references.
       where(statement)
   end
 
