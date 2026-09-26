@@ -34,6 +34,7 @@ class SlaProjectTrackersController < ApplicationController
   before_action :authorize_global 
 
   before_action :find_optional_project, :only => [ :index, :show, :new, :create, :edit, :update, :destroy, :context_menu ]
+  before_action :authorize_project_tracker_project
   before_action :find_project_tracker,  :only => [ :show, :edit, :update ]
   before_action :find_project_trackers, :only => [ :destroy, :context_menu ]
 
@@ -82,6 +83,8 @@ class SlaProjectTrackersController < ApplicationController
     @sla_project_tracker.safe_attributes = params[:sla_project_tracker]
     @sla_project_tracker.project = @project unless @project.nil?
 
+    raise Unauthorized if @sla_project_tracker.project && !@sla_project_tracker.editable?
+
     if @sla_project_tracker.save
       respond_to do |format|
         format.html do
@@ -107,6 +110,8 @@ class SlaProjectTrackersController < ApplicationController
   def update
     @sla_project_tracker.safe_attributes = params[:sla_project_tracker]
     @sla_project_tracker.project = @project unless @project.nil?
+
+    raise Unauthorized if @sla_project_tracker.project && !@sla_project_tracker.editable?
 
     if @sla_project_tracker.save
       respond_to do |format|
@@ -184,9 +189,14 @@ class SlaProjectTrackersController < ApplicationController
 
 private
 
+  def authorize_project_tracker_project
+    raise Unauthorized if @project && !User.current.allowed_to?(:manage_sla, @project)
+  end
+
   # Find a single SlaProjectTracker by ID.
   def find_project_tracker
     @sla_project_tracker = SlaProjectTracker.visible.with_references.find(params[:id])
+    raise Unauthorized if @project && @sla_project_tracker.project != @project
     raise ActiveRecord::RecordNotFound if @sla_project_tracker.nil?
   rescue ActiveRecord::RecordNotFound
     render_404
@@ -196,6 +206,7 @@ private
   def find_project_trackers
     params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]] 
     @sla_project_trackers = SlaProjectTracker.visible.with_references.find(params[:ids])
+    raise Unauthorized if @project && @sla_project_trackers.any? { |link| link.project != @project }
     @sla_project_tracker  = @sla_project_trackers.first if @sla_project_trackers.count == 1
     raise ActiveRecord::RecordNotFound if @sla_project_trackers.empty?
   rescue ActiveRecord::RecordNotFound
