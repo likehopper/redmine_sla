@@ -322,4 +322,67 @@ class SlaProjectTrackersControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
+  test "manager cannot create a tracker assignment in an unauthorized project" do
+    restrict_manager_to_project_one
+    assert_no_difference 'SlaProjectTracker.count' do
+      post :create, params: {sla_project_tracker: {project_id: 2, tracker_id: 1, sla_id: 1}}
+    end
+    assert_response :forbidden
+  end
+
+  test "manager cannot move an allowed tracker assignment to an unauthorized project" do
+    restrict_manager_to_project_one
+    link = SlaProjectTracker.find_by!(project_id: 1, tracker_id: 1)
+    patch :update, params: {id: link.id, sla_project_tracker: {project_id: 2}}
+    assert_response :forbidden
+    assert_equal 1, link.reload.project_id
+  end
+
+  test "restricted manager only sees manageable projects in the assignment form" do
+    restrict_manager_to_project_one
+    get :new
+    assert_response :success
+    assert_select 'select[name="sla_project_tracker[project_id]"] option' do |options|
+      assert_equal [1], options.map { |option| option['value'].to_i }.reject(&:zero?)
+    end
+  end
+
+  test "restricted manager cannot open the assignment form in another project" do
+    restrict_manager_to_project_one
+    get :new, params: {project_id: 2}
+    assert_response :forbidden
+  end
+
+  test "project context cannot move or delete an assignment from another project" do
+    @request.session[:user_id] = 1
+    link = SlaProjectTracker.find_by!(project_id: 1, tracker_id: 1)
+    patch :update, params: {project_id: 2, id: link.id, sla_project_tracker: {sla_id: 1}}
+    assert_response :forbidden
+    assert_equal 1, link.reload.project_id
+    assert_no_difference 'SlaProjectTracker.count' do
+      delete :destroy, params: {project_id: 2, id: link.id}
+    end
+    assert_response :forbidden
+  end
+
+  test "mixed project bulk deletion is rejected atomically for a restricted manager" do
+    restrict_manager_to_project_one
+    ids = [SlaProjectTracker.find_by!(project_id: 1).id, SlaProjectTracker.find_by!(project_id: 2).id]
+    assert_no_difference 'SlaProjectTracker.count' do
+      delete :destroy, params: {ids: ids}
+    end
+    assert_response :not_found
+    assert_equal 2, SlaProjectTracker.where(id: ids).count
+  end
+
+  private
+
+  def restrict_manager_to_project_one
+    Member.where(user_id: 2).where.not(project_id: 1).destroy_all
+    @request.session[:user_id] = 2
+    manager = User.find(2)
+    assert manager.allowed_to?(:manage_sla, Project.find(1))
+    assert_not manager.allowed_to?(:manage_sla, Project.find(2))
+  end
+
 end

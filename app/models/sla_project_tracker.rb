@@ -69,17 +69,17 @@ class SlaProjectTracker < ActiveRecord::Base
 
   # For index and show
   def visible?(user=User.current)
-    user.allowed_to?(:manage_sla, nil, global: true)
+    user.present? && project.present? && user.allowed_to?(:manage_sla, project)
   end
 
   # For create and update
   def editable?(user=User.current)
-    user.allowed_to?(:manage_sla, nil, global: true)
+    user.present? && project.present? && user.allowed_to?(:manage_sla, project)
   end
 
   # For destroy
   def deletable?(user=User.current)
-    user.allowed_to?(:manage_sla, nil, global: true)
+    user.present? && project.present? && user.allowed_to?(:manage_sla, project)
   end
 
 private
