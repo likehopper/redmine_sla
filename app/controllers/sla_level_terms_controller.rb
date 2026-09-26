@@ -182,7 +182,7 @@ class SlaLevelTermsController < ApplicationController
 
   # Find a single SLA Level Term.
   def find_sla_level_term
-    @sla_level_term = SlaLevelTerm.find(params[:id])
+    @sla_level_term = SlaLevelTerm.with_references.find(params[:id])
     raise Unauthorized unless @sla_level_term.visible?
   rescue ActiveRecord::RecordNotFound
     render_404
@@ -191,7 +191,7 @@ class SlaLevelTermsController < ApplicationController
   # Find multiple level terms for bulk actions.
   def find_sla_level_terms
     params[:ids] ||= [params[:id]] if params[:id]
-    @sla_level_terms = SlaLevelTerm.find(params[:ids]).to_a
+    @sla_level_terms = SlaLevelTerm.with_references.find(params[:ids]).to_a
     @sla_level_term  = @sla_level_terms.first if @sla_level_terms.size == 1
 
     raise Unauthorized unless @sla_level_terms.all?(&:visible?)

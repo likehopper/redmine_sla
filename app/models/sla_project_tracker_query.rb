@@ -76,18 +76,10 @@ class SlaProjectTrackerQuery < Query
     ].flat_map{|c| [c.to_s, c.to_sym]}
   end
 
-  # For Query Class
-  def base_scope
-    # self.queried_class.visible.where(statement)
-    self.queried_class.visible.
-      joins(:project).
-      where(statement)
-  end
-  
   def sla_project_trackers(options={})
     order_option = [group_by_sort_order, (options[:order] || sort_clause)].flatten.reject(&:blank?)
 
-    scope = self.queried_class.visible.where(statement).
+    scope = base_scope.
         includes(((options[:include] || [])).uniq).
         where(options[:conditions]).
         order(order_option).
@@ -103,9 +95,8 @@ class SlaProjectTrackerQuery < Query
 
   # For Query Class
   def base_scope
-    self.queried_class.visible.
-    joins(:sla,:tracker,:project).
-    where(statement)
+    self.queried_class.visible.with_references.
+      where(statement)
   end  
 
 end

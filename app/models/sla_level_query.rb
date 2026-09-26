@@ -83,7 +83,7 @@ class SlaLevelQuery < Query
 
   # For Query Class
   def base_scope
-    scope = self.queried_class.visible
+    scope = self.queried_class.visible.with_references
     scope = scope.in_project(project) if project
     scope.where(statement)
   end  

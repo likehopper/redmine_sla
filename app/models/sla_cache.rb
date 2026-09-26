@@ -31,10 +31,9 @@ class SlaCache < ActiveRecord::Base
   safe_attributes *%w[]
   include Redmine::I18n
 
-  # Join order is important
-  default_scope { joins(:sla_level,:project,:issue) }
+  scope :with_references, -> { joins(:sla_level, :project, :issue) }
 
-  scope :visible, ->(*args) { where(SlaCache.visible_condition(args.shift || User.current, *args)) }
+  scope :visible, ->(*args) { joins(:project, :issue).where(SlaCache.visible_condition(args.shift || User.current, *args)) }
 
   # Selection limitations for users based on access issues
   def self.visible_condition(user=User.current, options = {})
