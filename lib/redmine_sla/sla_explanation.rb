@@ -79,7 +79,7 @@ module RedmineSla
 
     def candidate_levels
       sla_ids = SlaProjectTracker.where(project_id: @issue.project_id, tracker_id: @issue.tracker_id).pluck(:sla_id)
-      SlaLevel.where(sla_id: sla_ids).includes(:sla_calendar).distinct.to_a
+      SlaLevel.with_references.where(sla_id: sla_ids).includes(:sla_calendar).distinct.to_a
     end
 
     def first_matching_minute(calendar_id)

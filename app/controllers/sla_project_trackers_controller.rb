@@ -186,7 +186,7 @@ private
 
   # Find a single SlaProjectTracker by ID.
   def find_project_tracker
-    @sla_project_tracker = SlaProjectTracker.visible.find(params[:id])
+    @sla_project_tracker = SlaProjectTracker.visible.with_references.find(params[:id])
     raise ActiveRecord::RecordNotFound if @sla_project_tracker.nil?
   rescue ActiveRecord::RecordNotFound
     render_404
@@ -195,7 +195,7 @@ private
   # Find multiple SlaProjectTrackers for bulk operations.
   def find_project_trackers
     params[:ids] = params[:id].nil? ? params[:ids] : [params[:id]] 
-    @sla_project_trackers = SlaProjectTracker.visible.find(params[:ids])
+    @sla_project_trackers = SlaProjectTracker.visible.with_references.find(params[:ids])
     @sla_project_tracker  = @sla_project_trackers.first if @sla_project_trackers.count == 1
     raise ActiveRecord::RecordNotFound if @sla_project_trackers.empty?
   rescue ActiveRecord::RecordNotFound

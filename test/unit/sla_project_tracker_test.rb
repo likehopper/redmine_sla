@@ -70,4 +70,14 @@ class SlaProjectTrackerTest < ApplicationSlaUnitsTestCase
     assert SlaProjectTracker.new(project_id: 2, tracker_id: 1, sla_id: 1).valid?
   end
 
+  test "visible project trackers honor project permissions for direct lookups" do
+    [User.find(2), User.find(3), User.anonymous].each do |user|
+      expected = SlaProjectTracker.all.select { |link| user.allowed_to?(:manage_sla, link.project) }.map(&:id).sort
+      assert_equal expected, SlaProjectTracker.visible(user).order(:id).pluck(:id)
+      if expected.any?
+        assert_equal expected.first, SlaProjectTracker.visible(user).find(expected.first).id
+      end
+    end
+  end
+
 end

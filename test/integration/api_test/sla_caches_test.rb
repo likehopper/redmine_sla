@@ -108,8 +108,8 @@ class Redmine::ApiTest::SlaCachesTest < ApplicationSlaApiTestCase
   end
 
   test "GET /sla/caches.xml should return sla_caches issue.tracker_id first" do
-    sla_cache = SlaCache.where("issues.tracker_id=1").order(:id).first
-    sla_cache_count = SlaCache.where("issues.tracker_id=1").count
+    sla_cache = SlaCache.joins(:issue).where(issues: {tracker_id: 1}).order(:id).first
+    sla_cache_count = SlaCache.joins(:issue).where(issues: {tracker_id: 1}).count
     ['admin','manager'].each do |user|
       get "/sla/caches.xml?issue.status_id=*&issue.tracker_id=1&sort=issue_id",
         headers: credentials(user)
