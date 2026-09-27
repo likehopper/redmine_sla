@@ -14,7 +14,7 @@
 
 ## Overview
 
-Current version: **3.0.4**. See the [changelog](CHANGELOG.md) for release details.
+Current version: **3.0.5**. See the [changelog](CHANGELOG.md) for release details.
 
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
@@ -195,11 +195,10 @@ Fully manageable through UI and REST API:
 | `Rails`            | >= 6.1                                            |
 | `Database`         | PostgreSQL >= 11, MySQL >= 8.0 or MariaDB >= 10.2 |
 
-The current **Unreleased** changes have been tested on Redmine **5.1.13,
+Version **3.0.5** has been tested on Redmine **5.1.13,
 6.1.4 and 7.0.1**, with all five suites on PostgreSQL, MariaDB and strict
 MySQL. See the [compatibility matrix](doc/TESTING.md#redmine-compatibility-matrix)
-for exact runtime versions and results. These results include compatibility
-fixes that are not part of the published v3.0.4 tag.
+for exact runtime versions and results.
 
 ------------------------------------------------------------------------
 
@@ -284,16 +283,18 @@ Plugin is ready to use.
 
 ------------------------------------------------------------------------
 
-## Upgrade to 3.0.4
+## Upgrade to 3.0.5
 
 Update the plugin files and restart Redmine. This release introduces no new
-schema migration relative to 3.0.3; when upgrading from an older version, run
+schema migration relative to 3.0.4; when upgrading from an older version, run
 the plugin migration command from the installation instructions as usual.
 
-This maintenance release fixes spent-cache grouping by SLA level on strict
-MySQL and ensures project cache purges also remove historical orphan rows.
-Project permissions remain unchanged. Custom Ruby integrations that relied on
-implicit model joins should follow the [query scope guide](doc/DEVELOPMENT.md).
+This release enforces project-scoped `manage_sla` permission when creating or
+moving project-tracker assignments and fixes compatibility with Redmine 5.1
+and 7.0. No new permission is introduced. See the
+[compatibility matrix](doc/TESTING.md#redmine-compatibility-matrix) for the exact
+versions tested. Custom Ruby integrations that relied on implicit model joins
+should follow the [query scope guide](doc/DEVELOPMENT.md).
 
 ------------------------------------------------------------------------
 
