@@ -118,7 +118,8 @@ resources :sla_caches, path: "sla/caches", except: [:new, :create, :edit, :updat
   end
   collection do
     get 'context_menu'
-    patch 'refresh', 'purge'
+    patch 'refresh'
+    patch 'purge'
   end
 end
 # context_menu : bulk_destroy
@@ -135,7 +136,8 @@ resources :sla_cache_spents, path: "sla/cache_spents", except: [:new, :create, :
   end
   collection do
     get 'context_menu'
-    patch 'refresh', 'purge'
+    patch 'refresh'
+    patch 'purge'
   end
 end
 # context_menu : bulk_destroy
