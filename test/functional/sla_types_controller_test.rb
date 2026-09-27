@@ -120,7 +120,7 @@ class SlaTypesControllerTest < ApplicationSlaFunctionalsTestCase
   test "should return 422 on format.js with invalid data as admin" do
     @request.session[:user_id] = 1
     put :update, params: { id: 1, sla_type: { name: "" }, format: :js }
-    assert_response :unprocessable_content
+    assert_response 422
   end
 
   test "should list sla types ordered by position on index" do
