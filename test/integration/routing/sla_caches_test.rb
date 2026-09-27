@@ -40,4 +40,10 @@ class RoutingSlaCachesTest < ApplicationSlaRoutingTestCase
     should_route 'GET /issues/1/sla_explain' => 'sla_caches#explain', :id => '1'
   end
 
+  def test_sla_cache_spents_mutations
+    should_route 'PATCH /sla/cache_spents/1/refresh' => 'sla_cache_spents#refresh', :id => '1'
+    should_route 'PATCH /sla/cache_spents/refresh' => 'sla_cache_spents#refresh'
+    should_route 'PATCH /sla/cache_spents/purge' => 'sla_cache_spents#purge'
+  end
+
 end

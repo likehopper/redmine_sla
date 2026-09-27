@@ -28,7 +28,8 @@ class SlaLevelsHelperSystemTest < ApplicationSlaSystemTestCase
 
     visit '/sla/levels?sort=id'
     assert_text l('sla_label.sla_level.index')
-    element = find('tr#entity_id_1')
+    # Redmine ignores right-clicks on links; target a stable non-link cell.
+    element = find('tr#entity_id_1 td.checkbox')
     element.right_click
     assert_selector 'div#context-menu', visible: true
     assert_selector 'div#context-menu a', text: 'Show'
@@ -39,7 +40,7 @@ class SlaLevelsHelperSystemTest < ApplicationSlaSystemTestCase
 
     visit '/sla/levels?sort=id'
     assert_text l('sla_label.sla_level.index')
-    element = find('tr#entity_id_1')
+    element = find('tr#entity_id_1 td.checkbox')
     element.right_click
     assert_selector 'div#context-menu', visible: true
     assert_selector 'div#context-menu a', text: l(:button_edit)
@@ -50,7 +51,7 @@ class SlaLevelsHelperSystemTest < ApplicationSlaSystemTestCase
 
     visit '/sla/levels?sort=id'
     assert_text l('sla_label.sla_level.index')
-    element = find('tr#entity_id_1')
+    element = find('tr#entity_id_1 td.checkbox')
     element.right_click
     assert_selector 'div#context-menu', visible: true
     assert_selector 'div#context-menu a', text: l(:button_delete)

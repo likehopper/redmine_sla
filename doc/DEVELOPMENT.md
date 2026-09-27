@@ -44,3 +44,20 @@ README current when preparing a release. The version unit tests check the
 Redmine registration and changelog against that constant.
 
 See [Testing](TESTING.md) for the database-backed regression suites.
+
+## Redmine compatibility
+
+Validate changes against the exact Redmine/Ruby/Rails combinations listed in
+[Testing](TESTING.md#redmine-compatibility-matrix), using all five suites on
+PostgreSQL, MariaDB and strict MySQL. Use isolated test instances and databases;
+no preproduction instance is required.
+
+Declare each HTTP route separately: Rails 8 rejects multiple path arguments
+to routing helpers such as `patch`. Use numeric HTTP status `422` where needed
+to support both older Rack versions and versions using the
+`unprocessable_content` name.
+
+For context-menu browser tests, right-click a non-link cell such as
+`td.checkbox`. Redmine deliberately leaves right-clicks on ordinary links to
+the browser; clicking the centre of an entire row can hit a link when column
+widths change. Keep assertions on menu visibility and the resulting action.
