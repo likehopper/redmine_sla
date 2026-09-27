@@ -2,7 +2,7 @@
 
 ## Redmine compatibility matrix
 
-Validated on 2026-09-27 for the **Unreleased** changes (including the
+Validated on 2026-09-27 for **3.0.5** (including the
 project-tracker permission fix and compatibility fixes); these results do
 not describe the unmodified v3.0.4 tag.
 
