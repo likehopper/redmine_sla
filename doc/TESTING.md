@@ -1,4 +1,40 @@
 # Testing
+
+## Redmine compatibility matrix
+
+Validated on 2026-09-27 for the **Unreleased** changes (including the
+project-tracker permission fix and compatibility fixes); these results do
+not describe the unmodified v3.0.4 tag.
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 971 / 4658 | 971 / 4661 | 971 / 4661 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 971 / 4738 | 971 / 4741 | 971 / 4741 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 971 / 5230 | 971 / 5233 | 971 / 5233 |
+
+Each combination runs all five suites: **142 unit, 430 functional, 310
+integration/API (including routing), 29 system and 60 documentation tests**.
+The table records tests / assertions; assertion counts vary with Redmine
+and its database adapter. All combinations finished with zero failures,
+errors and skips. MySQL runs with `ONLY_FULL_GROUP_BY` and strict SQL modes.
+
+The test environments use separate containers and databases, with no
+preproduction instance or production deployment. Redmine 6.1.4 and 7.0.1
+use the official Docker images plus test dependencies. Redmine 5.1.13 uses
+the [official release archive](https://www.redmine.org/releases/) on the
+Ruby environment of the 5.1 Docker image; its SHA-256 was checked against
+the published checksum. These are exact tested combinations, not a claim
+that every Ruby or database version above the minimum has been tested.
+
+Migrate both Redmine and the plugin, then generate fixtures before running
+the suites. The isolated matrix runner loads each suite directly with Ruby
+against that migrated test database, disables automatic test schema reload
+in the test environment, and clears SLA caches between suites. This keeps
+the SQL functions and views created by migrations intact. The standard
+Rake workflow below should keep `schema_format = :sql` for the same reason.
+Generated fixtures, logs and documentation screenshots stay in the test
+containers or local temporary storage; they are not release artifacts.
+
 Add this line in file "config/application.rb" : `config.active_record.schema_format = :sql`
 Use a dedicated database configured under `test:` in `config/database.yml` for
 all operations: `export RAILS_ENV=test`. The commands below recreate test data;

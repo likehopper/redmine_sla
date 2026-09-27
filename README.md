@@ -195,6 +195,12 @@ Fully manageable through UI and REST API:
 | `Rails`            | >= 6.1                                            |
 | `Database`         | PostgreSQL >= 11, MySQL >= 8.0 or MariaDB >= 10.2 |
 
+The current **Unreleased** changes have been tested on Redmine **5.1.13,
+6.1.4 and 7.0.1**, with all five suites on PostgreSQL, MariaDB and strict
+MySQL. See the [compatibility matrix](doc/TESTING.md#redmine-compatibility-matrix)
+for exact runtime versions and results. These results include compatibility
+fixes that are not part of the published v3.0.4 tag.
+
 ------------------------------------------------------------------------
 
 ### ⚠ Database Requirement

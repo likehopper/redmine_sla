@@ -8,6 +8,17 @@
     project-tracker assignments. Reject mismatched project context on direct
     and bulk operations, and restrict form project choices to manageable projects.
 
+### Compatibility
+
+-   Validate all five test suites on Redmine 5.1.13, 6.1.4 and 7.0.1 with
+    PostgreSQL, MariaDB and strict MySQL (971 tests per combination).
+
+-   Declare cache refresh and purge routes separately for Rails 8 / Redmine 7.
+-   Use HTTP status 422 for invalid SLA type JavaScript updates across Rack
+    versions, including Redmine 5.1.
+-   Make the SLA level context-menu browser test target a non-link cell across
+    Redmine layouts, retaining all menu action assertions.
+
 ## 3.0.4 - 2026-09-25
 
 ### Fixed

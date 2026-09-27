@@ -146,7 +146,7 @@ class SlaTypesController < ApplicationController
       respond_to do |format|
         format.html { render :edit }
         format.api  { render_validation_errors(@sla_type) }
-        format.js   { head :unprocessable_content }
+        format.js   { head 422 }
       end
     end
   end
