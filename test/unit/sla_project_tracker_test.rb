@@ -80,4 +80,17 @@ class SlaProjectTrackerTest < ApplicationSlaUnitsTestCase
     end
   end
 
+  test "instance permissions are restricted to the assignment project" do
+    Member.where(user_id: 2).where.not(project_id: 1).destroy_all
+    manager = User.find(2)
+    allowed = SlaProjectTracker.find_by!(project_id: 1)
+    forbidden = SlaProjectTracker.find_by!(project_id: 2)
+    [:visible?, :editable?, :deletable?].each do |permission|
+      assert allowed.public_send(permission, manager)
+      assert_not forbidden.public_send(permission, manager)
+      assert_not allowed.public_send(permission, User.anonymous)
+      assert_not allowed.public_send(permission, nil)
+    end
+  end
+
 end

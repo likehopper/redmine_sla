@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Security
+
+-   Require project-scoped `manage_sla` permission when creating or moving
+    project-tracker assignments. Reject mismatched project context on direct
+    and bulk operations, and restrict form project choices to manageable projects.
+
 ## 3.0.4 - 2026-09-25
 
 ### Fixed
