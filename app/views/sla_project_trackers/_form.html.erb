@@ -1,12 +1,13 @@
   <%= error_messages_for f.object -%>
   <div class="box tabular">
     <% if @project.nil? %>
+    <% manageable_projects = Project.has_module(:sla).active.visible.where(Project.allowed_to_condition(User.current, :manage_sla)) %>
     <p>
-      <% if Project.has_module(:sla).active.visible.count < 1 then %>
+      <% if manageable_projects.empty? then %>
         <label><%= l(:label_project) %></label><%= l('sla_label.sla_project_tracker.miss_project') -%>
       <% else %>
         <%= f.select :project_id, options_from_collection_for_select(
-                Project.has_module(:sla).active.visible, :id, :name,
+                manageable_projects, :id, :name,
                 f.object.project.blank? ? 0 : f.object.project.id), :required => true, :include_blank => (f.object.new_record??true:false) -%>
       <% end %>
     </p>
