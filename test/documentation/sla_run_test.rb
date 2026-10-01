@@ -1,6 +1,7 @@
 # frozen_string_literal: true
+# SPDX-License-Identifier: GPL-2.0-or-later
 
-# File: redmine_sla/test/documentation/sla_creation_documentation_test.rb
+# File: redmine_sla/test/documentation/sla_run_test.rb
 # Redmine SLA - Redmine's Plugin
 #
 # This program is free software; you can redistribute it and/or

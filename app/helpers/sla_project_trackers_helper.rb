@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+# File: redmine_sla/app/helpers/sla_project_trackers_helper.rb
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 # Redmine SLA - Redmine's Plugin 
 #

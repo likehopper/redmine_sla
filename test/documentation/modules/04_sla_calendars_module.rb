@@ -1,6 +1,7 @@
 # frozen_string_literal: true
+# SPDX-License-Identifier: GPL-2.0-or-later
 
-# File: redmine_sla/test/documentation/modules/04_sla_calendar_module.rb
+# File: redmine_sla/test/documentation/modules/04_sla_calendars_module.rb
 # Redmine SLA - Redmine plugin
 #
 # This program is free software; you can redistribute it and/or
