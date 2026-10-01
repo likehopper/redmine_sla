@@ -1,6 +1,7 @@
 # frozen_string_literal: true
+# SPDX-License-Identifier: GPL-2.0-or-later
 
-# File: redmine_sla/app/helpers/queries/sla_caches_queries_helper.rb
+# File: redmine_sla/app/helpers/queries/sla_caches_queries_helper.rb
 # Redmine - project management software
 # Copyright (C) 2006-  Jean-Philippe Lang
 #

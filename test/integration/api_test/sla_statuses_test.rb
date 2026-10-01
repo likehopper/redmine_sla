@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+# File: redmine_sla/test/integration/api_test/sla_statuses_test.rb
+# SPDX-License-Identifier: GPL-2.0-or-later
 
 # Redmine SLA - Redmine's Plugin 
 #

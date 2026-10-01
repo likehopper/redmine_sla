@@ -1,6 +1,7 @@
 # frozen_string_literal: true
+# SPDX-License-Identifier: GPL-2.0-or-later
 
-# File: redmine_sla/lib/redmine_sla/views_issues_hook.rb
+# File: redmine_sla/lib/redmine_sla/hooks/views_issues_hook.rb
 # Purpose:
 #   Define Redmine view hooks used by the SLA plugin. This hook injects
 #   SLA rendering logic into the issue details view, allowing SLA-related

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
+# SPDX-License-Identifier: GPL-2.0-or-later
 
-# File: redmine_sla/lib/redmine_sla/views_layouts_hook.rb
+# File: redmine_sla/lib/redmine_sla/hooks/views_layouts_hook.rb
 # Purpose:
 #   Register a layout-level view hook that injects the plugin's stylesheet
 #   into Redmine's global layout (<head> section), so SLA-specific styles are
