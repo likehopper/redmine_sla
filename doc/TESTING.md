@@ -1,5 +1,31 @@
 # Testing
 
+## Unreleased technical corrections
+
+Validated on **2026-10-10** in isolated local test containers:
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 989 / 4856 | 989 / 4859 | 989 / 4859 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 989 / 4936 | 989 / 4939 | 989 / 4939 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 989 / 5428 | 989 / 5431 | 989 / 5431 |
+
+Each combination passed **158 unit, 430 functional, 310 integration/API,
+31 system and 60 documentation tests**, with zero failures, errors or skips.
+Cells record tests / assertions. MySQL retained `ONLY_FULL_GROUP_BY`,
+`STRICT_TRANS_TABLES` and `STRICT_ALL_TABLES` in the Rails session.
+
+Regression coverage includes SLA memoization after issue save and reload,
+native issue/time-entry filter exclusions and missing values, project-scoped
+filter visibility, archived projects, sorting, grouped counts and hour totals.
+Time entries without an issue are covered in queries and display getters.
+Chromium checks verify the displayed SLA group labels and counts in both
+native lists. The existing functional and API permission suites also passed.
+
+These results cover the exact versions above. No production deployment or
+release was performed, and no representative performance benchmark was run.
+The released 3.0.5 results below remain a separate historical validation.
+
 ## Redmine compatibility matrix
 
 Validated on 2026-09-27 for **3.0.5** (including the
