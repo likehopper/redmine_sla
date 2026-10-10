@@ -1,6 +1,6 @@
 # Testing
 
-## Unreleased technical corrections
+## Version 3.0.6 technical corrections
 
 Validated on **2026-10-10** in isolated local test containers:
 
@@ -22,8 +22,8 @@ Time entries without an issue are covered in queries and display getters.
 Chromium checks verify the displayed SLA group labels and counts in both
 native lists. The existing functional and API permission suites also passed.
 
-These results cover the exact versions above. No production deployment or
-release was performed, and no representative performance benchmark was run.
+These results cover the exact versions above. Validation preceded publication; no production deployment or
+representative performance benchmark was performed.
 The released 3.0.5 results below remain a separate historical validation.
 
 ## Redmine compatibility matrix
