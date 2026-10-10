@@ -1,5 +1,31 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   Discard memoized issue SLA values after saving or reloading an issue,
+    including project, tracker, priority and custom-field changes.
+-   Honor exclusion, presence and absence operators in native issue and
+    time-entry SLA respect filters. Selecting both Yes and No includes only
+    issues with a contractual term and spent-time value for that SLA type.
+-   Use Redmine's native SQL filter handling for SLA levels, including
+    presence and absence operators.
+-   Use explicit native-query joins for SLA sorting and grouping, including
+    strict MySQL. Align group counts and totals with displayed Yes/No/missing
+    values and SLA level names.
+-   Render empty SLA values for time entries without an issue and include
+    these entries in SLA absence and exclusion filters.
+
+### Tests
+
+-   Cover issue SLA cache freshness and native issue/time-entry SLA filter
+    results, sorting and grouping for priority and custom-field levels.
+-   Cover native SLA filter choices for allowed, forbidden and archived
+    projects, users without SLA permission and anonymous users.
+-   Verify SLA group labels and counts in Chromium on native issue and
+    time-entry lists.
+
 ## 3.0.5 - 2026-09-27
 
 ### Security

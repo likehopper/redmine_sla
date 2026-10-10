@@ -34,7 +34,7 @@ module RedmineSla
 
       # Delegates SLA level retrieval to the associated issue.
       def get_sla_level
-        issue.get_sla_level
+        issue&.get_sla_level
       end
 
       # get_sla_respect_1, get_sla_respect_2, ... one per SLA type, delegating
@@ -45,7 +45,7 @@ module RedmineSla
 
       def method_missing(method_name, *args, &block)
         if (match = SLA_RESPECT_METHOD.match(method_name.to_s))
-          return issue.get_sla_respect(match[1].to_i)
+          return issue&.get_sla_respect(match[1].to_i)
         end
         super
       end
