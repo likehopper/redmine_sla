@@ -119,4 +119,31 @@ class SlaProjectVisibilityTest < ApplicationSlaUnitsTestCase
     end
   end
 
+  test "issue and time entry SLA filters respect project permissions" do
+    [IssueQuery, TimeEntryQuery].each do |klass|
+      allowed = klass.new(project: Project.find(1)).available_filters
+      assert_equal [1, 2], allowed.fetch('slas.sla_level_id')[:values].map { |_, id| id.to_i }.sort
+
+      forbidden = klass.new(project: Project.find(2)).available_filters
+      assert_empty forbidden.keys.grep(/\Aslas\./)
+    end
+  end
+
+  test "issue and time entry SLA filters are absent without permission" do
+    [User.find(5), User.anonymous].each do |user|
+      User.current = user
+      [IssueQuery, TimeEntryQuery].each do |klass|
+        assert_empty klass.new(project: Project.find(1)).available_filters.keys.grep(/\Aslas\./)
+      end
+    end
+  end
+
+  test "issue and time entry SLA filters are absent for archived projects" do
+    project = Project.find(1)
+    project.update_column(:status, Project::STATUS_ARCHIVED)
+    [IssueQuery, TimeEntryQuery].each do |klass|
+      assert_empty klass.new(project: project).available_filters.keys.grep(/\Aslas\./)
+    end
+  end
+
 end
