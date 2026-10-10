@@ -14,7 +14,7 @@
 
 ## Overview
 
-Current version: **3.0.5**. See the [changelog](CHANGELOG.md) for release details.
+Current version: **3.0.6**. See the [changelog](CHANGELOG.md) for release details.
 
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
@@ -195,9 +195,9 @@ Fully manageable through UI and REST API:
 | `Rails`            | >= 6.1                                            |
 | `Database`         | PostgreSQL >= 11, MySQL >= 8.0 or MariaDB >= 10.2 |
 
-Version **3.0.5** has been tested on Redmine **5.1.13,
+Version **3.0.6** has been tested on Redmine **5.1.13,
 6.1.4 and 7.0.1**, with all five suites on PostgreSQL, MariaDB and strict
-MySQL. See the [compatibility matrix](doc/TESTING.md#redmine-compatibility-matrix)
+MySQL. See the [compatibility matrix](doc/TESTING.md#version-306-technical-corrections)
 for exact runtime versions and results.
 
 ------------------------------------------------------------------------
@@ -283,7 +283,14 @@ Plugin is ready to use.
 
 ------------------------------------------------------------------------
 
-## Upgrade to 3.0.5
+## Upgrade to 3.0.6
+
+Update the plugin files and restart Redmine. This release introduces no new
+schema migration relative to 3.0.5. It fixes stale issue SLA values and native
+query filters, sorting and grouping, including time entries without an issue.
+See the [validation results](doc/TESTING.md#version-306-technical-corrections).
+
+### Previous upgrade: 3.0.5
 
 Update the plugin files and restart Redmine. This release introduces no new
 schema migration relative to 3.0.4; when upgrading from an older version, run
