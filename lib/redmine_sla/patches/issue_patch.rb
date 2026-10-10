@@ -43,6 +43,20 @@ module RedmineSla
         @sla_cache = SlaCache.find_by_issue_id(id)
       end
 
+      # Active Record reloads attributes and associations, but leaves plugin
+      # instance variables intact. Discard SLA values read before the reload.
+      module ReloadMethods
+        def reload(*args, **kwargs)
+          super.tap { clear_sla_memoized_values }
+        end
+      end
+
+      def clear_sla_memoized_values
+        %i[@sla_cache @sla_term_cache @sla_spent_cache].each do |name|
+          remove_instance_variable(name) if instance_variable_defined?(name)
+        end
+      end
+
       # Returns the SLA level associated with the current issue, if any.
       def get_sla_level
         self.get_sla_cache.sla_level if ! self.get_sla_cache.nil?
@@ -124,11 +138,13 @@ module RedmineSla
       #   - registers an after_save callback to refresh SLA cache when
       #     project or tracker changes.
       def self.included(base)
+        base.prepend(ReloadMethods)
         base.extend(ClassMethods)
         base.send(:include, InstanceMethods)
         base.class_eval do
           # After issue update, if project or tracker changed then refresh sla_cache !!!
           after_save :sla_cache_update
+          after_save :clear_sla_memoized_values
         end
       end
 
