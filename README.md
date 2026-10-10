@@ -1,4 +1,4 @@
-# redmine_sla
+# <img src="assets/images/sla_64.png" width="64" height="64" alt=""> Redmine SLA
 
 ![Redmine Version](https://img.shields.io/badge/Redmine-5.x+-blue)
 ![Ruby](https://img.shields.io/badge/Ruby-2.7+-red)
