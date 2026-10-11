@@ -157,8 +157,8 @@ class SlaCachesController < ApplicationController
   end
 
   # Explain the SLA calculation for a single issue, on demand.
-  # Read-only: queries sla_explain_level/sla_explain_spent, which mirror the
-  # production functions but never write to sla_caches/sla_cache_spents.
+  # Read-only: RedmineSla::SlaExplanation recomputes, in Ruby, what the
+  # production SQL functions do, and never writes to sla_caches/sla_cache_spents.
   # Works even when the issue has no SlaCache row yet (e.g. to explain why
   # no SLA level matched at all).
   def explain

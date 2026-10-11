@@ -129,16 +129,6 @@ namespace :sla do
 
   end
 
-  def init_task
-    unless ENV['DRY_RUN'].nil?
-    trace "\n!!! Dry-run execution !!!\n"
-    end
-  end
-
-  def trace(msg)
-    puts msg
-  end
-
 end
 
 namespace :redmine do

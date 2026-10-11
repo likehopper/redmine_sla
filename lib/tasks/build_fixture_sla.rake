@@ -660,16 +660,6 @@ namespace :redmine do
 
       end # task :build_fixture => :environment do
 
-    def init_task
-      unless ENV['DRY_RUN'].nil?
-      trace "\n!!! Dry-run execution !!!\n"
-      end
-    end # def init_task
-
-    def trace(msg)
-      puts msg
-    end # def trace(msg)
-
     end # namespace :redmine_sla do
 
   end # namespace :plugins do

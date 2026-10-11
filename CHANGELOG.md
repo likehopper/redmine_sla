@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Removed
+
+-   Drop the unused SQL functions `sla_get_level_overlap` (superseded by the
+    schedule overlap validation) and, on PostgreSQL, `sla_explain_level` and
+    `sla_explain_spent` (the "Explain" view uses the Ruby explanation
+    service on every database). Requires the plugin migration.
+-   Remove the unused `init_task`/`trace` helpers from the plugin Rake tasks.
+
 ## 3.1.1 - 2026-10-16
 
 ### Fixed
