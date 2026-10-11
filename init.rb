@@ -127,6 +127,11 @@ RedmineApp::Application.config.after_initialize do
     IssueCustomField.send(:include, RedmineSla::Patches::IssueCustomFieldPatch)
   end
 
+  # Invalidate SLA caches when Redmine changes or reassigns enumerations
+  unless CustomFieldEnumeration.included_modules.include? RedmineSla::Patches::CustomFieldEnumerationPatch
+    CustomFieldEnumeration.send(:include, RedmineSla::Patches::CustomFieldEnumerationPatch)
+  end
+
   # Extend Issue with SLA computation methods
   unless Issue.included_modules.include? RedmineSla::Patches::IssuePatch
     Issue.send(:include, RedmineSla::Patches::IssuePatch)

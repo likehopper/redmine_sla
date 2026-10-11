@@ -284,6 +284,12 @@ for the scenarios.
 
 ### Scope regression coverage
 
+`sla_cache_invalidation_test.rb` also covers custom field and enumeration
+changes, deletion with reassignment, unrelated fields, validation failures,
+and transaction rollback. The model callbacks delete caches only for SLA
+levels using the affected field; spent caches follow the foreign key cascade.
+Calculations are rebuilt on demand, within the existing SLA cache lifecycle.
+
 `test/unit/sla_explicit_query_scopes_test.rb` checks association sorting,
 grouped counts and row preservation. `sla_cache_scope_operations_test.rb`
 checks project/issue visibility, project purges including historical orphans,
