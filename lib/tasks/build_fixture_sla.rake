@@ -25,6 +25,10 @@ Available UPDATE SLA options:
   ff_red folder with redmine fixtures ( default: plugins/redmine_sla/files/src_redmine/ )
   ff_sla folder with sla fixtures ( default: plugins/redmine_sla/files/src_sla/ )
 
+Each CSV row is an issue created, assigned, resolved and closed at the given
+dates. The optional issue_status_changes column adds status changes after this
+closing, e.g. a reopening: "2021-11-16 14:00:00|New;2021-11-16 15:00:00|Closed".
+
 Example:
   rake --trace -f Rakefile --trace redmine:plugins:redmine_sla:build_fixture RAILS_ENV=development
 END_DESC
@@ -240,6 +244,12 @@ namespace :redmine do
         fields_sla_types = file_in_csv_header.select { |field| field.to_s.start_with?("sla_type") }
 
         file_in_csv_content = CSV.parse(File.read(file_in_csv), headers: true)
+
+        # Ids for status changes after the first closing (issue_status_changes),
+        # after those of the standard journals so that these keep their ids
+        extra_journal_id = file_in_csv_content.size * 3
+        extra_journal_detail_id = file_in_csv_content.size * 6
+
         file_in_csv_content.each_with_index do |row|
 
           # Auto create project if necessary
@@ -368,7 +378,9 @@ namespace :redmine do
 
           end
 
-          Rails.logger.info "#{taskname} FOUND project_id = #{project_id}" 
+          # The row's own project: rows of a project need not be contiguous
+          issue_project_id = projects[row["project_name"]]["id"]
+          Rails.logger.info "#{taskname} FOUND project_id = #{issue_project_id}"
 
           # Search for tracker
           if ( trackers[row["tracker_name"]].nil? )
@@ -391,7 +403,7 @@ namespace :redmine do
               "id" => issue_id,
               "subject" => row["issue_subject"],
               "description" => row["issue_description"],
-              "project_id" => project_id,
+              "project_id" => issue_project_id,
               "tracker_id" => tracker_id,
               "assigned_to_id" => row["resolver"], # role resolver = user developer & sysadmin
               "author_id" => 5, # user reporter
@@ -521,6 +533,42 @@ namespace :redmine do
             "value" => issue_statuses["Closed"]["id"],
           }
           journal_details[journal_detail_identifier_6] = journal_detail_new
+
+          # Optional status changes after the first closing, e.g. a reopening:
+          # "date|status;date|status". As Redmine does, closed_on keeps the
+          # last closing date, even once the issue is reopened.
+          previous_status = "Closed"
+          row["issue_status_changes"].to_s.split(";").each do |change|
+            change_date, change_status = change.split("|").map(&:strip)
+            if ( issue_statuses[change_status].nil? )
+              raise Exception.new("#{taskname} NOT FOUND status [ #{change_status} ] in issue_status_changes")
+            end
+
+            extra_journal_id += 1
+            journal_identifier = issue_identifier+"_journal_"+extra_journal_id.to_s.rjust(4,"0")
+            journals[journal_identifier] = {
+              "id" => extra_journal_id,
+              "user_id" => 2, # user manager
+              "journalized_id" => issue_id,
+              "journalized_type" => "Issue",
+              "created_on" => change_date,
+              "notes" => "Issue #{change_status} after closing",
+            }
+            extra_journal_detail_id += 1
+            journal_details[journal_identifier+"_journal_detail_"+extra_journal_detail_id.to_s.rjust(4,"0")] = {
+              "id" => extra_journal_detail_id,
+              "journal_id" => extra_journal_id,
+              "property" => "attr",
+              "prop_key" => "status_id",
+              "old_value" => issue_statuses[previous_status]["id"],
+              "value" => issue_statuses[change_status]["id"],
+            }
+
+            issue_new["status_id"] = issue_statuses[change_status]["id"]
+            issue_new["updated_on"] = change_date
+            issue_new["closed_on"] = change_date if issue_statuses[change_status]["is_closed"]
+            previous_status = change_status
+          end
 
           # Add fixture 
           fixture_id += 1
