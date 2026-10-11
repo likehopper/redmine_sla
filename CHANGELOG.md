@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   Stop SLA calculation for projects whose SLA module is disabled. Their
+    SLA cache is purged when the module is disabled and is no longer rebuilt;
+    their project-tracker SLA configuration is kept and applies again once
+    the module is re-enabled. The issue "Explain" view lists no SLA level
+    for such projects either. Requires the plugin migration.
+-   `update_sla` now processes all projects by default: it updates the SLA
+    cache of projects with the SLA module and purges the cache left on the
+    others. The new `projects=[all,with_sla,without_sla]` option restricts
+    it, e.g. `projects=without_sla` to only clean up the cache.
+
 ## 3.1.0 - 2026-10-12
 
 ### Added

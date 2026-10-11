@@ -697,6 +697,26 @@ class SlaCachesControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
+  test "should forbidden on get explain as admin when the SLA module is disabled" do
+    issue_id = SlaCache.where(project: 1).order(:id).first.issue_id
+    Project.find(1).disable_module!(:sla)
+    @request.session[:user_id] = 1
+    with_settings :default_language => "en" do
+      get :explain, params: { id: issue_id }
+      assert_response :forbidden
+    end
+  end
+
+  test "should forbidden on get explain as manager when the SLA module is disabled" do
+    issue_id = SlaCache.where(project: 1).order(:id).first.issue_id
+    Project.find(1).disable_module!(:sla)
+    @request.session[:user_id] = 2
+    with_settings :default_language => "en" do
+      get :explain, params: { id: issue_id }
+      assert_response :forbidden
+    end
+  end
+
   test "should success on get explain as admin for an issue with no matching SLA level" do
     issue = Issue.where(project_id: 1, tracker_id: 2).first # tracker with no sla_project_trackers association
     @request.session[:user_id] = 1
