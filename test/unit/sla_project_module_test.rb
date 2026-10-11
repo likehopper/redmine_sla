@@ -20,7 +20,7 @@
 # Purpose:
 #   Disabling the SLA module of a project keeps its SLA configuration,
 #   purges its SLA cache and stops any further SLA calculation, explanation
-#   included. The update_sla task cleans up the cache left behind.
+#   included. See sla_update_sla_task_test.rb for the update_sla clean-up.
 #
 # Redmine SLA - Redmine's Plugin
 
@@ -89,41 +89,6 @@ class SlaProjectModuleTest < ApplicationSlaUnitsTestCase
     assert_empty explanation.spent(1)
   end
 
-  test "update_sla purges by default the cache left on projects without the module" do
-    other_project_ids = SlaCache.where.not(project_id: @project.id).distinct.pluck(:project_id)
-    assert_not_empty other_project_ids
-    # Bypass the Project patch, as a direct SQL change to enabled_modules would.
-    EnabledModule.where(project_id: @project.id, name: 'sla').delete_all
-
-    run_update_sla
-
-    assert_not SlaCache.where(project_id: @project.id).exists?
-    assert_equal other_project_ids.sort, SlaCache.distinct.pluck(:project_id).sort
-  end
-
-  test "update_sla projects=without_sla only purges projects without the module" do
-    EnabledModule.where(project_id: @project.id, name: 'sla').delete_all
-    other_cache = SlaCache.where.not(project_id: @project.id).first
-    SlaCache.where(id: other_cache.id).delete_all
-
-    run_update_sla('projects' => 'without_sla')
-
-    assert_not SlaCache.where(project_id: @project.id).exists?
-    assert_not SlaCache.where(id: other_cache.id).exists?
-  end
-
-  test "update_sla projects=with_sla leaves projects without the module untouched" do
-    EnabledModule.where(project_id: @project.id, name: 'sla').delete_all
-
-    run_update_sla('projects' => 'with_sla')
-
-    assert SlaCache.where(project_id: @project.id).exists?
-  end
-
-  test "update_sla rejects an unknown projects option" do
-    assert_raises(SystemExit) { run_update_sla('projects' => 'unknown') }
-  end
-
   test "re-enabling the module calculates again from the kept configuration" do
     expected_level_id = @issue.get_sla_level.id
     @project.disable_module!(:sla)
@@ -132,18 +97,5 @@ class SlaProjectModuleTest < ApplicationSlaUnitsTestCase
     issue = Issue.find(@issue.id)
     assert_equal expected_level_id, issue.get_sla_level&.id
     assert_not_nil issue.get_sla_spent(1)
-  end
-
-  private
-
-  def run_update_sla(env = {})
-    # The task itself: its update_sla alias already ran in the test bootstrap.
-    task = Rake::Task['sla:update']
-    saved = env.keys.to_h { |key| [key, ENV[key]] }
-    env.each { |key, value| ENV[key] = value }
-    task.reenable
-    capture_io { task.invoke }
-  ensure
-    saved&.each { |key, value| ENV[key] = value }
   end
 end

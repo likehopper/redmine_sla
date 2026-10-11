@@ -13,6 +13,13 @@
     cache of projects with the SLA module and purges the cache left on the
     others. The new `projects=[all,with_sla,without_sla]` option restricts
     it, e.g. `projects=without_sla` to only clean up the cache.
+-   `update_sla` now applies its `scope` option, previously ignored:
+    `inprogress` (default) updates open issues and closed issues not updated
+    since their closing, `miss` only issues without SLA cache, `all` every
+    issue. `scope=miss` no longer aborts the task.
+-   `update_sla` keeps the SLA cache of projects not active (closed,
+    archived) as it was instead of purging it, since it was rebuilt as soon
+    as an issue was displayed.
 
 ## 3.1.0 - 2026-10-12
 

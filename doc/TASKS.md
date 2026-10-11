@@ -17,3 +17,11 @@ Projects to process: `projects=all` (default), `projects=with_sla` or
 cache updated; on the others, the SLA cache left behind is purged while their
 SLA configuration is kept. Use `projects=without_sla` to only clean up the
 cache, for example after disabling the SLA module on several projects.
+
+Issues to process: `scope=inprogress` (default) updates open issues, and
+closed issues whose SLA spent time was not updated since their closing, so
+their final value is settled once. `scope=miss` only calculates issues without
+SLA cache; `scope=all` updates every issue.
+
+Projects not active (closed, archived) are passed: their SLA cache is kept as
+it was, nothing is updated or purged.
