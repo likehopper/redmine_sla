@@ -25,7 +25,7 @@
 require File.expand_path('../../application_sla_units_test_case', __FILE__)
 
 class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
-  test "calendar update invalidates only caches using its levels" do
+  test "calendar update invalidates caches of all competing levels" do
     calendar = calendar_with_cached_level
 
     assert_only_levels_invalidated(level_ids_for(calendar)) do
@@ -33,7 +33,7 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     end
   end
 
-  test "schedule update invalidates only caches using its calendar" do
+  test "schedule update invalidates caches of all competing levels" do
     schedule = SlaSchedule.unscoped.detect { |record| level_ids_for(record.sla_calendar).any? }
 
     assert_only_levels_invalidated(level_ids_for(schedule.sla_calendar)) do
@@ -53,7 +53,7 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     end
   end
 
-  test "calendar holiday update invalidates only caches using its calendar" do
+  test "calendar holiday update invalidates caches of all competing levels" do
     calendar_holiday = SlaCalendarHoliday.unscoped.detect do |record|
       level_ids_for(record.sla_calendar).any?
     end
@@ -102,6 +102,170 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     assert_equal cache_ids, SlaCache.unscoped.order(:id).pluck(:id)
   end
 
+  test "creating a schedule invalidates its calendar caches" do
+    calendar = calendar_with_cached_level
+    assert_only_levels_invalidated(level_ids_for(calendar)) do
+      SlaSchedule.create!(sla_calendar: calendar, dow: 6,
+                          start_time: "09:00", end_time: "10:00", match: true)
+    end
+  end
+
+  test "creating a calendar holiday invalidates its calendar caches" do
+    calendar = calendar_with_cached_level
+    holiday = SlaHoliday.create!(name: "New exclusion", date: "2030-01-01")
+    assert_only_levels_invalidated(level_ids_for(calendar)) do
+      SlaCalendarHoliday.create!(sla_calendar: calendar, sla_holiday: holiday, match: false)
+    end
+  end
+
+  test "moving a schedule invalidates both calendars" do
+    schedule = SlaSchedule.unscoped.find_by!(sla_calendar_id: 1)
+    destination = SlaCalendar.find(2)
+    ids = level_ids_for(schedule.sla_calendar) + level_ids_for(destination)
+    assert_only_levels_invalidated(ids) do
+      schedule.update!(sla_calendar: destination, dow: 6,
+                       start_time: "09:00", end_time: "10:00")
+    end
+  end
+
+  test "moving a calendar holiday invalidates both calendars" do
+    link = SlaCalendarHoliday.unscoped.find_by!(sla_calendar_id: 1)
+    destination = SlaCalendar.find(2)
+    holiday = SlaHoliday.create!(name: "Moved exclusion", date: "2030-01-01")
+    ids = level_ids_for(link.sla_calendar) + level_ids_for(destination)
+    assert_only_levels_invalidated(ids) do
+      link.update!(sla_calendar: destination, sla_holiday: holiday)
+    end
+  end
+
+  test "replacing a linked holiday invalidates its calendar" do
+    link = SlaCalendarHoliday.unscoped.find_by!(sla_calendar_id: 1)
+    holiday = SlaHoliday.create!(name: "Replacement exclusion", date: "2030-01-01")
+    assert_only_levels_invalidated(level_ids_for(link.sla_calendar)) do
+      link.update!(sla_holiday: holiday)
+    end
+  end
+
+  test "destroying a linked holiday invalidates all its calendar caches" do
+    holiday = SlaCalendarHoliday.unscoped.find_by!(sla_calendar_id: 1).sla_holiday
+    ids = linked_calendar_ids(holiday).flat_map { |id| level_ids_for(SlaCalendar.find(id)) }
+    assert_only_levels_invalidated(ids) { holiday.destroy! }
+    assert_empty SlaCalendarHoliday.unscoped.where(sla_holiday_id: holiday.id)
+  end
+
+  test "destroying a calendar holiday invalidates its calendar caches" do
+    link = SlaCalendarHoliday.unscoped.find_by!(sla_calendar_id: 1)
+    assert_only_levels_invalidated(level_ids_for(link.sla_calendar)) { link.destroy! }
+  end
+
+  test "destroying a calendar invalidates its caches and spent caches" do
+    calendar = calendar_with_cached_level
+    assert_only_levels_invalidated(level_ids_for(calendar)) { calendar.destroy! }
+    assert_empty SlaSchedule.unscoped.where(sla_calendar_id: calendar.id)
+    assert_empty SlaCalendarHoliday.unscoped.where(sla_calendar_id: calendar.id)
+  end
+
+  test "nested schedule deletion invalidates its calendar caches" do
+    calendar = calendar_with_cached_level
+    schedule = calendar.sla_schedules.first
+    assert_only_levels_invalidated(level_ids_for(calendar)) do
+      calendar.update!(sla_schedules_attributes: [{id: schedule.id, _destroy: "1"}])
+    end
+    assert_not SlaSchedule.exists?(schedule.id)
+  end
+
+  test "rolling back a calendar change restores caches and spent caches" do
+    calendar = calendar_with_cached_level
+    cache_ids = SlaCache.unscoped.order(:id).pluck(:id)
+    spent_ids = SlaCacheSpent.unscoped.order(:id).pluck(:id)
+    assert_not_empty spent_ids
+    SlaCalendar.transaction(requires_new: true) do
+      assert_only_levels_invalidated(level_ids_for(calendar)) do
+        calendar.update!(name: "Rollback calendar")
+      end
+      raise ActiveRecord::Rollback
+    end
+    assert_equal cache_ids, SlaCache.unscoped.order(:id).pluck(:id)
+    assert_equal spent_ids, SlaCacheSpent.unscoped.order(:id).pluck(:id)
+  end
+
+  test "changing a competing calendar invalidates caches on the other level of the same SLA" do
+    level = SlaLevel.find(4)
+    competing = SlaLevel.find(5)
+    assert_equal level.sla_id, competing.sla_id
+    assert_not_equal level.sla_calendar_id, competing.sla_calendar_id
+    schedule = SlaSchedule.unscoped.find_by!(sla_calendar_id: competing.sla_calendar_id)
+    assert_only_levels_invalidated([level.id, competing.id]) do
+      schedule.update!(match: !schedule.match)
+    end
+  end
+
+  test "creating a level invalidates existing candidates for the same SLA" do
+    level = SlaLevel.find(4)
+    calendar = SlaCalendar.create!(name: "Additional candidate calendar")
+    assert_only_levels_invalidated(SlaLevel.unscoped.where(sla_id: level.sla_id).pluck(:id)) do
+      SlaLevel.create!(name: "Additional candidate", sla_id: level.sla_id, sla_calendar: calendar)
+    end
+  end
+
+  test "moving a level invalidates candidates of both the old and new SLA" do
+    level = SlaLevel.find(4)
+    destination = SlaLevel.find(6).sla
+    ids = SlaLevel.unscoped.where(sla_id: [level.sla_id, destination.id]).pluck(:id)
+    assert_only_levels_invalidated(ids) { level.update!(sla: destination) }
+  end
+
+  test "moving a term invalidates both levels" do
+    term = SlaLevelTerm.unscoped.find_by!(sla_level_id: 1)
+    destination = SlaLevel.find(2)
+    assert_only_levels_invalidated([term.sla_level_id, destination.id]) do
+      term.update!(sla_level: destination, sla_type_id: 2)
+    end
+  end
+
+  test "changing a level calendar invalidates its competing levels" do
+    level = SlaLevel.find(4)
+    calendar = SlaCalendar.create!(name: "Replacement candidate calendar")
+    ids = SlaLevel.unscoped.where(sla_id: level.sla_id).pluck(:id)
+    assert_only_levels_invalidated(ids) { level.update!(sla_calendar: calendar) }
+  end
+
+  test "creating a term invalidates its level caches" do
+    assert_only_levels_invalidated([2]) do
+      SlaLevelTerm.create!(sla_level_id: 2, sla_type_id: 2, sla_priority_id: 1, term: 120)
+    end
+  end
+
+  test "destroying a term invalidates its level caches" do
+    term = SlaLevelTerm.unscoped.find_by!(sla_level_id: 1)
+    assert_only_levels_invalidated([term.sla_level_id]) { term.destroy! }
+  end
+
+  test "destroying a level invalidates its caches and spent caches" do
+    level = SlaLevel.find(4)
+    assert_only_levels_invalidated([level.id]) { level.destroy! }
+  end
+
+  test "a changed competing schedule recalculates the selected level on next read" do
+    schedule = SlaSchedule.unscoped.find_by!(sla_calendar_id: 4, dow: 2,
+                                            start_time: "00:00:00")
+    schedule.update!(match: false)
+    issue = Issue.find(34).dup
+    issue.subject = "Competing calendar recalculation"
+    travel_to(Time.utc(2021, 12, 7, 8, 0)) { issue.save! }
+    assert_equal Time.utc(2021, 12, 7, 8, 0), issue.reload.created_on
+    assert_equal 4, SlaCache.find_by_issue_id(issue.id).sla_level_id
+    cache = SlaCache.unscoped.find_by!(issue_id: issue.id)
+    SlaCacheSpent.find_by_issue_and_type_id(issue, 1)
+    assert SlaCacheSpent.unscoped.exists?(sla_cache_id: cache.id)
+
+    schedule.update!(match: true)
+
+    assert_not SlaCache.unscoped.exists?(cache.id)
+    assert_not SlaCacheSpent.unscoped.exists?(sla_cache_id: cache.id)
+    assert_equal 5, SlaCache.find_by_issue_id(issue.id).sla_level_id
+  end
+
   private
 
   def cached_level_ids
@@ -113,7 +277,8 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
   end
 
   def level_ids_for(calendar)
-    SlaLevel.unscoped.where(sla_calendar_id: calendar.id).pluck(:id)
+    sla_ids = SlaLevel.unscoped.where(sla_calendar_id: calendar.id).pluck(:sla_id)
+    SlaLevel.unscoped.where(sla_id: sla_ids).pluck(:id)
   end
 
   def linked_calendar_ids(holiday)
@@ -122,13 +287,18 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
 
   def assert_only_levels_invalidated(level_ids)
     affected_ids = SlaCache.unscoped.where(sla_level_id: level_ids).pluck(:id)
-    unaffected = SlaCache.unscoped.where.not(sla_level_id: level_ids).first
+    unaffected_ids = SlaCache.unscoped.where.not(sla_level_id: level_ids).order(:id).pluck(:id)
     assert_not_empty affected_ids
+
+    assert_not_empty SlaCacheSpent.unscoped.where(sla_cache_id: affected_ids).pluck(:id)
+    unaffected_spent_ids = SlaCacheSpent.unscoped.where(sla_cache_id: unaffected_ids).order(:id).pluck(:id)
 
     yield
 
     assert_empty SlaCache.unscoped.where(id: affected_ids)
-    assert SlaCache.unscoped.exists?(unaffected.id) if unaffected
+    assert_equal unaffected_ids, SlaCache.unscoped.where(id: unaffected_ids).order(:id).pluck(:id)
     assert_empty SlaCacheSpent.unscoped.where(sla_cache_id: affected_ids)
+    assert_equal unaffected_spent_ids,
+                 SlaCacheSpent.unscoped.where(sla_cache_id: unaffected_ids).order(:id).pluck(:id)
   end
 end

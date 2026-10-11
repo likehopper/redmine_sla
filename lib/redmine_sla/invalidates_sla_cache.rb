@@ -33,7 +33,8 @@ module RedmineSla
     included do
       before_save :capture_sla_cache_level_ids, unless: :sla_description_only_change?
       after_save :invalidate_sla_cache
-      before_destroy :capture_sla_cache_level_ids
+      # Capture dependencies before dependent associations remove holiday links.
+      before_destroy :capture_sla_cache_level_ids, prepend: true
       after_destroy :invalidate_sla_cache
     end
 
