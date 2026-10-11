@@ -28,10 +28,12 @@ require File.expand_path('../../application_sla_units_test_case', __FILE__)
 class SlaUpdateSlaTaskTest < ApplicationSlaUnitsTestCase
   def setup
     @project = Project.find(1)
-    # Every fixture issue is closed, and settled by the test bootstrap run.
+    # Closed fixture issues are settled by the test bootstrap run.
     @open_issue = Issue.find(4)
     @open_issue.update_columns(status_id: IssueStatus.where(is_closed: false).order(:id).first.id)
-    @closed_issue_id = SlaCacheSpent.where(project_id: @project.id).where.not(issue_id: @open_issue.id).order(:issue_id).pick(:issue_id)
+    @closed_issue_ids = SlaCacheSpent.joins(issue: :status).where(project_id: @project.id, issue_statuses: { is_closed: true })
+                                     .where.not(issue_id: @open_issue.id).distinct.order(:issue_id).pluck(:issue_id)
+    @closed_issue_id = @closed_issue_ids.first
     assert_not_nil @closed_issue_id
   end
 
@@ -87,7 +89,7 @@ class SlaUpdateSlaTaskTest < ApplicationSlaUnitsTestCase
 
   test "scope defaults to open issues and closed issues not updated since closing" do
     SlaCache.where(issue_id: @closed_issue_id).delete_all
-    settled_issue_id = SlaCacheSpent.where(project_id: @project.id).where.not(issue_id: [@open_issue.id, @closed_issue_id]).pick(:issue_id)
+    settled_issue_id = @closed_issue_ids.second
 
     processed = run_update_sla
 
