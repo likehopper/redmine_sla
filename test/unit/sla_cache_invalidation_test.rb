@@ -266,7 +266,80 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     assert_equal 5, SlaCache.find_by_issue_id(issue.id).sla_level_id
   end
 
+  test "custom field update invalidates only levels using that field" do
+    assert_only_levels_invalidated(custom_field_level_ids) do
+      IssueCustomField.find(1).update!(description: 'Updated SLA priority field')
+    end
+  end
+
+  test "enumeration update invalidates only levels using its field" do
+    assert_only_levels_invalidated(custom_field_level_ids) do
+      CustomFieldEnumeration.find(1).update!(active: false)
+    end
+  end
+
+  test "enumeration creation invalidates only levels using its field" do
+    assert_only_levels_invalidated(custom_field_level_ids) do
+      CustomFieldEnumeration.create!(custom_field_id: 1, name: 'New priority', position: 5)
+    end
+  end
+
+  test "moving an enumeration invalidates levels using its previous field" do
+    assert_only_levels_invalidated(custom_field_level_ids) do
+      CustomFieldEnumeration.find(1).update!(custom_field_id: 2)
+    end
+  end
+
+  test "enumeration deletion without reassignment invalidates affected levels" do
+    assert_only_levels_invalidated(custom_field_level_ids) do
+      CustomFieldEnumeration.find(4).destroy
+    end
+  end
+
+  test "enumeration deletion with reassignment invalidates affected levels" do
+    enumeration = CustomFieldEnumeration.find(1)
+    values = enumeration.custom_values.pluck(:id)
+    assert_not_empty values
+
+    assert_only_levels_invalidated(custom_field_level_ids) do
+      enumeration.destroy(CustomFieldEnumeration.find(2))
+    end
+    assert_equal ['2'], CustomValue.where(id: values).distinct.pluck(:value)
+  end
+
+  test "custom field deletion removes affected caches" do
+    assert_only_levels_invalidated(custom_field_level_ids) do
+      IssueCustomField.find(1).destroy!
+    end
+  end
+
+  test "unrelated custom field changes preserve caches" do
+    cache_ids = SlaCache.unscoped.order(:id).pluck(:id)
+    IssueCustomField.find(2).update!(description: 'Unrelated field')
+    CustomFieldEnumeration.find(5).update!(active: false)
+    assert_equal cache_ids, SlaCache.unscoped.order(:id).pluck(:id)
+  end
+
+  test "invalid enumeration update preserves caches" do
+    cache_ids = SlaCache.unscoped.order(:id).pluck(:id)
+    assert_not CustomFieldEnumeration.find(1).update(name: '')
+    assert_equal cache_ids, SlaCache.unscoped.order(:id).pluck(:id)
+  end
+
+  test "rolled back enumeration update restores caches" do
+    cache_ids = SlaCache.unscoped.order(:id).pluck(:id)
+    CustomFieldEnumeration.transaction(requires_new: true) do
+      CustomFieldEnumeration.find(1).update!(active: false)
+      raise ActiveRecord::Rollback
+    end
+    assert_equal cache_ids, SlaCache.unscoped.order(:id).pluck(:id)
+  end
+
   private
+
+  def custom_field_level_ids
+    SlaLevel.unscoped.where(custom_field_id: 1).pluck(:id)
+  end
 
   def cached_level_ids
     SlaCache.unscoped.distinct.pluck(:sla_level_id)
