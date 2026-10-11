@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   Invalidate caches of competing levels in the same SLA when calendars,
+    schedules or holiday rules change, including level creation and changes
+    of SLA or calendar assignment.
+-   Remove calendar-holiday links when their calendar or holiday is destroyed,
+    capturing cache dependencies before dependent records are removed.
+
 ## 3.1.3 - 2026-10-18
 
 ### Fixed
