@@ -116,13 +116,16 @@ BEGIN
     -- Determine the calculation window: from the last cache update (or SLA start) to the closing date (or now)
     SELECT
       COALESCE(v_spent_updated_on, v_cache_start_date),
-      COALESCE(sla_get_date(closed_on), v_current_timestamp),
-      tracker_id,
-      project_id
+      -- closed_on only while the issue is closed: Redmine keeps it, as the
+      -- last closing date, when an issue is reopened.
+      COALESCE(sla_get_date(CASE WHEN issue_statuses.is_closed THEN issues.closed_on END), v_current_timestamp),
+      issues.tracker_id,
+      issues.project_id
     INTO
       v_window_start, v_window_end, v_issue_tracker_id, v_issue_project_id
     FROM issues
-    WHERE id = p_issue_id;
+    INNER JOIN issue_statuses ON ( issue_statuses.id = issues.status_id )
+    WHERE issues.id = p_issue_id;
 
     -- Prevent redundant updates if the cache is already newer than the issue's closing date
     IF ( v_spent_updated_on IS NOT NULL AND v_spent_updated_on > v_window_end ) THEN
@@ -191,11 +194,12 @@ BEGIN
         (
             SELECT DISTINCT issues.id AS issue_id,
                 sla_get_date(FIRST_VALUE(issues.created_on) OVER w) AS issue_created_on,
-                sla_get_date(FIRST_VALUE(issues.closed_on) OVER w) AS issue_closed_on,
+                sla_get_date(FIRST_VALUE(CASE WHEN issue_statuses.is_closed THEN issues.closed_on END) OVER w) AS issue_closed_on,
                 sla_get_date(FIRST_VALUE(issues.created_on) OVER w) AS journals_created_on,
                 COALESCE(FIRST_VALUE(CAST(journal_details.old_value AS SIGNED)) OVER w, issues.status_id) AS journal_detail_old_value,
                 COALESCE(FIRST_VALUE(CAST(journal_details.old_value AS SIGNED)) OVER w, issues.status_id) AS journal_detail_value
             FROM issues
+            INNER JOIN issue_statuses ON ( issue_statuses.id = issues.status_id )
             LEFT JOIN journals ON ( issues.id = journals.journalized_id )
             LEFT JOIN journal_details ON ( journals.id = journal_details.journal_id AND journal_details.property LIKE 'attr' AND journal_details.prop_key LIKE 'status_id' )
             WHERE issues.id = p_issue_id
@@ -203,11 +207,12 @@ BEGIN
         ) UNION (
             SELECT issues.id AS issue_id,
                 sla_get_date(issues.created_on) AS issue_created_on,
-                sla_get_date(issues.closed_on) AS issue_closed_on,
+                sla_get_date(CASE WHEN issue_statuses.is_closed THEN issues.closed_on END) AS issue_closed_on,
                 sla_get_date(journals.created_on) AS journals_created_on,
                 CAST(journal_details.old_value AS SIGNED) AS journal_detail_old_value,
                 CAST(journal_details.value AS SIGNED) AS journal_detail_value
             FROM issues
+            INNER JOIN issue_statuses ON ( issue_statuses.id = issues.status_id )
             INNER JOIN journals ON ( issues.id = journals.journalized_id )
             INNER JOIN journal_details ON ( journals.id = journal_details.journal_id AND journal_details.property LIKE 'attr' AND journal_details.prop_key LIKE 'status_id' )
             WHERE issues.id = p_issue_id
