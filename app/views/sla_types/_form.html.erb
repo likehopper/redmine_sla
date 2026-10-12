@@ -25,6 +25,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         <%= f.text_field :name, :required => true %>
       </p>
       <% end %>
+      <% if sla_type.safe_attribute?('description') %>
+      <p>
+        <%= f.text_area :description, :rows => 5, :class => 'wiki-edit' %>
+        <%= wikitoolbar_for 'sla_type_description' %>
+      </p>
+      <% end %>
   </div>
   <p>
     <% if f.object.new_record? %>

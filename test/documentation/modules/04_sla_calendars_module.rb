@@ -73,6 +73,7 @@ module SlaCalendarsDocumentationTest
       visit '/sla/calendars/new'
 
       fill_in 'sla_calendar_name', with: sla_calendar_name
+      fill_in 'sla_calendar_description', with: row['description'] if row['description'].present?
 
       # 2) Add all schedule rows before submitting the form
       sla_schedules.each do |dow, ranges|
@@ -92,7 +93,8 @@ module SlaCalendarsDocumentationTest
       assert_current_path sla_calendars_path
 
       # Search for the record
-      sla_calendar = SlaCalendar.find_by(name: sla_calendar_name)
+      sla_calendar = SlaCalendar.find_by!(name: sla_calendar_name)
+      assert_equal row['description'].to_s, sla_calendar.description.to_s
 
       # Validation and screenshot
       assert_text(l('sla_label.sla_calendar.notice_successful_create', id: "##{sla_calendar.id}"))

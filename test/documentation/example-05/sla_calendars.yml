@@ -18,6 +18,7 @@
 sla_calendars:
 
   - name: "Calendar HO tracker_change_request"
+    description: Calendar defining the matching working periods for this example.
     sla_schedules:
       Monday:
         - ["09:00","18:59",true]

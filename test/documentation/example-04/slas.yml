@@ -18,3 +18,4 @@
 slas:
 
   - name: SLA Support
+    description: Contract used for the requests in this example.

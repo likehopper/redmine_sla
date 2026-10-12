@@ -36,7 +36,7 @@ class Sla < ActiveRecord::Base
   
   validates_uniqueness_of :name, :case_sensitive => false
 
-  safe_attributes *%w[name]
+  safe_attributes *%w[name description]
 
   def self.visible(user=User.current)
     return all if user&.admin?

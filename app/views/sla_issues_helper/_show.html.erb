@@ -51,9 +51,9 @@ if User.current.allowed_to?(:view_sla, @project, :global => true)
 
     <ul class="flex-container">
       <li class="flex-item">&#9658;&nbsp;<%= link_to sla_cache.sla_level[:name], sla_level_path(sla_cache.sla_level),
-        title: l(:button_show)+" : "+l('sla_label.sla_level.singular') -%></li>
+        title: sla_description_tooltip(sla_cache.sla_level, l(:button_show)+" : "+l('sla_label.sla_level.singular')) -%></li>
       <li class="flex-item">&#9658;&nbsp;<%= link_to sla_cache.sla_level.sla_calendar[:name], sla_calendar_path(sla_cache.sla_level.sla_calendar),
-        title: l(:button_show)+" : "+l('sla_label.sla_calendar.singular') -%></li>
+        title: sla_description_tooltip(sla_cache.sla_level.sla_calendar, l(:button_show)+" : "+l('sla_label.sla_calendar.singular')) -%></li>
     </ul>
       <ul class="flex-container">      
 <%
@@ -79,7 +79,7 @@ if User.current.allowed_to?(:view_sla, @project, :global => true)
                 <%= sla_display sla_percent, issue.status.is_closed, Setting.plugin_redmine_sla["sla_display"] || 'bar - simple' -%>
               </td>
               <td style="vertical-align: bottom">
-                <strong><%= sla_type.name -%></strong>
+                <strong><%= sla_name_with_tooltip(sla_type) -%></strong>
               </td>
             </tr>
             <tr>

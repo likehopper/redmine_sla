@@ -17,6 +17,7 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 sla_levels:
 - name: Level Managed Services tracker_change_request HO
+  description: Terms associated with this SLA and calendar in the example.
   sla: SLA Managed Services tracker_change_request
   sla_calendar: Calendar HO tracker_change_request
 - name: Level Managed Services tracker_production_incident HO

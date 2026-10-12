@@ -14,7 +14,7 @@
 
 ## Overview
 
-Current version: **3.0.6**. See the [changelog](CHANGELOG.md) for release details.
+Current version: **3.1.0**. See the [changelog](CHANGELOG.md) for release details.
 
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
@@ -195,9 +195,9 @@ Fully manageable through UI and REST API:
 | `Rails`            | >= 6.1                                            |
 | `Database`         | PostgreSQL >= 11, MySQL >= 8.0 or MariaDB >= 10.2 |
 
-Version **3.0.6** has been tested on Redmine **5.1.13,
+Version **3.1.0** has been tested on Redmine **5.1.13,
 6.1.4 and 7.0.1**, with all five suites on PostgreSQL, MariaDB and strict
-MySQL. See the [compatibility matrix](doc/TESTING.md#version-306-technical-corrections)
+MySQL. See the [compatibility matrix](doc/TESTING.md#version-310-descriptions-and-list-corrections)
 for exact runtime versions and results.
 
 ------------------------------------------------------------------------
@@ -283,12 +283,29 @@ Plugin is ready to use.
 
 ------------------------------------------------------------------------
 
-## Upgrade to 3.0.6
+## Upgrade to 3.1.0
+
+Version **3.1.0** adds optional wiki descriptions to SLAs, SLA types, calendars
+and levels, and fixes HTTP 500 errors in list block columns. Descriptions appear
+on detail pages and as plain-text name tooltips (up to 250 characters).
+The API reads and writes the original wiki text.
+
+Back up the database, update the plugin files, then run:
+
+```sh
+bundle exec rake redmine:plugins:migrate NAME=redmine_sla RAILS_ENV=production
+```
+
+Restart Redmine after migration. Existing records retain their data and receive
+a nullable description. Rolling back the migration deletes description data;
+restore the previous plugin files as part of a downgrade.
+
+### Previous upgrade: 3.0.6
 
 Update the plugin files and restart Redmine. This release introduces no new
 schema migration relative to 3.0.5. It fixes stale issue SLA values and native
 query filters, sorting and grouping, including time entries without an issue.
-See the [validation results](doc/TESTING.md#version-306-technical-corrections).
+See the [validation results](doc/TESTING.md#version-310-descriptions-and-list-corrections).
 
 ### Previous upgrade: 3.0.5
 

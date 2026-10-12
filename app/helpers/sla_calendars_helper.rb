@@ -27,7 +27,7 @@ module SlaCalendarsHelper
 
   # Generates a link to a sla_calendar with name
   def link_to_sla_calendar_name(sla_calendar)
-    link_to sla_calendar.name, sla_calendar_url(sla_calendar, {:only_path => true})
+    link_to sla_calendar.name, sla_calendar_url(sla_calendar, {:only_path => true}), title: sla_description_tooltip(sla_calendar)
   end  
 
   def link_to_remove_fields(name, f)

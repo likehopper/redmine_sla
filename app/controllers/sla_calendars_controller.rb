@@ -206,6 +206,7 @@ class SlaCalendarsController < ApplicationController
   def sla_calendar_params
     params.require(:sla_calendar).permit(
       :name,
+      :description,
       sla_schedules_attributes: SlaSchedule.attribute_names.map(&:to_sym).push(:_destroy)
     )
   end   

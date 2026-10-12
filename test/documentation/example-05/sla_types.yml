@@ -17,4 +17,5 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 sla_types:
   - name: "Response time"
+    description: Time allowed for the first response to the request.
   - name: "Resolution deadline"

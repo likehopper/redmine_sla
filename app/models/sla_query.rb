@@ -32,6 +32,7 @@ class SlaQuery < Query
     @available_columns = []
     @available_columns << QueryColumn.new(:id, :sortable => "#{Sla.table_name}.id", :default_order => :asc, :groupable => false )
     @available_columns << QueryColumn.new(:name, :sortable => RedmineSla::DbDialect.case_sensitive_order("#{Sla.table_name}.name"), :default_order => :asc, :groupable => false )
+    @available_columns << QueryColumn.new(:description, :inline => false)
     @available_columns
   end
 

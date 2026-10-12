@@ -18,6 +18,7 @@
 api.sla_level do
   api.id @sla_level.id
   api.name @sla_level.name
+  api.description @sla_level.description
   api.sla @sla_level.sla
   api.sla_calendar @sla_level.sla_calendar
   api.custom_field @sla_level.custom_field
