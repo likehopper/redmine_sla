@@ -18,4 +18,5 @@
 slas:
 
   - name: "SLA bug"
+    description: Contract used for the requests in this example.
   - name: "SLA feature request"

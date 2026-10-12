@@ -31,6 +31,7 @@ class SlaCalendarQuery < Query
     @available_columns = []
     @available_columns << QueryColumn.new(:id, :sortable => "#{SlaCalendar.table_name}.id", :default_order => :asc, :groupable => false)
     @available_columns << QueryColumn.new(:name, :sortable => "#{SlaCalendar.table_name}.name", :default_order => :asc, :groupable => false)
+    @available_columns << QueryColumn.new(:description, :inline => false)
     @available_columns
   end
 

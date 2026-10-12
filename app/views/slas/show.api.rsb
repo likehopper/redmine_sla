@@ -18,4 +18,5 @@
 api.sla do
   api.id @sla.id
   api.name @sla.name
+  api.description @sla.description
 end

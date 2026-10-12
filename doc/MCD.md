@@ -23,6 +23,14 @@ During installation, twelve plugin-specific tables are created:
 
 ------------------------------------------------------------------------
 
+## Optional descriptions (3.1.0)
+
+Migration `202111112021022` adds a nullable `text` column named `description`
+to `slas`, `sla_types`, `sla_calendars` and `sla_levels`. Existing rows receive
+`NULL`; descriptions do not participate in SLA matching or time calculations.
+The field stores Redmine wiki source text. Reversing the migration removes
+these columns and their contents.
+
 ## External Redmine Tables Referenced
 
 The plugin relies on several Redmine core tables but does not create

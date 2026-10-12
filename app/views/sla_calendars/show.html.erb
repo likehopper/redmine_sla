@@ -27,6 +27,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
   </div>
 
   <h3>n°<%= @sla_calendar.id -%>&nbsp;:&nbsp;<%= @sla_calendar.name -%></h3>
+  <% if @sla_calendar.description.present? -%>
+    <div class="wiki sla-description"><%= textilizable @sla_calendar, :description -%></div>
+  <% end -%>
   
   <table border="1" margin="8px">
     <tr>
