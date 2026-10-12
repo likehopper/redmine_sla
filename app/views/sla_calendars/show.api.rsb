@@ -18,4 +18,5 @@
 api.sla_calendar do
   api.id @sla_calendar.id
   api.name @sla_calendar.name
+  api.description @sla_calendar.description
 end

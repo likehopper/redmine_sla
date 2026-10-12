@@ -17,6 +17,7 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 sla_calendars:
   - name: "Calendar TMA"
+    description: Calendar defining the matching working periods for this example.
     sla_schedules:
       Monday:
         - ["09:30","12:29",true]

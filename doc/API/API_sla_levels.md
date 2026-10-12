@@ -28,6 +28,13 @@ Returns a paginated list of Sla Levels. By default, it returns all Sla Levels.
 
 ### Creating a Sla Level
 
+Since version **3.1.0**, `description` is an optional string accepting the
+configured Redmine wiki syntax. List and detail responses return the source
+text, or `null` for existing records without a description. Creation and update
+requests accept it; send an empty string to clear it. HTML detail pages render
+the wiki formatting. Name tooltips in the supported lists and issue SLA block
+use plain text truncated to 250 characters; macros are not evaluated there.
+
 `POST /sla/levels.[format]`
 
 <u>Examples:</u>
@@ -40,6 +47,7 @@ DATA="$(cat <<-EOF
 {
   "sla_level": {
     "name": "Level Bug Tracker",
+    "description": "Terms applied to bugs on the business-hours calendar.",
     "sla_id": 1,
     "sla_calendar_id": 1
   }

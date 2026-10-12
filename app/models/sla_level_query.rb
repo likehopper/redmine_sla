@@ -37,6 +37,7 @@ class SlaLevelQuery < Query
     @available_columns << QueryColumn.new(:sla, :sortable => "#{Sla.table_name}.name", :default_order => :asc, :groupable => true)
     @available_columns << QueryColumn.new(:sla_calendar, :sortable => "#{SlaCalendar.table_name}.name", :default_order => :asc, :groupable => true)
     @available_columns << QueryColumn.new(:custom_field, :sortable => "#{CustomField.table_name}.name", :default_order => :asc, :groupable => true)
+    @available_columns << QueryColumn.new(:description, :inline => false)
     @available_columns
   end
 

@@ -27,6 +27,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
       <%= sla_calendar_form.label :name, :for => "sla_calendar_name"%><span class="required"> *</span>
       <%= sla_calendar_form.text_field :name, :id => "sla_calendar_name", :required => true %>
     </div>
+    <div>
+      <%= sla_calendar_form.label :description, l(:field_description), :for => "sla_calendar_description" %>
+      <%= sla_calendar_form.text_area :description, :id => "sla_calendar_description", :rows => 5, :class => "wiki-edit" %>
+      <%= wikitoolbar_for "sla_calendar_description" %>
+    </div>
     <fieldset>
       <legend><%= l('sla_label.sla_schedule.plural') %></legend>
       <%= sla_calendar_form.fields_for :sla_schedules do |sla_schedules_form| %>

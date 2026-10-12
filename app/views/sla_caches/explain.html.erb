@@ -65,7 +65,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
   <p class="nodata"><%= l(:label_sla_explain_no_term) %></p>
 <% else %>
   <% @sla_spent_explanations.each do |sla_type, intervals| %>
-    <h4><%= sla_type.name %></h4>
+    <h4><%= sla_name_with_tooltip(sla_type) %></h4>
     <table class="list">
       <thead>
         <tr>

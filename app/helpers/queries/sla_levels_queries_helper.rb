@@ -29,6 +29,8 @@ module Queries::SlaLevelsQueriesHelper
       case column.name
       when :id
         link_to_sla_level_id(item)        
+      when :name
+        sla_name_with_tooltip(item)
       when :sla
         link_to_sla_name(item.sla)        
       when :sla_calendar

@@ -35,6 +35,8 @@ module SlaTypesDocumentationTest
       # Open and fill out the form
       visit '/sla/types/new'
       fill_in 'sla_type_name', with: sla_type_name
+      expected_description = sla_type['description']
+      fill_in 'sla_type_description', with: expected_description if expected_description.present?
 
       # Take the photo and submit the form
       take_doc_screenshot(format("%02d-01-%02d-01-sla_type-new.png", id, idx))
@@ -43,6 +45,7 @@ module SlaTypesDocumentationTest
 
       # Search for the record
       sla_type = SlaType.find_by!(name: sla_type_name)
+      assert_equal expected_description.to_s, sla_type.description.to_s
 
       # Validation and screenshot
       assert_text(l('sla_label.sla_type.notice_successful_create', id: "##{sla_type.id}"))

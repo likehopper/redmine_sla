@@ -24,6 +24,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     <%= title l('sla_label.sla.show') %>
   </div>  
   <h3><%= @sla.name %></h3>
+  <% if @sla.description.present? %>
+    <div class="wiki sla-description"><%= textilizable @sla, :description %></div>
+  <% end %>
 </div>
 <% content_for :sidebar do %>
   <% render partial: 'slas/sidebar' %>

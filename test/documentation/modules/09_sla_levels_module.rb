@@ -38,6 +38,8 @@ module SlaLevelsDocumentationTest
       # Open and fill out the form
       visit '/sla/levels/new'
       fill_in 'sla_level_name', with: sla_level_name
+      expected_description = sla_level['description']
+      fill_in 'sla_level_description', with: expected_description if expected_description.present?
 
       # Resolve names -> records
       sla = Sla.find_by!(name: sla_name)
@@ -60,6 +62,7 @@ module SlaLevelsDocumentationTest
 
       # Search for the record
       sla_level = SlaLevel.find_by!(name: sla_level_name)
+      assert_equal expected_description.to_s, sla_level.description.to_s
       
       # Validation and screenshot
       assert_text(l('sla_label.sla_level.notice_successful_create', id: "##{sla_level.id}"))

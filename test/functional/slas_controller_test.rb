@@ -103,6 +103,19 @@ class SlasControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
+  # Regression: a block column (here the description) used to make the list
+  # fail with a 500 error, its partial reading an undefined `query`.
+  test "should get success on index with the description block column as admin" do
+    @request.session[:user_id] = 1
+    with_settings :default_language => "en" do
+      get :index, :params => {:set_filter => 1, :c => ['name', 'description']}
+      assert_response :success
+      # The description row spans the checkbox, name and buttons cells
+      assert_select 'tr#entity_id_1 + tr td.description[colspan="3"]',
+        :text => /#{Regexp.escape(Sla.find(1).description)}/
+    end
+  end
+
   test "should success on get new as admin" do
     @request.session[:user_id] = 1
     with_settings :default_language => "en" do

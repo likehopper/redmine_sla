@@ -27,7 +27,7 @@ module SlaTypesHelper
 
   # Generates a link to a sla_type with name
   def link_to_sla_type_name(sla_type)
-    link_to sla_type.name, sla_type_url(sla_type, {:only_path => true})
+    link_to sla_type.name, sla_type_url(sla_type, {:only_path => true}), title: sla_description_tooltip(sla_type)
   end
 
 end

@@ -1,5 +1,39 @@
 # Testing
 
+## Version 3.1.0 descriptions and list corrections
+
+Validated on **2026-10-11** in isolated local test containers:
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1051 / 5438 | 1051 / 5441 | 1051 / 5441 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1051 / 5518 | 1051 / 5521 | 1051 / 5521 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1051 / 6045 | 1051 / 6048 | 1051 / 6048 |
+
+Each combination passed **175 unit, 433 functional, 350 integration/API,
+33 Chromium system and 60 documentation tests**, with zero failures, errors
+or skips: **9,459 tests** across the matrix. Cells record tests / assertions.
+MySQL retained `ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES` and
+`STRICT_ALL_TABLES` in the Rails session.
+
+Regression coverage includes optional descriptions, HTML and JSON API creation,
+updates and clearing, JSON/XML reads, anonymous access, administrator writes,
+project visibility and cross-project access rejection. Textile and CommonMark
+rendering, escaped tooltips, per-view formatting reuse, issue and time-entry
+columns (including entries without an issue), and all eleven plugin block-column
+lists are covered. Calendar and level description-only saves preserve calculation
+caches; calculation changes and nested schedule updates still invalidate them.
+Chromium checks exercise the wiki toolbar, saving and clearing descriptions, and
+list block rows. Documentation forms and their screenshots were refreshed.
+
+For every combination, migration `202111112021022` was applied, rolled back and
+reapplied against existing records. Checks verified nullable text columns and
+preservation of the other record attributes. Rollback deletes description data.
+
+These results cover the exact versions above. No production deployment or
+representative performance benchmark was performed. Historical results below
+remain separate validations of their respective versions.
+
 ## Version 3.0.6 technical corrections
 
 Validated on **2026-10-10** in isolated local test containers:

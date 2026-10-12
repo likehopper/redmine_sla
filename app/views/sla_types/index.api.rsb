@@ -20,6 +20,7 @@ api.array :sla_types, api_meta(:total_count => @entity_count, :offset => @offset
     api.sla_type do
       api.id sla_type.id
       api.name sla_type.name
+      api.description sla_type.description
     end
   end
 end

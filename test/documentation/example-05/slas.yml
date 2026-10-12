@@ -18,4 +18,5 @@
 slas:
 
   - name: "SLA Managed Services tracker_change_request"
+    description: Contract used for the requests in this example.
   - name: "SLA Managed Services tracker_production_incident"

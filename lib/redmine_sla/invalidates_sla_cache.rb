@@ -31,13 +31,20 @@ module RedmineSla
     extend ActiveSupport::Concern
 
     included do
-      before_save :capture_sla_cache_level_ids
+      before_save :capture_sla_cache_level_ids, unless: :sla_description_only_change?
       after_save :invalidate_sla_cache
       before_destroy :capture_sla_cache_level_ids
       after_destroy :invalidate_sla_cache
     end
 
     private
+
+    # Descriptions are presentation text and do not affect SLA calculations.
+    # Apply this guard only to saves: destruction must always invalidate caches,
+    # even if the record also has an unsaved description change.
+    def sla_description_only_change?
+      persisted? && changes_to_save.keys == ['description']
+    end
 
     def capture_sla_cache_level_ids
       @sla_cache_level_ids_for_invalidation = sla_cache_level_ids_for_invalidation

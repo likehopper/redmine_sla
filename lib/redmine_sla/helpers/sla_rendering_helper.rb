@@ -61,6 +61,48 @@ module RedmineSla
           class: "icon #{icon_class}"
         )
       end
+
+      # Maximum length of a description shown as a tooltip.
+      SLA_DESCRIPTION_TOOLTIP_LENGTH = 250
+
+      # Plain-text tooltip built from an SLA object's description.
+      #
+      # Parameters:
+      #   object   - any SLA object responding to #description (or nil)
+      #   fallback - tooltip to keep when there is no description
+      #
+      # Returns:
+      #   The description rendered with the configured text formatting,
+      #   stripped of markup, squished and truncated, or +fallback+.
+      #
+      # Notes:
+      #   - The formatter is called directly instead of `textilizable`, so
+      #     no wiki macro or Redmine link is evaluated inside a tooltip.
+      #   - Results are cached in this view context by format and source text.
+      #     Repeated names share a tooltip; changed descriptions are recomputed.
+      #   - A nil return makes Rails omit the `title` attribute.
+      def sla_description_tooltip(object, fallback = nil)
+        description = object.try(:description)
+        return fallback if description.blank?
+
+        @sla_description_tooltips ||= {}
+        cache_key = [Setting.text_formatting, description.dup.freeze]
+        unless @sla_description_tooltips.key?(cache_key)
+          formatted_description = Redmine::WikiFormatting.to_html(cache_key.first, description)
+          plain_description = CGI.unescapeHTML(
+            ActionView::Base.full_sanitizer.sanitize(formatted_description).to_s
+          ).squish
+          @sla_description_tooltips[cache_key] = plain_description.presence&.truncate(SLA_DESCRIPTION_TOOLTIP_LENGTH)
+        end
+        @sla_description_tooltips[cache_key] || fallback
+      end
+
+      # An SLA object's name, wrapped in a span carrying its description as
+      # a tooltip when it has one. Used where names are displayed as text.
+      def sla_name_with_tooltip(object, name = object.name)
+        tooltip = sla_description_tooltip(object)
+        tooltip ? content_tag('span', name, title: tooltip) : name
+      end
     end
   end
 end

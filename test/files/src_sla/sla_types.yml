@@ -18,6 +18,7 @@
 GTI:
   id: 1
   name: GTI
+  description: Guaranteed Time of Intervention, from creation to the first answer.
   position: 1
 GTR:
   id: 2
