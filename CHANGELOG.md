@@ -1,5 +1,47 @@
 # Changelog
 
+## 3.1.0 - 2026-10-12
+
+### Added
+
+-   Optional description for SLAs, SLA types, SLA calendars and SLA levels,
+    edited with Redmine's wiki toolbar, shown on their pages and exposed by
+    the API.
+-   Show description tooltips in:
+    the SLA block of an issue, the SLA level column of issue and time-entry
+    lists, the plugin lists and the SLA level pages.
+-   Optional Description column in the SLA, calendar and level lists.
+
+### Fixed
+
+-   Fix HTTP 500 errors when rendering block columns in the plugin lists,
+    and span the checkbox, inline columns and action buttons.
+
+### Performance
+
+-   Reuse formatted description tooltips within each view context, including
+    when multiple records share the same description.
+-   Preserve SLA calculation caches when only a calendar or level description
+    changes; calculation-related changes still invalidate them.
+
+### Upgrade
+
+-   Back up the database and run `bundle exec rake redmine:plugins:migrate
+    NAME=redmine_sla RAILS_ENV=production` after updating the plugin files,
+    then restart Redmine. Migration `202111112021022` adds a nullable text
+    column to each of the four objects; existing records remain valid.
+-   Rolling this migration back removes the four description columns and
+    their contents. Restore the previous plugin files when downgrading.
+
+### Tests
+
+-   Cover description forms, updates and clearing, API reads and writes,
+    project permissions, wiki rendering and safe tooltip escaping.
+-   Cover tooltips on issue and time-entry lists, and reuse of formatted
+    descriptions within a view context.
+-   Render the description block column in the SLA, calendar and level
+    lists, and render the block-column rows of the other plugin lists.
+
 ## 3.0.6 - 2026-10-10
 
 ### Fixed

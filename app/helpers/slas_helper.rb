@@ -27,7 +27,7 @@ module SlasHelper
 
   # Generates a link to a sla with name
   def link_to_sla_name(sla)
-    link_to sla.name, sla_url(sla, {:only_path => true})
+    link_to sla.name, sla_url(sla, {:only_path => true}), title: sla_description_tooltip(sla)
   end
 
 end

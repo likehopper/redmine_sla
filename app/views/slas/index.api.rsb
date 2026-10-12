@@ -20,6 +20,7 @@ api.array :slas, api_meta(:total_count => @entity_count, :offset => @offset, :li
     api.sla do
       api.id sla.id
       api.name sla.name
+      api.description sla.description
     end
   end
 end

@@ -22,6 +22,7 @@ sla_tma_level_01:
   sla_id: 1
   sla_calendar_id: 1
   name: TMA - Bug HO
+  description: TMA bugs handled during business hours.
 
 # TMA HO GTI only on tracker_support_request
 sla_tma_level_02:

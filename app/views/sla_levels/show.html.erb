@@ -18,37 +18,40 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 -%>
 <% html_title(l(:sla_label_global_settings)) -%>
-<div class="content"> 
+<div class="content">
   <div class="contextual">
     <%= render :partial => 'action_menu' %>
   </div>
   <div class="title-sla-settings title-sla_level">
     <%= title l('sla_label.sla_level.show') -%>
-  </div>  
+  </div>
 
   <h3><%= @sla_level.name -%></h3>
+  <% if @sla_level.description.present? -%>
+    <div class="wiki sla-description"><%= textilizable @sla_level, :description -%></div>
+  <% end -%>
   <p>
     <b><%= l('sla_label.sla_calendar.singular') -%> : </b><%=  -%>
-    <%= link_to @sla_level.sla_calendar.name, sla_calendar_path(@sla_level.sla_calendar), title: l(:button_show) -%> 
+    <%= link_to @sla_level.sla_calendar.name, sla_calendar_path(@sla_level.sla_calendar), title: sla_description_tooltip(@sla_level.sla_calendar, l(:button_show)) -%>
   </p>
   <table style="border: none:" margin="8px">
   <tr>
     <th width="240px" colspan="2" style="border-top: solid darkgrey; border-left: solid darkgrey; border-right: solid darkgrey; text-align: right;"><%= l("sla_label.sla_level.plural") -%>&nbsp;<%= image_tag("arrow_right.png") -%></th>
-    <% 
+    <%
 
         sla_types = @sla_level.sla_level_terms
           .joins(:sla_type)
-          .select("sla_level_terms.sla_type_id AS id, sla_types.name AS name")
+          .select("sla_level_terms.sla_type_id AS id, sla_types.name AS name, sla_types.description AS description")
           .order("sla_types.name")
           .uniq.each do |sla_type|
     -%>
-      <th width="120px" rowspan="2" style="border: solid darkgrey;"><%= sla_type[:name] -%></th>
+      <th width="120px" rowspan="2" style="border: solid darkgrey;"><%= sla_name_with_tooltip(sla_type, sla_type[:name]) -%></th>
     <% end -%>
   </tr>
   <tr>
     <th width="240px" colspan="2" style="border-bottom: solid darkgrey; border-left: solid darkgrey; border-right: solid darkgrey; text-align: left;"><%= image_tag("arrow_down.png") -%>&nbsp;<%= l(:enumeration_issue_priorities) -%></th>
   </tr>
-  <% 
+  <%
     sla_level_term_priorities = @sla_level.sla_level_terms.distinct(:sla_priority_id).pluck(:sla_priority_id)
     SlaPriority.create(@sla_level.custom_field_id).all.each do |sla_priority_id|
       if ! sla_priority_id.id.in?(sla_level_term_priorities)

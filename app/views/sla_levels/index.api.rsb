@@ -20,6 +20,7 @@ api.array :sla_levels, api_meta(:total_count => @entity_count, :offset => @offse
     api.sla_level do
       api.id sla_level.id
       api.name sla_level.name
+      api.description sla_level.description
       api.sla_id sla_level.sla_id
       api.sla_calendar_id sla_level.sla_calendar_id
       api.custom_field_id sla_level.custom_field_id

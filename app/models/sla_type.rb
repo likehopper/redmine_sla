@@ -41,7 +41,7 @@ class SlaType < ActiveRecord::Base
 
   validates_uniqueness_of :name, :case_sensitive => false
 
-  safe_attributes *%w[name position]
+  safe_attributes *%w[name description position]
 
   # No selection limitations
   def self.visible_condition(user, options = {})

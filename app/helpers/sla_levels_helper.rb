@@ -27,7 +27,7 @@ module SlaLevelsHelper
 
   # Generates a link to a sla_level with name
   def link_to_sla_level_name(sla_level)
-    link_to sla_level.name, sla_level_url(sla_level, {:only_path => true})
+    link_to sla_level.name, sla_level_url(sla_level, {:only_path => true}), title: sla_description_tooltip(sla_level)
   end
 
 end

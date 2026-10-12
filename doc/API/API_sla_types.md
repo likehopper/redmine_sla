@@ -26,6 +26,13 @@ Returns a paginated list of Sla Types. By default, it returns all Sla Types.
 
 ### Creating a Sla Type
 
+Since version **3.1.0**, `description` is an optional string accepting the
+configured Redmine wiki syntax. List and detail responses return the source
+text, or `null` for existing records without a description. Creation and update
+requests accept it; send an empty string to clear it. HTML detail pages render
+the wiki formatting. Name tooltips in the supported lists and issue SLA block
+use plain text truncated to 250 characters; macros are not evaluated there.
+
 `POST /sla/types.[format]`
 
 <u>Examples:</u>
@@ -37,7 +44,8 @@ Use with :
 DATA="$(cat <<-EOF
 {
   "sla_type": {
-    "name": "Response time"
+    "name": "Response time",
+    "description": "Time until the first answer to the customer."
   }
 }
 EOF

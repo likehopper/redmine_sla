@@ -25,6 +25,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
   </div>  
 
   <h3>n°<%= @sla_type.id %>&nbsp;:&nbsp;<%= @sla_type.name %></h3>
+  <% if @sla_type.description.present? %>
+    <div class="wiki sla-description"><%= textilizable @sla_type, :description %></div>
+  <% end %>
 
 </div>
 <% content_for :sidebar do %>

@@ -123,7 +123,8 @@ module RedmineSla
               # Link to the SLA level page when SLA level is present
               link_to(
                 item.get_sla_level.name,
-                sla_level_url(item.get_sla_level, only_path: true)
+                sla_level_url(item.get_sla_level, only_path: true),
+                title: sla_description_tooltip(item.get_sla_level)
               ) if !item.get_sla_level.nil?
 
             # SLA respect columns for Issue, TimeEntry or SlaCache queries

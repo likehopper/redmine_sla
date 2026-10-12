@@ -18,6 +18,7 @@
 one:
   id: 1
   name: TMA - HO
+  description: Business hours, Monday to Friday.
 two:
   id: 2
   name: Managed Services std - HO - Request

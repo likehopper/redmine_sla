@@ -30,14 +30,14 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     <%= title l('sla_label.sla_level_term.edit') -%>
   </div>
 
-  <h3><%= l('sla_label.sla_level.singular') -%> : <%= link_to @sla_level.name, edit_sla_level_path(@sla_level), title: l(:button_show) -%></h3></h3>
+  <h3><%= l('sla_label.sla_level.singular') -%> : <%= link_to @sla_level.name, edit_sla_level_path(@sla_level), title: sla_description_tooltip(@sla_level, l(:button_show)) -%></h3></h3>
   <p>
     <b><%= l('sla_label.sla_calendar.singular') -%> : </b><%=  -%>
-    <%= link_to @sla_level.sla_calendar.name, sla_calendar_path(@sla_level.sla_calendar), title: l(:button_show) -%>
+    <%= link_to @sla_level.sla_calendar.name, sla_calendar_path(@sla_level.sla_calendar), title: sla_description_tooltip(@sla_level.sla_calendar, l(:button_show)) -%>
   </p>
   <p>
     <b><%= l('sla_label.sla.singular') -%> : </b><%=  -%>
-    <%= link_to @sla_level.sla.name, sla_path(@sla_level.sla), title: l(:button_show) -%>
+    <%= link_to @sla_level.sla.name, sla_path(@sla_level.sla), title: sla_description_tooltip(@sla_level.sla, l(:button_show)) -%>
   </p>
   <%
     sla_types = SlaType.sorted.to_a
@@ -64,7 +64,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
       <tr>
         <th><%= l(:enumeration_issue_priorities) -%></th>
         <% sla_types.each do |sla_type| -%>
-          <th class="<%= 'sla-type-hidden' if hidden_type_ids.include?(sla_type[:id]) -%>"><%= sla_type[:name] -%></th>
+          <th class="<%= 'sla-type-hidden' if hidden_type_ids.include?(sla_type[:id]) -%>"><%= sla_name_with_tooltip(sla_type) -%></th>
         <% end -%>
       </tr>
     </thead>

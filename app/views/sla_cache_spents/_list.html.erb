@@ -70,8 +70,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
           <% @query.block_columns.each do |column| %>
             <% if (text = column_content(column, entity)) && text.present? %>
               <tr class="<%= current_cycle %>">
-                <td colspan="<%= @query.inline_columns.size + 1 %>" class="<%= column.css_classes %>">
-                  <% if query.block_columns.count > 1 %>
+                <td colspan="<%= @query.inline_columns.size + 2 %>" class="<%= column.css_classes %>">
+                  <% if @query.block_columns.count > 1 %>
                   <span><%= column.caption %></span>
                   <% end %>
                   <%= text %>

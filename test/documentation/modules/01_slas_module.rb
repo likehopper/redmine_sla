@@ -35,6 +35,8 @@ module SlasDocumentationTest
       # Open and fill out the form
       visit '/sla/slas/new'
       fill_in 'sla_name', with: sla_name
+      expected_description = sla['description']
+      fill_in 'sla_description', with: expected_description if expected_description.present?
 
       # Take the photo and submit the form
       take_doc_screenshot(format('%02d-01-%02d-01-sla-new.png', id, idx))
@@ -43,6 +45,7 @@ module SlasDocumentationTest
 
       # Search for the record
       sla = Sla.find_by!(name: sla_name)
+      assert_equal expected_description.to_s, sla.description.to_s
 
       # Validation and screenshot
       assert_text(l('sla_label.sla.notice_successful_create', id: "##{sla.id}"))

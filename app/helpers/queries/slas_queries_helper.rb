@@ -28,6 +28,8 @@ module Queries::SlasQueriesHelper
       case column.name
       when :id
         link_to_sla_id(item)
+      when :name
+        sla_name_with_tooltip(item)
       else
         super
       end
