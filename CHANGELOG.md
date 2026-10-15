@@ -21,6 +21,9 @@
     non-member, anonymous, and SLA module disabled.
 -   Add a documentation test that checks the rendering in Chromium per
     profile and generates the screenshots of `doc/PROJECT_LISTS.md`.
+-   Allow documentation tests to run directly with `rails test`, without
+    the documentation rake task (`ApplicationSystemTestCase` is now loaded
+    by the plugin documentation test case).
 
 ## 3.1.5 - 2026-10-20
 
