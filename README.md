@@ -416,6 +416,7 @@ Restart application server.
     -   [Example 05](doc/EXAMPLE-05.md)
 -   [SLA Compute Explanation](doc/COMPUTE.md)
 -   [Plugin settings](doc/SETTINGS.md)
+-   [Projects with SLA](doc/PROJECT_LISTS.md)
 -   [API Rest for SLA](doc/API.md)
 -   [Tasks](doc/TASKS.md)
 -   [Change log](CHANGELOG.md)
