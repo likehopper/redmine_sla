@@ -44,6 +44,24 @@ class SlaProjectListsProjectsControllerTest < ApplicationSlaFunctionalsTestCase
     assert_select 'table.projects tr#project-4'
   end
 
+  test "board view shows the SLA icon only on projects with visible SLAs" do
+    @request.session[:user_id] = 2 # Manager in projects 1 to 5.
+    get :index, params: { display_type: 'board', set_filter: 1, f: [''] }
+
+    assert_response :success
+    assert_select '#projects-index a.project.has-sla', 4
+    assert_select '#projects-index a.project.has-sla[href=?]', '/projects/another-project-without-sla', 0
+  end
+
+  test "board view shows no SLA icon without SLA permission" do
+    @request.session[:user_id] = 5
+    get :index, params: { display_type: 'board', set_filter: 1, f: [''] }
+
+    assert_response :success
+    assert_select '#projects-index a.project', minimum: 1
+    assert_select '#projects-index a.project.has-sla', 0
+  end
+
   test "user without SLA permission gets no SLA column" do
     @request.session[:user_id] = 5
     get :index, params: { display_type: 'list', set_filter: 1, c: %w[name slas] }

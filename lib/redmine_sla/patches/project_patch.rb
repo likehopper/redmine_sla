@@ -10,7 +10,8 @@
 #     anything for such a project, so the cache is not rebuilt meanwhile.
 #   - Extend Redmine's Project model with the SLA associations and the
 #     permission check used by the project lists (projects#index and
-#     admin#projects) to show which projects have SLAs defined.
+#     admin#projects) to show which projects have SLAs defined. Projects
+#     with visible SLAs get a "has-sla" CSS class (SLA icon in the board).
 #
 # Redmine SLA - Redmine Plugin
 #
@@ -63,6 +64,18 @@ module RedmineSla
         return true if user.admin?
 
         user.allowed_to?(:view_sla, self) || user.allowed_to?(:manage_sla, self)
+      end
+
+      # True when the project has SLAs the user may see.
+      # Checks the (possibly preloaded) assignments first, so that projects
+      # without SLA never trigger a permission lookup.
+      def visible_sla?(user = User.current)
+        sla_project_trackers.any? && sla_visible?(user)
+      end
+
+      # Adds "has-sla" so the board view can show the SLA icon.
+      def css_classes
+        visible_sla? ? "#{super} has-sla" : super
       end
 
       # SLAs assigned to this project (through its trackers), sorted by name

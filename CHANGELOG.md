@@ -10,7 +10,8 @@
     is and is not. Administrators see every project. Other users only see
     SLAs of projects where they have the *View SLA* or *Manage SLA*
     permission; other projects behave as having no SLA.
--   Add a *Projects with SLA* link to the SLA administration sidebar.
+-   Show an SLA icon next to the name of projects with SLA in the
+    project board view, with the same permission rules.
 
 ### Tests
 
