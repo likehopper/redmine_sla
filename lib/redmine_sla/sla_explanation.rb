@@ -95,6 +95,9 @@ module RedmineSla
     private
 
     def candidate_levels
+      # Same rule as sla_get_level: no SLA level without the SLA module.
+      return [] unless @issue.project&.module_enabled?(:sla)
+
       sla_ids = SlaProjectTracker.where(project_id: @issue.project_id, tracker_id: @issue.tracker_id).pluck(:sla_id)
       SlaLevel.with_references.where(sla_id: sla_ids).includes(:sla_calendar).distinct.to_a
     end

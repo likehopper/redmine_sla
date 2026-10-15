@@ -14,7 +14,7 @@
 
 ## Overview
 
-Current version: **3.1.0**. See the [changelog](CHANGELOG.md) for release details.
+Current version: **3.1.1**. See the [changelog](CHANGELOG.md) for release details.
 
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
@@ -195,9 +195,9 @@ Fully manageable through UI and REST API:
 | `Rails`            | >= 6.1                                            |
 | `Database`         | PostgreSQL >= 11, MySQL >= 8.0 or MariaDB >= 10.2 |
 
-Version **3.1.0** has been tested on Redmine **5.1.13,
+Version **3.1.1** has been tested on Redmine **5.1.13,
 6.1.4 and 7.0.1**, with all five suites on PostgreSQL, MariaDB and strict
-MySQL. See the [compatibility matrix](doc/TESTING.md#version-310-descriptions-and-list-corrections)
+MySQL. See the [compatibility matrix](doc/TESTING.md#version-311-sla-module-gating-and-update_sla-scope)
 for exact runtime versions and results.
 
 ------------------------------------------------------------------------
@@ -283,7 +283,25 @@ Plugin is ready to use.
 
 ------------------------------------------------------------------------
 
-## Upgrade to 3.1.0
+## Upgrade to 3.1.1
+
+Version **3.1.1** stops SLA calculation on projects whose SLA module is
+disabled: their SLA cache is purged and no longer rebuilt, while their
+project-tracker configuration is kept for a later re-enabling. The
+`update_sla` task now processes all projects, applies its `scope` option and
+gains a `projects=[all,with_sla,without_sla]` option.
+
+Back up the database, update the plugin files, then run:
+
+```sh
+bundle exec rake redmine:plugins:migrate NAME=redmine_sla RAILS_ENV=production
+```
+
+Migration `202111112021021` makes the `sla_get_level` SQL function check the
+project's SLA module. Restart Redmine after migration, then run `update_sla`
+once to purge the cache left on projects without the SLA module.
+
+### Previous upgrade: 3.1.0
 
 Version **3.1.0** adds optional wiki descriptions to SLAs, SLA types, calendars
 and levels, and fixes HTTP 500 errors in list block columns. Descriptions appear

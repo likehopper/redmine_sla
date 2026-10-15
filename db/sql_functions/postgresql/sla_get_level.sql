@@ -53,6 +53,28 @@ BEGIN
   RAISE DEBUG 'sla_get_level | p_issue_id = %', p_issue_id ;
 
   ---------------------------------------------------------------------------
+  -- SLA module disabled on the issue's project: nothing is calculated.
+  -- Checked before the cache lookup so a stale entry is never returned;
+  -- the project's SLA configuration itself is kept for re-enabling.
+  -- sla_get_spent goes through this function, so it is covered too.
+  ---------------------------------------------------------------------------
+  IF NOT EXISTS (
+    SELECT 1
+    FROM "issues"
+    INNER JOIN "enabled_modules"
+      ON ( "enabled_modules"."project_id" = "issues"."project_id"
+           AND "enabled_modules"."name" = 'sla' )
+    WHERE "issues"."id" = p_issue_id
+  ) THEN
+    RAISE DEBUG 'sla_get_level | SLA module disabled → clear cache + return NULL' ;
+
+    DELETE FROM "sla_caches"
+    WHERE "sla_caches"."issue_id" = p_issue_id ;
+
+    RETURN NULL ;
+  END IF ;
+
+  ---------------------------------------------------------------------------
   -- Evaluate the current normalized timestamp using SLA calendar settings
   ---------------------------------------------------------------------------
   v_current_timestamp := sla_get_date(NOW()::TIMESTAMP WITHOUT TIME ZONE);

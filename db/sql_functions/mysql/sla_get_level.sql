@@ -63,6 +63,22 @@ BEGIN
         RETURN NULL;
     END IF;
 
+    -- SLA module disabled on the issue's project: nothing is calculated.
+    -- Checked before the cache lookup so a stale entry is never returned;
+    -- the project's SLA configuration itself is kept for re-enabling.
+    -- sla_get_spent goes through this function, so it is covered too.
+    IF NOT EXISTS (
+      SELECT 1
+      FROM issues
+      INNER JOIN enabled_modules
+        ON ( enabled_modules.project_id = issues.project_id
+             AND enabled_modules.name = 'sla' )
+      WHERE issues.id = p_issue_id
+    ) THEN
+        DELETE FROM sla_caches WHERE issue_id = p_issue_id;
+        RETURN NULL;
+    END IF;
+
     SET v_current_timestamp = sla_get_date(NOW());
 
     -- Try to retrieve the SLA level already stored in the cache
