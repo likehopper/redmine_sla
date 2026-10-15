@@ -15,8 +15,12 @@
 
 ### Tests
 
--   Cover the project list SLA column and filter for administrators,
-    members with SLA permission, users without it and anonymous users.
+-   Cover what each profile sees in the project lists (column, filter
+    values and results, board icon, administration access): administrator,
+    View and Manage SLA, View SLA only, Manage SLA only, no SLA permission,
+    non-member, anonymous, and SLA module disabled.
+-   Add a documentation test that checks the rendering in Chromium per
+    profile and generates the screenshots of `doc/PROJECT_LISTS.md`.
 
 ## 3.1.5 - 2026-10-20
 
