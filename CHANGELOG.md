@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 3.1.1 - 2026-10-16
 
 ### Fixed
 
@@ -20,6 +20,15 @@
 -   `update_sla` keeps the SLA cache of projects not active (closed,
     archived) as it was instead of purging it, since it was rebuilt as soon
     as an issue was displayed.
+
+### Upgrade
+
+-   Back up the database and run `bundle exec rake redmine:plugins:migrate
+    NAME=redmine_sla RAILS_ENV=production` after updating the plugin files,
+    then restart Redmine. Migration `202111112021021` makes `sla_get_level`
+    return no level for projects without the SLA module.
+-   Run `update_sla` once afterwards to purge the SLA cache left on projects
+    without the SLA module.
 
 ## 3.1.0 - 2026-10-12
 
