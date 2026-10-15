@@ -138,6 +138,7 @@ Fully manageable through UI and REST API:
 -   Role-based permissions
 -   SLA visibility control
 -   SLA columns in issue list
+-   SLA column and filter in the project lists (user and administration)
 -   SLA filtering
 -   SLA summary in issue view
 -   Responsive display

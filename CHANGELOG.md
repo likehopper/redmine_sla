@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+-   Add an **SLA** column and filter to the project lists
+    (`Projects` in list mode and `Administration > Projects`). The column
+    lists the SLAs assigned to each project; the filter supports any, none,
+    is and is not. Administrators see every project. Other users only see
+    SLAs of projects where they have the *View SLA* or *Manage SLA*
+    permission; other projects behave as having no SLA.
+-   Add a *Projects with SLA* link to the SLA administration sidebar.
+
+### Tests
+
+-   Cover the project list SLA column and filter for administrators,
+    members with SLA permission, users without it and anonymous users.
+
 ## 3.1.5 - 2026-10-20
 
 ### Fixed
