@@ -111,4 +111,26 @@ class SlaProjectQueryTest < ApplicationSlaUnitsTestCase
     end
   end
 
+  test "css classes flag projects with visible SLAs" do
+    User.current = User.find(3) # view_sla in projects 1 and 4.
+
+    assert_includes Project.find(1).css_classes.split, 'has-sla'
+    refute_includes Project.find(2).css_classes.split, 'has-sla'
+    refute_includes Project.find(5).css_classes.split, 'has-sla'
+
+    User.current = User.find(1)
+    assert_includes Project.find(2).css_classes.split, 'has-sla'
+    refute_includes Project.find(5).css_classes.split, 'has-sla'
+  end
+
+  test "board display preloads SLA assignments" do
+    User.current = User.find(3)
+    query = ProjectQuery.new(name: '_')
+    query.display_type = 'board'
+
+    project = query.results_scope.detect { |p| p.id == 1 }
+    assert project.association(:sla_project_trackers).loaded?
+    assert project.association(:enabled_modules).loaded?
+  end
+
 end

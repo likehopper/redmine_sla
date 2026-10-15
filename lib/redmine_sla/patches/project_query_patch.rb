@@ -8,6 +8,8 @@
 #     - an "SLA" filter (any / none / is / is not) on those assignments.
 #
 #   Both are offered on projects#index (list display) and admin#projects.
+#   In the board display, SLA assignments are preloaded for the SLA icon
+#   rendered next to project names (see ProjectPatch#css_classes).
 #   Non-admin users only see SLA data for projects where they have the
 #   :view_sla or :manage_sla permission; other projects behave as if they
 #   had no SLA so that the filter never discloses hidden configuration.
@@ -73,7 +75,13 @@ module RedmineSla
 
       def results_scope(options = {})
         scope = super
-        scope = scope.preload(sla_project_trackers: :sla) if has_column?(:slas)
+        if has_column?(:slas)
+          scope = scope.preload(sla_project_trackers: :sla)
+        elsif display_type == 'board' && sla_available_for_user?
+          # Board view: avoid one query per project for the SLA icon
+          # (assignments, then enabled modules for the permission check).
+          scope = scope.preload(:sla_project_trackers, :enabled_modules)
+        end
         scope
       end
 
