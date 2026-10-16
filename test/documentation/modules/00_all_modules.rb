@@ -19,6 +19,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 # Load all documentation modules once
+require_relative "00_roles_module"
 require_relative "01_slas_module"
 require_relative "02_sla_types_module"
 require_relative "03_sla_statuses_module"
@@ -34,6 +35,7 @@ require_relative "12_issues_module"
 
 # Aggregate includes in a single mixin
 module RedmineSlaDocumentationModules
+  include RolesDocumentationTest
   include SlasDocumentationTest
   include SlaTypesDocumentationTest
   include SlaStatusesDocumentationTest

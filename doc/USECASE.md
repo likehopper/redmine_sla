@@ -6,22 +6,20 @@ These examples are present in the web interface after the launch of the function
 -	"Managed Services Standard" and "Managed Services Spécific" : for change request on hours worked (HO) and for production incident also on non-working hours (HNO).
 
 
-## Connctions
+## Connections
 
-Differents users are configured :
-- user `admin` with pass `admin`
-- user `manager` with pass `manager`
-- user `developer` with pass `developer`
-- user `reporter` with pass `reporter`
+Different users are configured, each with their login as password:
+`admin`, `manager`, `developer`, `reporter`.
 
 
 ## Redmine base
 
-For each user an eponymous role has been defined
-- role `admin` : he can define the SLAs in the global configuration.
-- role `manager` : he sees the SLAs and manages them in the projects.
-- role `developer` : it only sees SLAs in issues.
-- role `reporter` : he doesn't see the SLAs nowhere.
+- `admin` is a Redmine administrator: they define the SLAs in the global configuration.
+- `manager` has the Manager role (`view_sla`, `manage_sla`): they see the SLAs and manage them in the projects.
+- `developer` has the Resolver role (`view_sla`): they only see SLAs in issues.
+- `reporter` has the Reporter role (no SLA permission): they don't see SLAs anywhere.
+
+See [Roles and permissions](SETTINGS.md#roles-and-permissions) and [Testing](TESTING.md#roles).
 
 A few issue priorities are defined in enumerations : low, normal and high. Currently, only "normal" priority is used in tests.
 
