@@ -398,3 +398,18 @@ en:
   label_sla_for: for
   label_sla_msgerror: KO
   label_sla_msgsuccess: OK
+  sla_holiday_import_title: "Import public holidays"
+  sla_holiday_import_country: "Country"
+  sla_holiday_import_default_country: "Default holiday country"
+  sla_holiday_import_country_hint: "ISO country code, e.g. FR. Leave blank to choose at import time."
+  sla_holiday_import_description: "Retrieve public holidays from Nager.Date. Existing dates and calendar associations are preserved."
+  sla_holiday_import_selection_hint: "National holidays are selected by default. Check regional holidays before selecting them. Entries on the same date are combined."
+  sla_holiday_import_scope: "Scope"
+  sla_holiday_import_existing: "Existing holiday"
+  sla_holiday_import_national: "National"
+  sla_holiday_import_success: "%{created} holidays created, %{skipped} existing dates skipped."
+  sla_holiday_import_error_unavailable: "The holiday service is unavailable. Please try again later."
+  sla_holiday_import_error_invalid_response: "The holiday service returned invalid data. No holidays were imported."
+  sla_holiday_import_error_invalid_selection: "Select a valid year and country."
+  sla_holiday_import_expired: "The preview has expired or is invalid. Please preview again."
+  sla_holiday_import_failed: "Import failed. No holidays were created."

@@ -1,5 +1,36 @@
 # Testing
 
+## Version 3.3.0 public holiday import
+
+Validated on **2026-10-16** in isolated local test containers:
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1161 / 6101 | 1161 / 6098 | 1161 / 6098 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1161 / 6189 | 1161 / 6186 | 1161 / 6186 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1161 / 6727 | 1161 / 6724 | 1161 / 6724 |
+
+Each combination ran **247 unit, 465 functional, 350 integration/API,
+35 Chromium system and 64 documentation tests**, with zero failures or
+errors: **10,449 tests** across the matrix. Cells record tests / assertions.
+The two migration unit tests skipped by design on MariaDB and MySQL are
+those of 3.1.2 and 3.1.3. MySQL retained `ONLY_FULL_GROUP_BY`,
+`STRICT_TRANS_TABLES` and `STRICT_ALL_TABLES` in the Rails session.
+
+Regression coverage includes the Nager.Date adapter (country options, local
+names and regional holidays, dates outside the requested year, invalid input
+before any request, timeouts, DNS failures, HTTP errors and malformed JSON),
+the importer (preview of existing dates without writes, repeated imports,
+same-day names combined, rollback of a failed import), the controller (access
+check, unavailable service, signed preview and import, invalid and expired
+previews, non-administrators refused) and the browser form in Chromium. The
+holiday service is stubbed: no test calls the network.
+
+This release introduces no migration. These results cover the exact versions
+above. No production deployment or representative performance benchmark was
+performed. Historical results below remain separate validations of their
+respective versions.
+
 ## Version 3.2.0 projects with SLA in project lists
 
 Validated on **2026-10-16** in isolated local test containers:
