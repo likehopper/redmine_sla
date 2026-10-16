@@ -73,6 +73,9 @@ match 'sla/statuses', :controller => 'sla_statuses', :action => 'destroy', :via 
 resources :sla_holidays, path: "sla/holidays" do
   collection do
     get 'context_menu'
+    get 'import', action: :import_form
+    post 'preview_import'
+    post 'import', action: :import_holidays
   end
 end
 # context_menu : bulk_destroy
