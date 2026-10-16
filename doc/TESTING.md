@@ -1,5 +1,30 @@
 # Testing
 
+## Version 3.3.1 roles and permissions documentation
+
+Validated on **2026-10-16** in isolated local test containers:
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1166 / 6105 | 1166 / 6102 | 1166 / 6102 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1166 / 6193 | 1166 / 6190 | 1166 / 6190 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1166 / 6731 | 1166 / 6728 | 1166 / 6728 |
+
+Each combination ran **247 unit, 465 functional, 350 integration/API,
+35 Chromium system and 69 documentation tests**, with zero failures or
+errors: **10,494 tests** across the matrix. Cells record tests / assertions.
+The two migration unit tests skipped by design on MariaDB and MySQL are
+those of 3.1.2 and 3.1.3. MySQL retained `ONLY_FULL_GROUP_BY`,
+`STRICT_TRANS_TABLES` and `STRICT_ALL_TABLES` in the Rails session.
+
+The new roles documentation test runs with each documentation suite and
+takes the permissions report and role form screenshots once, with
+`example-01`. This release changes documentation and tests only.
+
+These results cover the exact versions above. No production deployment or
+representative performance benchmark was performed. Historical results below
+remain separate validations of their respective versions.
+
 ## Version 3.3.0 public holiday import
 
 Validated on **2026-10-16** in isolated local test containers:
@@ -396,23 +421,27 @@ functional fixtures expect fixed cache IDs. Retain SQL schema dumps so Rails
 schema preparation preserves the plugin's functions and views.
 
 ### Users
-Five users have been created by the fixtures, the logins of which are:
-- admin
-- manager
-- developer ( only access to one project of TMA )
-- sysadmin ( only access to two projects of infrastructure )
-- reporter
-- other
-  
-The password for each user is their login/name.
+Six users have been created by the fixtures:
+
+| Login       | Admin | Role       | Projects                        |
+|-------------|:-----:|------------|---------------------------------|
+| `admin`     |   x   |            | all                             |
+| `manager`   |       | Manager    | all                             |
+| `developer` |       | Resolver   | the two TMA projects            |
+| `sysadmin`  |       | Resolver   | two infrastructure projects     |
+| `reporter`  |       | Reporter   | the four SLA test projects      |
+| `other`     |       |            | none                            |
+
+The password for each user is their login.
 
 ### Roles
-Here are the roles of the available users:
+Here are the SLA permissions of the fixture roles
+(see [Roles and permissions](SETTINGS.md#roles-and-permissions)):
 
-| Name        | is_admin  | sla_manage  | sla_view  | Description |
-|-------------|-----------|-------------|-----------|-------------|
-| `admin`     |     x     |             |           | all this includes the SLA admin interface access |
-| `manager`   |           |      x      |     x     | View and manage SALs in projects                 |
-| `resolver`  |           |             |     x     | Only sees SLAs in project tickets                |
-| `reporter`  |           |             |           | Access projects without seeing SLAs in tickets   |
-| `other`     |           |             |           | Don't access any projects             |
+| Role       | `view_sla` | `manage_sla` | Description                                   |
+|------------|:----------:|:------------:|-----------------------------------------------|
+| Manager    |     x      |      x       | Views and manages SLAs in projects            |
+| Resolver   |     x      |              | Only sees SLAs in project issues              |
+| Reporter   |            |              | Accesses projects without seeing SLAs         |
+
+Administrators (`admin`) manage the global SLA configuration regardless of roles.
