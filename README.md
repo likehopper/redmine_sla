@@ -14,7 +14,7 @@
 
 ## Overview
 
-Current version: **3.1.5**. See the [changelog](CHANGELOG.md) for release details.
+Current version: **3.2.0**. See the [changelog](CHANGELOG.md) for release details.
 
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
@@ -196,9 +196,9 @@ Fully manageable through UI and REST API:
 | `Rails`            | >= 6.1                                            |
 | `Database`         | PostgreSQL >= 11, MySQL >= 8.0 or MariaDB >= 10.2 |
 
-Version **3.1.5** has been tested on Redmine **5.1.13,
+Version **3.2.0** has been tested on Redmine **5.1.13,
 6.1.4 and 7.0.1**, with all five suites on PostgreSQL, MariaDB and strict
-MySQL. See the [compatibility matrix](doc/TESTING.md#version-315-custom-field-cache-invalidation)
+MySQL. See the [compatibility matrix](doc/TESTING.md#version-320-projects-with-sla-in-project-lists)
 for exact runtime versions and results.
 
 ------------------------------------------------------------------------
@@ -284,7 +284,16 @@ Plugin is ready to use.
 
 ------------------------------------------------------------------------
 
-## Upgrade to 3.1.5
+## Upgrade to 3.2.0
+
+Version **3.2.0** adds an **SLA** column and filter to the project lists
+(`Projects` in list mode and `Administration > Projects`) and an SLA icon in
+the project board view. Administrators see every project; other users only
+see the SLAs of projects where they have *View SLA* or *Manage SLA*. See
+[Projects with SLA](doc/PROJECT_LISTS.md). Update the plugin files and restart
+Redmine; this release introduces no new migration relative to 3.1.5.
+
+### Previous upgrade: 3.1.5
 
 Version **3.1.5** invalidates the SLA caches of levels using an issue custom
 field when that field or one of its enumeration values changes. Update the
