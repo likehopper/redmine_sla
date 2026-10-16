@@ -121,7 +121,7 @@ class CreateSlaCaches < ActiveRecord::Migration[5.2]
         SQL
         say "Dropped function sla_get_level"
 
-        # Left by installations that have not run 202111112021022
+        # Left by installations that have not run 202111112021023
         execute "DROP FUNCTION IF EXISTS sla_get_level_overlap ;"
 
         # Drop table

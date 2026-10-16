@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
-# File: redmine_sla/db/migrate/202111112021022_drop_unused_sql_functions.rb
+# File: redmine_sla/db/migrate/202111112021023_drop_unused_sql_functions.rb
 # Purpose:
 #   Drop SQL functions nothing calls anymore:
 #     - sla_get_level_overlap: superseded by the SlaSchedule overlap

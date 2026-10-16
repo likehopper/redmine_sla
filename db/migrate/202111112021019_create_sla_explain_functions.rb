@@ -20,8 +20,8 @@
 #   `sla_explain_level` and `sla_explain_spent`. The "Explain" action
 #   (SlaCachesController#explain) now uses the adapter-neutral
 #   RedmineSla::SlaExplanation service, so nothing is created anymore;
-#   202111112021022 drops them from existing installations. Rollback still
-#   drops them, for installations that have not run 202111112021022.
+#   202111112021023 drops them from existing installations. Rollback still
+#   drops them, for installations that have not run 202111112021023.
 
 class CreateSlaExplainFunctions < ActiveRecord::Migration[5.2]
 
