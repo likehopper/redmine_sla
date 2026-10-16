@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 3.2.0 - 2026-10-21
 
 ### Added
 
@@ -24,6 +24,12 @@
 -   Allow documentation tests to run directly with `rails test`, without
     the documentation rake task (`ApplicationSystemTestCase` is now loaded
     by the plugin documentation test case).
+
+### Upgrade
+
+-   Update the plugin files and restart Redmine. This release introduces no
+    new migration relative to 3.1.5 and no new permission: the project list
+    column, filter and board icon follow *View SLA* and *Manage SLA*.
 
 ## 3.1.5 - 2026-10-20
 
