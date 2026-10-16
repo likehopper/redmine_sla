@@ -1,5 +1,36 @@
 # Testing
 
+## Version 3.1.5 custom field cache invalidation
+
+Validated on **2026-10-16** in isolated local test containers:
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1106 / 5874 | 1106 / 5871 | 1106 / 5871 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1106 / 5954 | 1106 / 5951 | 1106 / 5951 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1106 / 6483 | 1106 / 6480 | 1106 / 6480 |
+
+Each combination ran **228 unit, 435 functional, 350 integration/API,
+33 Chromium system and 60 documentation tests**, with zero failures or
+errors: **9,954 tests** across the matrix. Cells record tests / assertions.
+The two migration unit tests skipped by design on MariaDB and MySQL are
+those of 3.1.2 and 3.1.3. On Redmine 5.1.13 with PostgreSQL, the unit suite
+was rerun alone after a first run started without its generated fixtures in
+the parallel test environment; the rerun passed. MySQL retained
+`ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES` and `STRICT_ALL_TABLES` in the
+Rails session.
+
+Regression coverage adds 10 custom field invalidation tests to the 27 of
+3.1.4: field update and deletion, enumeration creation, update, move to
+another field and deletion with or without reassignment invalidate only the
+levels using that field. Unrelated fields, validation failures and rolled
+back changes keep the caches.
+
+This release introduces no migration. These results cover the exact versions
+above. No production deployment or representative performance benchmark was
+performed. Historical results below remain separate validations of their
+respective versions.
+
 ## Version 3.1.4 competing level cache invalidation
 
 Validated on **2026-10-16** in isolated local test containers:
