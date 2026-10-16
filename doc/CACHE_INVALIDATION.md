@@ -26,8 +26,8 @@ records. A subsequent read recalculates the SLA level and spent time.
 
 The controllers for calendars, schedules, calendar-holiday links, holidays,
 levels and terms use Active Record save/update/destroy methods, including bulk
-controller deletions and nested schedules/terms. The holiday importer uses
-`create!`. These paths execute the invalidation callbacks. No configuration
+controller deletions and nested schedules/terms. These paths execute the
+invalidation callbacks. No configuration
 write bypass using `update_all`, `delete_all`, `insert_all`, `upsert_all` or
 `update_columns` was found in these paths.
 
@@ -53,5 +53,6 @@ Four regression cases failed before the corrections and passed afterwards.
 Enabling `ONLY_FULL_GROUP_BY` on MariaDB exposed an existing aggregate-query
 error in `sla_get_spent`, preventing cache preparation. This SQL-function issue
 is separate from callback invalidation and remains unresolved. MySQL passes
-with `ONLY_FULL_GROUP_BY` enabled. Other Redmine versions and the integration,
-system and documentation suites were not run for this change.
+with `ONLY_FULL_GROUP_BY` enabled. The 3.1.4 release then passed all five
+suites on Redmine 5.1.13, 6.1.4 and 7.0.1 with each database: see
+[Testing](TESTING.md#version-314-competing-level-cache-invalidation).
