@@ -21,7 +21,7 @@
 # installation.
 
 require File.expand_path('../../../application_sla_units_test_case', __FILE__)
-require Rails.root.join('plugins/redmine_sla/db/migrate/202111112021022_drop_unused_sql_functions')
+require Rails.root.join('plugins/redmine_sla/db/migrate/202111112021023_drop_unused_sql_functions')
 
 class DropUnusedSqlFunctionsTest < ApplicationSlaUnitsTestCase
   UNUSED = %w[sla_get_level_overlap sla_explain_level sla_explain_spent].freeze
