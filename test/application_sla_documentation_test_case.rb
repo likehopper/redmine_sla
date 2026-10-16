@@ -21,6 +21,10 @@
 require_relative 'helpers/sla_test_helper'
 require_relative 'helpers/sla_documentation_helper'
 
+# Load Redmine's ApplicationSystemTestCase so that documentation tests can
+# also run without the documentation rake task (e.g. `rails test <file>`).
+require File.expand_path('../../../../test/application_system_test_case', __FILE__)
+
 class ApplicationSlaDocumentationTestCase < ApplicationSystemTestCase
 
   include Redmine::I18n

@@ -1,5 +1,37 @@
 # Testing
 
+## Version 3.2.0 projects with SLA in project lists
+
+Validated on **2026-10-16** in isolated local test containers:
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1145 / 6025 | 1145 / 6022 | 1145 / 6022 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1145 / 6105 | 1145 / 6102 | 1145 / 6102 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1145 / 6636 | 1145 / 6633 | 1145 / 6633 |
+
+Each combination ran **238 unit, 460 functional, 350 integration/API,
+33 Chromium system and 64 documentation tests**, with zero failures or
+errors: **10,305 tests** across the matrix. Cells record tests / assertions.
+The two migration unit tests skipped by design on MariaDB and MySQL are
+those of 3.1.2 and 3.1.3. MySQL retained `ONLY_FULL_GROUP_BY`,
+`STRICT_TRANS_TABLES` and `STRICT_ALL_TABLES` in the Rails session.
+
+Regression coverage checks, for each profile, the SLA column, the filter
+values and results, the board icon and administration access in the project
+lists: administrator, View and Manage SLA, View SLA only, Manage SLA only, no
+SLA permission, non-member, anonymous, and SLA module disabled. Unit tests
+cover the distinct SLAs sorted by name in the column, filters with and
+without SLA, filter values, SLA preloading and the board CSS class. The
+documentation test checks
+the rendering per profile in Chromium and generates the screenshots of
+[Projects with SLA](PROJECT_LISTS.md).
+
+This release introduces no migration. These results cover the exact versions
+above. No production deployment or representative performance benchmark was
+performed. Historical results below remain separate validations of their
+respective versions.
+
 ## Version 3.1.5 custom field cache invalidation
 
 Validated on **2026-10-16** in isolated local test containers:

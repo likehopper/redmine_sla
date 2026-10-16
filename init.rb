@@ -137,14 +137,20 @@ RedmineApp::Application.config.after_initialize do
     Issue.send(:include, RedmineSla::Patches::IssuePatch)
   end
 
-  # Purge the SLA cache of projects whose SLA module gets disabled
-  unless Project.included_modules.include? RedmineSla::Patches::ProjectPatch
+  # Purge the SLA cache of projects whose SLA module gets disabled, and
+  # extend Project with SLA associations (used by the project lists)
+  unless Project.ancestors.include? RedmineSla::Patches::ProjectPatch
     Project.prepend(RedmineSla::Patches::ProjectPatch)
   end
 
   # Extend IssueQuery and TimeEntryQuery for SLA filtering/sorting
   if (ActiveRecord::Base.connection.tables.include?('queries') rescue false)
-    
+
+    # SLA column and filter in project lists (projects#index, admin#projects)
+    unless ProjectQuery.ancestors.include? RedmineSla::Patches::ProjectQueryPatch
+      ProjectQuery.prepend(RedmineSla::Patches::ProjectQueryPatch)
+    end
+
     # SLA columns in issue queries
     unless IssueQuery.included_modules.include? RedmineSla::Patches::IssueQueryPatch
       IssueQuery.send(:include, RedmineSla::Patches::IssueQueryPatch)
