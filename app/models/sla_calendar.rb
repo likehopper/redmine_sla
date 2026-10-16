@@ -20,6 +20,7 @@
 
 class SlaCalendar < ActiveRecord::Base
 
+  has_many :sla_calendar_holidays, dependent: :destroy
   has_many :sla_levels
   has_many :sla_schedules, inverse_of: :sla_calendar, :dependent => :destroy
 
@@ -74,7 +75,7 @@ class SlaCalendar < ActiveRecord::Base
   private
 
   def sla_cache_level_ids_for_invalidation
-    SlaLevel.unscoped.where(sla_calendar_id: id).pluck(:id)
+    SlaLevel.unscoped.sharing_sla_with_calendars(id).pluck(:id)
   end
 
 end

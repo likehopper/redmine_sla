@@ -1,5 +1,20 @@
 # Changelog
 
+## 3.1.4 - 2026-10-19
+
+### Fixed
+
+-   Invalidate caches of competing levels in the same SLA when calendars,
+    schedules or holiday rules change, including level creation and changes
+    of SLA or calendar assignment.
+-   Remove calendar-holiday links when their calendar or holiday is destroyed,
+    capturing cache dependencies before dependent records are removed.
+
+### Upgrade
+
+-   Update the plugin files and restart Redmine. This release introduces no
+    new migration relative to 3.1.3.
+
 ## 3.1.3 - 2026-10-18
 
 ### Fixed
