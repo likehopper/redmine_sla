@@ -19,7 +19,7 @@ The duration of the resolution commitment goes from the creation of the issue an
 
 ## Summary
 
-With the generate_series function, we generate a list for each minute of the creation of the issue at the closing (or at the current timestamp, if the issue isn't closed).
+With the generate_series function, we generate a list for each minute of the creation of the issue at the closing (or at the current timestamp, if the issue isn't closed). A reopened issue is not closed: Redmine keeps its last closing date (`closed_on`), which is ignored until the issue is closed again.
 
 For example, an issue was created on 06/01/2023 at 10:00 a.m. and it was closed on 06/01/2023 at 10:10 a.m., so we will have a series of 10 lines :
 - 2023-06-01 10:01

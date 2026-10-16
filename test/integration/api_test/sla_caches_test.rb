@@ -25,9 +25,11 @@ class Redmine::ApiTest::SlaCachesTest < ApplicationSlaApiTestCase
   include ActiveJob::TestHelper
   include SlaCachesHelperTest
 
-  issues_in_tma = 10 # project-sla-tests-tma
+  issues_in_tma = 12 # project-sla-tests-tma
   issues_in_std = 41 # project-sla-tests-std
-  issues_for_dev = 21
+  issues_for_dev = 23
+  # Default status filter: only open issues, i.e. "Bug reopened and still open"
+  open_issues_in_tma = 1
   issues_for_sys = 49
 
   # Sla#index in XML then JSON
@@ -120,14 +122,14 @@ class Redmine::ApiTest::SlaCachesTest < ApplicationSlaApiTestCase
     end
   end
 
-  test "GET /sla/caches.xml should return sla_caches issue.tracker_id none" do
+  test "GET /sla/caches.xml should return sla_caches issue.tracker_id open only" do
     ['admin','manager'].each do |user|
       get "/sla/caches.xml?issue.tracker_id=1",
         headers: credentials(user)
       assert_response :success
       assert_equal 'application/xml', @response.media_type
       assert_select 'sla_caches' do
-        assert_select '[total_count=?]', 0
+        assert_select '[total_count=?]', open_issues_in_tma
       end
     end
   end    
@@ -143,7 +145,7 @@ class Redmine::ApiTest::SlaCachesTest < ApplicationSlaApiTestCase
     end
   end
 
-  test "GET /sla/caches.xml should return sla_caches sla_level_id none" do
+  test "GET /sla/caches.xml should return sla_caches sla_level_id open only" do
     sla_cache = SlaCache.where(sla_level_id: 1).first
     ['admin','manager'].each do |user|
       get "/sla/caches.xml?sla_level_id=#{sla_cache.sla_level_id}",
@@ -151,7 +153,7 @@ class Redmine::ApiTest::SlaCachesTest < ApplicationSlaApiTestCase
       assert_response :success
       assert_equal 'application/xml', @response.media_type
       assert_select 'sla_caches' do
-        assert_select '[total_count=?]', 0
+        assert_select '[total_count=?]', open_issues_in_tma
       end
     end
   end 

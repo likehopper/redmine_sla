@@ -1,5 +1,31 @@
 # Changelog
 
+## 3.1.3 - 2026-10-18
+
+### Fixed
+
+-   Keep counting SLA spent time once a closed issue is reopened. Redmine
+    keeps its last closing date (`closed_on`) on reopening, and the
+    calculation stopped there; it is now used only while the issue is
+    closed, in the SQL calculation and the "Explain" view. The spent-time
+    cache of already reopened issues is purged and recalculated. Requires
+    the plugin migration.
+
+### Tests
+
+-   Add reopened issue fixtures: one reopened and still open, one reopened
+    then closed again. The fixture generator accepts status changes after
+    closing (`issue_status_changes` CSV column) and no longer needs a
+    project's rows to be contiguous.
+
+### Upgrade
+
+-   Back up the database and run `bundle exec rake redmine:plugins:migrate
+    NAME=redmine_sla RAILS_ENV=production` after updating the plugin files,
+    then restart Redmine. Migration `202111112021024` redeploys
+    `sla_view_journal_statuses` and `sla_get_spent`, and purges the spent-time
+    cache of reopened issues; it is recalculated on demand or by `update_sla`.
+
 ## 3.1.2 - 2026-10-17
 
 ### Removed
