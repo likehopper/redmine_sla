@@ -20,6 +20,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 <% html_title(l(:sla_label_global_settings)) %>
 <div class="content"> 
   <div class="contextual">
+    <%= link_to l(:sla_holiday_import_title), import_sla_holidays_path, class: 'icon icon-add' if User.current.admin? %>
     <%= link_to l('sla_label.sla_holiday.new'), new_sla_holiday_path, class: 'icon icon-add' if User.current.allowed_to?(:manage_sla, nil, global: true) %>
   </div>
   <div class="title-sla-settings title-sla_holiday">
