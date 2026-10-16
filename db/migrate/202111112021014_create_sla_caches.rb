@@ -21,12 +21,9 @@
 #   avoiding repeated computation of SLA levels. It includes:
 #     - the detected SLA level for the issue,
 #     - start date of the SLA countdown,
-#     - timestamps for updates,
-#     - functions used to calculate SLA levels and detect overlaps.
+#     - timestamps for updates.
 #
-#   This migration also loads the SQL functions:
-#     - sla_get_level_overlap
-#     - sla_get_level
+#   This migration also loads the SQL function sla_get_level.
 
 class CreateSlaCaches < ActiveRecord::Migration[5.2]
 
@@ -105,17 +102,11 @@ class CreateSlaCaches < ActiveRecord::Migration[5.2]
           say "Created constraints on table sla_caches"
         end
 
-        # Load supporting SQL functions.
+        # Load the SQL function.
         # MySQL has no CREATE OR REPLACE FUNCTION (unlike PostgreSQL, whose
         # files already self-contain an equivalent DROP), and Rails' mysql2
         # driver doesn't support multiple statements in a single execute call,
-        # so the drops are issued separately here.
-        if RedmineSla::DbDialect.adapter == :mysql
-          execute "DROP FUNCTION IF EXISTS sla_get_level_overlap ;"
-        end
-        execute RedmineSla::DbDialect.function_sql('sla_get_level_overlap')
-        say "Created function sla_get_level_overlap"
-
+        # so the drop is issued separately here.
         execute "DROP FUNCTION IF EXISTS sla_get_level ;" if RedmineSla::DbDialect.adapter == :mysql
         execute RedmineSla::DbDialect.function_sql('sla_get_level')
         say "Created function sla_get_level"
@@ -129,6 +120,9 @@ class CreateSlaCaches < ActiveRecord::Migration[5.2]
           DROP FUNCTION IF EXISTS sla_get_level ;
         SQL
         say "Dropped function sla_get_level"
+
+        # Left by installations that have not run 202111112021023
+        execute "DROP FUNCTION IF EXISTS sla_get_level_overlap ;"
 
         # Drop table
         drop_table :sla_caches

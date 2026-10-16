@@ -16,11 +16,12 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 # File: redmine_sla/db/migrate/202111112021019_create_sla_explain_functions.rb
 # Purpose:
-#   Deploy the read-only diagnostic functions `sla_explain_level` and
-#   `sla_explain_spent`, used exclusively by the on-demand "Explain" action
-#   (SlaCachesController#explain). They mirror the matching logic of
-#   sla_get_level/sla_get_spent but never write to sla_caches/sla_cache_spents
-#   — the production calculation functions are not modified by this migration.
+#   Formerly deployed the PostgreSQL-only diagnostic functions
+#   `sla_explain_level` and `sla_explain_spent`. The "Explain" action
+#   (SlaCachesController#explain) now uses the adapter-neutral
+#   RedmineSla::SlaExplanation service, so nothing is created anymore;
+#   202111112021023 drops them from existing installations. Rollback still
+#   drops them, for installations that have not run 202111112021023.
 
 class CreateSlaExplainFunctions < ActiveRecord::Migration[5.2]
 
@@ -29,22 +30,7 @@ class CreateSlaExplainFunctions < ActiveRecord::Migration[5.2]
     reversible do |dir|
 
       dir.up do
-
-        # MySQL/MariaDB do not support table-valued functions. Their
-        # diagnostic queries are executed through the adapter-neutral Ruby
-        # explanation service instead.
-        next unless RedmineSla::DbDialect.adapter == :postgresql
-
-        execute File.read(
-          File.expand_path('../../sql_functions/sla_explain_level.sql', __FILE__)
-        )
-        say "Created function sla_explain_level"
-
-        execute File.read(
-          File.expand_path('../../sql_functions/sla_explain_spent.sql', __FILE__)
-        )
-        say "Created function sla_explain_spent"
-
+        # Nothing to create anymore (see Purpose above).
       end
 
       dir.down do

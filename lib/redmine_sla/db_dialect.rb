@@ -75,9 +75,9 @@ module RedmineSla
 
     # MySQL/MariaDB cap recursive CTE depth at 1000 by default: MySQL raises
     # ER_CTE_RECURSION_LIMIT past that, MariaDB instead silently truncates
-    # the result with only a warning. sla_get_level/sla_get_level_overlap/
-    # sla_get_spent rely on deeper recursion for anything beyond a ~2.7-year
-    # window, so the cap must be raised before they run.
+    # the result with only a warning. sla_get_level/sla_get_spent rely on
+    # deeper recursion for anything beyond a ~2.7-year window, so the cap
+    # must be raised before they run.
     #
     # This can't live inside those stored FUNCTIONs: the session variable
     # controlling it is named differently per engine (cte_max_recursion_depth
