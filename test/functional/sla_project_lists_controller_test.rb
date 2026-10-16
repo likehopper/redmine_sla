@@ -93,8 +93,8 @@ class SlaProjectListsProjectsControllerTest < ApplicationSlaFunctionalsTestCase
   # Expected SLA visibility per profile: projects listed, and projects whose
   # SLAs are shown (cell / board icon). nil = column and filter not offered.
   PROFILES = {
-    'admin'     => { listed: [1, 2, 3, 4, 5], sla: [1, 2, 3, 4] },
-    'manager'   => { listed: [1, 2, 3, 4, 5], sla: [1, 2, 3, 4] },
+    'admin'     => { listed: [1, 2, 3, 4, 5, 6], sla: [1, 2, 3, 4] },
+    'manager'   => { listed: [1, 2, 3, 4, 5, 6], sla: [1, 2, 3, 4] },
     'developer' => { listed: [1, 4],          sla: [1, 4] },
     'reporter'  => { listed: [1, 2, 3, 4],    sla: nil },
     'other'     => { listed: [],              sla: nil }
@@ -218,7 +218,7 @@ class SlaProjectListsAdminControllerTest < ApplicationSlaFunctionalsTestCase
     assert_response :success
     assert sla_column_offered?
     assert sla_filter_offered?
-    assert_equal [1, 2, 3, 4, 5], listed_project_ids
+    assert_equal [1, 2, 3, 4, 5, 6], listed_project_ids
     assert_equal [1, 2, 3, 4], project_ids_with_sla_cell
   end
 
@@ -229,7 +229,7 @@ class SlaProjectListsAdminControllerTest < ApplicationSlaFunctionalsTestCase
     assert_equal [1, 2, 3, 4], listed_project_ids
 
     get :projects, params: { set_filter: 1, c: %w[name slas] }.merge(no_sla_filter)
-    assert_equal [5], listed_project_ids
+    assert_equal [5, 6], listed_project_ids
   end
 
   test "admin: project SLAs shown even when the SLA module is disabled" do
