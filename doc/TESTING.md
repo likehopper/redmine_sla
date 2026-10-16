@@ -1,5 +1,39 @@
 # Testing
 
+## Version 3.1.3 reopened issue spent time
+
+Validated on **2026-10-16** in isolated local test containers:
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1077 / 5576 | 1077 / 5573 | 1077 / 5573 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1077 / 5656 | 1077 / 5653 | 1077 / 5653 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1077 / 6185 | 1077 / 6182 | 1077 / 6182 |
+
+Each combination ran **199 unit, 435 functional, 350 integration/API,
+33 Chromium system and 60 documentation tests**, with zero failures or
+errors: **9,693 tests** across the matrix. Cells record tests / assertions.
+On MariaDB and MySQL, two unit tests are skipped by design: they apply a
+migration inside the test transaction, which `CREATE FUNCTION` and
+`CREATE VIEW` would commit implicitly on those databases. The checks below
+cover both paths. MySQL retained `ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES`
+and `STRICT_ALL_TABLES` in the Rails session.
+
+Regression coverage includes two generated reopened issues: one still open,
+which keeps its first closing date and counts the statuses after reopening,
+and one closed again, which counts up to its last closing. The explanation
+matches the computed spent time, and reopening a closed issue resumes it.
+API cache and spent-time expectations follow the new fixtures.
+
+For every combination, outside test transactions and on the generated
+fixtures, migration `202111112021024` was rolled back and reapplied: only the
+spent cache of the reopened issue was purged, and its recalculated spent time
+counted the time since reopening.
+
+These results cover the exact versions above. No production deployment or
+representative performance benchmark was performed. Historical results below
+remain separate validations of their respective versions.
+
 ## Version 3.1.2 unused SQL function removal
 
 Validated on **2026-10-16** in isolated local test containers:

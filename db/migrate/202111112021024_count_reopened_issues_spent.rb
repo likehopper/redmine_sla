@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
-# File: redmine_sla/db/migrate/202111112021023_count_reopened_issues_spent.rb
+# File: redmine_sla/db/migrate/202111112021024_count_reopened_issues_spent.rb
 # Purpose:
 #   Redmine keeps closed_on, as the last closing date, when an issue is
 #   reopened. SLA spent time stopped there, so it no longer counted for a

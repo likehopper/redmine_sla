@@ -25,7 +25,7 @@
 # Redmine SLA - Redmine's Plugin
 
 require File.expand_path('../../application_sla_units_test_case', __FILE__)
-require Rails.root.join('plugins/redmine_sla/db/migrate/202111112021023_count_reopened_issues_spent')
+require Rails.root.join('plugins/redmine_sla/db/migrate/202111112021024_count_reopened_issues_spent')
 
 class SlaReopenedIssueTest < ApplicationSlaUnitsTestCase
   GTI = 1 # counts New
