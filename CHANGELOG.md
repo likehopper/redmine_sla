@@ -1,5 +1,21 @@
 # Changelog
 
+## 3.3.2 - 2026-10-24
+
+### Tests
+
+-   The fixture generator adds a project without SLA that has an issue
+    (`project-without-sla-with-issue`), to cover ordinary issue tracking
+    outside any SLA. The project list tests and screenshots include it.
+-   The fixture generator also writes `time_entries.yml`: half an hour
+    logged before each status change of the generated issues, and on the
+    issue without SLA. The test suites do not load it yet.
+
+### Upgrade
+
+-   No change for installations: test fixtures only, no migration and no
+    functional change relative to 3.3.1.
+
 ## 3.3.1 - 2026-10-23
 
 ### Documentation

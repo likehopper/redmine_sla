@@ -28,7 +28,7 @@ The filter values only list SLAs assigned to projects the user may see.
 ## Screenshots
 
 Screenshots are taken on the test fixtures: projects 1 to 4 have SLAs,
-`another-project-without-sla` has none.
+`another-project-without-sla` and `project-without-sla-with-issue` have none.
 
 ### Administrator
 

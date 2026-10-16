@@ -14,7 +14,7 @@
 
 ## Overview
 
-Current version: **3.3.1**. See the [changelog](CHANGELOG.md) for release details.
+Current version: **3.3.2**. See the [changelog](CHANGELOG.md) for release details.
 
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
@@ -196,9 +196,9 @@ Fully manageable through UI and REST API:
 | `Rails`            | >= 6.1                                            |
 | `Database`         | PostgreSQL >= 11, MySQL >= 8.0 or MariaDB >= 10.2 |
 
-Version **3.3.1** has been tested on Redmine **5.1.13,
+Version **3.3.2** has been tested on Redmine **5.1.13,
 6.1.4 and 7.0.1**, with all five suites on PostgreSQL, MariaDB and strict
-MySQL. See the [compatibility matrix](doc/TESTING.md#version-331-roles-and-permissions-documentation)
+MySQL. See the [compatibility matrix](doc/TESTING.md#version-332-fixtures-for-a-project-without-sla)
 for exact runtime versions and results.
 
 ------------------------------------------------------------------------
@@ -284,7 +284,12 @@ Plugin is ready to use.
 
 ------------------------------------------------------------------------
 
-## Upgrade to 3.3.1
+## Upgrade to 3.3.2
+
+Version **3.3.2** only extends the test fixtures. Update the plugin files;
+there is no migration and no functional change relative to 3.3.1.
+
+### Previous upgrade: 3.3.1
 
 Version **3.3.1** documents the SLA roles and permissions in the
 [plugin settings](doc/SETTINGS.md#roles-and-permissions). Update the plugin
