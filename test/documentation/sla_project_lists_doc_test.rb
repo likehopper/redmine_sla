@@ -87,8 +87,9 @@ class SlaProjectListsDocTest < ApplicationSlaSystemTestCase
     take_doc_screenshot '01-01-admin-projects-with-sla.png'
 
     visit list_path('/admin/projects', filter: '!*')
-    assert_selector 'table.projects tr[id^="project-"]', count: 1
+    assert_selector 'table.projects tr[id^="project-"]', count: 2
     assert_selector 'table.projects tr#project-5'
+    assert_selector 'table.projects tr#project-6'
     take_doc_screenshot '01-02-admin-projects-without-sla.png'
   end
 

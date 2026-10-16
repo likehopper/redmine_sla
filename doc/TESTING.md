@@ -1,5 +1,35 @@
 # Testing
 
+## Version 3.3.2 fixtures for a project without SLA
+
+Validated on **2026-10-16** in isolated local test containers:
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1166 / 6107 | 1166 / 6104 | 1166 / 6104 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1166 / 6195 | 1166 / 6192 | 1166 / 6192 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1166 / 6733 | 1166 / 6730 | 1166 / 6730 |
+
+Each combination ran **247 unit, 465 functional, 350 integration/API,
+35 Chromium system and 69 documentation tests**, with zero failures or
+errors: **10,494 tests** across the matrix. Cells record tests / assertions.
+The two migration unit tests skipped by design on MariaDB and MySQL are
+those of 3.1.2 and 3.1.3. On Redmine 6.1.4 with MySQL, the unit suite was
+rerun alone after a first run started without its generated fixtures in the
+parallel test environment; the rerun passed. MySQL retained
+`ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES` and `STRICT_ALL_TABLES` in the
+Rails session.
+
+The generated project without SLA and with an issue is listed with the
+projects without SLA by the project list tests, for administrators and
+managers; the project list screenshots were regenerated accordingly. The
+generated `time_entries.yml` is not loaded by the test suites.
+
+This release introduces no migration. These results cover the exact versions
+above. No production deployment or representative performance benchmark was
+performed. Historical results below remain separate validations of their
+respective versions.
+
 ## Version 3.3.1 roles and permissions documentation
 
 Validated on **2026-10-16** in isolated local test containers:
