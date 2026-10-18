@@ -1,5 +1,35 @@
 # Changelog
 
+## 3.1.1 - 2026-10-16
+
+### Fixed
+
+-   Stop SLA calculation for projects whose SLA module is disabled. Their
+    SLA cache is purged when the module is disabled and is no longer rebuilt;
+    their project-tracker SLA configuration is kept and applies again once
+    the module is re-enabled. The issue "Explain" view lists no SLA level
+    for such projects either. Requires the plugin migration.
+-   `update_sla` now processes all projects by default: it updates the SLA
+    cache of projects with the SLA module and purges the cache left on the
+    others. The new `projects=[all,with_sla,without_sla]` option restricts
+    it, e.g. `projects=without_sla` to only clean up the cache.
+-   `update_sla` now applies its `scope` option, previously ignored:
+    `inprogress` (default) updates open issues and closed issues not updated
+    since their closing, `miss` only issues without SLA cache, `all` every
+    issue. `scope=miss` no longer aborts the task.
+-   `update_sla` keeps the SLA cache of projects not active (closed,
+    archived) as it was instead of purging it, since it was rebuilt as soon
+    as an issue was displayed.
+
+### Upgrade
+
+-   Back up the database and run `bundle exec rake redmine:plugins:migrate
+    NAME=redmine_sla RAILS_ENV=production` after updating the plugin files,
+    then restart Redmine. Migration `202111112021021` makes `sla_get_level`
+    return no level for projects without the SLA module.
+-   Run `update_sla` once afterwards to purge the SLA cache left on projects
+    without the SLA module.
+
 ## 3.1.0 - 2026-10-12
 
 ### Added
