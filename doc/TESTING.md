@@ -1,5 +1,37 @@
 # Testing
 
+## Version 3.1.1 SLA module gating and update_sla scope
+
+Validated on **2026-10-16** in isolated local test containers:
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1069 / 5530 | 1069 / 5533 | 1069 / 5533 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1069 / 5610 | 1069 / 5613 | 1069 / 5613 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1069 / 6137 | 1069 / 6140 | 1069 / 6140 |
+
+Each combination passed **191 unit, 435 functional, 350 integration/API,
+33 Chromium system and 60 documentation tests**, with zero failures, errors
+or skips: **9,621 tests** across the matrix. Cells record tests / assertions.
+MySQL retained `ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES` and
+`STRICT_ALL_TABLES` in the Rails session.
+
+Regression coverage includes SLA calculation on projects whose SLA module is
+disabled, then re-enabled: no level is computed, a stale cache is ignored and
+purged, and the project-tracker configuration is kept. Disabling another
+module keeps the cache. The explanation lists no SLA level and the "Explain"
+action is forbidden to administrators and managers on such projects.
+`update_sla` is covered for each `scope` (`inprogress`, `miss`, `all`) and
+`projects` option, rejects unknown values and keeps the cache of a project
+that is not active.
+
+For every combination, migration `202111112021021` was rolled back and
+reapplied, then the SLA module and `update_sla` tests passed again.
+
+These results cover the exact versions above. No production deployment or
+representative performance benchmark was performed. Historical results below
+remain separate validations of their respective versions.
+
 ## Version 3.1.0 descriptions and list corrections
 
 Validated on **2026-10-11** in isolated local test containers:
