@@ -1,5 +1,22 @@
 # Changelog
 
+## 3.1.2 - 2026-10-17
+
+### Removed
+
+-   Drop the unused SQL functions `sla_get_level_overlap` (superseded by the
+    schedule overlap validation) and, on PostgreSQL, `sla_explain_level` and
+    `sla_explain_spent` (the "Explain" view uses the Ruby explanation
+    service on every database). Requires the plugin migration.
+-   Remove the unused `init_task`/`trace` helpers from the plugin Rake tasks.
+
+### Upgrade
+
+-   Back up the database and run `bundle exec rake redmine:plugins:migrate
+    NAME=redmine_sla RAILS_ENV=production` after updating the plugin files,
+    then restart Redmine. Migration `202111112021023` drops the unused SQL
+    functions; rolling it back restores nothing, as nothing calls them.
+
 ## 3.1.1 - 2026-10-16
 
 ### Fixed

@@ -1,5 +1,37 @@
 # Testing
 
+## Version 3.1.2 unused SQL function removal
+
+Validated on **2026-10-16** in isolated local test containers:
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1071 / 5536 | 1071 / 5536 | 1071 / 5536 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1071 / 5616 | 1071 / 5616 | 1071 / 5616 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1071 / 6143 | 1071 / 6143 | 1071 / 6143 |
+
+Each combination ran **193 unit, 435 functional, 350 integration/API,
+33 Chromium system and 60 documentation tests**, with zero failures or
+errors: **9,639 tests** across the matrix. Cells record tests / assertions.
+On MariaDB and MySQL, one unit test is skipped by design: it recreates the
+dropped functions inside the test transaction, which `CREATE FUNCTION` would
+commit implicitly on those databases. The check below covers that path.
+MySQL retained `ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES` and
+`STRICT_ALL_TABLES` in the Rails session.
+
+Regression coverage checks that the unused functions are absent after a fresh
+installation while `sla_get_level` and `sla_get_spent` remain, and that the
+"Explain" view works with the Ruby explanation service on every database.
+
+For every combination, outside test transactions, the functions of an older
+installation were recreated (`sla_get_level_overlap`, plus `sla_explain_level`
+and `sla_explain_spent` on PostgreSQL). Migration `202111112021023` was rolled
+back and reapplied: they were dropped, and the calculation functions kept.
+
+These results cover the exact versions above. No production deployment or
+representative performance benchmark was performed. Historical results below
+remain separate validations of their respective versions.
+
 ## Version 3.1.1 SLA module gating and update_sla scope
 
 Validated on **2026-10-16** in isolated local test containers:

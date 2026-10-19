@@ -20,15 +20,15 @@
 
 require File.expand_path('../../application_sla_units_test_case', __FILE__)
 
-# Checks that the read-only sla_explain_level/sla_explain_spent functions
-# (used by the "Explain" action) agree with what the production
-# sla_get_level/sla_get_spent functions actually computed and cached —
+# Checks that the read-only RedmineSla::SlaExplanation service (used by the
+# "Explain" action) agrees with what the production sla_get_level/
+# sla_get_spent functions actually computed and cached —
 # the explanation must never tell a different story than the real result.
 class SlaExplainTest < ApplicationSlaUnitsTestCase
 
   @@array_fixtures_issues = YAML.load_file(Dir.pwd+"/plugins/redmine_sla/test/config/fixtures.yml")
 
-  test "#SlaExplainTest sla_explain_level selects the same level as the cache" do
+  test "#SlaExplainTest explained levels select the same level as the cache" do
 
     array_fixtures_issues = @@array_fixtures_issues
 
@@ -46,15 +46,15 @@ class SlaExplainTest < ApplicationSlaUnitsTestCase
           "issue #{issue_id}: expected no selected SLA level, got #{level_rows.inspect}"
       else
         selected = level_rows.find { |r| r['selected'] }
-        assert selected, "issue #{issue_id}: sla_explain_level returned no selected row"
+        assert selected, "issue #{issue_id}: explanation returned no selected level"
         assert_equal sla_cache.sla_level_id, selected['sla_level_id'].to_i,
-          "issue #{issue_id}: sla_explain_level selected level #{selected['sla_level_id']} but cache has #{sla_cache.sla_level_id}"
+          "issue #{issue_id}: explanation selected level #{selected['sla_level_id']} but cache has #{sla_cache.sla_level_id}"
       end
     }
 
   end
 
-  test "#SlaExplainTest sla_explain_spent totals match the officially computed spent time" do
+  test "#SlaExplainTest explained spent totals match the officially computed spent time" do
 
     array_fixtures_issues = @@array_fixtures_issues
 
@@ -81,7 +81,7 @@ class SlaExplainTest < ApplicationSlaUnitsTestCase
         explained_total = spent_rows.sum { |r| r['minutes_counted'].to_i }
 
         assert_equal spent, explained_total,
-          "issue #{issue_id} type #{sla_type_id}: sla_explain_spent total=#{explained_total} but expected #{spent}"
+          "issue #{issue_id} type #{sla_type_id}: explained total=#{explained_total} but expected #{spent}"
       }
     }
 
