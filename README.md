@@ -14,7 +14,7 @@
 
 ## Overview
 
-Current version: **3.1.2**. See the [changelog](CHANGELOG.md) for release details.
+Current version: **3.1.3**. See the [changelog](CHANGELOG.md) for release details.
 
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
@@ -195,9 +195,9 @@ Fully manageable through UI and REST API:
 | `Rails`            | >= 6.1                                            |
 | `Database`         | PostgreSQL >= 11, MySQL >= 8.0 or MariaDB >= 10.2 |
 
-Version **3.1.2** has been tested on Redmine **5.1.13,
+Version **3.1.3** has been tested on Redmine **5.1.13,
 6.1.4 and 7.0.1**, with all five suites on PostgreSQL, MariaDB and strict
-MySQL. See the [compatibility matrix](doc/TESTING.md#version-312-unused-sql-function-removal)
+MySQL. See the [compatibility matrix](doc/TESTING.md#version-313-reopened-issue-spent-time)
 for exact runtime versions and results.
 
 ------------------------------------------------------------------------
@@ -283,7 +283,22 @@ Plugin is ready to use.
 
 ------------------------------------------------------------------------
 
-## Upgrade to 3.1.2
+## Upgrade to 3.1.3
+
+Version **3.1.3** keeps counting SLA spent time once a closed issue is
+reopened. Redmine keeps the last closing date on reopening, and the
+calculation stopped there; it now uses it only while the issue is closed.
+Back up the database, update the plugin files, then run:
+
+```sh
+bundle exec rake redmine:plugins:migrate NAME=redmine_sla RAILS_ENV=production
+```
+
+Restart Redmine after migration (`202111112021024`). The spent-time cache of
+issues already reopened is purged and recalculated on demand, or at once with
+`update_sla`.
+
+### Previous upgrade: 3.1.2
 
 Version **3.1.2** removes SQL functions nothing calls anymore:
 `sla_get_level_overlap` and, on PostgreSQL, `sla_explain_level` and
