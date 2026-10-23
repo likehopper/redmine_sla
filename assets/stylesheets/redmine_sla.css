@@ -283,3 +283,14 @@ tr.sla-explain-no-schedule td { color: #999; font-style: italic; }
 /*** SLA Level Terms matrix: per-level SLA type masking ***/
 #sla-level-terms-table .sla-type-hidden { display: none; }
 #sla-level-terms-table.sla-types-all-visible .sla-type-hidden { display: table-cell; }
+
+/* Project board (projects#index): SLA icon after the name of projects with visible SLAs */
+#projects-index a.project.has-sla::after {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-left: 4px;
+  vertical-align: text-bottom;
+  background: url('../images/sla_16.png') no-repeat center / 16px 16px;
+}
