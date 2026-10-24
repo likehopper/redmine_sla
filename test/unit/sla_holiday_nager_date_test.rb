@@ -38,20 +38,20 @@ class SlaHolidayNagerDateTest < ApplicationSlaUnitsTestCase
   end
 
   def holiday(attributes = {})
-    { 'date' => '2026-01-01', 'localName' => 'Jour de l’an', 'name' => 'New Year',
-      'countryCode' => 'FR', 'global' => true, 'counties' => nil, 'types' => ['Public'] }.merge(attributes)
+    { 'date' => '2026-01-01', 'name' => 'New Year',
+      'countryCode' => 'FR', 'nationalHoliday' => true, 'subdivisionCodes' => nil, 'holidayTypes' => ['Public'] }.merge(attributes)
   end
 
   test 'country endpoint checks access and returns country options' do
-    @http.expects(:get).with('/api/v3/AvailableCountries', 'Accept' => 'application/json').returns(response([{ 'countryCode' => 'FR', 'name' => 'France' }]))
-    assert @adapter.accessible?
+    @http.expects(:get).with('/api/v4/Countries/Available', 'Accept' => 'application/json').returns(response([{ 'countryCode' => 'FR', 'name' => 'France' }]))
+    assert_equal [['France', 'FR']], @adapter.available_countries
   end
 
-  test 'normalizes local names and regional public holidays' do
-    @http.expects(:get).returns(response([holiday, holiday('global' => false, 'counties' => ['FR-67']), holiday('types' => ['Bank'])]))
+  test 'normalizes English names and regional public holidays' do
+    @http.expects(:get).with('/api/v4/Holidays/FR/2026', 'Accept' => 'application/json').returns(response([holiday, holiday('nationalHoliday' => false, 'subdivisionCodes' => ['FR-67']), holiday('holidayTypes' => ['Bank'])]))
     result = @adapter.holidays(year: 2026, country: 'fr')
     assert_equal 2, result.size
-    assert_equal 'Jour de l’an', result.first['name']
+    assert_equal 'New Year', result.first['name']
     assert_equal ['FR-67'], result.last['regions']
     assert_equal false, result.last['national']
   end
@@ -80,5 +80,32 @@ class SlaHolidayNagerDateTest < ApplicationSlaUnitsTestCase
     result.stubs(:body).returns('<html>Error</html>')
     @http.expects(:get).returns(result)
     assert_equal 'invalid_response', assert_raises(SlaHolidayAdapters::NagerDate::Error) { @adapter.available_countries }.message
+  end
+
+  test 'rejects malformed holiday fields instead of coercing them to strings' do
+    invalid_attributes = [
+      { 'name' => { 'unexpected' => 'object' } }, { 'name' => 123 }, { 'name' => ' ' },
+      { 'nationalHoliday' => 'true' }, { 'subdivisionCodes' => [123] },
+      { 'subdivisionCodes' => ['DE-BY'] }, { 'holidayTypes' => ['Public', {}] },
+      { 'countryCode' => 'DE' }, { 'date' => '2026-02-30' }
+    ]
+    invalid_attributes.each do |attributes|
+      @http.expects(:get).returns(response([holiday(attributes)]))
+      error = assert_raises(SlaHolidayAdapters::NagerDate::Error) { @adapter.holidays(year: 2026, country: 'FR') }
+      assert_equal 'invalid_response', error.message
+    end
+  end
+
+  test 'rejects malformed country lists' do
+    [nil, [], [{}], [{ 'countryCode' => 'fr', 'name' => 'France' }],
+     [{ 'countryCode' => 'FR', 'name' => {} }]].each do |countries|
+      @http.expects(:get).returns(response(countries))
+      assert_raises(SlaHolidayAdapters::NagerDate::Error) { @adapter.available_countries }
+    end
+  end
+
+  test 'accepts an empty holiday list' do
+    @http.expects(:get).returns(response([]))
+    assert_empty @adapter.holidays(year: 2026, country: 'FR')
   end
 end

@@ -23,7 +23,9 @@ the list by project).
 
 A project whose SLAs the user may not see behaves as a project without
 SLA: no value in the column, no icon, and it matches the "none" filter.
-The filter values only list SLAs assigned to projects the user may see.
+For non-administrators, the filter values only list SLAs assigned to projects
+where they have SLA access. Administrators can select any SLA, including
+unassigned ones.
 
 ## Screenshots
 
