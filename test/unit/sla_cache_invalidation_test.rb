@@ -25,11 +25,13 @@
 require File.expand_path('../../application_sla_units_test_case', __FILE__)
 
 class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
-  test "calendar update invalidates caches of all competing levels" do
+  test "calendar metadata changes preserve caches" do
     calendar = calendar_with_cached_level
 
-    assert_only_levels_invalidated(level_ids_for(calendar)) do
-      calendar.update!(name: "#{calendar.name} updated")
+    assert_cache_queries(0) do
+      assert_caches_preserved do
+        calendar.update!(name: "#{calendar.name} updated", description: "Updated metadata")
+      end
     end
   end
 
@@ -41,7 +43,7 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     end
   end
 
-  test "holiday update invalidates caches for every linked calendar" do
+  test "holiday date update invalidates caches for every linked calendar" do
     calendar_holiday = SlaCalendarHoliday.unscoped.detect do |record|
       level_ids_for(record.sla_calendar).any?
     end
@@ -49,7 +51,7 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     level_ids = linked_calendar_ids(holiday).flat_map { |id| level_ids_for(SlaCalendar.find(id)) }
 
     assert_only_levels_invalidated(level_ids) do
-      holiday.update!(name: "#{holiday.name} updated")
+      holiday.update!(date: "2030-02-03")
     end
   end
 
@@ -180,8 +182,9 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     spent_ids = SlaCacheSpent.unscoped.order(:id).pluck(:id)
     assert_not_empty spent_ids
     SlaCalendar.transaction(requires_new: true) do
+      schedule = calendar.sla_schedules.first
       assert_only_levels_invalidated(level_ids_for(calendar)) do
-        calendar.update!(name: "Rollback calendar")
+        schedule.update!(match: !schedule.match)
       end
       raise ActiveRecord::Rollback
     end
@@ -266,7 +269,140 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     assert_equal 5, SlaCache.find_by_issue_id(issue.id).sla_level_id
   end
 
+  test "holiday name changes preserve caches without dependency queries" do
+    holiday = SlaCalendarHoliday.unscoped.find_by!(sla_calendar_id: 1).sla_holiday
+    assert_cache_queries(0) do
+      assert_caches_preserved { holiday.update!(name: "Renamed holiday") }
+    end
+  end
+
+  test "holiday name and date changes still invalidate linked calendars" do
+    holiday = SlaCalendarHoliday.unscoped.find_by!(sla_calendar_id: 1).sla_holiday
+    ids = linked_calendar_ids(holiday).flat_map { |id| level_ids_for(SlaCalendar.find(id)) }
+    assert_only_levels_invalidated(ids) do
+      holiday.update!(name: "Renamed and moved holiday", date: "2030-02-03")
+    end
+  end
+
+  test "calendar rename with nested schedule changes still invalidates competing levels" do
+    calendar = calendar_with_cached_level
+    schedule = calendar.sla_schedules.first
+    assert_only_levels_invalidated(level_ids_for(calendar)) do
+      calendar.update!(name: "Renamed with schedule", sla_schedules_attributes: [
+        {id: schedule.id, match: schedule.match ? "0" : "1"}
+      ])
+    end
+  end
+
+  test "destroying a calendar captures dependencies and deletes caches once for many children" do
+    calendar = calendar_with_cached_level
+    10.times do |index|
+      holiday = SlaHoliday.create!(name: "Extra holiday #{index}", date: Date.new(2030, 1, 1) + index)
+      SlaCalendarHoliday.create!(sla_calendar: calendar, sla_holiday: holiday, match: false)
+    end
+    # Setup changes invalidate caches; repopulate before measuring destruction.
+    Rake::Task['sla:update'].execute
+    ids = level_ids_for(calendar)
+    assert_operator calendar.sla_schedules.count, :>, 1
+    calendar.name = "Unsaved metadata"
+    assert_only_levels_invalidated(ids) do
+      assert_cache_queries(2) { calendar.destroy! }
+    end
+    assert_empty SlaCalendarHoliday.unscoped.where(sla_calendar_id: calendar.id)
+    assert_empty SlaSchedule.unscoped.where(sla_calendar_id: calendar.id)
+  end
+
+  test "destroying a holiday captures dependencies and deletes caches once for many links" do
+    holiday = SlaHoliday.create!(name: "Shared exclusion", date: "2030-02-03")
+    SlaCalendar.find_each do |calendar|
+      SlaCalendarHoliday.create!(sla_calendar: calendar, sla_holiday: holiday, match: false)
+    end
+    Rake::Task['sla:update'].execute
+    ids = linked_calendar_ids(holiday).flat_map { |id| level_ids_for(SlaCalendar.find(id)) }
+    assert_operator holiday.sla_calendar_holidays.count, :>, 1
+    assert_only_levels_invalidated(ids) do
+      assert_cache_queries(3) { holiday.destroy! }
+    end
+    assert_empty SlaCalendarHoliday.unscoped.where(sla_holiday_id: holiday.id)
+  end
+
+  test "parent destruction invalidates once after an aborted child destruction" do
+    calendar = calendar_with_cached_level
+    calendar.sla_schedules.load
+    schedule = calendar.sla_schedules.first
+    abort_destroy = :abort_sla_cache_test_destruction
+    schedule.define_singleton_method(abort_destroy) { throw(:abort) }
+    begin
+      SlaSchedule.set_callback(:destroy, :before, abort_destroy, if: ->(record) { record.equal?(schedule) })
+      assert_caches_preserved { assert_not schedule.destroy }
+    ensure
+      SlaSchedule.skip_callback(:destroy, :before, abort_destroy)
+    end
+    assert_only_levels_invalidated(level_ids_for(calendar)) do
+      assert_cache_queries(2) { calendar.destroy! }
+    end
+  end
+
+  test "rolling back a dependent destruction restores configuration links and caches" do
+    calendar = calendar_with_cached_level
+    schedule_ids = calendar.sla_schedules.order(:id).pluck(:id)
+    link_ids = calendar.sla_calendar_holidays.order(:id).pluck(:id)
+    assert_not_empty link_ids
+    assert_caches_preserved do
+      SlaCalendar.transaction(requires_new: true) do
+        calendar.destroy!
+        raise ActiveRecord::Rollback
+      end
+    end
+    assert SlaCalendar.exists?(calendar.id)
+    assert_equal schedule_ids, calendar.sla_schedules.reload.order(:id).pluck(:id)
+    assert_equal link_ids, calendar.sla_calendar_holidays.reload.order(:id).pluck(:id)
+  end
+
+  test "aborted dependent destruction preserves configuration and caches" do
+    calendar = calendar_with_cached_level
+    schedule = calendar.sla_schedules.first
+    abort_destroy = :abort_sla_cache_test_destruction
+    calendar.define_singleton_method(abort_destroy) { throw(:abort) }
+    begin
+      SlaCalendar.set_callback(:destroy, :before, abort_destroy, if: ->(record) { record.equal?(calendar) })
+      assert_caches_preserved { assert_not calendar.destroy }
+    ensure
+      SlaCalendar.skip_callback(:destroy, :before, abort_destroy)
+    end
+    assert SlaCalendar.exists?(calendar.id)
+    assert SlaSchedule.exists?(schedule.id)
+    assert_cache_queries(0) do
+      assert_caches_preserved { calendar.update!(name: "Renamed after aborted destruction") }
+    end
+  end
+
   private
+
+  def assert_caches_preserved
+    cache_ids = SlaCache.unscoped.order(:id).pluck(:id)
+    spent_ids = SlaCacheSpent.unscoped.order(:id).pluck(:id)
+    assert_not_empty cache_ids
+    assert_not_empty spent_ids
+    yield
+    assert_equal cache_ids, SlaCache.unscoped.order(:id).pluck(:id)
+    assert_equal spent_ids, SlaCacheSpent.unscoped.order(:id).pluck(:id)
+  end
+
+  # Count dependency SELECTs and cache DELETEs, excluding verification reads.
+  def assert_cache_queries(expected)
+    queries = []
+    subscriber = lambda do |*args|
+      sql = args.last[:sql]
+      if sql.match?(/\ASELECT.*FROM ["`]?sla_levels["`]?/i) ||
+          sql.match?(/\ASELECT.*sla_calendar_id.*FROM ["`]?sla_calendar_holidays["`]?/i) ||
+          sql.match?(/\ADELETE FROM ["`]?sla_caches["`]?/i)
+        queries << sql
+      end
+    end
+    ActiveSupport::Notifications.subscribed(subscriber, 'sql.active_record') { yield }
+    assert_equal expected, queries.size, queries.join("\n")
+  end
 
   def cached_level_ids
     SlaCache.unscoped.distinct.pluck(:sla_level_id)
