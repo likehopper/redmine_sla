@@ -1,5 +1,34 @@
 # Testing
 
+## Version 3.3.3 issue SLA block for configured trackers
+
+Validated on **2026-10-24** in isolated local test containers:
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1168 / 6120 | 1168 / 6117 | 1168 / 6117 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1168 / 6208 | 1168 / 6205 | 1168 / 6205 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1168 / 6747 | 1168 / 6744 | 1168 / 6744 |
+
+Each combination ran **247 unit, 465 functional, 352 integration/API,
+35 Chromium system and 69 documentation tests**, with zero failures or
+errors: **10,512 tests** across the matrix. Cells record tests / assertions.
+The two migration unit tests skipped by design on MariaDB and MySQL are
+those of 3.1.2 and 3.1.3. Each suite ran on a freshly migrated database with
+freshly generated fixtures. On Redmine 5.1.13 with PostgreSQL, the
+documentation suite was rerun alone after a transient Chromium inspector
+error; the rerun passed. MySQL retained `ONLY_FULL_GROUP_BY`,
+`STRICT_TRANS_TABLES` and `STRICT_ALL_TABLES` in the Rails session.
+
+Two integration tests cover the issue page: a tracker without SLA in the
+project shows no SLA block, and a tracker with an SLA but no applicable level
+keeps the *Explain* link. The first one fails without the fix.
+
+This release introduces no migration. These results cover the exact versions
+above. No production deployment or representative performance benchmark was
+performed. Historical results below remain separate validations of their
+respective versions.
+
 ## Version 3.3.2 fixtures for a project without SLA
 
 Validated on **2026-10-16** in isolated local test containers:
