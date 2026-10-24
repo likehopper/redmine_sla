@@ -19,6 +19,10 @@ records. A subsequent read recalculates the SLA level and spent time.
   or calendar invalidates candidates of both the old and new SLA. Other level
   changes and level destruction invalidate its own caches.
 - Term changes invalidate their level; moving a term includes both levels.
+- Issue custom field changes and deletion, and creating, changing, moving or
+  deleting one of its enumeration values (with or without reassignment),
+  invalidate the levels using that field. Moving a value includes its previous
+  field. Other fields keep their caches.
 - Calendar and holiday destruction also removes their calendar-holiday links.
   Dependencies are captured before dependent associations are destroyed; the
   parent invalidates once and removes schedules/links in bulk with Rails

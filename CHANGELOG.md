@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.1.5 - 2026-10-24
+
+### Fixed
+
+-   Invalidate the SLA caches of levels using an issue custom field when
+    that field or one of its enumeration values is changed, created, moved
+    or deleted, including deletion with reassignment. Unrelated fields keep
+    their caches; validation failures and rolled back changes too.
+
+### Upgrade
+
+-   Update the plugin files and restart Redmine. This release introduces no
+    new migration relative to 3.1.4.
+
 ## 3.1.4 - 2026-10-24
 
 ### Fixed
