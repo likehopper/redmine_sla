@@ -1,0 +1,58 @@
+<%#
+File: redmine_sla/app/views/sla_holidays/import_form.html.erb
+SPDX-License-Identifier: GPL-2.0-or-later
+
+Redmine SLA - service level agreement plugin
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
+-%>
+<% html_title l(:sla_holiday_import_title) %>
+<h2><%= l(:sla_holiday_import_title) %></h2>
+<p><%= l(:sla_holiday_import_description) %></p>
+<%= form_tag preview_import_sla_holidays_path do %>
+  <div class="box tabular">
+    <p><%= label_tag :year, l(:label_year) %><%= number_field_tag :year, @year, min: 1, max: 9999, required: true %></p>
+    <p><%= label_tag :country, l(:sla_holiday_import_country) %><%= select_tag :country, options_for_select(@countries || [], @country), include_blank: true, required: true %></p>
+  </div>
+  <%= submit_tag l(:label_preview), disabled: @countries.blank? %>
+  <%= link_to l(:button_cancel), sla_holidays_path %>
+  <%= link_to l(:button_refresh), import_sla_holidays_path if @countries.blank? %>
+<% end %>
+<% if @holidays %>
+  <h3><%= l(:label_preview) %></h3>
+  <% if @holidays.empty? %>
+    <p class="nodata"><%= l(:label_no_data) %></p>
+  <% else %>
+    <p><%= l(:sla_holiday_import_selection_hint) %></p>
+    <%= form_tag import_sla_holidays_path do %>
+      <%= hidden_field_tag :preview_token, @preview_token %>
+      <table class="list">
+        <thead><tr><th></th><th><%= l(:field_date) %></th><th><%= l(:field_name) %></th><th><%= l(:sla_holiday_import_scope) %></th><th><%= l(:sla_holiday_import_existing) %></th></tr></thead>
+        <tbody>
+          <% @holidays.each_with_index do |holiday, index| %>
+            <tr>
+              <td><%= check_box_tag 'selected[]', index, holiday['national'] && holiday['existing_name'].nil?, id: "holiday_#{index}", disabled: holiday['existing_name'].present? %></td>
+              <td><%= format_date(Date.iso8601(holiday['date'])) %></td>
+              <td><%= label_tag "holiday_#{index}", holiday['name'] %></td>
+              <td><%= holiday['national'] ? l(:sla_holiday_import_national) : holiday['regions'].join(', ') %></td>
+              <td><%= holiday['existing_name'] %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <%= submit_tag l(:button_import) %>
+    <% end %>
+  <% end %>
+<% end %>
+<%= render partial: 'slas/sidebar' %>

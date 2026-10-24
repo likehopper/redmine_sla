@@ -1,5 +1,40 @@
 # Testing
 
+## Version 3.3.0 public holiday import
+
+Validated on **2026-10-24**, after integrating main's corrections, in isolated
+local test containers (final Redmine 5.1/PostgreSQL unit and holiday-browser
+recheck on **2026-10-25**):
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1181 / 6333 | 1181 / 6330 | 1181 / 6330 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1181 / 6429 | 1181 / 6426 | 1181 / 6426 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1181 / 6979 | 1181 / 6976 | 1181 / 6976 |
+
+Each combination ran **262 unit, 470 functional, 350 integration/API,
+35 Chromium system and 64 documentation tests**: **10,629 tests /
+59,205 assertions**, zero failures or errors. Cells record tests /
+assertions. The 12 expected skips are the two migration unit tests for 3.1.2
+and 3.1.3 on MariaDB/MySQL. MySQL retains `ONLY_FULL_GROUP_BY`,
+`STRICT_TRANS_TABLES` and `STRICT_ALL_TABLES`; MariaDB uses strict mode without
+`ONLY_FULL_GROUP_BY`.
+
+Coverage includes API v4 normalization, malformed names/regions/types/countries,
+HTTP/network/JSON errors, previews without writes, repeated and atomic imports,
+signed/expired previews, invalid selections, access control and the browser form.
+The malformed-name regression fails against the original API v3 implementation.
+Initial 6.1/7 unit runs exposed core fixtures loaded by a boot test; disabling
+its unused fixtures fixes the isolation, and the final matrix passes.
+
+All holiday calls in the suites are stubbed. Separate read-only live API v4
+checks on 2026-10-24 returned 204 countries and normalized France (11 holidays), Germany
+(19, including 10 regional entries) and the USA (13, including 3 regional
+entries) for 2026. API v4 supplies holiday names in English.
+
+No new migration, production deployment or representative performance benchmark.
+Historical results below remain validations of their respective versions.
+
 ## Version 3.2.0 projects with SLA in project lists
 
 After integrating main's cache corrections on **2026-10-24**, all nine

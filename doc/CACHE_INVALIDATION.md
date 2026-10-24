@@ -38,10 +38,10 @@ records. A subsequent read recalculates the SLA level and spent time.
 
 The controllers for calendars, schedules, calendar-holiday links, holidays,
 levels and terms use Active Record save/update/destroy methods, including bulk
-controller deletions and nested schedules/terms. These paths execute the
-invalidation callbacks. The dependent schedule/link cleanup uses bulk deletion,
-covered by the parent's captured dependencies. Other configuration writes in
-these paths do not bypass callbacks.
+controller deletions and nested schedules/terms. The holiday importer (3.3.0)
+uses `create!`. These paths execute the invalidation callbacks. The dependent
+schedule/link cleanup uses bulk deletion, covered by the parent's captured
+dependencies. Other configuration writes in these paths do not bypass callbacks.
 
 Direct SQL and Active Record writes that skip callbacks remain outside this
 mechanism. External scripts must explicitly invalidate affected caches.

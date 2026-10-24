@@ -14,7 +14,7 @@
 
 ## Overview
 
-Current version: **3.2.0**. See the [changelog](CHANGELOG.md) for release details.
+Current version: **3.3.0**. See the [changelog](CHANGELOG.md) for release details.
 
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
@@ -125,7 +125,7 @@ Fully manageable through UI and REST API:
 -   SLAs
 -   SLA Types
 -   SLA Statuses
--   SLA Holidays
+-   SLA Holidays (with public holiday import)
 -   SLA Calendars
 -   Weekly schedules
 -   Calendar-specific holidays
@@ -196,9 +196,9 @@ Fully manageable through UI and REST API:
 | `Rails`            | >= 6.1                                            |
 | `Database`         | PostgreSQL >= 11, MySQL >= 8.0 or MariaDB >= 10.2 |
 
-Version **3.2.0** has been tested on Redmine **5.1.13,
+Version **3.3.0** has been tested on Redmine **5.1.13,
 6.1.4 and 7.0.1**, with all five suites on PostgreSQL, MariaDB and strict
-MySQL. See the [compatibility matrix](doc/TESTING.md#version-320-projects-with-sla-in-project-lists)
+MySQL. See the [compatibility matrix](doc/TESTING.md#version-330-public-holiday-import)
 for exact runtime versions and results.
 
 ------------------------------------------------------------------------
@@ -284,7 +284,17 @@ Plugin is ready to use.
 
 ------------------------------------------------------------------------
 
-## Upgrade to 3.2.0
+## Upgrade to 3.3.0
+
+Version **3.3.0** imports public holidays from Nager.Date: from the SLA holiday
+list, administrators choose a year and a country, preview the holidays and
+import the selected dates. An optional default country can be set in the
+plugin settings. See [Public holiday import](doc/HOLIDAY_IMPORT.md). Update the
+plugin files and restart Redmine; this release introduces no new migration
+relative to 3.2.0. The Redmine server needs outbound HTTPS access to
+`nagerholidays.com` to use the import.
+
+### Previous upgrade: 3.2.0
 
 Version **3.2.0** adds an **SLA** column and filter to the project lists
 (`Projects` in list mode and `Administration > Projects`) and an SLA icon in
@@ -428,6 +438,7 @@ Restart application server.
 -   [SLA Compute Explanation](doc/COMPUTE.md)
 -   [Plugin settings](doc/SETTINGS.md)
 -   [Projects with SLA](doc/PROJECT_LISTS.md)
+-   [Public holiday import](doc/HOLIDAY_IMPORT.md)
 -   [API Rest for SLA](doc/API.md)
 -   [Tasks](doc/TASKS.md)
 -   [Change log](CHANGELOG.md)
