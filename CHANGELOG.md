@@ -7,13 +7,13 @@
 -   Document the SLA roles and permissions (`view_sla`, `manage_sla`) in the
     plugin settings guide, with screenshots of the role form and the
     permissions report, and link them from the examples, use cases and
-    testing guide. Fix the default display setting and typos.
+    testing guide. Clarify the display setting description and fix typos.
 -   Describe the fixture users and roles in a table in the testing guide.
 
 ### Tests
 
 -   Generate the roles and permissions screenshots in a documentation test.
-    Documentation screenshots can be written to a dedicated folder.
+    Check granted permissions and refuse role administration to non-admins.
 
 ### Upgrade
 

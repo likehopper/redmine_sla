@@ -196,9 +196,9 @@ Fully manageable through UI and REST API:
 | `Rails`            | >= 6.1                                            |
 | `Database`         | PostgreSQL >= 11, MySQL >= 8.0 or MariaDB >= 10.2 |
 
-Version **3.3.1** has been tested on Redmine **5.1.13,
-6.1.4 and 7.0.1**, with all five suites on PostgreSQL, MariaDB and strict
-MySQL. See the [compatibility matrix](doc/TESTING.md#version-331-roles-and-permissions-documentation)
+Version **3.3.1** has been checked on Redmine **5.1.13, 6.1.4 and 7.0.1**,
+with unit, functional and permission documentation tests on PostgreSQL, MariaDB
+and strict MySQL. See the [compatibility matrix](doc/TESTING.md#version-331-roles-and-permissions-documentation)
 for exact runtime versions and results.
 
 ------------------------------------------------------------------------

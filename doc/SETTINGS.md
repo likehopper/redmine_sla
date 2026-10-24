@@ -24,7 +24,6 @@ country at import time.
 
 Default: blank
 
-
 ## Roles and permissions
 
 SLA definitions (SLAs, types, statuses, holidays, calendars, levels and terms)
@@ -37,12 +36,18 @@ module, tick the permissions it needs:
 
 ![SLA module in a role](screenshots/settings/01-02-role-edit-sla.png)
 
-| Permission | Label | Grants |
-|---|---|---|
-| `view_sla` | View SLA | SLA block on issues, SLA columns and filters in issue and time entry lists, project **SLA** menu (caches and spent times, with refresh), read-only view of the SLAs, levels and calendars used by the project, SLA column, filter and board icon in the [project lists](PROJECT_LISTS.md) |
-| `manage_sla` | Manage SLA | Everything above, plus tracker ↔ SLA mapping in `Project → Settings → SLA`, the **Explain** button on issues, cache deletion and purge |
+| Permission | Grants |
+|---|---|
+| `view_sla` (View SLA) | SLA block on issues, SLA columns and filters in issue/time-entry lists, the project SLA menu, and read-only access to the project's SLAs, levels, calendars and caches |
+| `manage_sla` (Manage SLA) | Tracker-to-SLA mappings in project settings and the Explain action. Cache refresh, deletion and project purge also require `view_sla`. |
 
-Both permissions only apply to projects where:
+Grant **both permissions** to project managers: `manage_sla` does not include
+`view_sla`. Either permission grants access to the SLA column, filter and board
+icon in the [project lists](PROJECT_LISTS.md). Only administrators may purge
+caches across all projects.
+
+For non-administrators, permissions apply to projects where:
+
 - the **SLA** module is enabled (`Project → Settings → Modules`);
 - the user is a member with a role carrying the permission.
 

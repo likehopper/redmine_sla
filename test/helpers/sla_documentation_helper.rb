@@ -49,10 +49,9 @@ module SlaDocumentationHelperTest
     viewport: { width: 800, height: 600, scale: 1 },
     resize_to: "640x",
     quality: 80,
-    full_page: true,
-    folder: nil
+    full_page: true
   )
-    suite = folder || @current_suite || ENV['SUITE'] || 'default'
+    suite = @current_suite || ENV['SUITE'] || 'default'
     path  = Rails.root.join('tmp', 'redmine_sla', 'screenshots', suite, name)
     FileUtils.mkdir_p(File.dirname(path))
 
