@@ -273,6 +273,9 @@ Save and confirm.
 
 ![Module enabled](screenshots/example-01/11-02a-01-project-settings-issues-saved.png)
 
+Project members only see the SLA if their role has the `view_sla` permission
+(also grant `manage_sla` to manage project mappings and caches). See [Roles and permissions](SETTINGS.md#roles-and-permissions).
+
 ---
 
 ### 9.2 Map a tracker to the SLA

@@ -1,5 +1,25 @@
 # Changelog
 
+## 3.3.1 - 2026-10-25
+
+### Documentation
+
+-   Document the SLA roles and permissions (`view_sla`, `manage_sla`) in the
+    plugin settings guide, with screenshots of the role form and the
+    permissions report, and link them from the examples, use cases and
+    testing guide. Clarify the display setting description and fix typos.
+-   Describe the fixture users and roles in a table in the testing guide.
+
+### Tests
+
+-   Generate the roles and permissions screenshots in a documentation test.
+    Check granted permissions and refuse role administration to non-admins.
+
+### Upgrade
+
+-   Update the plugin files; no migration and no functional change relative
+    to 3.3.0.
+
 ## 3.3.0 - 2026-10-25
 
 ### Added
