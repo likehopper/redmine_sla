@@ -474,7 +474,7 @@ Here are the SLA permissions of the fixture roles
 | Role       | `view_sla` | `manage_sla` | Description                                   |
 |------------|:----------:|:------------:|-----------------------------------------------|
 | Manager    |     x      |      x       | Views and manages SLAs in projects            |
-| Resolver   |     x      |              | Only sees SLAs in project issues              |
+| Resolver   |     x      |              | Reads SLA information in projects              |
 | Reporter   |            |              | Accesses projects without seeing SLAs         |
 
 Administrators (`admin`) manage the global SLA configuration regardless of roles.
