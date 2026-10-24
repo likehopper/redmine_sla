@@ -13,6 +13,11 @@
 -   Show an SLA icon next to the name of projects with SLA in the
     project board view, with the same permission rules.
 
+### Fixed
+
+-   Avoid per-project SLA lookups in the board for users without SLA access,
+    and preload enabled modules for permission checks in the SLA list column.
+
 ### Tests
 
 -   Cover what each profile sees in the project lists (column, filter
@@ -21,6 +26,8 @@
     non-member, anonymous, and SLA module disabled.
 -   Add a documentation test that checks the rendering in Chromium per
     profile and generates the screenshots of `doc/PROJECT_LISTS.md`.
+-   Check mixed project permissions and a fixed number of SLA association
+    queries as the displayed project count grows.
 -   Allow documentation tests to run directly with `rails test`, without
     the documentation rake task (`ApplicationSystemTestCase` is now loaded
     by the plugin documentation test case).
