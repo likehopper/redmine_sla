@@ -58,11 +58,17 @@ class SlaProjectQueryTest < ApplicationSlaUnitsTestCase
     assert_equal [1, 2, 3, 5, 6], project_ids_for(ProjectAdminQuery, '!', ['7', '8'])
   end
 
-  test "admin filter values list every SLA" do
+  test "admin filter values include unassigned SLAs while member values exclude them" do
+    unassigned_sla = Sla.create!(name: 'Unassigned SLA')
     User.current = User.find(1)
 
     assert_equal Sla.order(:name).pluck(:id).map(&:to_s),
                  ProjectAdminQuery.new.project_sla_values.map(&:last)
+    assert_includes ProjectAdminQuery.new.project_sla_values.map(&:last), unassigned_sla.id.to_s
+    assert_empty project_ids_for(ProjectAdminQuery, '=', [unassigned_sla.id.to_s])
+
+    User.current = User.find(3)
+    refute_includes ProjectQuery.new.project_sla_values.map(&:last), unassigned_sla.id.to_s
   end
 
   test "column lists distinct SLAs sorted by name" do
@@ -131,6 +137,58 @@ class SlaProjectQueryTest < ApplicationSlaUnitsTestCase
     project = query.results_scope.detect { |p| p.id == 1 }
     assert project.association(:sla_project_trackers).loaded?
     assert project.association(:enabled_modules).loaded?
+  end
+
+  %w[list board].each do |display_type|
+    test "#{display_type}: SLA queries do not grow with the project count" do
+      User.current = User.find(2) # Manager sees all fixture projects.
+      query = ProjectQuery.new(name: '_')
+      query.display_type = display_type
+      query.column_names = [:name, :slas] if display_type == 'list'
+
+      query_counts = [1, 5].map do |limit|
+        project_count = nil
+        statements = project_sla_queries do
+          projects = query.results_scope.limit(limit).to_a
+          project_count = projects.size
+          projects.each do |project|
+            display_type == 'list' ? project.visible_slas : project.css_classes
+          end
+        end
+        assert_equal limit, project_count
+        statements.size
+      end
+
+      assert_operator query_counts.first, :>, 0
+      assert_equal query_counts.first, query_counts.last,
+                   'SLA rendering must use a fixed number of association queries'
+    end
+  end
+
+  test "board without SLA permission does not query assignments or enabled modules" do
+    [User.find(5), User.anonymous].each do |user|
+      User.current = user
+      projects = Project.order(:id).to_a
+
+      statements = project_sla_queries do
+        projects.each { |project| refute_includes project.css_classes.split, 'has-sla' }
+      end
+
+      assert_empty statements
+    end
+  end
+
+  private
+
+  # Include cached SELECTs so the query cache cannot hide per-project lookups.
+  def project_sla_queries
+    statements = []
+    subscriber = lambda do |*arguments|
+      sql = arguments.last[:sql]
+      statements << sql if sql.match?(/\bFROM\s+["`]?\b(?:sla_project_trackers|slas|enabled_modules)\b/i)
+    end
+    ActiveSupport::Notifications.subscribed(subscriber, 'sql.active_record') { yield }
+    statements
   end
 
 end

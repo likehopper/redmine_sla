@@ -26,10 +26,10 @@ module SlaHolidayAdapters
   # Convert Nager.Date responses to provider-independent holiday attributes.
   class NagerDate
     class Error < StandardError; end
-    BASE_URL = 'https://date.nager.at/api/v3'
+    BASE_URL = 'https://nagerholidays.com/api/v4'
 
     def available_countries
-      rows = request('/AvailableCountries')
+      rows = request('/Countries/Available')
       raise Error, 'invalid_response' unless rows.is_a?(Array) && rows.any?
       rows.map do |row|
         unless row.is_a?(Hash) && row['countryCode'].is_a?(String) &&
@@ -40,31 +40,31 @@ module SlaHolidayAdapters
       end.sort
     end
 
-    # A successful, validated country-list response proves access to the API.
-    def accessible?
-      available_countries
-      true
-    end
-
     def holidays(year:, country:)
       year = year.to_s
       country = country.to_s.upcase
       raise Error, 'invalid_selection' unless year.match?(/\A\d{1,4}\z/) && year.to_i.between?(1, 9999) && country.match?(/\A[A-Z]{2}\z/)
-      rows = request("/PublicHolidays/#{year}/#{country}")
+      rows = request("/Holidays/#{country}/#{year.to_i}")
       raise Error, 'invalid_response' unless rows.is_a?(Array)
-      rows.map do |row|
+      rows.filter_map do |row|
         raise Error, 'invalid_response' unless row.is_a?(Hash)
         date = Date.iso8601(row.fetch('date'))
-        name = row['localName'].to_s.strip
-        name = row['name'].to_s.strip if name.empty?
+        name = row.fetch('name')
+        regions = row['subdivisionCodes']
+        types = row['holidayTypes']
         unless row['date'] == date.iso8601 && date.year == year.to_i && row['countryCode'] == country &&
-               !name.empty? && [true, false].include?(row['global']) &&
-               row['types'].is_a?(Array) && (row['counties'].nil? || row['counties'].is_a?(Array))
+               name.is_a?(String) && !name.strip.empty? && [true, false].include?(row['nationalHoliday']) &&
+               types.is_a?(Array) && types.all? { |type| type.is_a?(String) && !type.empty? } &&
+               (regions.nil? || (regions.is_a?(Array) && regions.all? do |region|
+                 region.is_a?(String) && region.match?(/\A#{country}-[A-Z0-9]{1,3}\z/)
+               end))
           raise Error, 'invalid_response'
         end
-        { 'date' => date.iso8601, 'name' => name, 'national' => row['global'],
-          'regions' => Array(row['counties']).map(&:to_s), 'public' => row['types'].include?('Public') }
-      end.select { |holiday| holiday['public'] }.sort_by { |holiday| holiday['date'] }
+        next unless types.include?('Public')
+
+        { 'date' => date.iso8601, 'name' => name.strip, 'national' => row['nationalHoliday'],
+          'regions' => regions || [] }
+      end.sort_by { |holiday| holiday['date'] }
     rescue KeyError, ArgumentError, TypeError
       raise Error, 'invalid_response'
     end
