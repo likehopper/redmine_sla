@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.1.5 - 2026-10-20
+## 3.1.5 - 2026-10-24
 
 ### Fixed
 
@@ -14,7 +14,7 @@
 -   Update the plugin files and restart Redmine. This release introduces no
     new migration relative to 3.1.4.
 
-## 3.1.4 - 2026-10-19
+## 3.1.4 - 2026-10-24
 
 ### Fixed
 
