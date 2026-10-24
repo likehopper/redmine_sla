@@ -2,28 +2,32 @@
 
 ## Version 3.3.1 roles and permissions documentation
 
-Validated on **2026-10-16** in isolated local test containers:
+Validated on **2026-10-25** in isolated local test containers, after integrating
+release 3.3.0. This release changes documentation, screenshots and tests only.
 
 | Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
 | --- | --- | --- | --- | --- | --- |
-| 5.1.13 | 3.2.11 | 6.1.7.10 | 1166 / 6105 | 1166 / 6102 | 1166 / 6102 |
-| 6.1.4 | 3.4.11 | 7.2.3.2 | 1166 / 6193 | 1166 / 6190 | 1166 / 6190 |
-| 7.0.1 | 4.0.7 | 8.1.3.1 | 1166 / 6731 | 1166 / 6728 | 1166 / 6728 |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 738 / 2949 | 738 / 2946 | 738 / 2946 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 798 / 3516 | 738 / 2972 | 738 / 2972 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 738 / 3071 | 738 / 3068 | 738 / 3068 |
 
-Each combination ran **247 unit, 465 functional, 350 integration/API,
-35 Chromium system and 69 documentation tests**, with zero failures or
-errors: **10,494 tests** across the matrix. Cells record tests / assertions.
-The two migration unit tests skipped by design on MariaDB and MySQL are
-those of 3.1.2 and 3.1.3. MySQL retained `ONLY_FULL_GROUP_BY`,
-`STRICT_TRANS_TABLES` and `STRICT_ALL_TABLES` in the Rails session.
+Each combination ran **262 unit and 470 functional tests**, plus **6 Chromium
+documentation tests** for roles and project lists. Redmine 6.1/PostgreSQL ran
+all **66 documentation tests** instead. Total: **6,702 tests /
+27,508 assertions**, zero failures/errors and 12 expected migration
+skips (3.1.2/3.1.3 on MariaDB/MySQL). Cells record tests / assertions.
+MySQL retains `ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES` and
+`STRICT_ALL_TABLES`; MariaDB uses strict mode without `ONLY_FULL_GROUP_BY`.
 
-The new roles documentation test runs with each documentation suite and
-takes the permissions report and role form screenshots once, with
-`example-01`. This release changes documentation and tests only.
+The standalone roles test checks the granted and unchecked permissions for
+Manager, Resolver and Reporter, verifies the Manager form, and captures both
+native role screens once. A negative test refuses role administration and the
+permissions report to a project manager. Existing functional tests cover the
+project-scoped read/manage access documented in the guide.
 
-These results cover the exact versions above. No production deployment or
-representative performance benchmark was performed. Historical results below
-remain separate validations of their respective versions.
+API and general system suites were not repeated for this documentation release;
+the full 3.3.0 matrix remains documented separately below. No migration or
+production deployment.
 
 ## Version 3.3.0 public holiday import
 
