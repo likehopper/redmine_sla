@@ -1,5 +1,26 @@
 # Changelog
 
+## 3.3.3 - 2026-10-25
+
+### Fixed
+
+-   The issue page shows the *Service levels* block and its *Explain* link
+    only when an SLA is assigned to the issue tracker in its project. Issues
+    of other trackers no longer show them, and no longer compute an SLA level
+    when displayed. When the tracker has an SLA but no level applies, the
+    *Explain* link stays available to managers.
+-   French translations of the holiday import use straight apostrophes.
+
+### Tests
+
+-   Cover the issue page of a tracker without SLA and of a tracker with an
+    SLA but no applicable level.
+
+### Upgrade
+
+-   Update the plugin files and restart Redmine. There is no migration
+    relative to 3.3.2.
+
 ## 3.3.2 - 2026-10-24
 
 ### Tests

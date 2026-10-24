@@ -14,7 +14,7 @@
 
 ## Overview
 
-Current version: **3.3.2**. See the [changelog](CHANGELOG.md) for release details.
+Current version: **3.3.3**. See the [changelog](CHANGELOG.md) for release details.
 
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
@@ -196,9 +196,9 @@ Fully manageable through UI and REST API:
 | `Rails`            | >= 6.1                                            |
 | `Database`         | PostgreSQL >= 11, MySQL >= 8.0 or MariaDB >= 10.2 |
 
-Version **3.3.2** has been tested on Redmine **5.1.13,
+Version **3.3.3** has been tested on Redmine **5.1.13,
 6.1.4 and 7.0.1**, with all five suites on PostgreSQL, MariaDB and strict
-MySQL. See the [compatibility matrix](doc/TESTING.md#version-332-fixtures-for-a-project-without-sla)
+MySQL. See the [compatibility matrix](doc/TESTING.md#version-333-issue-sla-block-for-configured-trackers)
 for exact runtime versions and results.
 
 ------------------------------------------------------------------------
@@ -284,7 +284,13 @@ Plugin is ready to use.
 
 ------------------------------------------------------------------------
 
-## Upgrade to 3.3.2
+## Upgrade to 3.3.3
+
+Version **3.3.3** shows the SLA block of the issue page only for trackers with
+an SLA in the project. Update the plugin files and restart Redmine; there is
+no migration relative to 3.3.2.
+
+### Previous upgrade: 3.3.2
 
 Version **3.3.2** only extends the test fixtures. Update the plugin files;
 there is no migration and no functional change relative to 3.3.1.
