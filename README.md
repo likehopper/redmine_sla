@@ -292,7 +292,7 @@ import the selected dates. An optional default country can be set in the
 plugin settings. See [Public holiday import](doc/HOLIDAY_IMPORT.md). Update the
 plugin files and restart Redmine; this release introduces no new migration
 relative to 3.2.0. The Redmine server needs outbound HTTPS access to
-`date.nager.at` to use the import.
+`nagerholidays.com` to use the import.
 
 ### Previous upgrade: 3.2.0
 
