@@ -64,6 +64,56 @@ class SlaHolidaysController < ApplicationController
     end    
   end
 
+  # Fetching countries also checks connectivity from the Redmine server.
+  def import_form
+    @year = Date.current.year
+    @country = Setting.plugin_redmine_sla['sla_holiday_country'].to_s.upcase
+    @countries = holiday_adapter.available_countries
+  rescue SlaHolidayAdapters::NagerDate::Error => error
+    flash.now[:error] = l("sla_holiday_import_error_#{error.message}")
+    @countries = []
+  end
+
+  def preview_import
+    @year = params[:year].to_s
+    @country = params[:country].to_s.upcase
+    @countries = holiday_adapter.available_countries
+    unless @countries.any? { |_name, code| code == @country }
+      raise SlaHolidayAdapters::NagerDate::Error, 'invalid_selection'
+    end
+    @holidays = SlaHolidayImporter.new(adapter: holiday_adapter).preview(year: @year, country: @country)
+    @preview_token = holiday_import_verifier.generate({
+      'user_id' => User.current.id, 'expires_at' => 15.minutes.from_now.to_i,
+      'holidays' => @holidays
+    })
+    render :import_form
+  rescue SlaHolidayAdapters::NagerDate::Error => error
+    @countries ||= []
+    flash.now[:error] = l("sla_holiday_import_error_#{error.message}")
+    render :import_form
+  end
+
+  def import_holidays
+    preview = holiday_import_verifier.verify(params[:preview_token].to_s)
+    unless preview['user_id'] == User.current.id && preview['expires_at'] > Time.current.to_i
+      raise ActiveSupport::MessageVerifier::InvalidSignature
+    end
+    indices = Array(params[:selected]).map(&:to_s).uniq
+    unless indices.all? { |index| index.match?(/\A\d+\z/) && index.to_i < preview['holidays'].size }
+      raise ActiveSupport::MessageVerifier::InvalidSignature
+    end
+    holidays = indices.map { |index| preview['holidays'][index.to_i] }
+    result = SlaHolidayImporter.new(adapter: holiday_adapter).import(holidays: holidays)
+    flash[:notice] = l(:sla_holiday_import_success, created: result[:created], skipped: result[:skipped])
+    redirect_to sla_holidays_path
+  rescue ActiveSupport::MessageVerifier::InvalidSignature
+    flash[:error] = l(:sla_holiday_import_expired)
+    redirect_to import_sla_holidays_path
+  rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique
+    flash[:error] = l(:sla_holiday_import_failed)
+    redirect_to import_sla_holidays_path
+  end
+
   # Render form for a new SLA Holiday.
   def new
     @sla_holiday = SlaHoliday.new
@@ -171,6 +221,14 @@ class SlaHolidaysController < ApplicationController
   end
  
   private
+
+  def holiday_adapter
+    SlaHolidayAdapters::NagerDate.new
+  end
+
+  def holiday_import_verifier
+    Rails.application.message_verifier(:sla_holiday_import)
+  end
 
   # Find a single SLA Holiday and ensure it is visible.
   def find_sla_holiday

@@ -54,7 +54,8 @@ Redmine::Plugin.register :redmine_sla do
   settings(
     default: {
       'sla_time_zone' => 'Etc/UTC',
-      'sla_display'   => 'bar - simple'
+      'sla_display'   => 'bar - simple',
+      'sla_holiday_country' => ''
     },
     # Settings UI partial
     partial: 'sla_settings_plugin/sla_settings_plugin'

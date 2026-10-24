@@ -225,4 +225,129 @@ class SlaHolidaysControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
+
+  test "import form verifies access and offers countries" do
+    @request.session[:user_id] = 1
+    SlaHolidayAdapters::NagerDate.any_instance.expects(:available_countries).returns([['France', 'FR']])
+    get :import_form
+    assert_response :success
+    assert_select 'select[name=country] option[value=FR]', 'France'
+  end
+
+  test "unavailable API displays an error without writes" do
+    @request.session[:user_id] = 1
+    SlaHolidayAdapters::NagerDate.any_instance.expects(:available_countries).raises(SlaHolidayAdapters::NagerDate::Error, 'unavailable')
+    assert_no_difference 'SlaHoliday.count' do
+      get :import_form
+      assert_response :success
+      assert_select '#flash_error'
+      assert_select 'input[type=submit][disabled]'
+    end
+  end
+
+  test "preview and import selected holidays with signed data" do
+    @request.session[:user_id] = 1
+    SlaHolidayAdapters::NagerDate.any_instance.stubs(:available_countries).returns([['France', 'FR']])
+    SlaHolidayAdapters::NagerDate.any_instance.stubs(:holidays).returns([
+      { 'date' => '2098-01-01', 'name' => 'National', 'national' => true, 'regions' => [] },
+      { 'date' => '2098-01-02', 'name' => 'Regional', 'national' => false, 'regions' => ['FR-67'] }
+    ])
+    assert_no_difference 'SlaHoliday.count' do
+      post :preview_import, params: { year: '2098', country: 'FR' }
+      assert_response :success
+    end
+    assert_select 'input[name="selected[]"][checked]', count: 1
+    token = css_select('input[name=preview_token]').first['value']
+    SlaHolidayAdapters::NagerDate.any_instance.expects(:available_countries).never
+    SlaHolidayAdapters::NagerDate.any_instance.expects(:holidays).never
+    assert_difference 'SlaHoliday.count', 1 do
+      post :import_holidays, params: { preview_token: token, selected: ['0'] }
+      assert_redirected_to sla_holidays_path
+    end
+    assert_equal 'National', SlaHoliday.find_by(date: '2098-01-01').name
+  end
+
+  test "invalid and expired previews never write" do
+    @request.session[:user_id] = 1
+    verifier = Rails.application.message_verifier(:sla_holiday_import)
+    tokens = ['tampered', verifier.generate({ 'user_id' => 1, 'expires_at' => 1, 'holidays' => [] }),
+              verifier.generate({ 'user_id' => 2, 'expires_at' => 15.minutes.from_now.to_i, 'holidays' => [] })]
+    tokens.each do |token|
+      assert_no_difference 'SlaHoliday.count' do
+        post :import_holidays, params: { preview_token: token, selected: ['0'] }
+        assert_redirected_to import_sla_holidays_path
+      end
+    end
+  end
+
+  test "non administrators cannot access any import action" do
+    @request.session[:user_id] = 6
+    SlaHolidayAdapters::NagerDate.any_instance.expects(:available_countries).never
+    get :import_form
+    assert_response :forbidden
+    post :preview_import, params: { year: '2026', country: 'FR' }
+    assert_response :forbidden
+    assert_no_difference 'SlaHoliday.count' do
+      post :import_holidays, params: { preview_token: 'invalid' }
+      assert_response :forbidden
+    end
+  end
+
+  test "invalid country is refused before fetching holidays" do
+    @request.session[:user_id] = 1
+    SlaHolidayAdapters::NagerDate.any_instance.expects(:available_countries).returns([['France', 'FR']])
+    SlaHolidayAdapters::NagerDate.any_instance.expects(:holidays).never
+    assert_no_difference 'SlaHoliday.count' do
+      post :preview_import, params: { year: '2026', country: 'XX' }
+      assert_response :success
+      assert_select '#flash_error', text: l(:sla_holiday_import_error_invalid_selection)
+      assert_select 'input[name=preview_token]', count: 0
+    end
+  end
+
+  test "holiday service errors during preview never offer an import" do
+    @request.session[:user_id] = 1
+    SlaHolidayAdapters::NagerDate.any_instance.stubs(:available_countries).returns([['France', 'FR']])
+    %w[unavailable invalid_response invalid_selection].each do |reason|
+      SlaHolidayAdapters::NagerDate.any_instance.stubs(:holidays).raises(SlaHolidayAdapters::NagerDate::Error, reason)
+      assert_no_difference 'SlaHoliday.count' do
+        post :preview_import, params: { year: '2026', country: 'FR' }
+        assert_response :success
+        assert_select '#flash_error', text: l("sla_holiday_import_error_#{reason}")
+        assert_select 'input[name=preview_token]', count: 0
+      end
+    end
+  end
+
+  test "invalid selection indices never import or call the provider" do
+    @request.session[:user_id] = 1
+    token = Rails.application.message_verifier(:sla_holiday_import).generate({
+      'user_id' => 1, 'expires_at' => 15.minutes.from_now.to_i,
+      'holidays' => [{ 'date' => '2098-01-01', 'name' => 'National' }]
+    })
+    SlaHolidayAdapters::NagerDate.any_instance.expects(:available_countries).never
+    SlaHolidayAdapters::NagerDate.any_instance.expects(:holidays).never
+    %w[-1 1 invalid].each do |index|
+      assert_no_difference 'SlaHoliday.count' do
+        post :import_holidays, params: { preview_token: token, selected: [index] }
+        assert_redirected_to import_sla_holidays_path
+        assert_equal l(:sla_holiday_import_expired), flash[:error]
+      end
+    end
+  end
+
+  test "failed import rolls back and displays an error" do
+    @request.session[:user_id] = 1
+    token = Rails.application.message_verifier(:sla_holiday_import).generate({
+      'user_id' => 1, 'expires_at' => 15.minutes.from_now.to_i,
+      'holidays' => [{ 'date' => '2098-01-01', 'name' => 'Valid' },
+                     { 'date' => '2098-01-02', 'name' => '' }]
+    })
+    assert_no_difference 'SlaHoliday.count' do
+      post :import_holidays, params: { preview_token: token, selected: ['0', '1'] }
+      assert_redirected_to import_sla_holidays_path
+      assert_equal l(:sla_holiday_import_failed), flash[:error]
+    end
+  end
+
 end
