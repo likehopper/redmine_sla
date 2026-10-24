@@ -1,5 +1,48 @@
 # Testing
 
+## Version 3.2.0 projects with SLA in project lists
+
+After integrating main's cache corrections on **2026-10-24**, all nine
+combinations reran **250 unit, 461 functional and 4 project-list documentation
+tests**: **6,435 tests / 25,350 assertions**, zero failures or errors and
+12 expected migration skips. The full five-suite matrix below predates that
+integration; API, general system and the other documentation tests were not
+repeated afterwards.
+
+Validated on **2026-10-24** in isolated local test containers:
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1149 / 6072 | 1149 / 6069 | 1149 / 6069 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1149 / 6152 | 1149 / 6149 | 1149 / 6149 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1149 / 6685 | 1149 / 6682 | 1149 / 6682 |
+
+Each combination ran **241 unit, 461 functional, 350 integration/API,
+33 Chromium system and 64 documentation tests**, with zero failures or
+errors: **10,341 tests** across the matrix. Cells record tests / assertions.
+The two migration unit tests skipped by design on MariaDB and MySQL are
+those of 3.1.2 and 3.1.3. MySQL retained `ONLY_FULL_GROUP_BY`,
+`STRICT_TRANS_TABLES` and `STRICT_ALL_TABLES` in the Rails session.
+MariaDB uses `STRICT_TRANS_TABLES` without `ONLY_FULL_GROUP_BY`; enabling
+that mode fails existing calculation and grouped-query tests.
+
+Regression coverage checks, for each profile, the SLA column, the filter
+values and results, the board icon and administration access in the project
+lists: administrator, View and Manage SLA, View SLA only, Manage SLA only, no
+SLA permission, non-member, anonymous, mixed project permissions, and SLA
+module disabled. Unit tests cover distinct SLAs sorted by name in the column,
+filters with and without SLA, unassigned SLAs in filter values, preloading
+and the board CSS class. Query regressions check a fixed number of SLA queries
+for one or five projects in both displays, and no assignment or module lookups for
+users without SLA access. Both performance regressions failed on the original
+3.2.0 code before the fixes. The documentation test checks each profile in
+Chromium and generates the screenshots of [Projects with SLA](PROJECT_LISTS.md).
+
+This release introduces no migration. These results cover the exact versions
+above. No production deployment or representative performance benchmark was
+performed. Historical results below remain separate validations of their
+respective versions.
+
 ## Version 3.1.5 custom field cache invalidation
 
 Merge validation on **2026-10-24**, after incorporating the 3.1.4 cache
@@ -342,8 +385,8 @@ Calculations are rebuilt on demand, within the existing SLA cache lifecycle.
 grouped counts and row preservation. `sla_cache_scope_operations_test.rb`
 checks project/issue visibility, project purges including historical orphans,
 and targeted cache deletion. Run these alongside the functional and API
-suites on PostgreSQL, MariaDB and strict MySQL, including
-`ONLY_FULL_GROUP_BY`; MariaDB results do not substitute for MySQL results.
+suites on PostgreSQL, MariaDB and strict MySQL, with `ONLY_FULL_GROUP_BY`
+enabled on MySQL. MariaDB results do not substitute for MySQL results.
 
 When running suites separately, reset the dedicated test database or its
 cache rows and spent-cache sequence between runs. Some existing API and

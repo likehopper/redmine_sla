@@ -1,5 +1,43 @@
 # Changelog
 
+## 3.2.0 - 2026-10-24
+
+### Added
+
+-   Add an **SLA** column and filter to the project lists
+    (`Projects` in list mode and `Administration > Projects`). The column
+    lists the SLAs assigned to each project; the filter supports any, none,
+    is and is not. Administrators see every project. Other users only see
+    SLAs of projects where they have the *View SLA* or *Manage SLA*
+    permission; other projects behave as having no SLA.
+-   Show an SLA icon next to the name of projects with SLA in the
+    project board view, with the same permission rules.
+
+### Fixed
+
+-   Avoid per-project SLA lookups in the board for users without SLA access,
+    and preload enabled modules for permission checks in the SLA list column.
+
+### Tests
+
+-   Cover what each profile sees in the project lists (column, filter
+    values and results, board icon, administration access): administrator,
+    View and Manage SLA, View SLA only, Manage SLA only, no SLA permission,
+    non-member, anonymous, and SLA module disabled.
+-   Add a documentation test that checks the rendering in Chromium per
+    profile and generates the screenshots of `doc/PROJECT_LISTS.md`.
+-   Check mixed project permissions and a fixed number of SLA association
+    queries as the displayed project count grows.
+-   Allow documentation tests to run directly with `rails test`, without
+    the documentation rake task (`ApplicationSystemTestCase` is now loaded
+    by the plugin documentation test case).
+
+### Upgrade
+
+-   Update the plugin files and restart Redmine. This release introduces no
+    new migration relative to 3.1.5 and no new permission: the project list
+    column, filter and board icon follow *View SLA* and *Manage SLA*.
+
 ## 3.1.5 - 2026-10-24
 
 ### Fixed
