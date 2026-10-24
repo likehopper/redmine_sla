@@ -40,12 +40,6 @@ module RedmineSla
         self.name
       end
 
-      module ClassMethods
-      end
-
-      module InstanceMethods
-      end
-
       private
 
       def sla_cache_level_ids_for_invalidation

@@ -174,6 +174,28 @@ class SlaProjectListsProjectsControllerTest < ApplicationSlaFunctionalsTestCase
     assert_equal [1, 2, 3, 4], board_project_ids_with_icon
   end
 
+  test "mixed project permissions hide only the restricted project SLAs" do
+    membership = Member.find_by!(user_id: 3, project_id: 4)
+    membership.roles = [Role.find(3)] # Reporter retains project access without SLA permissions.
+    log_in('developer')
+
+    get :index, params: list_params
+    assert_equal [1, 4], listed_project_ids
+    assert_equal [1], project_ids_with_sla_cell
+
+    get :index, params: list_params(any_sla_filter)
+    assert_equal [1], listed_project_ids
+    Sla.where(id: [7, 8]).pluck(:name).each do |name|
+      refute_includes response.body, name.to_json[1..-2]
+    end
+
+    get :index, params: list_params(no_sla_filter)
+    assert_equal [4], listed_project_ids
+
+    get :index, params: { display_type: 'board', set_filter: 1, f: [''] }
+    assert_equal [1], board_project_ids_with_icon
+  end
+
   test "SLA module disabled hides the project SLAs for members" do
     Project.find(4).disable_module!(:sla)
     log_in('developer')
