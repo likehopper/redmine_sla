@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 # File: redmine_sla/test/documentation/sla_roles_doc_test.rb
-# Redmine SLA - Redmine's Plugin 
+# Redmine SLA - Redmine's Plugin
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
