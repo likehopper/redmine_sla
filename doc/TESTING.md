@@ -1,5 +1,42 @@
 # Testing
 
+## Version 3.1.5 custom field cache invalidation
+
+Merge validation on **2026-10-24**, after incorporating the 3.1.4 cache
+optimizations and clarifying the custom field regression tests: **237 unit
+tests / 1,925 assertions**, zero failures, errors or skips, on Redmine 6.1.4
+with PostgreSQL in a dedicated local container and database. This run did
+not repeat the other suites or the full database matrix below.
+
+Validated on **2026-10-16** in isolated local test containers:
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1106 / 5874 | 1106 / 5871 | 1106 / 5871 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1106 / 5954 | 1106 / 5951 | 1106 / 5951 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1106 / 6483 | 1106 / 6480 | 1106 / 6480 |
+
+Each combination ran **228 unit, 435 functional, 350 integration/API,
+33 Chromium system and 60 documentation tests**, with zero failures or
+errors: **9,954 tests** across the matrix. Cells record tests / assertions.
+The two migration unit tests skipped by design on MariaDB and MySQL are
+those of 3.1.2 and 3.1.3. On Redmine 5.1.13 with PostgreSQL, the unit suite
+was rerun alone after a first run started without its generated fixtures in
+the parallel test environment; the rerun passed. MySQL retained
+`ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES` and `STRICT_ALL_TABLES` in the
+Rails session.
+
+Regression coverage adds 10 custom field invalidation tests to the 27 of
+3.1.4: field update and deletion, enumeration creation, update, move to
+another field and deletion with or without reassignment invalidate only the
+levels using that field. Unrelated fields, validation failures and rolled
+back changes keep the caches.
+
+This release introduces no migration. These results cover the exact versions
+above. No production deployment or representative performance benchmark was
+performed. Historical results below remain separate validations of their
+respective versions.
+
 ## Version 3.1.4 competing level cache invalidation
 
 Validated again on **2026-10-24** in dedicated local test containers and
@@ -294,6 +331,12 @@ for the scenarios.
 > **_NOTE:_** It's possible to reload default data after tests success : `bundle exec rake db:drop db:create db:migrate redmine:plugins:migrate redmine:load_default_data`
 
 ### Scope regression coverage
+
+`sla_cache_invalidation_test.rb` also covers custom field and enumeration
+changes, deletion with reassignment, unrelated fields, validation failures,
+and transaction rollback. The model callbacks delete caches only for SLA
+levels using the affected field; spent caches follow the foreign key cascade.
+Calculations are rebuilt on demand, within the existing SLA cache lifecycle.
 
 `test/unit/sla_explicit_query_scopes_test.rb` checks association sorting,
 grouped counts and row preservation. `sla_cache_scope_operations_test.rb`
