@@ -75,39 +75,41 @@ module RedmineSla
 
       def results_scope(options = {})
         scope = super
-        if has_column?(:slas)
-          scope = scope.preload(sla_project_trackers: :sla)
-        elsif display_type == 'board' && sla_available_for_user?
-          # Board view: avoid one query per project for the SLA icon
-          # (assignments, then enabled modules for the permission check).
-          scope = scope.preload(:sla_project_trackers, :enabled_modules)
+        return scope unless sla_available_for_user?
+
+        # Both displays need enabled modules for per-project permissions.
+        if display_type == 'board'
+          scope.preload(:sla_project_trackers, :enabled_modules)
+        elsif has_column?(:slas)
+          scope.preload(:enabled_modules, sla_project_trackers: :sla)
+        else
+          scope
         end
-        scope
       end
 
       # SQL for the "SLA" filter. A project matches "any" (*) or "is" (=)
       # only when it has a matching assignment AND the user may see it.
-      def sql_for_sla_id_field(field, operator, value)
-        spt = SlaProjectTracker.table_name
-        condition = "EXISTS (SELECT 1 FROM #{spt} WHERE #{spt}.project_id = #{Project.table_name}.id"
+      def sql_for_sla_id_field(_field, operator, value)
+        assignment_table = SlaProjectTracker.table_name
+        condition = "EXISTS (SELECT 1 FROM #{assignment_table} WHERE #{assignment_table}.project_id = #{Project.table_name}.id"
         if %w[= !].include?(operator)
-          ids = Array(value).map(&:to_i)
-          condition += ids.empty? ? ' AND 1=0' : " AND #{spt}.sla_id IN (#{ids.join(',')})"
+          sla_ids = Array(value).map(&:to_i)
+          condition += sla_ids.empty? ? ' AND 1=0' : " AND #{assignment_table}.sla_id IN (#{sla_ids.join(',')})"
         end
         condition += ')'
 
-        visibility = sla_project_visibility_condition
-        condition = "(#{condition} AND #{visibility})" if visibility
+        visibility_condition = sla_project_visibility_condition
+        condition = "(#{condition} AND #{visibility_condition})" if visibility_condition
 
         %w[! !*].include?(operator) ? "(NOT #{condition})" : condition
       end
 
-      # Filter values: SLAs assigned to at least one project the user may see.
+      # Administrators get every SLA; other users get visible assignments only.
       def project_sla_values
         scope = Sla.order(:name)
-        visibility = sla_project_visibility_condition
-        if visibility
-          project_ids = Project.where(visibility).select(:id)
+        visibility_condition = sla_project_visibility_condition
+        if visibility_condition
+          project_ids = Project.where(visibility_condition).select(:id)
           scope = scope.where(id: SlaProjectTracker.where(project_id: project_ids).select(:sla_id))
         end
         scope.pluck(:name, :id).map { |name, id| [name, id.to_s] }
