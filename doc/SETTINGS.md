@@ -51,7 +51,7 @@ For non-administrators, permissions apply to projects where:
 - the **SLA** module is enabled (`Project → Settings → Modules`);
 - the user is a member with a role carrying the permission.
 
-A role without either permission does not see any SLA information, even on
+Non-administrators with neither permission see no SLA information, even on
 issues covered by an SLA.
 
 Typical setup:
