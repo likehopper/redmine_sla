@@ -14,7 +14,7 @@
 
 ## Overview
 
-Current version: **3.3.0**. See the [changelog](CHANGELOG.md) for release details.
+Current version: **3.3.1**. See the [changelog](CHANGELOG.md) for release details.
 
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
@@ -196,9 +196,9 @@ Fully manageable through UI and REST API:
 | `Rails`            | >= 6.1                                            |
 | `Database`         | PostgreSQL >= 11, MySQL >= 8.0 or MariaDB >= 10.2 |
 
-Version **3.3.0** has been tested on Redmine **5.1.13,
-6.1.4 and 7.0.1**, with all five suites on PostgreSQL, MariaDB and strict
-MySQL. See the [compatibility matrix](doc/TESTING.md#version-330-public-holiday-import)
+Version **3.3.1** has been checked on Redmine **5.1.13, 6.1.4 and 7.0.1**,
+with unit, functional and permission documentation tests on PostgreSQL, MariaDB
+and strict MySQL. See the [compatibility matrix](doc/TESTING.md#version-331-roles-and-permissions-documentation)
 for exact runtime versions and results.
 
 ------------------------------------------------------------------------
@@ -284,7 +284,13 @@ Plugin is ready to use.
 
 ------------------------------------------------------------------------
 
-## Upgrade to 3.3.0
+## Upgrade to 3.3.1
+
+Version **3.3.1** documents the SLA roles and permissions in the
+[plugin settings](doc/SETTINGS.md#roles-and-permissions). Update the plugin
+files; there is no migration and no functional change relative to 3.3.0.
+
+### Previous upgrade: 3.3.0
 
 Version **3.3.0** imports public holidays from Nager.Date: from the SLA holiday
 list, administrators choose a year and a country, preview the holidays and
