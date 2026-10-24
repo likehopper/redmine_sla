@@ -23,6 +23,19 @@
     of SLA or calendar assignment.
 -   Remove calendar-holiday links when their calendar or holiday is destroyed,
     capturing cache dependencies before dependent records are removed.
+-   Preserve caches when only a calendar name/description or a holiday name
+    changes. Nested schedule changes still invalidate competing levels.
+-   Resolve dependencies and delete caches once per calendar/holiday destruction.
+    Remove dependent schedules and holiday links in bulk with Rails instead of
+    repeating their cache invalidation callbacks.
+-   Keep caches intact on aborted destruction and on a later metadata-only save
+    of the same instance.
+
+### Tests
+
+-   Check affected and unaffected caches, nested edits, rollback and aborted
+    destruction. SQL query assertions cover metadata edits and destruction with
+    many dependent records; see `doc/CACHE_INVALIDATION.md` for measurements.
 
 ### Upgrade
 

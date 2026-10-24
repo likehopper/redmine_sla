@@ -471,7 +471,6 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     SlaLevel.unscoped.where(custom_field_id: 1).pluck(:id)
   end
 
-
   def assert_caches_preserved
     cache_ids = SlaCache.unscoped.order(:id).pluck(:id)
     spent_ids = SlaCacheSpent.unscoped.order(:id).pluck(:id)
