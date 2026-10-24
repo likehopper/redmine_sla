@@ -2,6 +2,12 @@
 
 ## Version 3.1.5 custom field cache invalidation
 
+Merge validation on **2026-10-24**, after incorporating the 3.1.4 cache
+optimizations and clarifying the custom field regression tests: **237 unit
+tests / 1,925 assertions**, zero failures, errors or skips, on Redmine 6.1.4
+with PostgreSQL in a dedicated local container and database. This run did
+not repeat the other suites or the full database matrix below.
+
 Validated on **2026-10-16** in isolated local test containers:
 
 | Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
