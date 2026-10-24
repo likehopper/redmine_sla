@@ -1,5 +1,45 @@
 # Testing
 
+## Version 3.1.4 competing level cache invalidation
+
+Validated again on **2026-10-24** in dedicated local test containers and
+separate databases:
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1104 / 5896 | 1104 / 5893 | 1104 / 5893 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1104 / 5976 | 1104 / 5973 | 1104 / 5973 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1104 / 6507 | 1104 / 6504 | 1104 / 6504 |
+
+Each combination ran **226 unit, 435 functional, 350 integration/API,
+33 Chromium system and 60 documentation tests**, with zero failures or
+errors: **9,936 tests and 55,119 assertions** across the matrix. Cells record
+tests / assertions. After the final bulk-cleanup simplification, the full unit
+and controller suites were rerun on all nine combinations; the table uses
+those final reruns.
+
+The two migration unit tests skipped by design on MariaDB and MySQL are those
+of 3.1.2 and 3.1.3 (12 skips across the matrix). MySQL retained
+`ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES` and `STRICT_ALL_TABLES` in the Rails
+session. MariaDB used `STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION`, separately
+from strict MySQL. Test databases were migrated explicitly and SQL functions
+were preserved; generated plugin fixtures and seed 0 were used.
+
+Regression coverage includes 35 invalidation tests: affected and unaffected
+cache/spent rows, creation, reassignment, direct and nested destruction,
+metadata edits, invalid saves, rollback and aborted parent/child destruction.
+A changed competing schedule selects the other level on the next SQL read.
+Metadata edits issue no invalidation queries. Parent destruction resolves
+its dependencies and deletes caches once, while dependent schedules/links
+are removed in bulk. Query-count assertions run on every combination; see
+[SLA cache invalidation](CACHE_INVALIDATION.md) for the before/after workloads.
+
+This release introduces no migration relative to 3.1.3. These results cover
+the exact versions above. SQL query counts were measured on regression
+fixtures; no production deployment or production latency benchmark was
+performed. Historical results below remain separate validations of their
+respective versions.
+
 ## Version 3.1.3 reopened issue spent time
 
 Validated on **2026-10-16** in isolated local test containers:

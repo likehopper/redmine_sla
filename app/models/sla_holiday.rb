@@ -20,6 +20,8 @@
 
 class SlaHoliday < ActiveRecord::Base
 
+  has_many :sla_calendar_holidays, dependent: :delete_all
+
   include Redmine::SafeAttributes
   include RedmineSla::InvalidatesSlaCache
 
@@ -59,9 +61,13 @@ class SlaHoliday < ActiveRecord::Base
 
   private
 
+  def sla_cache_preserving_change?
+    persisted? && (changes_to_save.keys - %w[name]).empty?
+  end
+
   def sla_cache_level_ids_for_invalidation
     calendar_ids = SlaCalendarHoliday.unscoped.where(sla_holiday_id: id).pluck(:sla_calendar_id)
-    SlaLevel.unscoped.where(sla_calendar_id: calendar_ids).pluck(:id)
+    SlaLevel.unscoped.sharing_sla_with_calendars(calendar_ids).pluck(:id)
   end
 
 end
