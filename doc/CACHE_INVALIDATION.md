@@ -8,11 +8,13 @@ records. A subsequent read recalculates the SLA level and spent time.
 
 ## Dependency rules
 
-- Calendar, schedule and calendar-holiday changes invalidate every level of the
+- Schedule and calendar-holiday changes invalidate every level of the
   SLAs using the affected calendars. A cache can reference another competing
   level (for example HO versus HNO), whose selection is now obsolete.
 - Moving a schedule or calendar-holiday link includes both calendars.
-- Holiday changes include every linked calendar and its competing levels.
+- Holiday date changes include every linked calendar and its competing levels.
+  Calendar name/description and holiday name changes preserve caches and do not
+  query their cache dependencies. Nested schedule changes still invalidate caches.
 - Creating a level invalidates existing candidates of its SLA. Changing its SLA
   or calendar invalidates candidates of both the old and new SLA. Other level
   changes and level destruction invalidate its own caches.
@@ -22,41 +24,55 @@ records. A subsequent read recalculates the SLA level and spent time.
   invalidate the levels using that field. Moving a value includes its previous
   field. Other fields keep their caches.
 - Calendar and holiday destruction also removes their calendar-holiday links.
-  Dependencies are captured before dependent associations are destroyed.
+  Dependencies are captured before dependent associations are destroyed; the
+  parent invalidates once and removes schedules/links in bulk with Rails
+  `dependent: :delete_all`. Their only destruction callback was the redundant
+  cache invalidation. Direct schedule/link destruction and nested schedule
+  deletion still run their own invalidation callbacks.
 - Validation failure preserves caches. Transaction rollback restores configuration,
-  links and caches together.
+  links and caches together. A metadata-only save also clears any dependencies
+  left by an aborted destruction on the same model instance. Bulk cleanup also
+  avoids reusing dependencies left by an earlier aborted child destruction.
 
-## Write-path review (2026-10-11)
+## Write-path review (2026-10-24)
 
 The controllers for calendars, schedules, calendar-holiday links, holidays,
 levels and terms use Active Record save/update/destroy methods, including bulk
 controller deletions and nested schedules/terms. These paths execute the
-invalidation callbacks. No configuration
-write bypass using `update_all`, `delete_all`, `insert_all`, `upsert_all` or
-`update_columns` was found in these paths.
+invalidation callbacks. The dependent schedule/link cleanup uses bulk deletion,
+covered by the parent's captured dependencies. Other configuration writes in
+these paths do not bypass callbacks.
 
 Direct SQL and Active Record writes that skip callbacks remain outside this
 mechanism. External scripts must explicitly invalidate affected caches.
 Existing orphaned calendar-holiday links are not repaired by this change.
 
-## Validation
+## Validation and query cost
 
-Validated on Redmine 6.1.4 in isolated containers with generated plugin fixtures:
+The 35 invalidation tests check affected and unaffected cache/spent rows,
+creation, reassignment, dependent destruction, nested edits, invalid saves,
+rollback and aborted destruction. A real SQL recalculation selects HNO instead
+of HO on the next read after a competing schedule changes.
 
-| Database | Unit tests | Controller tests | SQL mode |
-| --- | --- | --- | --- |
-| PostgreSQL 17 | 186 passed | 435 passed | Native PostgreSQL |
-| MySQL 8.0 | 186 passed | 435 passed | `STRICT_TRANS_TABLES,ONLY_FULL_GROUP_BY,NO_ENGINE_SUBSTITUTION` |
-| MariaDB 10.11 | 186 passed | 435 passed | `STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION` |
+The query assertions count dependency SELECTs and cache DELETEs, excluding
+validation queries, child-row deletion, transactions and test verification reads.
+On Redmine 6.1.4 / PostgreSQL 17, the same generated fixtures and added child
+records give the following comparison against the initial 3.1.4 commit
+(`a04ae8b`):
 
-The unit suite includes 27 invalidation tests, checking affected and unaffected
-cache/spent rows, rollback, creation, reassignment, dependent destruction, nested
-schedule deletion and a real SQL recalculation from HO to HNO on the next read.
-Four regression cases failed before the corrections and passed afterwards.
+| Operation | Initial implementation | Optimized implementation |
+| --- | --- | --- |
+| Calendar name/description or holiday name edit | Deletes useful caches | Preserves cache/spent rows; 0 invalidation queries |
+| Destroy calendar with 10 schedules and 54 holiday links (10 added) | 130 invalidation queries | 2 (resolve levels, delete caches) |
+| Destroy holiday linked to all 7 fixture calendars | 17 invalidation queries | 3 (resolve calendars, resolve levels, delete caches) |
 
-Enabling `ONLY_FULL_GROUP_BY` on MariaDB exposed an existing aggregate-query
-error in `sla_get_spent`, preventing cache preparation. This SQL-function issue
-is separate from callback invalidation and remains unresolved. MySQL passes
-with `ONLY_FULL_GROUP_BY` enabled. The 3.1.4 release then passed all five
-suites on Redmine 5.1.13, 6.1.4 and 7.0.1 with each database: see
+The optimized query counts are asserted on every database in the release
+matrix. They stay independent of the number of dependent schedules/links;
+the number of deleted rows still scales with that number, while dependent
+cleanup uses one DELETE per association. These are SQL workload
+measurements in isolated tests, not production latency benchmarks.
+
+The full compatibility results and SQL modes are recorded in
 [Testing](TESTING.md#version-314-competing-level-cache-invalidation).
+MariaDB is tested separately from strict MySQL; its existing `sla_get_spent`
+aggregate-query limitation with `ONLY_FULL_GROUP_BY` remains outside this change.
