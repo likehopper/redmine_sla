@@ -303,7 +303,7 @@ import the selected dates. An optional default country can be set in the
 plugin settings. See [Public holiday import](doc/HOLIDAY_IMPORT.md). Update the
 plugin files and restart Redmine; this release introduces no new migration
 relative to 3.2.0. The Redmine server needs outbound HTTPS access to
-`date.nager.at` to use the import.
+`nagerholidays.com` to use the import.
 
 ### Previous upgrade: 3.2.0
 
@@ -328,6 +328,8 @@ SLA when calendars, schedules or holiday rules change, including level
 creation and changes of SLA or calendar assignment. Calendar-holiday links are
 removed with their calendar or holiday. Update the plugin files and restart
 Redmine; this release introduces no new migration relative to 3.1.3.
+Calendar name/description and holiday name edits preserve caches. Calendar and
+holiday destruction invalidate once, covering their dependent records.
 
 ### Previous upgrade: 3.1.3
 

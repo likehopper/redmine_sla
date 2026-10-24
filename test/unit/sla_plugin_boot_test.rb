@@ -22,6 +22,9 @@ require 'rbconfig'
 require File.expand_path('../../application_sla_units_test_case', __FILE__)
 
 class SlaPluginBootTest < ActiveSupport::TestCase
+  # Boot checks do not need Redmine's core fixtures, which replace SLA test data.
+  self.fixture_table_names = []
+
   test 'initializer explicitly loads the database dialect before plugin registration' do
     initializer = Rails.root.join('plugins/redmine_sla/init.rb').read
     require_position = initializer.index('require_relative "lib/redmine_sla/db_dialect"')

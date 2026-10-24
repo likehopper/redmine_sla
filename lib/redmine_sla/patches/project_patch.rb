@@ -62,15 +62,16 @@ module RedmineSla
       def sla_visible?(user = User.current)
         return false unless user
         return true if user.admin?
+        # Avoid per-project module lookups when no role grants SLA access.
+        return false unless user.allowed_to?(:view_sla, nil, global: true) ||
+                            user.allowed_to?(:manage_sla, nil, global: true)
 
         user.allowed_to?(:view_sla, self) || user.allowed_to?(:manage_sla, self)
       end
 
       # True when the project has SLAs the user may see.
-      # Checks the (possibly preloaded) assignments first, so that projects
-      # without SLA never trigger a permission lookup.
       def visible_sla?(user = User.current)
-        sla_project_trackers.any? && sla_visible?(user)
+        sla_visible?(user) && sla_project_trackers.any?
       end
 
       # Adds "has-sla" so the board view can show the SLA icon.

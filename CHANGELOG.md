@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.3.2 - 2026-10-24
+## 3.3.2 - 2026-10-25
 
 ### Tests
 
@@ -16,35 +16,35 @@
 -   No change for installations: test fixtures only, no migration and no
     functional change relative to 3.3.1.
 
-## 3.3.1 - 2026-10-23
+## 3.3.1 - 2026-10-25
 
 ### Documentation
 
 -   Document the SLA roles and permissions (`view_sla`, `manage_sla`) in the
     plugin settings guide, with screenshots of the role form and the
     permissions report, and link them from the examples, use cases and
-    testing guide. Fix the default display setting and typos.
+    testing guide. Clarify the display setting description and fix typos.
 -   Describe the fixture users and roles in a table in the testing guide.
 
 ### Tests
 
 -   Generate the roles and permissions screenshots in a documentation test.
-    Documentation screenshots can be written to a dedicated folder.
+    Check granted permissions and refuse role administration to non-admins.
 
 ### Upgrade
 
 -   Update the plugin files; no migration and no functional change relative
     to 3.3.0.
 
-## 3.3.0 - 2026-10-22
+## 3.3.0 - 2026-10-25
 
 ### Added
 
--   Import public holidays from Nager.Date: administrators choose a year and
-    a country from the SLA holiday list, preview the public holidays and
+-   Import public holidays from Nager.Date community API v4: administrators
+    choose a year and a country from the SLA holiday list, preview the public holidays and
     import the selected dates. National holidays are selected by default;
-    regional ones show their subdivisions. Existing dates keep their names
-    and calendar associations; entries on the same date are combined.
+    regional ones show their subdivisions. Imported names are in English.
+    Existing dates keep their names and calendar associations; entries on the same date are combined.
 -   New *Default holiday country* plugin setting (optional ISO code).
 -   The preview is signed, belongs to the administrator and expires after
     15 minutes. The import runs in one transaction and does not attach the
@@ -55,15 +55,16 @@
 -   Cover the Nager.Date adapter (normalization, HTTP and data errors), the
     importer, the controller actions and permissions, and the import form in
     Chromium. The holiday service is stubbed; no test calls the network.
+-   Keep boot tests from loading Redmine's native fixtures into SLA suites.
 
 ### Upgrade
 
 -   Update the plugin files and restart Redmine. This release introduces no
     new migration relative to 3.2.0. The import calls
-    `https://date.nager.at` from the Redmine server; allow outbound HTTPS to
+    `https://nagerholidays.com` from the Redmine server; allow outbound HTTPS to
     it to use the feature.
 
-## 3.2.0 - 2026-10-21
+## 3.2.0 - 2026-10-24
 
 ### Added
 
@@ -76,6 +77,11 @@
 -   Show an SLA icon next to the name of projects with SLA in the
     project board view, with the same permission rules.
 
+### Fixed
+
+-   Avoid per-project SLA lookups in the board for users without SLA access,
+    and preload enabled modules for permission checks in the SLA list column.
+
 ### Tests
 
 -   Cover what each profile sees in the project lists (column, filter
@@ -84,6 +90,8 @@
     non-member, anonymous, and SLA module disabled.
 -   Add a documentation test that checks the rendering in Chromium per
     profile and generates the screenshots of `doc/PROJECT_LISTS.md`.
+-   Check mixed project permissions and a fixed number of SLA association
+    queries as the displayed project count grows.
 -   Allow documentation tests to run directly with `rails test`, without
     the documentation rake task (`ApplicationSystemTestCase` is now loaded
     by the plugin documentation test case).
@@ -94,7 +102,7 @@
     new migration relative to 3.1.5 and no new permission: the project list
     column, filter and board icon follow *View SLA* and *Manage SLA*.
 
-## 3.1.5 - 2026-10-20
+## 3.1.5 - 2026-10-24
 
 ### Fixed
 
@@ -108,7 +116,7 @@
 -   Update the plugin files and restart Redmine. This release introduces no
     new migration relative to 3.1.4.
 
-## 3.1.4 - 2026-10-19
+## 3.1.4 - 2026-10-24
 
 ### Fixed
 
@@ -117,6 +125,19 @@
     of SLA or calendar assignment.
 -   Remove calendar-holiday links when their calendar or holiday is destroyed,
     capturing cache dependencies before dependent records are removed.
+-   Preserve caches when only a calendar name/description or a holiday name
+    changes. Nested schedule changes still invalidate competing levels.
+-   Resolve dependencies and delete caches once per calendar/holiday destruction.
+    Remove dependent schedules and holiday links in bulk with Rails instead of
+    repeating their cache invalidation callbacks.
+-   Keep caches intact on aborted destruction and on a later metadata-only save
+    of the same instance.
+
+### Tests
+
+-   Check affected and unaffected caches, nested edits, rollback and aborted
+    destruction. SQL query assertions cover metadata edits and destruction with
+    many dependent records; see `doc/CACHE_INVALIDATION.md` for measurements.
 
 ### Upgrade
 

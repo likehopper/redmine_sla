@@ -402,7 +402,7 @@ en:
   sla_holiday_import_country: "Country"
   sla_holiday_import_default_country: "Default holiday country"
   sla_holiday_import_country_hint: "ISO country code, e.g. FR. Leave blank to choose at import time."
-  sla_holiday_import_description: "Retrieve public holidays from Nager.Date. Existing dates and calendar associations are preserved."
+  sla_holiday_import_description: "Retrieve public holidays from Nager.Date, with names in English. Existing dates and calendar associations are preserved."
   sla_holiday_import_selection_hint: "National holidays are selected by default. Check regional holidays before selecting them. Entries on the same date are combined."
   sla_holiday_import_scope: "Scope"
   sla_holiday_import_existing: "Existing holiday"
