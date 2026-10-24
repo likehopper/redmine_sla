@@ -4,11 +4,11 @@
 
 ### Added
 
--   Import public holidays from Nager.Date: administrators choose a year and
-    a country from the SLA holiday list, preview the public holidays and
+-   Import public holidays from Nager.Date community API v4: administrators
+    choose a year and a country from the SLA holiday list, preview the public holidays and
     import the selected dates. National holidays are selected by default;
-    regional ones show their subdivisions. Existing dates keep their names
-    and calendar associations; entries on the same date are combined.
+    regional ones show their subdivisions. Imported names are in English.
+    Existing dates keep their names and calendar associations; entries on the same date are combined.
 -   New *Default holiday country* plugin setting (optional ISO code).
 -   The preview is signed, belongs to the administrator and expires after
     15 minutes. The import runs in one transaction and does not attach the
@@ -19,12 +19,13 @@
 -   Cover the Nager.Date adapter (normalization, HTTP and data errors), the
     importer, the controller actions and permissions, and the import form in
     Chromium. The holiday service is stubbed; no test calls the network.
+-   Keep boot tests from loading Redmine's native fixtures into SLA suites.
 
 ### Upgrade
 
 -   Update the plugin files and restart Redmine. This release introduces no
     new migration relative to 3.2.0. The import calls
-    `https://date.nager.at` from the Redmine server; allow outbound HTTPS to
+    `https://nagerholidays.com` from the Redmine server; allow outbound HTTPS to
     it to use the feature.
 
 ## 3.2.0 - 2026-10-24

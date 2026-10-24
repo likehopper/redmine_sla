@@ -64,7 +64,7 @@ class SlaHolidaysController < ApplicationController
     end    
   end
 
-  # Fetch countries also checks connectivity from the Redmine server.
+  # Fetching countries also checks connectivity from the Redmine server.
   def import_form
     @year = Date.current.year
     @country = Setting.plugin_redmine_sla['sla_holiday_country'].to_s.upcase
@@ -78,7 +78,7 @@ class SlaHolidaysController < ApplicationController
     @year = params[:year].to_s
     @country = params[:country].to_s.upcase
     @countries = holiday_adapter.available_countries
-    unless @countries.any? { |name, code| code == @country }
+    unless @countries.any? { |_name, code| code == @country }
       raise SlaHolidayAdapters::NagerDate::Error, 'invalid_selection'
     end
     @holidays = SlaHolidayImporter.new(adapter: holiday_adapter).preview(year: @year, country: @country)
