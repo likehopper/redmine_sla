@@ -40,20 +40,26 @@ module SlaHolidayAdapters
       end.sort
     end
 
-    def holidays(year:, country:)
+    def holidays(year:, country:, language: 'en')
+      raise Error, 'invalid_selection' unless %w[en local].include?(language)
       year = year.to_s
       country = country.to_s.upcase
       raise Error, 'invalid_selection' unless year.match?(/\A\d{1,4}\z/) && year.to_i.between?(1, 9999) && country.match?(/\A[A-Z]{2}\z/)
-      rows = request("/Holidays/#{country}/#{year.to_i}")
+      rows = if language == 'local'
+               request("/PublicHolidays/#{year.to_i}/#{country}", base_url: 'https://date.nager.at/api/v3')
+             else
+               request("/Holidays/#{country}/#{year.to_i}")
+             end
       raise Error, 'invalid_response' unless rows.is_a?(Array)
       rows.filter_map do |row|
         raise Error, 'invalid_response' unless row.is_a?(Hash)
         date = Date.iso8601(row.fetch('date'))
-        name = row.fetch('name')
-        regions = row['subdivisionCodes']
-        types = row['holidayTypes']
+        name = row.fetch(language == 'local' ? 'localName' : 'name')
+        regions = row[language == 'local' ? 'counties' : 'subdivisionCodes']
+        types = row[language == 'local' ? 'types' : 'holidayTypes']
+        national = row[language == 'local' ? 'global' : 'nationalHoliday']
         unless row['date'] == date.iso8601 && date.year == year.to_i && row['countryCode'] == country &&
-               name.is_a?(String) && !name.strip.empty? && [true, false].include?(row['nationalHoliday']) &&
+               name.is_a?(String) && !name.strip.empty? && [true, false].include?(national) &&
                types.is_a?(Array) && types.all? { |type| type.is_a?(String) && !type.empty? } &&
                (regions.nil? || (regions.is_a?(Array) && regions.all? do |region|
                  region.is_a?(String) && region.match?(/\A#{country}-[A-Z0-9]{1,3}\z/)
@@ -62,7 +68,7 @@ module SlaHolidayAdapters
         end
         next unless types.include?('Public')
 
-        { 'date' => date.iso8601, 'name' => name.strip, 'national' => row['nationalHoliday'],
+        { 'date' => date.iso8601, 'name' => name.strip, 'national' => national,
           'regions' => regions || [] }
       end.sort_by { |holiday| holiday['date'] }
     rescue KeyError, ArgumentError, TypeError
@@ -71,8 +77,8 @@ module SlaHolidayAdapters
 
     private
 
-    def request(path)
-      uri = URI("#{BASE_URL}#{path}")
+    def request(path, base_url: BASE_URL)
+      uri = URI("#{base_url}#{path}")
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
       http.open_timeout = 5
