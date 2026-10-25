@@ -1,5 +1,34 @@
 # Testing
 
+## Version 3.3.3 issue SLA block for configured trackers
+
+Validated on **2026-10-25** in isolated local test containers, after integrating
+release 3.3.2 and regenerating fixtures for each database:
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1135 / 6627 | 1135 / 6624 | 1135 / 6624 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1195 / 7264 | 1135 / 6720 | 1135 / 6720 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1135 / 7274 | 1135 / 7271 | 1135 / 7271 |
+
+Each combination ran **266 unit, 470 functional, 358 integration/API and
+35 Chromium system tests**, plus **6 role/project documentation tests**.
+Redmine 6.1/PostgreSQL ran all **66 documentation tests** instead.
+Total: **10,275 tests / 62,395 assertions**, zero failures/errors
+and 12 expected migration skips (3.1.2/3.1.3 on MariaDB/MySQL). Cells record
+tests / assertions. MySQL retains `ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES`
+and `STRICT_ALL_TABLES`; MariaDB uses strict mode without `ONLY_FULL_GROUP_BY`.
+
+Eight integration tests cover the issue block: unassigned trackers for admins
+and managers, assignments in another project, denied view access, disabled
+modules, assigned SLAs with no matching level, and read-only level display.
+They also check that hidden blocks skip assignment queries and/or cache
+calculation. The two unassigned-tracker regressions fail without the fix.
+The no-matching-level cases use real assignments and database calculation.
+
+No new migration, production deployment or representative performance benchmark.
+Historical results below remain separate validations of their respective versions.
+
 ## Version 3.3.2 fixtures for a project without SLA
 
 Validated on **2026-10-25** in isolated local test containers, after integrating

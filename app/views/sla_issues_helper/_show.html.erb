@@ -18,7 +18,8 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 -%>
 <%
-if User.current.allowed_to?(:view_sla, @project, :global => true)
+if User.current.allowed_to?(:view_sla, @project, :global => true) &&
+   SlaProjectTracker.exists?(project_id: issue.project_id, tracker_id: issue.tracker_id)
 
   sla_cache = issue.get_sla_cache
   can_explain = User.current.allowed_to?(:manage_sla, @project)
@@ -97,6 +98,6 @@ if User.current.allowed_to?(:view_sla, @project, :global => true)
   </div>
 </div>
 <%
-  end # if ( !sla_level_id.nil? )
-end # if User.current.allowed_to?(:view_sla, @project, :global => true)
+  end
+end
 %>
