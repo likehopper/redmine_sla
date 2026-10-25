@@ -2,32 +2,32 @@
 
 ## Version 3.3.3 issue SLA block for configured trackers
 
-Validated on **2026-10-24** in isolated local test containers:
+Validated on **2026-10-25** in isolated local test containers, after integrating
+release 3.3.2 and regenerating fixtures for each database:
 
 | Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
 | --- | --- | --- | --- | --- | --- |
-| 5.1.13 | 3.2.11 | 6.1.7.10 | 1168 / 6120 | 1168 / 6117 | 1168 / 6117 |
-| 6.1.4 | 3.4.11 | 7.2.3.2 | 1168 / 6208 | 1168 / 6205 | 1168 / 6205 |
-| 7.0.1 | 4.0.7 | 8.1.3.1 | 1168 / 6747 | 1168 / 6744 | 1168 / 6744 |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1135 / 6627 | 1135 / 6624 | 1135 / 6624 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1195 / 7264 | 1135 / 6720 | 1135 / 6720 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1135 / 7274 | 1135 / 7271 | 1135 / 7271 |
 
-Each combination ran **247 unit, 465 functional, 352 integration/API,
-35 Chromium system and 69 documentation tests**, with zero failures or
-errors: **10,512 tests** across the matrix. Cells record tests / assertions.
-The two migration unit tests skipped by design on MariaDB and MySQL are
-those of 3.1.2 and 3.1.3. Each suite ran on a freshly migrated database with
-freshly generated fixtures. On Redmine 5.1.13 with PostgreSQL, the
-documentation suite was rerun alone after a transient Chromium inspector
-error; the rerun passed. MySQL retained `ONLY_FULL_GROUP_BY`,
-`STRICT_TRANS_TABLES` and `STRICT_ALL_TABLES` in the Rails session.
+Each combination ran **266 unit, 470 functional, 358 integration/API and
+35 Chromium system tests**, plus **6 role/project documentation tests**.
+Redmine 6.1/PostgreSQL ran all **66 documentation tests** instead.
+Total: **10,275 tests / 62,395 assertions**, zero failures/errors
+and 12 expected migration skips (3.1.2/3.1.3 on MariaDB/MySQL). Cells record
+tests / assertions. MySQL retains `ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES`
+and `STRICT_ALL_TABLES`; MariaDB uses strict mode without `ONLY_FULL_GROUP_BY`.
 
-Two integration tests cover the issue page: a tracker without SLA in the
-project shows no SLA block, and a tracker with an SLA but no applicable level
-keeps the *Explain* link. The first one fails without the fix.
+Eight integration tests cover the issue block: unassigned trackers for admins
+and managers, assignments in another project, denied view access, disabled
+modules, assigned SLAs with no matching level, and read-only level display.
+They also check that hidden blocks skip assignment queries and/or cache
+calculation. The two unassigned-tracker regressions fail without the fix.
+The no-matching-level cases use real assignments and database calculation.
 
-This release introduces no migration. These results cover the exact versions
-above. No production deployment or representative performance benchmark was
-performed. Historical results below remain separate validations of their
-respective versions.
+No new migration, production deployment or representative performance benchmark.
+Historical results below remain separate validations of their respective versions.
 
 ## Version 3.3.2 fixtures for a project without SLA
 
