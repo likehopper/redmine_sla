@@ -196,8 +196,8 @@ Fully manageable through UI and REST API:
 | `Rails`            | >= 6.1                                            |
 | `Database`         | PostgreSQL >= 11, MySQL >= 8.0 or MariaDB >= 10.2 |
 
-Version **3.3.3** has been tested on Redmine **5.1.13,
-6.1.4 and 7.0.1**, with all five suites on PostgreSQL, MariaDB and strict
+Version **3.3.3** has been checked on Redmine **5.1.13, 6.1.4 and 7.0.1**,
+with unit, functional, API and Chromium tests on PostgreSQL, MariaDB and strict
 MySQL. See the [compatibility matrix](doc/TESTING.md#version-333-issue-sla-block-for-configured-trackers)
 for exact runtime versions and results.
 
@@ -309,7 +309,7 @@ import the selected dates. An optional default country can be set in the
 plugin settings. See [Public holiday import](doc/HOLIDAY_IMPORT.md). Update the
 plugin files and restart Redmine; this release introduces no new migration
 relative to 3.2.0. The Redmine server needs outbound HTTPS access to
-`date.nager.at` to use the import.
+`nagerholidays.com` to use the import.
 
 ### Previous upgrade: 3.2.0
 
@@ -334,6 +334,8 @@ SLA when calendars, schedules or holiday rules change, including level
 creation and changes of SLA or calendar assignment. Calendar-holiday links are
 removed with their calendar or holiday. Update the plugin files and restart
 Redmine; this release introduces no new migration relative to 3.1.3.
+Calendar name/description and holiday name edits preserve caches. Calendar and
+holiday destruction invalidate once, covering their dependent records.
 
 ### Previous upgrade: 3.1.3
 
