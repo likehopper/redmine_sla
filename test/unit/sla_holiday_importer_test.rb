@@ -28,12 +28,13 @@ class SlaHolidayImporterTest < ApplicationSlaUnitsTestCase
   test 'preview identifies existing names without writes' do
     entry = SlaHoliday.first
     adapter = mock('holiday adapter')
-    adapter.expects(:holidays).with(year: entry.date.year, country: 'FR').returns(
+    adapter.expects(:holidays).with(year: entry.date.year, country: 'FR', language: 'en').returns(
       [{ 'date' => entry.date.iso8601, 'name' => 'Different name' }]
     )
     before = SlaHoliday.count
     preview = SlaHolidayImporter.new(adapter: adapter).preview(year: entry.date.year, country: 'FR')
     assert_equal entry.name, preview.first['existing_name']
+    assert_equal "Different name #{entry.date.year}", preview.first['name']
     assert_equal before, SlaHoliday.count
   end
 

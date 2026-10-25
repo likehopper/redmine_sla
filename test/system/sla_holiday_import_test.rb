@@ -33,7 +33,7 @@ class SlaHolidayImportSystemTest < ApplicationSlaSystemTestCase
     fill_in 'year', with: '2098'
     select 'France', from: 'country'
     click_button l(:label_preview)
-    assert_text 'National test holiday'
+    assert_text 'National test holiday 2098'
     assert_text 'FR-67'
     assert_checked_field 'holiday_0'
     assert_unchecked_field 'holiday_1'
@@ -41,7 +41,7 @@ class SlaHolidayImportSystemTest < ApplicationSlaSystemTestCase
     click_button l(:button_import)
     assert_current_path '/sla/holidays'
     assert_selector '#flash_notice'
-    assert_equal 'National test holiday', SlaHoliday.find_by(date: '2098-01-01').name
+    assert_equal 'National test holiday 2098', SlaHoliday.find_by(date: '2098-01-01').name
     assert_nil SlaHoliday.find_by(date: '2098-01-02')
   end
 

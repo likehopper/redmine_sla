@@ -232,6 +232,7 @@ class SlaHolidaysControllerTest < ApplicationSlaFunctionalsTestCase
     get :import_form
     assert_response :success
     assert_select 'select[name=country] option[value=FR]', 'France'
+    assert_select 'select[name=language] option[value=local][selected]'
   end
 
   test "unavailable API displays an error without writes" do
@@ -248,12 +249,12 @@ class SlaHolidaysControllerTest < ApplicationSlaFunctionalsTestCase
   test "preview and import selected holidays with signed data" do
     @request.session[:user_id] = 1
     SlaHolidayAdapters::NagerDate.any_instance.stubs(:available_countries).returns([['France', 'FR']])
-    SlaHolidayAdapters::NagerDate.any_instance.stubs(:holidays).returns([
+    SlaHolidayAdapters::NagerDate.any_instance.expects(:holidays).with(year: '2098', country: 'FR', language: 'local').returns([
       { 'date' => '2098-01-01', 'name' => 'National', 'national' => true, 'regions' => [] },
       { 'date' => '2098-01-02', 'name' => 'Regional', 'national' => false, 'regions' => ['FR-67'] }
     ])
     assert_no_difference 'SlaHoliday.count' do
-      post :preview_import, params: { year: '2098', country: 'FR' }
+      post :preview_import, params: { year: '2098', country: 'FR', language: 'local' }
       assert_response :success
     end
     assert_select 'input[name="selected[]"][checked]', count: 1
@@ -264,7 +265,7 @@ class SlaHolidaysControllerTest < ApplicationSlaFunctionalsTestCase
       post :import_holidays, params: { preview_token: token, selected: ['0'] }
       assert_redirected_to sla_holidays_path
     end
-    assert_equal 'National', SlaHoliday.find_by(date: '2098-01-01').name
+    assert_equal 'National 2098', SlaHoliday.find_by(date: '2098-01-01').name
   end
 
   test "invalid and expired previews never write" do

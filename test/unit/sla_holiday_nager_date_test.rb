@@ -56,6 +56,29 @@ class SlaHolidayNagerDateTest < ApplicationSlaUnitsTestCase
     assert_equal false, result.last['national']
   end
 
+  test 'local language uses the provider local name' do
+    row = { 'date' => '2026-01-01', 'localName' => "Jour de l’an", 'name' => 'New Year',
+            'countryCode' => 'FR', 'global' => true, 'counties' => nil, 'types' => ['Public'] }
+    @http.expects(:get).with('/api/v3/PublicHolidays/2026/FR', 'Accept' => 'application/json').returns(response([row]))
+    result = @adapter.holidays(year: 2026, country: 'FR', language: 'local')
+    assert_equal "Jour de l’an", result.first['name']
+    assert_equal true, result.first['national']
+  end
+
+  test 'rejects unsupported languages before accessing network' do
+    @http.expects(:get).never
+    assert_equal 'invalid_selection', assert_raises(SlaHolidayAdapters::NagerDate::Error) {
+      @adapter.holidays(year: 2026, country: 'FR', language: 'xx')
+    }.message
+  end
+
+  test 'missing local names are rejected without English fallback' do
+    @http.expects(:get).returns(response([holiday]))
+    assert_equal 'invalid_response', assert_raises(SlaHolidayAdapters::NagerDate::Error) {
+      @adapter.holidays(year: 2026, country: 'FR', language: 'local')
+    }.message
+  end
+
   test 'rejects holidays outside requested year' do
     @http.expects(:get).returns(response([holiday('date' => '2025-01-01')]))
     assert_equal 'invalid_response', assert_raises(SlaHolidayAdapters::NagerDate::Error) { @adapter.holidays(year: 2026, country: 'FR') }.message

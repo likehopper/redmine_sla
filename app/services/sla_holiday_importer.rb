@@ -24,10 +24,13 @@ class SlaHolidayImporter
     @adapter = adapter
   end
 
-  def preview(year:, country:)
-    holidays = @adapter.holidays(year: year, country: country)
+  def preview(year:, country:, language: 'en')
+    holidays = @adapter.holidays(year: year, country: country, language: language)
     existing = SlaHoliday.where(date: holidays.map { |holiday| holiday.fetch('date') }).pluck(:date, :name).to_h
-    holidays.map { |holiday| holiday.merge('existing_name' => existing[Date.iso8601(holiday.fetch('date'))]) }
+    holidays.map do |holiday|
+      date = Date.iso8601(holiday.fetch('date'))
+      holiday.merge('name' => "#{holiday.fetch('name')} #{date.year}", 'existing_name' => existing[date])
+    end
   end
 
   def import(holidays:)

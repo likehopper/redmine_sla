@@ -14,7 +14,7 @@
 
 ## Overview
 
-Current version: **3.3.3**. See the [changelog](CHANGELOG.md) for release details.
+Current version: **3.3.4**. See the [changelog](CHANGELOG.md) for release details.
 
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
@@ -284,6 +284,14 @@ Plugin is ready to use.
 
 ------------------------------------------------------------------------
 
+## Upgrade to 3.3.4
+
+Version **3.3.4** appends the year to imported holiday names and offers English
+or the country's local names (French for France). Local names are selected by
+default and require access to `date.nager.at` through the legacy Nager.Date v3
+API. Existing holidays keep their names. Update the plugin files and restart
+Redmine; no new migration relative to 3.3.3. See [Public holiday import](doc/HOLIDAY_IMPORT.md).
+
 ## Upgrade to 3.3.3
 
 Version **3.3.3** shows the SLA block of the issue page only for trackers with
@@ -304,12 +312,12 @@ files; there is no migration and no functional change relative to 3.3.0.
 ### Previous upgrade: 3.3.0
 
 Version **3.3.0** imports public holidays from Nager.Date: from the SLA holiday
-list, administrators choose a year and a country, preview the holidays and
+list, administrators choose a year, a country and the name language, preview the holidays and
 import the selected dates. An optional default country can be set in the
 plugin settings. See [Public holiday import](doc/HOLIDAY_IMPORT.md). Update the
 plugin files and restart Redmine; this release introduces no new migration
 relative to 3.2.0. The Redmine server needs outbound HTTPS access to
-`nagerholidays.com` to use the import.
+`nagerholidays.com` (and `date.nager.at` for local names) to use the import.
 
 ### Previous upgrade: 3.2.0
 

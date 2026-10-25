@@ -1,5 +1,32 @@
 # Changelog
 
+## 3.3.4 - 2026-10-25
+
+### Fixed
+
+-   Append the holiday year to imported names, including in the preview.
+
+### Added
+
+-   Choose English or the country's local holiday names when importing.
+    Local names are selected by default and use the legacy Nager.Date v3
+    endpoint, which requires HTTPS access to `date.nager.at`. English names
+    and country choices continue to use v4 on `nagerholidays.com`.
+    This is a choice of provider names, not arbitrary translation languages.
+
+### Tests
+
+-   Targeted importer, adapter and controller tests: 45 tests, 210 assertions.
+    Chromium import tests: 2 tests, 16 assertions, on Redmine 7.0.1.
+    No failures or errors. Both API paths were also checked live for France
+    in 2028: 11 public holidays each, with English and French names.
+
+### Upgrade
+
+-   Update the plugin files and restart Redmine. No new migration relative
+    to 3.3.3. Existing dates keep their names and calendar associations;
+    importing again does not rename previously imported holidays.
+
 ## 3.3.3 - 2026-10-25
 
 ### Fixed

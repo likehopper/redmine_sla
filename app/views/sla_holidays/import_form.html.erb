@@ -24,6 +24,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
   <div class="box tabular">
     <p><%= label_tag :year, l(:label_year) %><%= number_field_tag :year, @year, min: 1, max: 9999, required: true %></p>
     <p><%= label_tag :country, l(:sla_holiday_import_country) %><%= select_tag :country, options_for_select(@countries || [], @country), include_blank: true, required: true %></p>
+    <p><%= label_tag :language, l(:field_language) %><%= select_tag :language, options_for_select([[l(:sla_holiday_import_language_local), 'local'], ['English', 'en']], @language) %></p>
   </div>
   <%= submit_tag l(:label_preview), disabled: @countries.blank? %>
   <%= link_to l(:button_cancel), sla_holidays_path %>
