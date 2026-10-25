@@ -9,7 +9,8 @@
     outside any SLA. The project list tests and screenshots include it.
 -   The fixture generator also writes `time_entries.yml`: half an hour
     logged before each status change of the generated issues, and on the
-    issue without SLA. The test suites do not load it yet.
+    issue without SLA, including reopening transitions. Dedicated tests
+    validate these records and use them in native issue/time-entry queries.
 
 ### Upgrade
 
