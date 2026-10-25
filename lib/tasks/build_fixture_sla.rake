@@ -137,7 +137,8 @@ namespace :redmine do
         time_entries = {}
         time_entries_have_author = TimeEntry.column_names.include?("author_id")
         add_time_entry = lambda do |issue, user_id, recorded_at, comments|
-          # Redmine stores timestamps in UTC, including offset-bearing CSV dates.
+          # Keep the source work date; Redmine stores timestamps in UTC.
+          spent_on = recorded_at.to_date
           recorded_at = recorded_at.new_offset(0)
           entry_id = time_entries.size + 1
           attributes = {
@@ -148,10 +149,10 @@ namespace :redmine do
             "activity_id" => 4,
             "hours" => 0.5,
             "comments" => comments,
-            "spent_on" => recorded_at.strftime("%Y-%m-%d"),
-            "tyear" => recorded_at.year,
-            "tmonth" => recorded_at.month,
-            "tweek" => recorded_at.cweek,
+            "spent_on" => spent_on.iso8601,
+            "tyear" => spent_on.year,
+            "tmonth" => spent_on.month,
+            "tweek" => spent_on.cweek,
             "created_on" => recorded_at.strftime("%Y-%m-%d %H:%M:%S"),
             "updated_on" => recorded_at.strftime("%Y-%m-%d %H:%M:%S"),
           }
