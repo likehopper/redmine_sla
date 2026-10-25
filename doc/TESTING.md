@@ -1,5 +1,38 @@
 # Testing
 
+## Version 3.3.2 fixtures for a project without SLA
+
+Validated on **2026-10-25** in isolated local test containers, after integrating
+release 3.3.1 and regenerating fixtures for each database:
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1127 / 6570 | 1127 / 6567 | 1127 / 6567 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1187 / 7207 | 1127 / 6663 | 1127 / 6663 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1127 / 7216 | 1127 / 7213 | 1127 / 7213 |
+
+Each combination ran **266 unit, 470 functional, 350 integration/API and
+35 Chromium system tests**, plus **6 role/project documentation tests**.
+Redmine 6.1/PostgreSQL ran all **66 documentation tests** instead.
+Total: **10,203 tests / 61,879 assertions**, zero failures/errors
+and 12 expected migration skips (3.1.2/3.1.3 on MariaDB/MySQL). Cells record
+tests / assertions. MySQL retains `ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES`
+and `STRICT_ALL_TABLES`; MariaDB uses strict mode without `ONLY_FULL_GROUP_BY`.
+
+The new tests validate every generated time entry with Redmine's model, check
+work recorded 30 minutes before every journal transition (including reopening),
+and use generated records in native queries with and without SLA. The missing
+reopening-entry regression fails before the correction. Selected records are
+created inside test transactions; other suites keep their own time-entry data.
+The original empty project remains, and the additional non-SLA project contains
+one issue and supports time tracking. Project-list screenshots are refreshed.
+Separate Redmine 6.1/7 MySQL CLI checks confirm unchanged default output,
+UTC timestamp conversion with the source work date preserved, and reproducible
+generation. The four new tests also passed a final 6.1/MySQL recheck.
+
+No new migration, production behavior or deployment. Historical results below
+remain separate validations of their respective versions.
+
 ## Version 3.3.1 roles and permissions documentation
 
 Validated on **2026-10-25** in isolated local test containers, after integrating

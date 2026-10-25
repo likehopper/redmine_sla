@@ -53,9 +53,9 @@ class SlaProjectQueryTest < ApplicationSlaUnitsTestCase
     User.current = User.find(1)
 
     assert_equal [1, 2, 3, 4], project_ids_for(ProjectAdminQuery, '*')
-    assert_equal [5], project_ids_for(ProjectAdminQuery, '!*')
+    assert_equal [5, 6], project_ids_for(ProjectAdminQuery, '!*')
     assert_equal [4], project_ids_for(ProjectAdminQuery, '=', ['7'])
-    assert_equal [1, 2, 3, 5], project_ids_for(ProjectAdminQuery, '!', ['7', '8'])
+    assert_equal [1, 2, 3, 5, 6], project_ids_for(ProjectAdminQuery, '!', ['7', '8'])
   end
 
   test "admin filter values include unassigned SLAs while member values exclude them" do
