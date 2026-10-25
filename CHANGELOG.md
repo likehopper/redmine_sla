@@ -13,8 +13,9 @@
 
 ### Tests
 
--   Cover the issue page of a tracker without SLA and of a tracker with an
-    SLA but no applicable level.
+-   Cover administrator/manager/reader visibility, project-scoped assignments,
+    disabled modules and assigned SLAs without levels. Check that hidden blocks
+    skip assignment queries or SLA calculation where appropriate.
 
 ### Upgrade
 

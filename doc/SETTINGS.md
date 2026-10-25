@@ -46,6 +46,9 @@ Grant **both permissions** to project managers: `manage_sla` does not include
 icon in the [project lists](PROJECT_LISTS.md). Only administrators may purge
 caches across all projects.
 
+On an issue, the SLA block also requires a tracker-to-SLA mapping in that
+project. If no level matches, users with both permissions still see Explain.
+
 For non-administrators, permissions apply to projects where:
 
 - the **SLA** module is enabled (`Project → Settings → Modules`);

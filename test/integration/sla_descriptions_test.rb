@@ -58,27 +58,6 @@ class SlaDescriptionsTest < ApplicationSlaIntegrationTestCase
     assert_select "div.sla.attribute a[href='/sla/levels/1'][title=?]", "Show : SLA Level"
   end
 
-  test "issue SLA block is hidden when no SLA is configured for the tracker" do
-    issue = Issue.where(project_id: 1, tracker_id: 2).first
-    assert issue, "an issue on tracker 2 (no SLA) is expected in the fixtures"
-    assert_not SlaProjectTracker.exists?(project_id: 1, tracker_id: 2)
-    log_user('admin', 'admin')
-
-    get "/issues/#{issue.id}"
-    assert_response :success
-    assert_select 'div.sla.attribute', 0
-  end
-
-  test "issue SLA block keeps the explain link when the tracker has an SLA but no level" do
-    issue = described_issue
-    Issue.any_instance.stubs(:get_sla_cache).returns(nil)
-    log_user('admin', 'admin')
-
-    get "/issues/#{issue.id}"
-    assert_response :success
-    assert_select "div.sla.attribute a[href='/issues/#{issue.id}/sla_explain']"
-  end
-
   test "issue list SLA level column shows the level description as tooltip" do
     issue = described_issue
     log_user('admin', 'admin')
