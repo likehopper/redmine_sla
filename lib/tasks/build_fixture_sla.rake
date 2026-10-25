@@ -18,12 +18,13 @@
 desc <<-END_DESC
 Build fixtures for plugin SLA
 
-Available UPDATE SLA options:
-  in     input CSV file ( default: plugins/redmine_sla/test/fixtures/config/fixtures.csv )
-  out    output yml files dir results ( default: plugins/redmine_sla/test/fixtures/config/fixtures.yml )
+Fixture generation options:
+  tz     timezone CSV (default: plugins/redmine_sla/test/config/timezone.csv)
+  in     input CSV (default: plugins/redmine_sla/test/config/fixtures.csv)
+  out    expected SLA results YAML (default: plugins/redmine_sla/test/config/fixtures.yml)
   ff     output folder for fixture ( default: plugins/redmine_sla/test/fixtures/ )
-  ff_red folder with redmine fixtures ( default: plugins/redmine_sla/files/src_redmine/ )
-  ff_sla folder with sla fixtures ( default: plugins/redmine_sla/files/src_sla/ )
+  ff_red Redmine templates (default: plugins/redmine_sla/test/files/src_redmine/)
+  ff_sla SLA templates (default: plugins/redmine_sla/test/files/src_sla/)
 
 Each CSV row is an issue created, assigned, resolved and closed at the given
 dates. The optional issue_status_changes column adds status changes after this
@@ -134,9 +135,12 @@ namespace :redmine do
         journal_details ||= {}
         custom_values ||= {}
         time_entries = {}
+        time_entries_have_author = TimeEntry.column_names.include?("author_id")
         add_time_entry = lambda do |issue, user_id, recorded_at, comments|
+          # Redmine stores timestamps in UTC, including offset-bearing CSV dates.
+          recorded_at = recorded_at.new_offset(0)
           entry_id = time_entries.size + 1
-          time_entries["time_entry_#{entry_id.to_s.rjust(4, '0')}"] = {
+          attributes = {
             "id" => entry_id,
             "project_id" => issue["project_id"],
             "issue_id" => issue["id"],
@@ -151,6 +155,8 @@ namespace :redmine do
             "created_on" => recorded_at.strftime("%Y-%m-%d %H:%M:%S"),
             "updated_on" => recorded_at.strftime("%Y-%m-%d %H:%M:%S"),
           }
+          attributes["author_id"] = user_id if time_entries_have_author
+          time_entries["time_entry_#{entry_id.to_s.rjust(4, '0')}"] = attributes
         end
 
         # For priorities & time entries !!!
@@ -581,6 +587,8 @@ namespace :redmine do
               "created_on" => change_date,
               "notes" => "Issue #{change_status} after closing",
             }
+            recorded_at = DateTime.parse(change_date) - Rational(1, 48)
+            add_time_entry.call(issue_new, 2, recorded_at, "Half an hour before status change")
             extra_journal_detail_id += 1
             journal_details[journal_identifier+"_journal_detail_"+extra_journal_detail_id.to_s.rjust(4,"0")] = {
               "id" => extra_journal_detail_id,
@@ -702,9 +710,10 @@ namespace :redmine do
           "updated_on" => project_new["created_on"]
         )
         member_id += 1
-        members["#{project_identifier}_manager"] = member_new.merge(
-          "id" => member_id, "project_id" => project_id
-        )
+        members["#{project_identifier}_manager"] = {
+          "id" => member_id, "project_id" => project_id, "user_id" => 2,
+          "created_on" => "2024-05-01 11:11:11", "mail_notification" => false
+        }
         member_role_id += 1
         member_roles["#{project_identifier}_manager_role"] = {
           "id" => member_role_id, "member_id" => member_id, "role_id" => 1

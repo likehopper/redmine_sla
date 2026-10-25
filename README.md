@@ -196,8 +196,8 @@ Fully manageable through UI and REST API:
 | `Rails`            | >= 6.1                                            |
 | `Database`         | PostgreSQL >= 11, MySQL >= 8.0 or MariaDB >= 10.2 |
 
-Version **3.3.2** has been tested on Redmine **5.1.13,
-6.1.4 and 7.0.1**, with all five suites on PostgreSQL, MariaDB and strict
+Version **3.3.2** has been checked on Redmine **5.1.13, 6.1.4 and 7.0.1**,
+with unit, functional, API and Chromium tests on PostgreSQL, MariaDB and strict
 MySQL. See the [compatibility matrix](doc/TESTING.md#version-332-fixtures-for-a-project-without-sla)
 for exact runtime versions and results.
 
