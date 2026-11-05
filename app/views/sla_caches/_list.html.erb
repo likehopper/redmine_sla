@@ -39,7 +39,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             <% reset_cycle %>
             <tr class="group open">
               <td colspan="<%= @query.inline_columns.size + 2 %>">
-                <span class="expander icon icon-expanded" onclick="toggleRowGroup(this);">&nbsp;</span>
+                <span class="expander icon icon-expanded" onclick="toggleRowGroup(this);"><%= sprite_icon("angle-down") %></span>
                 <span class="name"><%= group_name %></span>
                 <% if group_count %>
                 <span class="badge badge-count count"><%= group_count %></span>
@@ -57,16 +57,16 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             <% end %>
             <td class="buttons">
               <%= if entity.deletable?
-                      link_to l(:button_refresh), ( @project.nil? ? refresh_sla_cache_path(entity) : refresh_project_sla_cache_path(@project,entity) ),
+                      link_to sprite_icon('refresh', l(:button_refresh), icon_only: true, plugin: 'redmine_sla'), ( @project.nil? ? refresh_sla_cache_path(entity) : refresh_project_sla_cache_path(@project,entity) ),
                               method: :patch, title: l(:button_refresh), class: 'icon-only icon-sla_cache_refresh'
                   end -%>
               <%= if User.current.admin?
-                      link_to l(:button_show),
+                      link_to sprite_icon('zoom-in', l(:button_show), icon_only: true),
                               sla_cache_spents_path(set_filter: 1, f: ['issue_id'], op: { 'issue_id' => '=' }, v: { 'issue_id' => [entity.issue_id] }),
                               title: l(:button_show), class: 'icon-only icon-magnifier'
                   end -%>
               <%= if entity.deletable?
-                      link_to l(:button_delete), ( @project.nil? ? sla_cache_path(entity) : project_sla_cache_path(@project,entity) ),
+                      link_to sprite_icon('del', l(:button_delete), icon_only: true), ( @project.nil? ? sla_cache_path(entity) : project_sla_cache_path(@project,entity) ),
                           data: {confirm: l(:text_are_you_sure)}, method: :delete,
                           title: l(:button_delete), class: 'icon-only icon-del'
                   end -%>

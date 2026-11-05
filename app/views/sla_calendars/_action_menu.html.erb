@@ -18,16 +18,16 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 -%>
 <div class="contextual">
-  <%= link_to l(:button_back), :back,
+  <%= link_to sprite_icon('cancel', l(:button_back)), :back,
       :title => l(:button_back), class: 'icon icon-cancel',
       :accesskey => accesskey(:previous) %>
   <% if User.current.admin? -%>  
-    <%= link_to l('sla_label.sla_calendar.index'), sla_calendars_path,
+    <%= link_to sprite_icon('calendar-code', l('sla_label.sla_calendar.index'), plugin: 'redmine_sla'), sla_calendars_path,
           title: l('sla_label.sla_calendar.index'), class: 'icon icon-sla_calendar' %>
-    <%= link_to l('sla_label.sla_calendar.edit'), edit_sla_calendar_path(@sla_calendar),
+    <%= link_to sprite_icon('edit', l('sla_label.sla_calendar.edit')), edit_sla_calendar_path(@sla_calendar),
           title: l('sla_label.sla_calendar.edit'), class: 'icon icon-edit',
           :accesskey => accesskey(:edit) %>
-    <%= link_to l('sla_label.sla_calendar.delete'), sla_calendar_path(@sla_calendar),
+    <%= link_to sprite_icon('del', l('sla_label.sla_calendar.delete')), sla_calendar_path(@sla_calendar),
           data: {:confirm => l(:text_are_you_sure)}, :method => :delete,
           title: l('sla_label.sla_calendar.delete'), class: 'icon icon-del',
           :accesskey => accesskey(:delete) %>
