@@ -14,7 +14,7 @@
 
 ## Overview
 
-Current version: **3.1.2**. See the [changelog](CHANGELOG.md) for release details.
+Current version: **3.3.4**. See the [changelog](CHANGELOG.md) for release details.
 
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
@@ -125,7 +125,7 @@ Fully manageable through UI and REST API:
 -   SLAs
 -   SLA Types
 -   SLA Statuses
--   SLA Holidays
+-   SLA Holidays (with public holiday import)
 -   SLA Calendars
 -   Weekly schedules
 -   Calendar-specific holidays
@@ -138,6 +138,7 @@ Fully manageable through UI and REST API:
 -   Role-based permissions
 -   SLA visibility control
 -   SLA columns in issue list
+-   SLA column and filter in the project lists (user and administration)
 -   SLA filtering
 -   SLA summary in issue view
 -   Responsive display
@@ -195,9 +196,9 @@ Fully manageable through UI and REST API:
 | `Rails`            | >= 6.1                                            |
 | `Database`         | PostgreSQL >= 11, MySQL >= 8.0 or MariaDB >= 10.2 |
 
-Version **3.1.2** has been tested on Redmine **5.1.13,
-6.1.4 and 7.0.1**, with all five suites on PostgreSQL, MariaDB and strict
-MySQL. See the [compatibility matrix](doc/TESTING.md#version-312-unused-sql-function-removal)
+Version **3.3.3** has been checked on Redmine **5.1.13, 6.1.4 and 7.0.1**,
+with unit, functional, API and Chromium tests on PostgreSQL, MariaDB and strict
+MySQL. See the [compatibility matrix](doc/TESTING.md#version-333-issue-sla-block-for-configured-trackers)
 for exact runtime versions and results.
 
 ------------------------------------------------------------------------
@@ -283,7 +284,83 @@ Plugin is ready to use.
 
 ------------------------------------------------------------------------
 
-## Upgrade to 3.1.2
+## Upgrade to 3.3.4
+
+Version **3.3.4** appends the year to imported holiday names and offers English
+or the country's local names (French for France). Local names are selected by
+default and require access to `date.nager.at` through the legacy Nager.Date v3
+API. Existing holidays keep their names. Update the plugin files and restart
+Redmine; no new migration relative to 3.3.3. See [Public holiday import](doc/HOLIDAY_IMPORT.md).
+
+## Upgrade to 3.3.3
+
+Version **3.3.3** shows the SLA block of the issue page only for trackers with
+an SLA in the project. Update the plugin files and restart Redmine; there is
+no migration relative to 3.3.2.
+
+### Previous upgrade: 3.3.2
+
+Version **3.3.2** only extends the test fixtures. Update the plugin files;
+there is no migration and no functional change relative to 3.3.1.
+
+### Previous upgrade: 3.3.1
+
+Version **3.3.1** documents the SLA roles and permissions in the
+[plugin settings](doc/SETTINGS.md#roles-and-permissions). Update the plugin
+files; there is no migration and no functional change relative to 3.3.0.
+
+### Previous upgrade: 3.3.0
+
+Version **3.3.0** imports public holidays from Nager.Date: from the SLA holiday
+list, administrators choose a year, a country and the name language, preview the holidays and
+import the selected dates. An optional default country can be set in the
+plugin settings. See [Public holiday import](doc/HOLIDAY_IMPORT.md). Update the
+plugin files and restart Redmine; this release introduces no new migration
+relative to 3.2.0. The Redmine server needs outbound HTTPS access to
+`nagerholidays.com` (and `date.nager.at` for local names) to use the import.
+
+### Previous upgrade: 3.2.0
+
+Version **3.2.0** adds an **SLA** column and filter to the project lists
+(`Projects` in list mode and `Administration > Projects`) and an SLA icon in
+the project board view. Administrators see every project; other users only
+see the SLAs of projects where they have *View SLA* or *Manage SLA*. See
+[Projects with SLA](doc/PROJECT_LISTS.md). Update the plugin files and restart
+Redmine; this release introduces no new migration relative to 3.1.5.
+
+### Previous upgrade: 3.1.5
+
+Version **3.1.5** invalidates the SLA caches of levels using an issue custom
+field when that field or one of its enumeration values changes. Update the
+plugin files and restart Redmine; this release introduces no new migration
+relative to 3.1.4.
+
+### Previous upgrade: 3.1.4
+
+Version **3.1.4** invalidates the SLA caches of competing levels in the same
+SLA when calendars, schedules or holiday rules change, including level
+creation and changes of SLA or calendar assignment. Calendar-holiday links are
+removed with their calendar or holiday. Update the plugin files and restart
+Redmine; this release introduces no new migration relative to 3.1.3.
+Calendar name/description and holiday name edits preserve caches. Calendar and
+holiday destruction invalidate once, covering their dependent records.
+
+### Previous upgrade: 3.1.3
+
+Version **3.1.3** keeps counting SLA spent time once a closed issue is
+reopened. Redmine keeps the last closing date on reopening, and the
+calculation stopped there; it now uses it only while the issue is closed.
+Back up the database, update the plugin files, then run:
+
+```sh
+bundle exec rake redmine:plugins:migrate NAME=redmine_sla RAILS_ENV=production
+```
+
+Restart Redmine after migration (`202111112021024`). The spent-time cache of
+issues already reopened is purged and recalculated on demand, or at once with
+`update_sla`.
+
+### Previous upgrade: 3.1.2
 
 Version **3.1.2** removes SQL functions nothing calls anymore:
 `sla_get_level_overlap` and, on PostgreSQL, `sla_explain_level` and
@@ -385,6 +462,8 @@ Restart application server.
     -   [Example 05](doc/EXAMPLE-05.md)
 -   [SLA Compute Explanation](doc/COMPUTE.md)
 -   [Plugin settings](doc/SETTINGS.md)
+-   [Projects with SLA](doc/PROJECT_LISTS.md)
+-   [Public holiday import](doc/HOLIDAY_IMPORT.md)
 -   [API Rest for SLA](doc/API.md)
 -   [Tasks](doc/TASKS.md)
 -   [Change log](CHANGELOG.md)

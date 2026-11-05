@@ -25,7 +25,7 @@ class Redmine::ApiTest::SlaCacheSpentsTest < ApplicationSlaApiTestCase
   include ActiveJob::TestHelper
   include SlaCachesHelperTest
 
-  item_project_sla_tests_tma = 17
+  item_project_sla_tests_tma = 21
   item_project_sla_tests_std = 82
   item_project_sla_tests_spe1 = 16
   item_project_sla_tests_tma_cf	= 19
@@ -34,6 +34,8 @@ class Redmine::ApiTest::SlaCacheSpentsTest < ApplicationSlaApiTestCase
   
   item_for_dev = item_project_sla_tests_tma + item_project_sla_tests_tma_cf
   item_for_sys = item_project_sla_tests_std + item_project_sla_tests_spe1
+  # Default status filter: only open issues, i.e. "Bug reopened and still open"
+  item_open_in_tma = 2
 
   # Sla#index in XML then JSON
 
@@ -121,14 +123,14 @@ class Redmine::ApiTest::SlaCacheSpentsTest < ApplicationSlaApiTestCase
     end
   end
 
-  test "GET /sla/cache_spents.xml should return sla_cache_spents issue.tracker_id none" do
+  test "GET /sla/cache_spents.xml should return sla_cache_spents issue.tracker_id open only" do
     ['admin','manager'].each do |user|
       get "/sla/cache_spents.xml?issue.tracker_id=1",
         headers: credentials(user)
       assert_response :success
       assert_equal 'application/xml', @response.media_type
       assert_select 'sla_cache_spents' do
-        assert_select '[total_count=?]', 0
+        assert_select '[total_count=?]', item_open_in_tma
       end
     end
   end    

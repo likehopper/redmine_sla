@@ -33,3 +33,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 ]
  %>
 <%= render_tabs sla_tabs %>
+<p>
+  <%= label_tag 'settings_sla_holiday_country', l(:sla_holiday_import_default_country) %>
+  <%= text_field_tag 'settings[sla_holiday_country]', @settings['sla_holiday_country'], id: 'settings_sla_holiday_country', size: 2, maxlength: 2, pattern: '[A-Za-z]{2}' %>
+  <em class="info"><%= l(:sla_holiday_import_country_hint) %></em>
+</p>

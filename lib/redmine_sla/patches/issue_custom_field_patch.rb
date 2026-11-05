@@ -6,6 +6,7 @@
 #   Extend Redmine's IssueCustomField behavior for SLA-related usage.
 #   This patch overrides `to_s` so that SLA custom fields can be rendered
 #   consistently (for example in SLA level lists or configuration screens).
+#   Invalidates caches for SLA levels using the field after save or destroy.
 
 # Redmine SLA - Redmine Plugin
 #
@@ -30,6 +31,8 @@ module RedmineSla
 
     # Patch module for Redmine's IssueCustomField
     module IssueCustomFieldPatch
+      extend ActiveSupport::Concern
+      include RedmineSla::InvalidatesSlaCache
 
       # Redefine the string representation to return the field name.
       # This is useful when displaying SLA-related custom fields in lists.
@@ -37,10 +40,10 @@ module RedmineSla
         self.name
       end
 
-      module ClassMethods
-      end
+      private
 
-      module InstanceMethods
+      def sla_cache_level_ids_for_invalidation
+        SlaLevel.unscoped.where(custom_field_id: id).pluck(:id)
       end
 
     end

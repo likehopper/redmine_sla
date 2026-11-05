@@ -41,6 +41,11 @@ class SlaLevel < ActiveRecord::Base
       where(sla_project_trackers: {project_id: project.id}).distinct
   }
 
+  # Calendar changes can alter which competing level is selected for an issue.
+  scope :sharing_sla_with_calendars, ->(calendar_ids) {
+    where(sla_id: SlaLevel.unscoped.where(sla_calendar_id: calendar_ids).select(:sla_id))
+  }
+
   scope :with_references, -> { joins(:sla, :sla_calendar).left_joins(:custom_field) }
   
   validates_presence_of :name
@@ -97,7 +102,12 @@ class SlaLevel < ActiveRecord::Base
   private
 
   def sla_cache_level_ids_for_invalidation
-    [id].compact
+    if new_record? || will_save_change_to_sla_id? || will_save_change_to_sla_calendar_id?
+      sla_ids = [sla_id, attribute_in_database("sla_id")].compact.uniq
+      ([id] + SlaLevel.unscoped.where(sla_id: sla_ids).pluck(:id)).compact.uniq
+    else
+      [id].compact
+    end
   end
 
   def sla_level_terms_greater_than_or_equal_to_zero

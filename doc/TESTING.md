@@ -1,5 +1,285 @@
 # Testing
 
+## Version 3.3.3 issue SLA block for configured trackers
+
+Validated on **2026-10-25** in isolated local test containers, after integrating
+release 3.3.2 and regenerating fixtures for each database:
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1135 / 6627 | 1135 / 6624 | 1135 / 6624 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1195 / 7264 | 1135 / 6720 | 1135 / 6720 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1135 / 7274 | 1135 / 7271 | 1135 / 7271 |
+
+Each combination ran **266 unit, 470 functional, 358 integration/API and
+35 Chromium system tests**, plus **6 role/project documentation tests**.
+Redmine 6.1/PostgreSQL ran all **66 documentation tests** instead.
+Total: **10,275 tests / 62,395 assertions**, zero failures/errors
+and 12 expected migration skips (3.1.2/3.1.3 on MariaDB/MySQL). Cells record
+tests / assertions. MySQL retains `ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES`
+and `STRICT_ALL_TABLES`; MariaDB uses strict mode without `ONLY_FULL_GROUP_BY`.
+
+Eight integration tests cover the issue block: unassigned trackers for admins
+and managers, assignments in another project, denied view access, disabled
+modules, assigned SLAs with no matching level, and read-only level display.
+They also check that hidden blocks skip assignment queries and/or cache
+calculation. The two unassigned-tracker regressions fail without the fix.
+The no-matching-level cases use real assignments and database calculation.
+
+No new migration, production deployment or representative performance benchmark.
+Historical results below remain separate validations of their respective versions.
+
+## Version 3.3.2 fixtures for a project without SLA
+
+Validated on **2026-10-25** in isolated local test containers, after integrating
+release 3.3.1 and regenerating fixtures for each database:
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1127 / 6570 | 1127 / 6567 | 1127 / 6567 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1187 / 7207 | 1127 / 6663 | 1127 / 6663 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1127 / 7216 | 1127 / 7213 | 1127 / 7213 |
+
+Each combination ran **266 unit, 470 functional, 350 integration/API and
+35 Chromium system tests**, plus **6 role/project documentation tests**.
+Redmine 6.1/PostgreSQL ran all **66 documentation tests** instead.
+Total: **10,203 tests / 61,879 assertions**, zero failures/errors
+and 12 expected migration skips (3.1.2/3.1.3 on MariaDB/MySQL). Cells record
+tests / assertions. MySQL retains `ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES`
+and `STRICT_ALL_TABLES`; MariaDB uses strict mode without `ONLY_FULL_GROUP_BY`.
+
+The new tests validate every generated time entry with Redmine's model, check
+work recorded 30 minutes before every journal transition (including reopening),
+and use generated records in native queries with and without SLA. The missing
+reopening-entry regression fails before the correction. Selected records are
+created inside test transactions; other suites keep their own time-entry data.
+The original empty project remains, and the additional non-SLA project contains
+one issue and supports time tracking. Project-list screenshots are refreshed.
+Separate Redmine 6.1/7 MySQL CLI checks confirm unchanged default output,
+UTC timestamp conversion with the source work date preserved, and reproducible
+generation. The four new tests also passed a final 6.1/MySQL recheck.
+
+No new migration, production behavior or deployment. Historical results below
+remain separate validations of their respective versions.
+
+## Version 3.3.1 roles and permissions documentation
+
+Validated on **2026-10-25** in isolated local test containers, after integrating
+release 3.3.0. This release changes documentation, screenshots and tests only.
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 738 / 2949 | 738 / 2946 | 738 / 2946 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 798 / 3516 | 738 / 2972 | 738 / 2972 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 738 / 3071 | 738 / 3068 | 738 / 3068 |
+
+Each combination ran **262 unit and 470 functional tests**, plus **6 Chromium
+documentation tests** for roles and project lists. Redmine 6.1/PostgreSQL ran
+all **66 documentation tests** instead. Total: **6,702 tests /
+27,508 assertions**, zero failures/errors and 12 expected migration
+skips (3.1.2/3.1.3 on MariaDB/MySQL). Cells record tests / assertions.
+MySQL retains `ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES` and
+`STRICT_ALL_TABLES`; MariaDB uses strict mode without `ONLY_FULL_GROUP_BY`.
+
+The standalone roles test checks the granted and unchecked permissions for
+Manager, Resolver and Reporter, verifies the Manager form, and captures both
+native role screens once. A negative test refuses role administration and the
+permissions report to a project manager. Existing functional tests cover the
+project-scoped read/manage access documented in the guide.
+
+API and general system suites were not repeated for this documentation release;
+the full 3.3.0 matrix remains documented separately below. No migration or
+production deployment.
+
+## Version 3.3.0 public holiday import
+
+Validated on **2026-10-24**, after integrating main's corrections, in isolated
+local test containers (final Redmine 5.1/PostgreSQL unit and holiday-browser
+recheck on **2026-10-25**):
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1181 / 6333 | 1181 / 6330 | 1181 / 6330 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1181 / 6429 | 1181 / 6426 | 1181 / 6426 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1181 / 6979 | 1181 / 6976 | 1181 / 6976 |
+
+Each combination ran **262 unit, 470 functional, 350 integration/API,
+35 Chromium system and 64 documentation tests**: **10,629 tests /
+59,205 assertions**, zero failures or errors. Cells record tests /
+assertions. The 12 expected skips are the two migration unit tests for 3.1.2
+and 3.1.3 on MariaDB/MySQL. MySQL retains `ONLY_FULL_GROUP_BY`,
+`STRICT_TRANS_TABLES` and `STRICT_ALL_TABLES`; MariaDB uses strict mode without
+`ONLY_FULL_GROUP_BY`.
+
+Coverage includes API v4 normalization, malformed names/regions/types/countries,
+HTTP/network/JSON errors, previews without writes, repeated and atomic imports,
+signed/expired previews, invalid selections, access control and the browser form.
+The malformed-name regression fails against the original API v3 implementation.
+Initial 6.1/7 unit runs exposed core fixtures loaded by a boot test; disabling
+its unused fixtures fixes the isolation, and the final matrix passes.
+
+All holiday calls in the suites are stubbed. Separate read-only live API v4
+checks on 2026-10-24 returned 204 countries and normalized France (11 holidays), Germany
+(19, including 10 regional entries) and the USA (13, including 3 regional
+entries) for 2026. API v4 supplies holiday names in English.
+
+No new migration, production deployment or representative performance benchmark.
+Historical results below remain validations of their respective versions.
+
+## Version 3.2.0 projects with SLA in project lists
+
+After integrating main's cache corrections on **2026-10-24**, all nine
+combinations reran **250 unit, 461 functional and 4 project-list documentation
+tests**: **6,435 tests / 25,350 assertions**, zero failures or errors and
+12 expected migration skips. The full five-suite matrix below predates that
+integration; API, general system and the other documentation tests were not
+repeated afterwards.
+
+Validated on **2026-10-24** in isolated local test containers:
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1149 / 6072 | 1149 / 6069 | 1149 / 6069 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1149 / 6152 | 1149 / 6149 | 1149 / 6149 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1149 / 6685 | 1149 / 6682 | 1149 / 6682 |
+
+Each combination ran **241 unit, 461 functional, 350 integration/API,
+33 Chromium system and 64 documentation tests**, with zero failures or
+errors: **10,341 tests** across the matrix. Cells record tests / assertions.
+The two migration unit tests skipped by design on MariaDB and MySQL are
+those of 3.1.2 and 3.1.3. MySQL retained `ONLY_FULL_GROUP_BY`,
+`STRICT_TRANS_TABLES` and `STRICT_ALL_TABLES` in the Rails session.
+MariaDB uses `STRICT_TRANS_TABLES` without `ONLY_FULL_GROUP_BY`; enabling
+that mode fails existing calculation and grouped-query tests.
+
+Regression coverage checks, for each profile, the SLA column, the filter
+values and results, the board icon and administration access in the project
+lists: administrator, View and Manage SLA, View SLA only, Manage SLA only, no
+SLA permission, non-member, anonymous, mixed project permissions, and SLA
+module disabled. Unit tests cover distinct SLAs sorted by name in the column,
+filters with and without SLA, unassigned SLAs in filter values, preloading
+and the board CSS class. Query regressions check a fixed number of SLA queries
+for one or five projects in both displays, and no assignment or module lookups for
+users without SLA access. Both performance regressions failed on the original
+3.2.0 code before the fixes. The documentation test checks each profile in
+Chromium and generates the screenshots of [Projects with SLA](PROJECT_LISTS.md).
+
+This release introduces no migration. These results cover the exact versions
+above. No production deployment or representative performance benchmark was
+performed. Historical results below remain separate validations of their
+respective versions.
+
+## Version 3.1.5 custom field cache invalidation
+
+Merge validation on **2026-10-24**, after incorporating the 3.1.4 cache
+optimizations and clarifying the custom field regression tests: **237 unit
+tests / 1,925 assertions**, zero failures, errors or skips, on Redmine 6.1.4
+with PostgreSQL in a dedicated local container and database. This run did
+not repeat the other suites or the full database matrix below.
+
+Validated on **2026-10-16** in isolated local test containers:
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1106 / 5874 | 1106 / 5871 | 1106 / 5871 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1106 / 5954 | 1106 / 5951 | 1106 / 5951 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1106 / 6483 | 1106 / 6480 | 1106 / 6480 |
+
+Each combination ran **228 unit, 435 functional, 350 integration/API,
+33 Chromium system and 60 documentation tests**, with zero failures or
+errors: **9,954 tests** across the matrix. Cells record tests / assertions.
+The two migration unit tests skipped by design on MariaDB and MySQL are
+those of 3.1.2 and 3.1.3. On Redmine 5.1.13 with PostgreSQL, the unit suite
+was rerun alone after a first run started without its generated fixtures in
+the parallel test environment; the rerun passed. MySQL retained
+`ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES` and `STRICT_ALL_TABLES` in the
+Rails session.
+
+Regression coverage adds 10 custom field invalidation tests to the 27 of
+3.1.4: field update and deletion, enumeration creation, update, move to
+another field and deletion with or without reassignment invalidate only the
+levels using that field. Unrelated fields, validation failures and rolled
+back changes keep the caches.
+
+This release introduces no migration. These results cover the exact versions
+above. No production deployment or representative performance benchmark was
+performed. Historical results below remain separate validations of their
+respective versions.
+
+## Version 3.1.4 competing level cache invalidation
+
+Validated again on **2026-10-24** in dedicated local test containers and
+separate databases:
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1104 / 5896 | 1104 / 5893 | 1104 / 5893 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1104 / 5976 | 1104 / 5973 | 1104 / 5973 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1104 / 6507 | 1104 / 6504 | 1104 / 6504 |
+
+Each combination ran **226 unit, 435 functional, 350 integration/API,
+33 Chromium system and 60 documentation tests**, with zero failures or
+errors: **9,936 tests and 55,119 assertions** across the matrix. Cells record
+tests / assertions. After the final bulk-cleanup simplification, the full unit
+and controller suites were rerun on all nine combinations; the table uses
+those final reruns.
+
+The two migration unit tests skipped by design on MariaDB and MySQL are those
+of 3.1.2 and 3.1.3 (12 skips across the matrix). MySQL retained
+`ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES` and `STRICT_ALL_TABLES` in the Rails
+session. MariaDB used `STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION`, separately
+from strict MySQL. Test databases were migrated explicitly and SQL functions
+were preserved; generated plugin fixtures and seed 0 were used.
+
+Regression coverage includes 35 invalidation tests: affected and unaffected
+cache/spent rows, creation, reassignment, direct and nested destruction,
+metadata edits, invalid saves, rollback and aborted parent/child destruction.
+A changed competing schedule selects the other level on the next SQL read.
+Metadata edits issue no invalidation queries. Parent destruction resolves
+its dependencies and deletes caches once, while dependent schedules/links
+are removed in bulk. Query-count assertions run on every combination; see
+[SLA cache invalidation](CACHE_INVALIDATION.md) for the before/after workloads.
+
+This release introduces no migration relative to 3.1.3. These results cover
+the exact versions above. SQL query counts were measured on regression
+fixtures; no production deployment or production latency benchmark was
+performed. Historical results below remain separate validations of their
+respective versions.
+
+## Version 3.1.3 reopened issue spent time
+
+Validated on **2026-10-16** in isolated local test containers:
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1077 / 5576 | 1077 / 5573 | 1077 / 5573 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1077 / 5656 | 1077 / 5653 | 1077 / 5653 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1077 / 6185 | 1077 / 6182 | 1077 / 6182 |
+
+Each combination ran **199 unit, 435 functional, 350 integration/API,
+33 Chromium system and 60 documentation tests**, with zero failures or
+errors: **9,693 tests** across the matrix. Cells record tests / assertions.
+On MariaDB and MySQL, two unit tests are skipped by design: they apply a
+migration inside the test transaction, which `CREATE FUNCTION` and
+`CREATE VIEW` would commit implicitly on those databases. The checks below
+cover both paths. MySQL retained `ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES`
+and `STRICT_ALL_TABLES` in the Rails session.
+
+Regression coverage includes two generated reopened issues: one still open,
+which keeps its first closing date and counts the statuses after reopening,
+and one closed again, which counts up to its last closing. The explanation
+matches the computed spent time, and reopening a closed issue resumes it.
+API cache and spent-time expectations follow the new fixtures.
+
+For every combination, outside test transactions and on the generated
+fixtures, migration `202111112021024` was rolled back and reapplied: only the
+spent cache of the reopened issue was purged, and its recalculated spent time
+counted the time since reopening.
+
+These results cover the exact versions above. No production deployment or
+representative performance benchmark was performed. Historical results below
+remain separate validations of their respective versions.
+
 ## Version 3.1.2 unused SQL function removal
 
 Validated on **2026-10-16** in isolated local test containers:
@@ -221,12 +501,18 @@ for the scenarios.
 
 ### Scope regression coverage
 
+`sla_cache_invalidation_test.rb` also covers custom field and enumeration
+changes, deletion with reassignment, unrelated fields, validation failures,
+and transaction rollback. The model callbacks delete caches only for SLA
+levels using the affected field; spent caches follow the foreign key cascade.
+Calculations are rebuilt on demand, within the existing SLA cache lifecycle.
+
 `test/unit/sla_explicit_query_scopes_test.rb` checks association sorting,
 grouped counts and row preservation. `sla_cache_scope_operations_test.rb`
 checks project/issue visibility, project purges including historical orphans,
 and targeted cache deletion. Run these alongside the functional and API
-suites on PostgreSQL, MariaDB and strict MySQL, including
-`ONLY_FULL_GROUP_BY`; MariaDB results do not substitute for MySQL results.
+suites on PostgreSQL, MariaDB and strict MySQL, with `ONLY_FULL_GROUP_BY`
+enabled on MySQL. MariaDB results do not substitute for MySQL results.
 
 When running suites separately, reset the dedicated test database or its
 cache rows and spent-cache sequence between runs. Some existing API and
@@ -234,23 +520,27 @@ functional fixtures expect fixed cache IDs. Retain SQL schema dumps so Rails
 schema preparation preserves the plugin's functions and views.
 
 ### Users
-Five users have been created by the fixtures, the logins of which are:
-- admin
-- manager
-- developer ( only access to one project of TMA )
-- sysadmin ( only access to two projects of infrastructure )
-- reporter
-- other
-  
-The password for each user is their login/name.
+Six users have been created by the fixtures:
+
+| Login       | Admin | Role       | Projects                        |
+|-------------|:-----:|------------|---------------------------------|
+| `admin`     |   x   |            | all                             |
+| `manager`   |       | Manager    | all                             |
+| `developer` |       | Resolver   | the two TMA projects            |
+| `sysadmin`  |       | Resolver   | two infrastructure projects     |
+| `reporter`  |       | Reporter   | the four SLA test projects      |
+| `other`     |       |            | none                            |
+
+The password for each user is their login.
 
 ### Roles
-Here are the roles of the available users:
+Here are the SLA permissions of the fixture roles
+(see [Roles and permissions](SETTINGS.md#roles-and-permissions)):
 
-| Name        | is_admin  | sla_manage  | sla_view  | Description |
-|-------------|-----------|-------------|-----------|-------------|
-| `admin`     |     x     |             |           | all this includes the SLA admin interface access |
-| `manager`   |           |      x      |     x     | View and manage SALs in projects                 |
-| `resolver`  |           |             |     x     | Only sees SLAs in project tickets                |
-| `reporter`  |           |             |           | Access projects without seeing SLAs in tickets   |
-| `other`     |           |             |           | Don't access any projects             |
+| Role       | `view_sla` | `manage_sla` | Description                                   |
+|------------|:----------:|:------------:|-----------------------------------------------|
+| Manager    |     x      |      x       | Views and manages SLAs in projects            |
+| Resolver   |     x      |              | Reads SLA information in projects              |
+| Reporter   |            |              | Accesses projects without seeing SLAs         |
+
+Administrators (`admin`) manage the global SLA configuration regardless of roles.

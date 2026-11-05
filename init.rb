@@ -54,7 +54,8 @@ Redmine::Plugin.register :redmine_sla do
   settings(
     default: {
       'sla_time_zone' => 'Etc/UTC',
-      'sla_display'   => 'bar - simple'
+      'sla_display'   => 'bar - simple',
+      'sla_holiday_country' => ''
     },
     # Settings UI partial
     partial: 'sla_settings_plugin/sla_settings_plugin'
@@ -128,19 +129,30 @@ RedmineApp::Application.config.after_initialize do
     IssueCustomField.send(:include, RedmineSla::Patches::IssueCustomFieldPatch)
   end
 
+  # Invalidate SLA caches when Redmine changes or reassigns enumerations
+  unless CustomFieldEnumeration.included_modules.include? RedmineSla::Patches::CustomFieldEnumerationPatch
+    CustomFieldEnumeration.send(:include, RedmineSla::Patches::CustomFieldEnumerationPatch)
+  end
+
   # Extend Issue with SLA computation methods
   unless Issue.included_modules.include? RedmineSla::Patches::IssuePatch
     Issue.send(:include, RedmineSla::Patches::IssuePatch)
   end
 
-  # Purge the SLA cache of projects whose SLA module gets disabled
-  unless Project.included_modules.include? RedmineSla::Patches::ProjectPatch
+  # Purge the SLA cache of projects whose SLA module gets disabled, and
+  # extend Project with SLA associations (used by the project lists)
+  unless Project.ancestors.include? RedmineSla::Patches::ProjectPatch
     Project.prepend(RedmineSla::Patches::ProjectPatch)
   end
 
   # Extend IssueQuery and TimeEntryQuery for SLA filtering/sorting
   if (ActiveRecord::Base.connection.tables.include?('queries') rescue false)
-    
+
+    # SLA column and filter in project lists (projects#index, admin#projects)
+    unless ProjectQuery.ancestors.include? RedmineSla::Patches::ProjectQueryPatch
+      ProjectQuery.prepend(RedmineSla::Patches::ProjectQueryPatch)
+    end
+
     # SLA columns in issue queries
     unless IssueQuery.included_modules.include? RedmineSla::Patches::IssueQueryPatch
       IssueQuery.send(:include, RedmineSla::Patches::IssueQueryPatch)

@@ -7,6 +7,7 @@ Usage: `rake redmine:plugins:redmine_sla:build_fixture RAILS_ENV=development --t
 ## documentation_tests.rake
 Generate screenshots for the different examples
 Usage: `rake redmine:plugins:test:documentation NAME=redmine_sla RAILS_ENV=test TESTOPTS="-v -w -b" SUITE=example-05`
+Also runs `test/documentation/sla_project_lists_doc_test.rb`, which writes the [project lists](PROJECT_LISTS.md) screenshots to `tmp/redmine_sla/screenshots/project-lists/`.
 
 ## update_sla.rake
 Update SLA manualy or by crontab

@@ -1,5 +1,225 @@
 # Changelog
 
+## 3.3.4 - 2026-10-25
+
+### Fixed
+
+-   Append the holiday year to imported names, including in the preview.
+
+### Added
+
+-   Choose English or the country's local holiday names when importing.
+    Local names are selected by default and use the legacy Nager.Date v3
+    endpoint, which requires HTTPS access to `date.nager.at`. English names
+    and country choices continue to use v4 on `nagerholidays.com`.
+    This is a choice of provider names, not arbitrary translation languages.
+
+### Tests
+
+-   Targeted importer, adapter and controller tests: 45 tests, 210 assertions.
+    Chromium import tests: 2 tests, 16 assertions, on Redmine 7.0.1.
+    No failures or errors. Both API paths were also checked live for France
+    in 2028: 11 public holidays each, with English and French names.
+
+### Upgrade
+
+-   Update the plugin files and restart Redmine. No new migration relative
+    to 3.3.3. Existing dates keep their names and calendar associations;
+    importing again does not rename previously imported holidays.
+
+## 3.3.3 - 2026-10-25
+
+### Fixed
+
+-   The issue page shows the *Service levels* block and its *Explain* link
+    only when an SLA is assigned to the issue tracker in its project. Issues
+    of other trackers no longer show them, and no longer compute an SLA level
+    when displayed. When the tracker has an SLA but no level applies, the
+    *Explain* link stays available to managers.
+-   French translations of the holiday import use straight apostrophes.
+
+### Tests
+
+-   Cover administrator/manager/reader visibility, project-scoped assignments,
+    disabled modules and assigned SLAs without levels. Check that hidden blocks
+    skip assignment queries or SLA calculation where appropriate.
+
+### Upgrade
+
+-   Update the plugin files and restart Redmine. There is no migration
+    relative to 3.3.2.
+
+## 3.3.2 - 2026-10-25
+
+### Tests
+
+-   The fixture generator adds a project without SLA that has an issue
+    (`project-without-sla-with-issue`), to cover ordinary issue tracking
+    outside any SLA. The project list tests and screenshots include it.
+-   The fixture generator also writes `time_entries.yml`: half an hour
+    logged before each status change of the generated issues, and on the
+    issue without SLA, including reopening transitions. Dedicated tests
+    validate these records and use them in native issue/time-entry queries.
+
+### Upgrade
+
+-   No change for installations: test fixtures only, no migration and no
+    functional change relative to 3.3.1.
+
+## 3.3.1 - 2026-10-25
+
+### Documentation
+
+-   Document the SLA roles and permissions (`view_sla`, `manage_sla`) in the
+    plugin settings guide, with screenshots of the role form and the
+    permissions report, and link them from the examples, use cases and
+    testing guide. Clarify the display setting description and fix typos.
+-   Describe the fixture users and roles in a table in the testing guide.
+
+### Tests
+
+-   Generate the roles and permissions screenshots in a documentation test.
+    Check granted permissions and refuse role administration to non-admins.
+
+### Upgrade
+
+-   Update the plugin files; no migration and no functional change relative
+    to 3.3.0.
+
+## 3.3.0 - 2026-10-25
+
+### Added
+
+-   Import public holidays from Nager.Date community API v4: administrators
+    choose a year and a country from the SLA holiday list, preview the public holidays and
+    import the selected dates. National holidays are selected by default;
+    regional ones show their subdivisions. Imported names are in English.
+    Existing dates keep their names and calendar associations; entries on the same date are combined.
+-   New *Default holiday country* plugin setting (optional ISO code).
+-   The preview is signed, belongs to the administrator and expires after
+    15 minutes. The import runs in one transaction and does not attach the
+    new holidays to calendars. Service errors are reported without import.
+
+### Tests
+
+-   Cover the Nager.Date adapter (normalization, HTTP and data errors), the
+    importer, the controller actions and permissions, and the import form in
+    Chromium. The holiday service is stubbed; no test calls the network.
+-   Keep boot tests from loading Redmine's native fixtures into SLA suites.
+
+### Upgrade
+
+-   Update the plugin files and restart Redmine. This release introduces no
+    new migration relative to 3.2.0. The import calls
+    `https://nagerholidays.com` from the Redmine server; allow outbound HTTPS to
+    it to use the feature.
+
+## 3.2.0 - 2026-10-24
+
+### Added
+
+-   Add an **SLA** column and filter to the project lists
+    (`Projects` in list mode and `Administration > Projects`). The column
+    lists the SLAs assigned to each project; the filter supports any, none,
+    is and is not. Administrators see every project. Other users only see
+    SLAs of projects where they have the *View SLA* or *Manage SLA*
+    permission; other projects behave as having no SLA.
+-   Show an SLA icon next to the name of projects with SLA in the
+    project board view, with the same permission rules.
+
+### Fixed
+
+-   Avoid per-project SLA lookups in the board for users without SLA access,
+    and preload enabled modules for permission checks in the SLA list column.
+
+### Tests
+
+-   Cover what each profile sees in the project lists (column, filter
+    values and results, board icon, administration access): administrator,
+    View and Manage SLA, View SLA only, Manage SLA only, no SLA permission,
+    non-member, anonymous, and SLA module disabled.
+-   Add a documentation test that checks the rendering in Chromium per
+    profile and generates the screenshots of `doc/PROJECT_LISTS.md`.
+-   Check mixed project permissions and a fixed number of SLA association
+    queries as the displayed project count grows.
+-   Allow documentation tests to run directly with `rails test`, without
+    the documentation rake task (`ApplicationSystemTestCase` is now loaded
+    by the plugin documentation test case).
+
+### Upgrade
+
+-   Update the plugin files and restart Redmine. This release introduces no
+    new migration relative to 3.1.5 and no new permission: the project list
+    column, filter and board icon follow *View SLA* and *Manage SLA*.
+
+## 3.1.5 - 2026-10-24
+
+### Fixed
+
+-   Invalidate the SLA caches of levels using an issue custom field when
+    that field or one of its enumeration values is changed, created, moved
+    or deleted, including deletion with reassignment. Unrelated fields keep
+    their caches; validation failures and rolled back changes too.
+
+### Upgrade
+
+-   Update the plugin files and restart Redmine. This release introduces no
+    new migration relative to 3.1.4.
+
+## 3.1.4 - 2026-10-24
+
+### Fixed
+
+-   Invalidate caches of competing levels in the same SLA when calendars,
+    schedules or holiday rules change, including level creation and changes
+    of SLA or calendar assignment.
+-   Remove calendar-holiday links when their calendar or holiday is destroyed,
+    capturing cache dependencies before dependent records are removed.
+-   Preserve caches when only a calendar name/description or a holiday name
+    changes. Nested schedule changes still invalidate competing levels.
+-   Resolve dependencies and delete caches once per calendar/holiday destruction.
+    Remove dependent schedules and holiday links in bulk with Rails instead of
+    repeating their cache invalidation callbacks.
+-   Keep caches intact on aborted destruction and on a later metadata-only save
+    of the same instance.
+
+### Tests
+
+-   Check affected and unaffected caches, nested edits, rollback and aborted
+    destruction. SQL query assertions cover metadata edits and destruction with
+    many dependent records; see `doc/CACHE_INVALIDATION.md` for measurements.
+
+### Upgrade
+
+-   Update the plugin files and restart Redmine. This release introduces no
+    new migration relative to 3.1.3.
+
+## 3.1.3 - 2026-10-18
+
+### Fixed
+
+-   Keep counting SLA spent time once a closed issue is reopened. Redmine
+    keeps its last closing date (`closed_on`) on reopening, and the
+    calculation stopped there; it is now used only while the issue is
+    closed, in the SQL calculation and the "Explain" view. The spent-time
+    cache of already reopened issues is purged and recalculated. Requires
+    the plugin migration.
+
+### Tests
+
+-   Add reopened issue fixtures: one reopened and still open, one reopened
+    then closed again. The fixture generator accepts status changes after
+    closing (`issue_status_changes` CSV column) and no longer needs a
+    project's rows to be contiguous.
+
+### Upgrade
+
+-   Back up the database and run `bundle exec rake redmine:plugins:migrate
+    NAME=redmine_sla RAILS_ENV=production` after updating the plugin files,
+    then restart Redmine. Migration `202111112021024` redeploys
+    `sla_view_journal_statuses` and `sla_get_spent`, and purges the spent-time
+    cache of reopened issues; it is recalculated on demand or by `update_sla`.
+
 ## 3.1.2 - 2026-10-17
 
 ### Removed

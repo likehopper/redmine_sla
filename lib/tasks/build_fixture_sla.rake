@@ -18,12 +18,17 @@
 desc <<-END_DESC
 Build fixtures for plugin SLA
 
-Available UPDATE SLA options:
-  in     input CSV file ( default: plugins/redmine_sla/test/fixtures/config/fixtures.csv )
-  out    output yml files dir results ( default: plugins/redmine_sla/test/fixtures/config/fixtures.yml )
+Fixture generation options:
+  tz     timezone CSV (default: plugins/redmine_sla/test/config/timezone.csv)
+  in     input CSV (default: plugins/redmine_sla/test/config/fixtures.csv)
+  out    expected SLA results YAML (default: plugins/redmine_sla/test/config/fixtures.yml)
   ff     output folder for fixture ( default: plugins/redmine_sla/test/fixtures/ )
-  ff_red folder with redmine fixtures ( default: plugins/redmine_sla/files/src_redmine/ )
-  ff_sla folder with sla fixtures ( default: plugins/redmine_sla/files/src_sla/ )
+  ff_red Redmine templates (default: plugins/redmine_sla/test/files/src_redmine/)
+  ff_sla SLA templates (default: plugins/redmine_sla/test/files/src_sla/)
+
+Each CSV row is an issue created, assigned, resolved and closed at the given
+dates. The optional issue_status_changes column adds status changes after this
+closing, e.g. a reopening: "2021-11-16 14:00:00|New;2021-11-16 15:00:00|Closed".
 
 Example:
   rake --trace -f Rakefile --trace redmine:plugins:redmine_sla:build_fixture RAILS_ENV=development
@@ -129,6 +134,31 @@ namespace :redmine do
         journals ||= {}
         journal_details ||= {}
         custom_values ||= {}
+        time_entries = {}
+        time_entries_have_author = TimeEntry.column_names.include?("author_id")
+        add_time_entry = lambda do |issue, user_id, recorded_at, comments|
+          # Keep the source work date; Redmine stores timestamps in UTC.
+          spent_on = recorded_at.to_date
+          recorded_at = recorded_at.new_offset(0)
+          entry_id = time_entries.size + 1
+          attributes = {
+            "id" => entry_id,
+            "project_id" => issue["project_id"],
+            "issue_id" => issue["id"],
+            "user_id" => user_id,
+            "activity_id" => 4,
+            "hours" => 0.5,
+            "comments" => comments,
+            "spent_on" => spent_on.iso8601,
+            "tyear" => spent_on.year,
+            "tmonth" => spent_on.month,
+            "tweek" => spent_on.cweek,
+            "created_on" => recorded_at.strftime("%Y-%m-%d %H:%M:%S"),
+            "updated_on" => recorded_at.strftime("%Y-%m-%d %H:%M:%S"),
+          }
+          attributes["author_id"] = user_id if time_entries_have_author
+          time_entries["time_entry_#{entry_id.to_s.rjust(4, '0')}"] = attributes
+        end
 
         # For priorities & time entries !!!
         enumerations = {
@@ -240,6 +270,12 @@ namespace :redmine do
         fields_sla_types = file_in_csv_header.select { |field| field.to_s.start_with?("sla_type") }
 
         file_in_csv_content = CSV.parse(File.read(file_in_csv), headers: true)
+
+        # Ids for status changes after the first closing (issue_status_changes),
+        # after those of the standard journals so that these keep their ids
+        extra_journal_id = file_in_csv_content.size * 3
+        extra_journal_detail_id = file_in_csv_content.size * 6
+
         file_in_csv_content.each_with_index do |row|
 
           # Auto create project if necessary
@@ -368,7 +404,9 @@ namespace :redmine do
 
           end
 
-          Rails.logger.info "#{taskname} FOUND project_id = #{project_id}" 
+          # The row's own project: rows of a project need not be contiguous
+          issue_project_id = projects[row["project_name"]]["id"]
+          Rails.logger.info "#{taskname} FOUND project_id = #{issue_project_id}"
 
           # Search for tracker
           if ( trackers[row["tracker_name"]].nil? )
@@ -391,7 +429,7 @@ namespace :redmine do
               "id" => issue_id,
               "subject" => row["issue_subject"],
               "description" => row["issue_description"],
-              "project_id" => project_id,
+              "project_id" => issue_project_id,
               "tracker_id" => tracker_id,
               "assigned_to_id" => row["resolver"], # role resolver = user developer & sysadmin
               "author_id" => 5, # user reporter
@@ -453,6 +491,14 @@ namespace :redmine do
             "notes" => "Issue Closed",
           }
           journals[journal_identifier_3] = journal_new
+
+          # Redmine stores a date for spent_on; the timestamp is carried by created_on.
+          [journal_identifier_1, journal_identifier_2, journal_identifier_3].each do |identifier|
+            journal = journals.fetch(identifier)
+            recorded_at = DateTime.parse(journal.fetch("created_on")) - Rational(30, 24 * 60)
+            add_time_entry.call(issue_new, journal.fetch("user_id"), recorded_at,
+                                "Half an hour before status change")
+          end
 
           journal_detail_id_1 = ( ( issue_id - 1 ) * 6 ) + 1
           journal_detail_id_2 = journal_detail_id_1 + 1 
@@ -522,6 +568,44 @@ namespace :redmine do
           }
           journal_details[journal_detail_identifier_6] = journal_detail_new
 
+          # Optional status changes after the first closing, e.g. a reopening:
+          # "date|status;date|status". As Redmine does, closed_on keeps the
+          # last closing date, even once the issue is reopened.
+          previous_status = "Closed"
+          row["issue_status_changes"].to_s.split(";").each do |change|
+            change_date, change_status = change.split("|").map(&:strip)
+            if ( issue_statuses[change_status].nil? )
+              raise Exception.new("#{taskname} NOT FOUND status [ #{change_status} ] in issue_status_changes")
+            end
+
+            extra_journal_id += 1
+            journal_identifier = issue_identifier+"_journal_"+extra_journal_id.to_s.rjust(4,"0")
+            journals[journal_identifier] = {
+              "id" => extra_journal_id,
+              "user_id" => 2, # user manager
+              "journalized_id" => issue_id,
+              "journalized_type" => "Issue",
+              "created_on" => change_date,
+              "notes" => "Issue #{change_status} after closing",
+            }
+            recorded_at = DateTime.parse(change_date) - Rational(1, 48)
+            add_time_entry.call(issue_new, 2, recorded_at, "Half an hour before status change")
+            extra_journal_detail_id += 1
+            journal_details[journal_identifier+"_journal_detail_"+extra_journal_detail_id.to_s.rjust(4,"0")] = {
+              "id" => extra_journal_detail_id,
+              "journal_id" => extra_journal_id,
+              "property" => "attr",
+              "prop_key" => "status_id",
+              "old_value" => issue_statuses[previous_status]["id"],
+              "value" => issue_statuses[change_status]["id"],
+            }
+
+            issue_new["status_id"] = issue_statuses[change_status]["id"]
+            issue_new["updated_on"] = change_date
+            issue_new["closed_on"] = change_date if issue_statuses[change_status]["is_closed"]
+            previous_status = change_status
+          end
+
           # Add fixture 
           fixture_id += 1
           fixture_identifier ="fixture_"+fixture_id.to_s.rjust(4,"0")
@@ -548,7 +632,7 @@ namespace :redmine do
 
 ######################################
 
-            # A last project with no sa no issue
+            # Keep an empty project without the SLA module or any issue.
             project_id += 1
             project_identifier = "another-project-without-sla"
             project_new = {
@@ -617,7 +701,46 @@ namespace :redmine do
               projects_trackers[projects_trackers_identifier] =  projects_trackers_new
             end
 
-########################""
+        # Also cover ordinary issue/time tracking in a project without SLA.
+        empty_project_id = project_id
+        project_id += 1
+        project_identifier = "project-without-sla-with-issue"
+        projects[project_identifier] = project_new.merge(
+          "id" => project_id, "name" => project_identifier,
+          "identifier" => project_identifier, "lft" => project_lft, "rgt" => project_rgt,
+          "updated_on" => project_new["created_on"]
+        )
+        member_id += 1
+        members["#{project_identifier}_manager"] = {
+          "id" => member_id, "project_id" => project_id, "user_id" => 2,
+          "created_on" => "2024-05-01 11:11:11", "mail_notification" => false
+        }
+        member_role_id += 1
+        member_roles["#{project_identifier}_manager_role"] = {
+          "id" => member_role_id, "member_id" => member_id, "role_id" => 1
+        }
+        enabled_modules.values.select { |entry| entry["project_id"] == empty_project_id }.each do |entry|
+          enabled_module_id += 1
+          enabled_modules["enabled_module_#{enabled_module_id.to_s.rjust(4, '0')}"] = entry.merge("project_id" => project_id)
+        end
+        projects_trackers.values.select { |entry| entry["project_id"] == empty_project_id }.each do |entry|
+          projects_trackers_id += 1
+          projects_trackers["projects_trackers_#{projects_trackers_id.to_s.rjust(4, '0')}"] = entry.merge("project_id" => project_id)
+        end
+
+        issue_id += 1
+        issue_without_sla = {
+          "id" => issue_id, "project_id" => project_id, "tracker_id" => trackers["tracker_bug"]["id"],
+          "subject" => "Issue in a project without SLA", "description" => "Ordinary issue and time tracking without SLA",
+          "author_id" => 2, "assigned_to_id" => 2, "status_id" => issue_statuses["New"]["id"],
+          "priority_id" => enumerations["Normal"]["id"], "done_ratio" => 0,
+          "created_on" => "2024-05-01 11:00:00", "updated_on" => "2024-05-01 11:00:00",
+          "start_date" => "2024-05-01", "root_id" => issue_id, "lft" => 1, "rgt" => 2
+        }
+        issues["issue_without_sla"] = issue_without_sla
+        fixtures["fixture_#{(fixture_id + 1).to_s.rjust(4, '0')}"] = {"issue_id" => issue_id, "sla_types" => {}}
+        add_time_entry.call(issue_without_sla, 2, DateTime.parse("2024-05-01 11:30:00"),
+                            "Work in a project without SLA")
 
 
         File.write( file_out_yml, fixtures.to_yaml )
@@ -655,6 +778,9 @@ namespace :redmine do
         FileUtils.copy Dir["#{src_sla_yaml}/*.yml"], file_out_fixtures
 
         
+        # Write after copying source fixtures so generated entries cannot be overwritten.
+        File.write(file_out_fixtures+"/time_entries.yml", time_entries.to_yaml)
+
         # End
         Rails.logger.info "#{taskname} END"
 
