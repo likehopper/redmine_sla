@@ -234,45 +234,18 @@
 
 /*** Administration ***/
 
-#admin-menu a.redmine-sla { background-image:url('../images/sla_16.png'); }
-
-.title-sla-settings h2 {
-  background-position: 0% 0%;
-  background-repeat: no-repeat;
-  padding-left: 36px;
-  height: 32px;
+/* Page headings: a 24px Tabler icon from the plugin sprite beside the h2 */
+.title-sla-settings {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 8px;
+  margin-bottom: 10px;
 }
-
-.icon-sla { background-image:url('../images/sla_16.png'); }
-.title-sla h2 { background-image:url('../images/sla_32.png'); }
-.icon-sla_type { background-image:url('../images/sla_type_16.png'); }
-.title-sla_type h2 { background-image:url('../images/sla_type_32.png'); }
-.icon-sla_status { background-image:url('../images/sla_status_16.png'); }
-.title-sla_status h2 { background-image:url('../images/sla_status_32.png'); }
-.icon-sla_holiday { background-image:url('../images/sla_holiday_16.png'); }
-.title-sla_holiday h2 { background-image:url('../images/sla_holiday_32.png'); }
-.icon-sla_calendar { background-image:url('../images/sla_calendar_16.png'); }
-.title-sla_calendar h2 { background-image:url('../images/sla_calendar_32.png'); }
-.icon-sla_calendar_holiday { background-image:url('../images/sla_calendar_holiday_16.png'); }
-.title-sla_calendar_holiday h2 { background-image:url('../images/sla_calendar_holiday_32.png'); }
-.icon-sla_schedule { background-image:url('../images/sla_schedule_16.png'); }
-.title-sla_schedule h2 { background-image:url('../images/sla_schedule_32.png'); }
-.icon-sla_level { background-image:url('../images/sla_level_16.png'); }
-.title-sla_level h2 { background-image:url('../images/sla_level_32.png'); }
-.icon-sla_level_term { background-image:url('../images/sla_level_term_16.png'); }
-.title-sla_level_term h2 { background-image:url('../images/sla_level_term_32.png'); }
-.icon-sla_project_tracker { background-image:url('../images/sla_project_tracker_16.png'); }
-.title-sla_project_tracker h2 { background-image:url('../images/sla_project_tracker_32.png'); }
-.icon-sla_cache { background-image:url('../images/sla_cache_16.png'); }
-.title-sla_cache h2 { background-image:url('../images/sla_cache_32.png'); }
-.icon-sla_cache_spent { background-image:url('../images/sla_cache_spent_16.png'); }
-.title-sla_cache_spent h2 { background-image:url('../images/sla_cache_spent_32.png'); }
-
-.icon-sla_cache_refresh { background-image:url('../images/sla_cache_refresh_16.png'); }
-.icon-sla_cache_spent_refresh { background-image:url('../images/sla_cache_spent_refresh_16.png'); }
-
-.redmine_sla_footer { border-top: 1px solid#bbb; font-size: 0.9em; color: #aaa; padding: 5px; text-align:center;}
-.redmine_sla_flaticon_logo { width: 16px; height: 16px; margin-right: 3px; vertical-align: text-bottom; }
+.title-sla-settings h2 { margin-bottom: 0; }
+/* anything else in the heading block (e.g. the SLA caches notice) gets its own line */
+.title-sla-settings > :not(h2):not(svg) { flex-basis: 100%; }
+.title-sla-settings svg.s24 { width: 24px; height: 24px; flex-shrink: 0; }
 
 /*** SLA Explain view ***/
 tr.sla-explain-selected { background-color: #e3f3d3; }
@@ -284,7 +257,8 @@ tr.sla-explain-no-schedule td { color: #999; font-style: italic; }
 #sla-level-terms-table .sla-type-hidden { display: none; }
 #sla-level-terms-table.sla-types-all-visible .sla-type-hidden { display: table-cell; }
 
-/* Project board (projects#index): SLA icon after the name of projects with visible SLAs */
+/* Project board (projects#index): SLA icon after the name of projects with visible SLAs.
+   Tabler clock-record used as a mask, so it takes the link colour like the sprite icons. */
 #projects-index a.project.has-sla::after {
   content: "";
   display: inline-block;
@@ -292,5 +266,7 @@ tr.sla-explain-no-schedule td { color: #999; font-style: italic; }
   height: 16px;
   margin-left: 4px;
   vertical-align: text-bottom;
-  background: url('../images/sla_16.png') no-repeat center / 16px 16px;
+  background-color: currentColor;
+  -webkit-mask: url('../images/clock-record.svg') no-repeat center / 16px 16px;
+  mask: url('../images/clock-record.svg') no-repeat center / 16px 16px;
 }

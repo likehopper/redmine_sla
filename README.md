@@ -1,4 +1,4 @@
-# <img src="assets/images/sla_64.png" width="64" height="64" alt=""> Redmine SLA
+# Redmine SLA
 
 ![Redmine Version](https://img.shields.io/badge/Redmine-5.x+-blue)
 ![Ruby](https://img.shields.io/badge/Ruby-2.7+-red)
@@ -473,5 +473,5 @@ Restart application server.
 
 ## Credits
 
-Icons created by [Magnific](https://www.flaticon.com/fr/auteurs/magnific)
-on [Flaticon](https://www.flaticon.com/). See the [image credits](assets/images/CREDITS.md).
+Icons from [Tabler Icons](https://tabler.io/icons) (MIT, (c) 2020-2024 Pawel Kuna),
+the same set Redmine core uses. The plugin's own are in `assets/images/icons.svg`.

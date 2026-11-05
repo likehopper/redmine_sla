@@ -69,7 +69,7 @@ class SlaCacheQuery < Query
     @available_columns << QueryColumn.new(:id, :sortable => "#{SlaCache.table_name}.id", :default_order => nil, :groupable => false )
     available_columns << QueryColumn.new(:project, :sortable => "#{Project.table_name}.name", :default_order => nil, :groupable => (project.nil??true:false) )
     @available_columns << QueryColumn.new(:issue, :sortable => "#{Issue.table_name}.id", :default_order => :desc, :groupable => false)
-    @available_columns << QueryColumn.new(:sla_level, :sortable => "#{SlaLevel.table_name}.name", :default_order => nil, :groupable => true )
+    @available_columns << QueryColumn.new(:sla_level, :caption => "◷ " + l(:field_sla_level), :sortable => "#{SlaLevel.table_name}.name", :default_order => nil, :groupable => true )
     @available_columns << QueryColumn.new(:start_date, :sortable => "#{SlaCache.table_name}.start_date", :default_order => nil, :groupable => false )
     @available_columns << QueryColumn.new(:created_on, :sortable => "#{SlaCache.table_name}.created_on", :default_order => nil, :groupable => false ) if User.current.admin?
     @available_columns << QueryColumn.new(:updated_on, :sortable => "#{SlaCache.table_name}.updated_on", :default_order => nil, :groupable => false )
@@ -79,7 +79,7 @@ class SlaCacheQuery < Query
     sla_types_for_project.each { |sla_type|
       tid = sla_type.id
 
-      @available_columns << build_sla_column("get_sla_spent_#{tid}", "🚀 #{l(:label_sla_spent)} #{sla_type.name}", "(
+      @available_columns << build_sla_column("get_sla_spent_#{tid}", "◷ #{l(:label_sla_spent)} #{sla_type.name}", "(
         SELECT DISTINCT sla_cache_spents.spent
         FROM sla_caches
         LEFT JOIN sla_levels ON ( sla_caches.sla_level_id = sla_levels.id )
@@ -88,7 +88,7 @@ class SlaCacheQuery < Query
         WHERE sla_caches.issue_id = issues.id
       )")
 
-      @available_columns << build_sla_column("get_sla_term_#{tid}", "🏁 #{l(:label_sla_term)} #{sla_type.name}", "(
+      @available_columns << build_sla_column("get_sla_term_#{tid}", "◷ #{l(:label_sla_term)} #{sla_type.name}", "(
         SELECT DISTINCT sla_level_terms.term AS get_sla_term
         FROM issues AS sla_issues
         LEFT JOIN sla_caches ON ( sla_issues.id = sla_caches.issue_id )
@@ -103,7 +103,7 @@ class SlaCacheQuery < Query
         WHERE sla_caches.issue_id = issues.id
       )")
 
-      @available_columns << build_sla_column("get_sla_remain_#{tid}", "🏃 #{l(:label_sla_remain)} #{sla_type.name}", "(
+      @available_columns << build_sla_column("get_sla_remain_#{tid}", "◷ #{l(:label_sla_remain)} #{sla_type.name}", "(
         SELECT DISTINCT ( sla_level_terms.term - sla_cache_spents.spent ) AS get_sla_remain
         FROM issues AS sla_issues
         LEFT JOIN sla_caches ON ( sla_issues.id = sla_caches.issue_id )
@@ -119,7 +119,7 @@ class SlaCacheQuery < Query
         WHERE sla_issues.id = issues.id
       )")
 
-      @available_columns << build_sla_column("get_sla_respect_#{tid}", "⏰ #{l(:label_sla_respect)} #{sla_type.name}", "(
+      @available_columns << build_sla_column("get_sla_respect_#{tid}", "◷ #{l(:label_sla_respect)} #{sla_type.name}", "(
         SELECT DISTINCT CASE
           WHEN sla_level_terms.term IS NULL THEN 0
           WHEN ( ( NOT ( sla_level_terms.term < sla_cache_spents.spent ) ) IS NOT TRUE ) THEN 1

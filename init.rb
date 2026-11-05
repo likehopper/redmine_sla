@@ -64,6 +64,7 @@ Redmine::Plugin.register :redmine_sla do
   # Add entry in Redmine's administration menu
   menu :admin_menu, :redmine_sla,
     { controller: 'slas', action: 'index' },
+    icon: 'clock-record', plugin: :redmine_sla,
     html: { class: 'icon redmine-sla' },
     caption: :sla_label_global_settings,
     public: false

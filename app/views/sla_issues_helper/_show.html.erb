@@ -31,7 +31,7 @@ if User.current.allowed_to?(:view_sla, @project, :global => true) &&
 <div class="sla attribute">
   <div class="label"><%= l('sla_label.sla.plural') -%></div>
   <div class="value">
-    <%= link_to l(:button_sla_explain), sla_explain_issue_path(issue), class: 'icon icon-help' -%>
+    <%= link_to sprite_icon('help', l(:button_sla_explain)), sla_explain_issue_path(issue), class: 'icon icon-help' -%>
   </div>
 </div>
 <%
@@ -44,7 +44,7 @@ if User.current.allowed_to?(:view_sla, @project, :global => true) &&
   <div class="label">
     <%= l('sla_label.sla.plural') -%>
     <% if can_explain %>
-      &nbsp;<%= link_to l(:button_sla_explain), sla_explain_issue_path(issue), class: 'icon icon-help' -%>
+      &nbsp;<%= link_to sprite_icon('help', l(:button_sla_explain)), sla_explain_issue_path(issue), class: 'icon icon-help' -%>
     <% end %>
   </div>
 
