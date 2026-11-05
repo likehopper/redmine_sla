@@ -257,7 +257,8 @@ tr.sla-explain-no-schedule td { color: #999; font-style: italic; }
 #sla-level-terms-table .sla-type-hidden { display: none; }
 #sla-level-terms-table.sla-types-all-visible .sla-type-hidden { display: table-cell; }
 
-/* Project board (projects#index): SLA icon after the name of projects with visible SLAs */
+/* Project board (projects#index): SLA icon after the name of projects with visible SLAs.
+   Tabler clock-record used as a mask, so it takes the link colour like the sprite icons. */
 #projects-index a.project.has-sla::after {
   content: "";
   display: inline-block;
@@ -265,5 +266,7 @@ tr.sla-explain-no-schedule td { color: #999; font-style: italic; }
   height: 16px;
   margin-left: 4px;
   vertical-align: text-bottom;
-  background: url('../images/sla_16.png') no-repeat center / 16px 16px;
+  background-color: currentColor;
+  -webkit-mask: url('../images/clock-record.svg') no-repeat center / 16px 16px;
+  mask: url('../images/clock-record.svg') no-repeat center / 16px 16px;
 }

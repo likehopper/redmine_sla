@@ -18,7 +18,10 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 -%>
 <% html_title l(:sla_holiday_import_title) %>
-<h2><%= l(:sla_holiday_import_title) %></h2>
+<div class="title-sla-settings title-sla_holiday">
+  <%= sprite_icon('beach', size: 24, plugin: 'redmine_sla') %>
+  <h2><%= l(:sla_holiday_import_title) %></h2>
+</div>
 <p><%= l(:sla_holiday_import_description) %></p>
 <%= form_tag preview_import_sla_holidays_path do %>
   <div class="box tabular">
