@@ -91,13 +91,12 @@
       <path d="M12 7v5l2 2"/>
       <path d="M16 19a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
     </symbol>
-    <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--database-x">
+    <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--database-search">
       <path d="M4 6c0 1.657 3.582 3 8 3s8 -1.343 8 -3s-3.582 -3 -8 -3s-8 1.343 -8 3"/>
-      <path d="M4 6v6c0 1.657 3.582 3 8 3c.537 0 1.062 -.02 1.57 -.058"/>
-      <path d="M20 13.5v-7.5"/>
-      <path d="M4 12v6c0 1.657 3.582 3 8 3c.384 0 .762 -.01 1.132 -.03"/>
-      <path d="M22 22l-5 -5"/>
-      <path d="M17 22l5 -5"/>
+      <path d="M4 6v6c0 1.657 3.582 3 8 3m8 -3.5v-5.5"/>
+      <path d="M4 12v6c0 1.657 3.582 3 8 3"/>
+      <path d="M15 18a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+      <path d="M20.2 20.2l1.8 1.8"/>
     </symbol>
     <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--heart-handshake">
       <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"/>
