@@ -36,12 +36,31 @@
 - Warn in the settings that changing the time zone does not recalculate SLA
   times already calculated, and show a reminder to inform users when another
   zone is selected.
+- Count spent time once when the same issue is calculated concurrently,
+  for example by two users displaying the same issue list, or by the
+  `update_sla` task while users browse. Both calls could add the same
+  minutes.
+- Refreshing an SLA cache or a spent cache now recalculates spent time
+  from the SLA start. It previously kept the stored total and only added
+  the minutes since its last update.
+- Changing the statuses counted by an SLA type now invalidates the spent
+  time of that type. Totals already calculated kept the previous rule.
+- Saving or deleting a tracker-to-SLA mapping no longer recalculates every
+  SLA cache of the project inside the request, which could time out on
+  large projects. The caches of the previous and new project/tracker pairs
+  are deleted, then rebuilt when issues are displayed or by the
+  `update_sla` task (use `scope=miss` for closed issues).
 
 ### Upgrade
 
-- Run the plugin migrations: migration 026 redeploys `sla_get_date`. SLA times
-  already calculated with a truncated zone are not recalculated: purge the SLA
-  caches to recalculate them.
+- Requires Ruby 3.0 or later.
+- Run the plugin migrations: migration 025 redeploys `sla_get_spent` and
+  migration 026 redeploys `sla_get_date`. Existing caches are kept.
+- SLA times already calculated are not corrected automatically: spent totals
+  inflated by concurrent calculations, and times calculated with a truncated
+  time zone. To recalculate them, purge the SLA caches, or refresh the
+  affected caches. Purged caches are recalculated on demand or by the
+  `update_sla` task.
 
 ### Tests
 

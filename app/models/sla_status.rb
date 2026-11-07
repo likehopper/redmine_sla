@@ -40,6 +40,11 @@ class SlaStatus < ActiveRecord::Base
 
   safe_attributes *%w[sla_type_id status_id]
 
+  # Counted statuses decide the spent time of their SLA type, not the SLA
+  # level: drop only that type's incremental totals, recalculated on demand.
+  after_save :invalidate_sla_spent_cache, if: :saved_changes?
+  after_destroy :invalidate_sla_spent_cache
+
   # No selection limitations
   def self.visible_condition(user, options = {})
     '1=1'
@@ -58,6 +63,14 @@ class SlaStatus < ActiveRecord::Base
   # For destroy
   def deletable?(user=User.current)
     user.allowed_to?(:manage_sla, nil, global: true)
+  end
+
+  private
+
+  def invalidate_sla_spent_cache
+    # Moving a status to another type changes the totals of both types.
+    type_ids = [sla_type_id, sla_type_id_before_last_save].compact.uniq
+    SlaCacheSpent.unscoped.where(sla_type_id: type_ids).delete_all
   end
 
 end
