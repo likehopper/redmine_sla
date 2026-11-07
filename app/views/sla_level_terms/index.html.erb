@@ -20,7 +20,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 <% html_title(l(:sla_label_global_settings)) %>
 <div class="content"> 
   <div class="title-sla-settings title-sla_level_term">
-    <%= sprite_icon('alarm-minus', size: 24, plugin: 'redmine_sla') %>
+    <%= sla_icon('sla_level_term', context: :heading, plugin: 'redmine_sla') %>
     <%= title l('sla_label.sla_level_term.index') %>
   </div>
   <%= form_tag(sla_level_terms_path, method: :get, id: 'query_form') do %>

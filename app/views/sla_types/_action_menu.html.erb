@@ -18,15 +18,15 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 -%>
 <div class="contextual">
-  <%= link_to sprite_icon('cancel', l(:button_back)), :back,
+  <%= link_to sla_icon('cancel', l(:button_back)), :back,
       :title => l(:button_back), class: 'icon icon-cancel',
       :accesskey => accesskey(:previous) %>
-  <%= link_to sprite_icon('list', l('sla_label.sla_type.index'), plugin: 'redmine_sla'), sla_types_path,
+  <%= link_to sla_icon('sla_type', l('sla_label.sla_type.index'), plugin: 'redmine_sla'), sla_types_path,
         class: 'icon icon-sla_type' if @sla_type.visible? %>
-  <%= link_to sprite_icon('edit', l('sla_label.sla_type.edit')), edit_sla_type_path(@sla_type),
+  <%= link_to sla_icon('edit', l('sla_label.sla_type.edit')), edit_sla_type_path(@sla_type),
         title: l('sla_label.sla_type.edit'), class: 'icon icon-edit',
         :accesskey => accesskey(:edit) if @sla_type.editable? %>
-  <%= link_to sprite_icon('del', l('sla_label.sla_type.delete')), sla_type_path(@sla_type),
+  <%= link_to sla_icon('del', l('sla_label.sla_type.delete')), sla_type_path(@sla_type),
         data: {confirm: l(:text_are_you_sure)}, method: :delete,
         title: l('sla_label.sla_type.delete'), class: 'icon icon-del',
         :accesskey => accesskey(:delete) if @sla_type.deletable? %>

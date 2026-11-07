@@ -16,6 +16,10 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 # File: redmine_sla/config/locales/fr.yml
 fr:
+  label_sla_locale_settings: Paramètres régionaux
+  label_sla_gauge_style: Style des jauges SLA
+  label_sla_icon_set: Jeu d’icônes
+  label_sla_icons_credit: Icônes réalisées par
   permission_view_sla: Voir les SLA
   permission_manage_sla: Configurer les SLA
 

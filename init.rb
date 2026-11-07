@@ -34,6 +34,12 @@ require "chronic_duration"
 require_relative "lib/redmine_sla/db_dialect"
 require_relative "lib/redmine_sla/invalidates_sla_cache"
 
+# Load icon rendering helpers and native view patches before plugin registration
+require_relative "lib/redmine_sla/helpers/sla_icons_helper"
+require_relative "lib/redmine_sla/patches/column_headers_patch"
+require_relative "lib/redmine_sla/patches/admin_menu_icons_patch"
+require_relative "lib/redmine_sla/patches/project_icons_patch"
+
 # Load custom pluralization rules (e.g., "sla_cache" → "sla_caches")
 require_relative "config/initializers/inflections.rb"
 
@@ -55,7 +61,8 @@ Redmine::Plugin.register :redmine_sla do
     default: {
       'sla_time_zone' => 'Etc/UTC',
       'sla_display'   => 'bar - simple',
-      'sla_holiday_country' => ''
+      'sla_holiday_country' => '',
+      'sla_icon_set' => 'flaticon'
     },
     # Settings UI partial
     partial: 'sla_settings_plugin/sla_settings_plugin'
@@ -64,7 +71,6 @@ Redmine::Plugin.register :redmine_sla do
   # Add entry in Redmine's administration menu
   menu :admin_menu, :redmine_sla,
     { controller: 'slas', action: 'index' },
-    icon: 'clock-record', plugin: :redmine_sla,
     html: { class: 'icon redmine-sla' },
     caption: :sla_label_global_settings,
     public: false
@@ -102,6 +108,10 @@ end
 
 # After Redmine bootstrap, extend core classes with SLA patches
 RedmineApp::Application.config.after_initialize do
+
+  ActionView::Base.send(:include, RedmineSla::Helpers::SlaIconsHelper)
+  Redmine::MenuManager::MenuHelper.prepend(RedmineSla::Patches::AdminMenuIconsPatch)
+  ApplicationHelper.prepend(RedmineSla::Patches::ProjectIconsPatch)
 
   # Load helper modules ( to display respect boolean in lists )
   ActionView::Base.send(:include, RedmineSla::Helpers::SlaRenderingHelper)

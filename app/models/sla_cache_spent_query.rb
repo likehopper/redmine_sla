@@ -41,7 +41,7 @@ class SlaCacheSpentQuery < Query
     @available_columns << QueryColumn.new(:id, :sortable => "#{SlaCacheSpent.table_name}.id", :default_order => nil, :groupable => false )
     @available_columns << QueryColumn.new(:project, :sortable => "#{Project.table_name}.name", :default_order => nil, :groupable => true)
     @available_columns << QueryColumn.new(:issue, :sortable => "#{Issue.table_name}.id", :default_order => :desc, :groupable => true)
-    sla_level_columns = QueryColumn.new(:sla_level, :caption => "◷ " + l(:field_sla_level), :sortable => "#{SlaLevel.table_name}.name", :default_order => nil, :groupable => true )
+    sla_level_columns = QueryColumn.new(:sla_level, :caption => l(:field_sla_level), :sortable => "#{SlaLevel.table_name}.name", :default_order => nil, :groupable => true )
     def sla_level_columns.group_by_statement
       self.sortable
     end

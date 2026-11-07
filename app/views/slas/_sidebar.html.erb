@@ -24,61 +24,64 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
   <h3><%= l(:sla_label_global_settings) %></h3>
   <ul>
     <%= 
-    content_tag(:li, link_to(sprite_icon('clock-record', l('sla_label.sla.plural'), plugin: 'redmine_sla'), slas_path,
+    content_tag(:li, link_to(sla_icon('sla', l('sla_label.sla.plural'), plugin: 'redmine_sla'), slas_path,
       title: l(:sla_label_global_settings)+" : "+l('sla_label.sla.plural'),
       class: 'icon icon-sla sla'))
   %>
   <%= 
-    content_tag(:li, link_to(sprite_icon('list', l('sla_label.sla_type.plural'), plugin: 'redmine_sla'), sla_types_path,
+    content_tag(:li, link_to(sla_icon('sla_type', l('sla_label.sla_type.plural'), plugin: 'redmine_sla'), sla_types_path,
       title: l(:sla_label_global_settings)+" : "+l('sla_label.sla_type.plural'),
       class: 'icon icon-sla_type'))
   %>  
   <%= 
-    content_tag(:li, link_to(sprite_icon('clipboard-check', l('sla_label.sla_status.plural'), plugin: 'redmine_sla'), sla_statuses_path,
+    content_tag(:li, link_to(sla_icon('sla_status', l('sla_label.sla_status.plural'), plugin: 'redmine_sla'), sla_statuses_path,
       title: l(:sla_label_global_settings)+" : "+l('sla_label.sla_status.plural'),
       class: 'icon icon-sla_status'))
   %>
   <%= 
-    content_tag(:li, link_to(sprite_icon('beach', l('sla_label.sla_holiday.plural'), plugin: 'redmine_sla'), sla_holidays_path,
+    content_tag(:li, link_to(sla_icon('sla_holiday', l('sla_label.sla_holiday.plural'), plugin: 'redmine_sla'), sla_holidays_path,
       title: l(:sla_label_global_settings)+" : "+l('sla_label.sla_holiday.plural'),
       class: 'icon icon-sla_holiday'))
   %>
   <%= 
-    content_tag(:li, link_to(sprite_icon('calendar-code', l('sla_label.sla_calendar.plural'), plugin: 'redmine_sla'), sla_calendars_path,
+    content_tag(:li, link_to(sla_icon('sla_calendar', l('sla_label.sla_calendar.plural'), plugin: 'redmine_sla'), sla_calendars_path,
       title: l(:sla_label_global_settings)+" : "+l('sla_label.sla_calendar.plural'),
       class: 'icon icon-sla_calendar'))
   %>
   <%= 
-    content_tag(:li, link_to(sprite_icon('calendar-heart', l('sla_label.sla_calendar_holiday.plural'), plugin: 'redmine_sla'), sla_calendar_holidays_path,
+    content_tag(:li, link_to(sla_icon('sla_calendar_holiday', l('sla_label.sla_calendar_holiday.plural'), plugin: 'redmine_sla'), sla_calendar_holidays_path,
       title: l(:sla_label_global_settings)+" : "+l('sla_label.sla_calendar_holiday.plural'),
       class: 'icon icon-sla_calendar_holiday'))
   %>
   <%= 
-    content_tag(:li, link_to(sprite_icon('heart-handshake', l('sla_label.sla_level.plural'), plugin: 'redmine_sla'), sla_levels_path,
+    content_tag(:li, link_to(sla_icon('sla_level', l('sla_label.sla_level.plural'), plugin: 'redmine_sla'), sla_levels_path,
       title: l(:sla_label_global_settings)+" : "+l('sla_label.sla_level.plural'),
       class: 'icon icon-sla_level'))
   %>
   <%= 
-    content_tag(:li, link_to(sprite_icon('alarm-minus', l('sla_label.sla_level_term.plural'), plugin: 'redmine_sla'), sla_level_terms_path,
+    content_tag(:li, link_to(sla_icon('sla_level_term', l('sla_label.sla_level_term.plural'), plugin: 'redmine_sla'), sla_level_terms_path,
       title: l(:sla_label_global_settings)+" : "+l('sla_label.sla_level_term.plural'),
       class: 'icon icon-sla_level_term'))
   %>
   <%= 
-  content_tag(:li, link_to(sprite_icon('building-cog', l('sla_label.sla_project_tracker.plural'), plugin: 'redmine_sla'), sla_project_trackers_path,
+  content_tag(:li, link_to(sla_icon('sla_project_tracker', l('sla_label.sla_project_tracker.plural'), plugin: 'redmine_sla'), sla_project_trackers_path,
     title: l(:sla_label_global_settings)+" : "+l('sla_label.sla_project_tracker.plural'),
     class: 'icon icon-sla_project_tracker'))
   %>
   <%= 
-  content_tag(:li, link_to(sprite_icon('database-search', l('sla_label.sla_cache.plural'), plugin: 'redmine_sla'), sla_caches_path,
+  content_tag(:li, link_to(sla_icon('sla_cache', l('sla_label.sla_cache.plural'), plugin: 'redmine_sla'), sla_caches_path,
     title: l(:sla_label_global_settings)+" : "+l('sla_label.sla_cache.plural'),
     class: 'icon icon-sla_cache'))
   %>
   <%= 
-  content_tag(:li, link_to(sprite_icon('alarm', l('sla_label.sla_cache_spent.plural'), plugin: 'redmine_sla'), sla_cache_spents_path,
+  content_tag(:li, link_to(sla_icon('sla_cache_spent', l('sla_label.sla_cache_spent.plural'), plugin: 'redmine_sla'), sla_cache_spents_path,
     title: l(:sla_label_global_settings)+" : "+l('sla_label.sla_cache_spent.plural'),
     class: 'icon icon-sla_cache_spent'))
   %>
   </ul>
+  <% if (credit = sla_icon_credit) %>
+    <div id="sla-icon-credit"><%= credit %></div>
+  <% end %>
 <% end %>
 <br />
 <% end %>

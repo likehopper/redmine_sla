@@ -18,16 +18,16 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 -%>
 <div class="contextual">
-  <%= link_to sprite_icon('cancel', l(:button_back)), :back,
+  <%= link_to sla_icon('cancel', l(:button_back)), :back,
       :title => l(:button_back), class: 'icon icon-cancel',
       :accesskey => accesskey(:previous) %>
   <% if User.current.admin? -%>  
-    <%= link_to sprite_icon('beach', l('sla_label.sla_holiday.index'), plugin: 'redmine_sla'), sla_holidays_path,
+    <%= link_to sla_icon('sla_holiday', l('sla_label.sla_holiday.index'), plugin: 'redmine_sla'), sla_holidays_path,
           title: l('sla_label.sla_holiday.index'), class: 'icon icon-sla_holiday' %>
-    <%= link_to sprite_icon('edit', l('sla_label.sla_holiday.edit')), edit_sla_holiday_path(@sla_holiday),
+    <%= link_to sla_icon('edit', l('sla_label.sla_holiday.edit')), edit_sla_holiday_path(@sla_holiday),
           title: l('sla_label.sla_holiday.edit'), class: 'icon icon-edit',
           :accesskey => accesskey(:edit) %>
-    <%= link_to sprite_icon('del', l('sla_label.sla_holiday.delete')), sla_holiday_path(@sla_holiday),
+    <%= link_to sla_icon('del', l('sla_label.sla_holiday.delete')), sla_holiday_path(@sla_holiday),
           data: {:confirm => l(:text_are_you_sure)}, :method => :delete,
           title: l('sla_label.sla_holiday.delete'), class: 'icon icon-del',
           :accesskey => accesskey(:delete) %>

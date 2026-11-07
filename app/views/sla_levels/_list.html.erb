@@ -39,7 +39,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             <% reset_cycle %>
             <tr class="group open">
               <td colspan="<%= @query.inline_columns.size + 2 %>">
-                <span class="expander icon icon-expanded" onclick="toggleRowGroup(this);"><%= sprite_icon("angle-down") %></span>
+                <span class="expander icon icon-expanded" onclick="toggleRowGroup(this);"><%= sla_icon("angle-down") %></span>
                 <span class="name"><%= group_name %></span>
                 <% if group_count %>
                 <span class="badge badge-count count"><%= group_count %></span>
@@ -57,22 +57,22 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             <% end %>
             <td class="buttons">
               <%= if entity.editable?
-                    link_to sprite_icon('alarm-minus', l(:button_add), icon_only: true, plugin: 'redmine_sla'), sla_terms_sla_level_path(entity),
+                    link_to sla_icon('sla_level_term', l(:button_add), icon_only: true, plugin: 'redmine_sla'), sla_terms_sla_level_path(entity),
                             title: l('sla_label.sla_level_term.edit'),
                             class: 'icon-only icon-sla_level_term'
                   end -%>
               <%= if entity.visible?
                     show_path = @project ? project_sla_level_path(@project, entity) : sla_level_path(entity)
-                    link_to sprite_icon('zoom-in', l(:button_show), icon_only: true), show_path,
+                    link_to sla_icon('zoom-in', l(:button_show), icon_only: true), show_path,
                             title: l(:button_show), class: 'icon-only icon-magnifier'
                   end -%>
               <%= if entity.editable?
-                    link_to sprite_icon('edit', l(:button_edit), icon_only: true), edit_sla_level_path(entity),
+                    link_to sla_icon('edit', l(:button_edit), icon_only: true), edit_sla_level_path(entity),
                             title: l(:button_edit),
                             class: 'icon-only icon-edit' 
                   end -%>
               <%= if entity.deletable?
-                    link_to sprite_icon('del', l(:button_delete), icon_only: true), sla_level_path(entity),
+                    link_to sla_icon('del', l(:button_delete), icon_only: true), sla_level_path(entity),
                           data: {confirm: l(:text_are_you_sure)}, method: :delete,
                           title: l(:button_delete), class: 'icon-only icon-del'
                   end -%>

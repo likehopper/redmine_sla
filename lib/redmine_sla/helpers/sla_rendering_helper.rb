@@ -57,7 +57,7 @@ module RedmineSla
         #   - a tooltip containing localized text.
         content_tag(
           'span',
-          sprite_icon(icon_name, text, icon_only: true),
+          sla_icon(icon_name, text, icon_only: true),
           title: text,
           class: "icon-only #{icon_class}"
         )

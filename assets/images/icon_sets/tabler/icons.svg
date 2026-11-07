@@ -116,5 +116,15 @@
       <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/>
       <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/>
     </symbol>
+<symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--time">
+      <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/>
+      <path d="M12 7v5l3 3"/>
+    </symbol>
+<symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--hourglass">
+      <path d="M6.5 7h11"/>
+      <path d="M6.5 17h11"/>
+      <path d="M6 20v-2a6 6 0 1 1 12 0v2a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1z"/>
+      <path d="M6 4v2a6 6 0 1 0 12 0v-2a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1z"/>
+    </symbol>
   </defs>
 </svg>

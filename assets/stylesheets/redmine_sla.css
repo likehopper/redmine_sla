@@ -234,7 +234,7 @@
 
 /*** Administration ***/
 
-/* Page headings: a 24px Tabler icon from the plugin sprite beside the h2 */
+/* Page headings use the selected icon set at 24px. */
 .title-sla-settings {
   display: flex;
   flex-wrap: wrap;
@@ -257,16 +257,37 @@ tr.sla-explain-no-schedule td { color: #999; font-style: italic; }
 #sla-level-terms-table .sla-type-hidden { display: none; }
 #sla-level-terms-table.sla-types-all-visible .sla-type-hidden { display: table-cell; }
 
-/* Project board (projects#index): SLA icon after the name of projects with visible SLAs.
-   Tabler clock-record used as a mask, so it takes the link colour like the sprite icons. */
-#projects-index a.project.has-sla::after {
-  content: "";
-  display: inline-block;
+.sla-project-marker { margin-inline-start: 4px; }
+
+/* Icon dimensions are explicit for both raster images and SVG sprites. */
+.sla-icon-image, .sla-icon-svg { display: inline-block; vertical-align: middle; flex-shrink: 0; }
+.sla-icon-label { margin-left: 4px; }
+.sla-icon-label-hidden { position: absolute; top: 0; left: 0; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+.icon:has(> .sla-icon-image), .icon:has(> .sla-icon-svg) { background-image: none; padding-left: 0; }
+.title-sla-settings > .sla-icon-image { flex-basis: auto; }
+.redmine_sla_footer { border-top: 1px solid #bbb; font-size: 0.9em; color: #777; padding: 5px; text-align: center; }
+.sla-credit-logo { vertical-align: middle; }
+/* Redmine 5's icon-only links reserve padding for a background and clip children.
+   Inline icons need their own box and an anchor for the accessible label. */
+.icon-only:has(> .sla-icon-svg), .icon-only:has(> .sla-icon-image) {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 16px;
   height: 16px;
-  margin-left: 4px;
-  vertical-align: text-bottom;
-  background-color: currentColor;
-  -webkit-mask: url('../images/clock-record.svg') no-repeat center / 16px 16px;
-  mask: url('../images/clock-record.svg') no-repeat center / 16px 16px;
+  padding: 0;
+  background-image: none;
+  overflow: hidden;
 }
+.icon-only:has(> .sla-icon-svg)::after,
+.icon-only:has(> .sla-icon-image)::after { content: none; }
+
+/* Keep attribution at the bottom of the sidebar as its content grows. */
+#sidebar:has(#sla-icon-credit),
+#sidebar-wrapper:has(#sla-icon-credit) {
+  display: flex;
+  flex-direction: column;
+}
+#sidebar-wrapper:has(#sla-icon-credit) { flex: 1; }
+#sidebar #sla-icon-credit { margin-top: auto; padding-top: 12px; }

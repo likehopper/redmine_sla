@@ -1,0 +1,78 @@
+name: Flaticon / Magnific
+format: files
+icons:
+  sla:
+    16: sla_16.png
+    32: sla_32.png
+    24: sla_24.png
+    64: sla_64.png
+  sla_level:
+    24: sla_level_24.png
+    32: sla_level_32.png
+    16: sla_level_16.png
+  sla_status:
+    32: sla_status_32.png
+    24: sla_status_24.png
+    16: sla_status_16.png
+  sla_holiday:
+    16: sla_holiday_16.png
+    32: sla_holiday_32.png
+    24: sla_holiday_24.png
+  sla_calendar:
+    24: sla_calendar_24.png
+    32: sla_calendar_32.png
+    16: sla_calendar_16.png
+  sla_calendar_holiday:
+    16: sla_calendar_holiday_16.png
+    24: sla_calendar_holiday_24.png
+    32: sla_calendar_holiday_32.png
+  sla_schedule:
+    24: sla_schedule_24.png
+    32: sla_schedule_32.png
+    16: sla_schedule_16.png
+  sla_level_term:
+    24: sla_level_term_24.png
+    32: sla_level_term_32.png
+    16: sla_level_term_16.png
+  sla_cache_spent:
+    32: sla_cache_spent_32.png
+    16: sla_cache_spent_16.png
+    24: sla_cache_spent_24.png
+  sla_project_tracker:
+    32: sla_project_tracker_32.png
+    24: sla_project_tracker_24.png
+    16: sla_project_tracker_16.png
+  sla_cache:
+    16: sla_cache_16.png
+    24: sla_cache_24.png
+    32: sla_cache_32.png
+  sla_type:
+    24: sla_type_24.png
+    32: sla_type_32.png
+    16: sla_type_16.png
+  refresh:
+    16: sla_cache_refresh_16.png
+  sla_respect:
+    32: sla_status_32.png
+    24: sla_status_24.png
+    16: sla_status_16.png
+  sla_spent:
+    32: sla_cache_spent_32.png
+    16: sla_cache_spent_16.png
+    24: sla_cache_spent_24.png
+  sla_term:
+    24: sla_level_term_24.png
+    32: sla_level_term_32.png
+    16: sla_level_term_16.png
+  sla_remain:
+    16: sla_cache_spent_refresh_16.png
+credit:
+  display: true
+  logo: flaticon-32.png
+  text_key: label_sla_icons_credit
+  author:
+    name: Magnific
+    url: https://www.flaticon.com/fr/auteurs/magnific
+  source:
+    name: Flaticon
+    url: https://www.flaticon.com/

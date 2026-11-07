@@ -1,5 +1,48 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Select Flaticon / Magnific or Tabler Icons in plugin display settings, with
+  context-specific sizes and manifest-driven credits.
+- Add local icon sets alongside the bundled sets using the same manifest format.
+- Distinct SLA column-header icons and monochrome markers in column selectors;
+  exports retain plain-text captions.
+
+### Changed
+
+- Require Ruby 3.0 or later: view patches rely on prepending to helper modules
+  that are already included.
+- Group locale settings (time zone and holiday country) separately from display
+  settings (gauges and icons).
+- Order cache columns as issue, start date, update date and SLA level, with
+  deadline, spent time, remaining time and respect per type. Custom orders remain.
+- Centralize asset resolution in `IconSet`; keep HTML rendering in helpers and
+  native-view adaptations in patches. Support Redmine 5 direct assets and the
+  Redmine 6/7 asset catalogue.
+- Refresh documentation screenshots for the current interface.
+
+### Fixed
+
+- Stop icon resolution from recursing when the Tabler fallback set is missing.
+- Ignore malformed local icon manifests with a warning. Normalize quoted image
+  sizes and reject invalid or duplicate sizes before rendering.
+- Avoid tiled icons on recent Redmine versions, clipped list actions and duplicate
+  symbols in SLA headers. Preserve native sorting and column-selector behavior.
+
+
+### Tests
+
+- Follow-up manifest and real URL-prefix checks on Redmine 5/6/7: 87 tests /
+  1,606 assertions, no failures/errors/skips. The full matrix below predates
+  this follow-up.
+- Local Redmine 5.1.13/6.1.4/7.0.1 matrix on PostgreSQL 17.7, MariaDB 10.11.19
+  and strict MySQL 8.0.46: 10,545 tests / 65,863 assertions, no failures/errors,
+  12 expected migration skips. See [Testing](doc/TESTING.md).
+- Regenerate 251 existing screenshots and add 14 icon-set illustrations on
+  Redmine 6.1.4, including both sets and their selector/header distinctions.
+
 ## 3.3.4 - 2026-10-25
 
 ### Fixed

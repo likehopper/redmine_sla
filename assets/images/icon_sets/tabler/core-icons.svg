@@ -1,0 +1,71 @@
+<!-- Tabler icons, MIT; extracted from Redmine core. See TABLER-LICENSE.txt. -->
+<svg xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--add">
+      <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/>
+      <path d="M9 12h6"/>
+      <path d="M12 9v6"/>
+    </symbol>
+<symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--angle-down">
+      <path d="M6 9l6 6l6 -6"/>
+    </symbol>
+<symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--cancel">
+      <path d="M9 14l-4 -4l4 -4"/>
+      <path d="M5 10h11a4 4 0 1 1 0 8h-1"/>
+    </symbol>
+<symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--checked">
+      <path d="M5 12l5 5l10 -10"/>
+    </symbol>
+<symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--close">
+      <path d="M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-14z"/>
+      <path d="M9 9l6 6m0 -6l-6 6"/>
+    </symbol>
+<symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--del">
+      <path d="M4 7l16 0"/>
+      <path d="M10 11l0 6"/>
+      <path d="M14 11l0 6"/>
+      <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/>
+      <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/>
+    </symbol>
+<symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--edit">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"/>
+      <path d="M13.5 6.5l4 4"/>
+    </symbol>
+<symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--help">
+      <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/>
+      <path d="M12 9h.01"/>
+      <path d="M11 12h1v4h1"/>
+    </symbol>
+<symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--import">
+      <path d="M4 6c0 1.657 3.582 3 8 3s8 -1.343 8 -3s-3.582 -3 -8 -3s-8 1.343 -8 3"/>
+      <path d="M4 6v6c0 1.657 3.582 3 8 3c1.118 0 2.183 -.086 3.15 -.241"/>
+      <path d="M20 12v-6"/>
+      <path d="M4 12v6c0 1.657 3.582 3 8 3c.157 0 .312 -.002 .466 -.005"/>
+      <path d="M16 19h6"/>
+      <path d="M19 16l3 3l-3 3"/>
+    </symbol>
+<symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--reload">
+      <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/>
+      <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/>
+    </symbol>
+<symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--warning">
+      <path d="M12 9v4"/>
+      <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z"/>
+      <path d="M12 16h.01"/>
+    </symbol>
+<symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--zoom-in">
+      <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"/>
+      <path d="M7 10l6 0"/>
+      <path d="M10 7l0 6"/>
+      <path d="M21 21l-6 -6"/>
+    </symbol>
+<symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--arrow-right">
+      <path d="M5 12l14 0"/>
+      <path d="M13 18l6 -6"/>
+      <path d="M13 6l6 6"/>
+    </symbol>
+<symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--arrow-down">
+      <path d="M12 5l0 14"/>
+      <path d="M18 13l-6 6"/>
+      <path d="M6 13l6 6"/>
+    </symbol>
+</defs></svg>

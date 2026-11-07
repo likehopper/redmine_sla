@@ -19,10 +19,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 -%>
 <ul>
   <% if @sla_calendar_ids.count == 1 %>
-    <li><%= context_menu_link sprite_icon('zoom-in', l(:button_show)), sla_calendar_path(@sla_calendar), class: 'icon icon-magnifier', disabled: !@can[:show] %></li>
-    <li><%= context_menu_link sprite_icon('edit', l(:button_edit)), edit_sla_calendar_path(@sla_calendar), class: 'icon icon-edit', disabled: !@can[:edit] %></li>
+    <li><%= context_menu_link sla_icon('zoom-in', l(:button_show)), sla_calendar_path(@sla_calendar), class: 'icon icon-magnifier', disabled: !@can[:show] %></li>
+    <li><%= context_menu_link sla_icon('edit', l(:button_edit)), edit_sla_calendar_path(@sla_calendar), class: 'icon icon-edit', disabled: !@can[:edit] %></li>
   <% end %>
-  <li><%= context_menu_link sprite_icon('del', l(:button_delete)),
+  <li><%= context_menu_link sla_icon('del', l(:button_delete)),
             sla_calendars_path(id: @sla_calendar_ids, back_url: @back),
             method: :delete, class: 'icon icon-del', disabled: !@can[:delete],
             data: { confirm: l('sla_label.sla_calendar.count',count: @sla_calendar_ids.count)+"\n"+l(:text_are_you_sure) }

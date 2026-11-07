@@ -1,5 +1,86 @@
 # Testing
 
+## Icon manifest review follow-up (2026-11-06)
+
+After the full matrix below, manifest loading was hardened and size keys were
+normalized. Targeted checks on the updated files passed in the existing isolated
+PostgreSQL 17.7 installations:
+
+| Redmine | Catalogue | HTML rendering | Chromium workflows and URL mount |
+| --- | --- | --- | --- |
+| 5.1.13 | 12 / 179 | 14 / 87 | 3 / 402 |
+| 6.1.4 | 12 / 179 | 14 / 87 | 3 / 202 |
+| 7.0.1 | 12 / 179 | 14 / 87 | 3 / 204 |
+
+Cells record tests / assertions: **87 tests / 1,606 assertions**, zero failures,
+errors or skips. The catalogue tests reject invalid YAML, empty manifests,
+unsupported formats, malformed credits and invalid/duplicate sizes, while quoted
+integer sizes resolve correctly and valid sets remain available.
+
+The browser tests exercise both sets through settings and native views, plus a
+real Rack mount under `/redmine`: login, settings submission, SLA views, asset URL
+prefixes, HTTP responses, sprite symbols and loaded raster images. Importmap's
+URL cache is cleared when changing mounts to isolate the test from other cases.
+The standalone HTML tests now use Rails' actual `relative_url_root` configuration
+instead of overriding `image_path`.
+
+Run from the Redmine root with `RAILS_ENV=test` in the prepared test installation:
+
+```sh
+bundle exec ruby plugins/redmine_sla/test/standalone/icon_set_test.rb
+bundle exec ruby plugins/redmine_sla/test/standalone/sla_icons_helper_test.rb
+bundle exec ruby -Itest -e 'ARGV.each { |path| require File.expand_path(path) }' plugins/redmine_sla/test/system/sla_icon_sets_test.rb plugins/redmine_sla/test/system/sla_icon_url_prefix_test.rb
+```
+
+SHA-256 over the four changed Ruby files (path, NUL, contents, NUL, in the order
+`icon_set.rb`, `icon_set_test.rb`, `sla_icons_helper_test.rb`,
+`sla_icon_url_prefix_test.rb`): `e7a3450e5be002a7799a194e12a697aa589cdc00d00646635ca8e385a1589815`.
+The full nine-cell matrix below predates this follow-up and was not rerun for
+these corrections. No production deployment or publication occurred.
+
+## Unreleased: configurable icon sets (initial matrix)
+
+Validated on **2026-11-06** on the integration snapshot identified below, in isolated
+containers and freshly migrated databases. Cells record **tests / assertions**.
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 strict | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1165 / 7012 | 1165 / 7009 | 1165 / 7009 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1225 / 7649 | 1165 / 7105 | 1165 / 7105 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1165 / 7660 | 1165 / 7657 | 1165 / 7657 |
+
+Total: **10,545 tests / 65,863 assertions / 0 failures / 0 errors**. The 12 expected
+migration skips are the two PostgreSQL-specific migration tests on each
+MariaDB/MySQL combination. MySQL sessions retain `ONLY_FULL_GROUP_BY`,
+`STRICT_TRANS_TABLES` and `STRICT_ALL_TABLES`. MariaDB uses strict mode without
+`ONLY_FULL_GROUP_BY`.
+
+Each combination ran 1,097 unit/functional/integration/API tests, 37 Chromium
+system tests, 25 standalone icon/HTML tests and 6 role/project documentation
+tests. Redmine 6/PostgreSQL ran all 66 documentation tests instead.
+
+Image regression coverage includes asset selection and immutable resolved assets,
+size variants, missing-role fallbacks, custom file/sprite sets, HTML escaping,
+credits, native menu/project markers, distinct header icons and selector-only
+symbols. Browser tests fetch the actual image/SVG assets. Native sorting, exports
+and permission-aware project markers are covered as well.
+
+The validation databases were migrated explicitly with SQL routines/views intact;
+automatic test-schema loading was disabled after Rails initialization. The isolated
+MySQL server allowed stored-function creation (`log_bin_trust_function_creators=1`).
+These environment settings are not plugin configuration changes.
+
+All **251 existing documentation screenshots** were regenerated on Redmine 6.1.4,
+with **14 new icon-set illustrations**. The README issue image was refreshed.
+The reference capture environment includes DejaVu Sans and FreeSerif fallback fonts.
+The 151 local Markdown image references were checked; none are missing.
+
+Implementation, asset and test-input snapshot SHA-256:
+`e75fb3e6ad24c21a0b35b59e976138aa6718f757fecda3914cbfecaa682e121b`.
+
+No merge, tag, release or production deployment. Historical results below describe
+their own snapshots.
+
 ## Version 3.3.3 issue SLA block for configured trackers
 
 Validated on **2026-10-25** in isolated local test containers, after integrating

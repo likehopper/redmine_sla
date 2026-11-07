@@ -1,7 +1,7 @@
 # Redmine SLA
 
 ![Redmine Version](https://img.shields.io/badge/Redmine-5.x+-blue)
-![Ruby](https://img.shields.io/badge/Ruby-2.7+-red)
+![Ruby](https://img.shields.io/badge/Ruby-3.0+-red)
 ![Rails](https://img.shields.io/badge/Rails-6.1+-brightgreen)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-11+-blue)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0+-blue)
@@ -192,7 +192,7 @@ Fully manageable through UI and REST API:
 | Name               | requirement                                       |
 |--------------------|---------------------------------------------------|
 | `Redmine`          | >= 5.0                                            |
-| `Ruby`             | >= 2.7                                            |
+| `Ruby`             | >= 3.0                                            |
 | `Rails`            | >= 6.1                                            |
 | `Database`         | PostgreSQL >= 11, MySQL >= 8.0 or MariaDB >= 10.2 |
 
@@ -473,5 +473,10 @@ Restart application server.
 
 ## Credits
 
-Icons from [Tabler Icons](https://tabler.io/icons) (MIT, (c) 2020-2024 Pawel Kuna),
-the same set Redmine core uses. The plugin's own are in `assets/images/icons.svg`.
+The icon set can be selected in the plugin settings. See [Icon sets](doc/ICON_SETS.md).
+
+Flaticon icons were created by [Magnific](https://www.flaticon.com/fr/auteurs/magnific)
+on [Flaticon](https://www.flaticon.com/). See [image credits](assets/images/icon_sets/flaticon/CREDITS.md).
+
+SVG icons from [Tabler Icons](https://tabler.io/icons) (MIT, (c) 2020-2024 Pawel Kuna),
+the same set Redmine core uses. The plugin's own are in `assets/images/icon_sets/tabler/icons.svg`.

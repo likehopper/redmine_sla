@@ -18,17 +18,17 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 -%>
 <ul>
-  <li><%= context_menu_link sprite_icon('refresh', l(:button_refresh), plugin: 'redmine_sla'),
+  <li><%= context_menu_link sla_icon('refresh', l(:button_refresh), plugin: 'redmine_sla'),
     refresh_sla_caches_path(ids: @sla_cache_ids, back_url: @back),
     method: :patch, class: 'icon icon-sla_cache_refresh', disabled: !@can[:refresh]
   -%></li>
   <% if @sla_cache_ids.count == 1 && @can[:show] %>
-  <li><%= context_menu_link sprite_icon('zoom-in', l(:button_show)),
+  <li><%= context_menu_link sla_icon('zoom-in', l(:button_show)),
     sla_cache_spents_path(set_filter: 1, f: ['issue_id'], op: { 'issue_id' => '=' }, v: { 'issue_id' => [@sla_cache.issue_id] }),
     class: 'icon icon-magnifier'  
   -%></li>
   <% end %>  
-  <li><%= context_menu_link sprite_icon('del', l(:button_delete)),
+  <li><%= context_menu_link sla_icon('del', l(:button_delete)),
             sla_caches_path(ids: @sla_cache_ids, back_url: @back),
             method: :delete, class: 'icon icon-del', disabled: !@can[:delete],
             data: { confirm: l('sla_label.sla_cache.count',count: @sla_cache_ids.count)+"\n"+l(:text_are_you_sure) }
