@@ -25,8 +25,13 @@ class SlaIconUrlPrefixTest < ApplicationSlaSystemTestCase
   end
 
   # Importmap caches resolved URLs across requests, including the mount prefix.
+  # Its cache sweeper exists only when classes reload (development), so clear
+  # the map directly: stale "/redmine" module URLs break JavaScript, such as
+  # context menus, in the tests that run afterwards.
   def clear_importmap_cache
-    Rails.application.importmap.cache_sweeper&.execute if Rails.application.respond_to?(:importmap)
+    return unless Rails.application.respond_to?(:importmap)
+
+    Rails.application.importmap.send(:clear_cache)
   end
 
   test 'both sets and core action assets work under a real URL mount' do
