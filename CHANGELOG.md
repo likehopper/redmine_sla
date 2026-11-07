@@ -30,7 +30,18 @@
   sizes and reject invalid or duplicate sizes before rendering.
 - Avoid tiled icons on recent Redmine versions, clipped list actions and duplicate
   symbols in SLA headers. Preserve native sorting and column-selector behavior.
+- Read every time zone offered in the settings. Names with `_`, digits, `+` or
+  `-` were truncated: `America/New_York` failed on PostgreSQL and returned no
+  SLA on MySQL/MariaDB, and `Etc/GMT+12` was read as `Etc/GMT`.
+- Warn in the settings that changing the time zone does not recalculate SLA
+  times already calculated, and show a reminder to inform users when another
+  zone is selected.
 
+### Upgrade
+
+- Run the plugin migrations: migration 026 redeploys `sla_get_date`. SLA times
+  already calculated with a truncated zone are not recalculated: purge the SLA
+  caches to recalculate them.
 
 ### Tests
 

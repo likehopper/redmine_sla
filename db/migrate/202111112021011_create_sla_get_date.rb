@@ -29,7 +29,7 @@ class CreateSlaGetDate < ActiveRecord::Migration[5.2]
 
       dir.up do
         # MySQL has no CREATE OR REPLACE FUNCTION (unlike PostgreSQL, whose
-        # file already self-contains an equivalent DROP), and Rails' mysql2
+        # file uses it), and Rails' mysql2
         # driver doesn't support multiple statements in a single execute call,
         # so the drop is issued separately here.
         execute "DROP FUNCTION IF EXISTS sla_get_date ;" if RedmineSla::DbDialect.adapter == :mysql

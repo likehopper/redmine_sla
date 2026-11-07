@@ -9,6 +9,10 @@ The **Locale** tab contains the time zone used for SLA calculations (default:
 `Etc/UTC`) and the optional default holiday country. Use an ISO country code such
 as `FR`, or leave it blank to choose during [holiday import](HOLIDAY_IMPORT.md).
 
+A new time zone applies to new calculations only: SLA times already calculated
+keep the previous zone. The page shows a reminder to inform users when another
+zone is selected. Purge the SLA caches to recalculate existing times.
+
 ![Locale settings](screenshots/icon-sets/flaticon-locale.png)
 
 ## Display
