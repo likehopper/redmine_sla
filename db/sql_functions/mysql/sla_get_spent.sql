@@ -78,10 +78,16 @@ BEGIN
     -- sla_get_level.sql for why this can't just use its return value).
     DO sla_get_level(p_issue_id, FALSE);
 
+    -- The spent total is incremental: serialize concurrent calls for this
+    -- issue so that the second one waits for the first to commit. Locking
+    -- reads return the latest committed rows even under REPEATABLE READ,
+    -- so the second call reads the first one's total instead of adding the
+    -- same minutes again.
     SELECT id, sla_level_id, start_date
     INTO v_cache_id, v_cache_sla_level_id, v_cache_start_date
     FROM sla_caches
-    WHERE issue_id = p_issue_id;
+    WHERE issue_id = p_issue_id
+    FOR UPDATE;
 
     -- Exit if the issue is not governed by any SLA level
     IF ( v_cache_id IS NULL ) THEN
@@ -106,7 +112,8 @@ BEGIN
     INTO v_spent_id, v_spent_updated_on, v_spent_existing
     FROM sla_cache_spents
     WHERE sla_cache_id = v_cache_id
-      AND sla_type_id = p_sla_type_id;
+      AND sla_type_id = p_sla_type_id
+    FOR UPDATE;
 
     -- Optimization: If the cache was already updated during this transaction/timestamp, skip recalculation
     IF ( v_spent_id IS NOT NULL AND v_spent_updated_on = v_current_timestamp ) THEN

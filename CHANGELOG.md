@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+-   Count spent time once when the same issue is calculated concurrently,
+    for example by two users displaying the same issue list, or by the
+    `update_sla` task while users browse. Both calls could add the same
+    minutes.
+
+### Upgrade
+
+-   Run the plugin migrations: migration 025 redeploys `sla_get_spent`.
+
 ## 3.3.4 - 2026-10-25
 
 ### Fixed
