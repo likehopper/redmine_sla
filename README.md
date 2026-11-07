@@ -14,7 +14,7 @@
 
 ## Overview
 
-Current version: **3.3.4**. See the [changelog](CHANGELOG.md) for release details.
+Current version: **3.4.0**. See the [changelog](CHANGELOG.md) for release details.
 
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
@@ -283,6 +283,17 @@ rake redmine:plugins:migrate NAME=redmine_sla
 Plugin is ready to use.
 
 ------------------------------------------------------------------------
+
+## Upgrade to 3.4.0
+
+Version **3.4.0** requires Ruby 3.0 or later. It adds configurable icon sets
+(see [Icon sets](doc/ICON_SETS.md)) and fixes SLA calculations: time zones
+with `_`, digits, `+` or `-`, spent time counted twice by concurrent requests,
+refresh keeping wrong totals, counted status changes and tracker mapping saves.
+Update the plugin files, run `bundle exec rake redmine:plugins:migrate
+RAILS_ENV=production` (migrations 025 and 026 redeploy SQL functions), then
+restart Redmine. Existing SLA caches are kept: purge them to recalculate
+values computed before the upgrade. See the [changelog](CHANGELOG.md).
 
 ## Upgrade to 3.3.4
 
