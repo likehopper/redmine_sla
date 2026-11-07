@@ -11,6 +11,8 @@
 -   Refreshing an SLA cache or a spent cache now recalculates spent time
     from the SLA start. It previously kept the stored total and only added
     the minutes since its last update.
+-   Changing the statuses counted by an SLA type now invalidates the spent
+    time of that type. Totals already calculated kept the previous rule.
 
 ### Upgrade
 
