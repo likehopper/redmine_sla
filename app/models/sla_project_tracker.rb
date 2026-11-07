@@ -28,7 +28,7 @@ class SlaProjectTracker < ActiveRecord::Base
   has_many :sla_level_terms, through: :sla_levels
   has_many :sla_types, through: :sla_level_terms
 
-  after_save :sla_cache_update
+  after_save :sla_cache_update, if: :saved_changes?
   after_destroy :sla_cache_destroy
 
   extend Redmine::I18n
@@ -85,16 +85,22 @@ class SlaProjectTracker < ActiveRecord::Base
 
 private
 
+  # Recalculating every cache of a project inside the web request can time
+  # out: delete them instead, like the other configuration models. They are
+  # rebuilt when the issues are displayed, or by the update_sla task.
+  # sla_cache_spents are removed by the database foreign key cascade.
   def sla_cache_update
-    # At any change, we update sla_cache affected by the old values
-    SlaCache.where(project_id: self.project_id_before_last_save, tracker_id: self.tracker_id_before_last_save).find_each do |sla_cache|
-      sla_cache.refresh
-    end
+    # The old pair lost this mapping, the new pair gained it.
+    sla_cache_delete(self.project_id_before_last_save, self.tracker_id_before_last_save)
+    sla_cache_delete(self.project_id, self.tracker_id)
   end
 
   def sla_cache_destroy
-    # if sla_project_tracker destroyed then must destroy sla_cache
-    SlaCache.where(project_id: self.project_id, tracker_id: self.tracker_id).destroy_all
+    sla_cache_delete(self.project_id, self.tracker_id)
+  end
+
+  def sla_cache_delete(project_id, tracker_id)
+    SlaCache.unscoped.where(project_id: project_id, tracker_id: tracker_id).delete_all
   end
 
 end

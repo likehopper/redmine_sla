@@ -13,6 +13,11 @@
     the minutes since its last update.
 -   Changing the statuses counted by an SLA type now invalidates the spent
     time of that type. Totals already calculated kept the previous rule.
+-   Saving or deleting a tracker-to-SLA mapping no longer recalculates every
+    SLA cache of the project inside the request, which could time out on
+    large projects. The caches of the previous and new project/tracker pairs
+    are deleted, then rebuilt when issues are displayed or by the
+    `update_sla` task (use `scope=miss` for closed issues).
 
 ### Upgrade
 
