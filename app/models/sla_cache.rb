@@ -74,6 +74,10 @@ class SlaCache < ActiveRecord::Base
     # Let's recalculate the sla_cache
     RedmineSla::DbDialect.ensure_recursion_depth!
     ActiveRecord::Base.connection.execute(self.class.sanitize_sql(["SELECT sla_get_level(?,true) ; ", self.issue_id]))
+    # The forced level keeps the same cache row, so its spent rows survive.
+    # sla_get_spent only adds the minutes since their last update: delete them
+    # so the totals are recalculated from the SLA start under the current level.
+    SlaCacheSpent.where(issue_id: self.issue_id).delete_all
     # Then, let's recalculate the sla_cache_spents !
     SlaCacheSpent.refresh_by_issue_id(self.issue_id)
   end  

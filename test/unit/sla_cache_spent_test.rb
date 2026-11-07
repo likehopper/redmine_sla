@@ -26,6 +26,19 @@ class SlaCacheSpentTest < ApplicationSlaUnitsTestCase
     assert_not SlaCacheSpent.count.zero?
   end
 
+  test "refresh recalculates the spent time instead of keeping a wrong total" do
+    project = Project.find_by!(identifier: 'project-sla-tests-tma')
+    issue = Issue.find_by!(project: project, subject: 'Bug with simple SLA')
+    gtr = 2 # counts New and Assigned; 90 minutes for this closed issue
+    spent = SlaCacheSpent.find_by_issue_and_type_id(issue, gtr)
+    assert_equal 90, spent.spent
+    spent.update_column(:spent, 999)
+
+    spent.refresh
+
+    assert_equal 90, SlaCacheSpent.find_by!(issue_id: issue.id, sla_type_id: gtr).spent
+  end
+
   test "global spent purge keeps cache rows" do
     cache_ids = SlaCache.unscoped.order(:id).pluck(:id)
     assert_not_empty cache_ids

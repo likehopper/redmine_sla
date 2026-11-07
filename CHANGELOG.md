@@ -8,10 +8,17 @@
     for example by two users displaying the same issue list, or by the
     `update_sla` task while users browse. Both calls could add the same
     minutes.
+-   Refreshing an SLA cache or a spent cache now recalculates spent time
+    from the SLA start. It previously kept the stored total and only added
+    the minutes since its last update.
 
 ### Upgrade
 
 -   Run the plugin migrations: migration 025 redeploys `sla_get_spent`.
+-   Totals already inflated by concurrent calculations are not corrected
+    automatically. To recalculate them, purge the SLA caches, or refresh
+    the affected caches. Purged totals are recalculated on demand or by the
+    `update_sla` task.
 
 ## 3.3.4 - 2026-10-25
 
