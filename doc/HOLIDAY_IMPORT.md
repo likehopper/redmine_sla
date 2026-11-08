@@ -6,8 +6,9 @@ The plugin settings accept an optional ISO country code (for example `FR`)
 as the default. Redmine's default language does not determine a country.
 
 The form requests the country list from Nager.Date's community API v4.
-The Redmine server needs outbound HTTPS access to `nagerholidays.com` and,
-for local names, `date.nager.at`.
+The Redmine server needs outbound HTTPS access to `nagerholidays.com`, the
+official Nager.Date host, for both English and local names. Since 3.4.1 local
+names no longer use `date.nager.at`.
 
 Only holidays of type `Public` are offered. National holidays are selected by
 default; regional holidays show their subdivision codes and require selection.
