@@ -14,7 +14,7 @@
 
 ## Overview
 
-Current version: **3.4.0**. See the [changelog](CHANGELOG.md) for release details.
+Current version: **3.4.1**. See the [changelog](CHANGELOG.md) for release details.
 
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
@@ -283,6 +283,16 @@ rake redmine:plugins:migrate NAME=redmine_sla
 Plugin is ready to use.
 
 ------------------------------------------------------------------------
+
+## Upgrade to 3.4.1
+
+Version **3.4.1** shows SLA values for issues whose priority was deactivated,
+keeps the same SLA level on every refresh when two levels open at the same
+minute, and requests local holiday names from `nagerholidays.com` only.
+Update the plugin files, run `bundle exec rake redmine:plugins:migrate
+RAILS_ENV=production` (migration 027 redeploys `sla_get_level`), then restart
+Redmine. Allow outbound HTTPS to `nagerholidays.com` for holiday imports. See
+the [changelog](CHANGELOG.md).
 
 ## Upgrade to 3.4.0
 

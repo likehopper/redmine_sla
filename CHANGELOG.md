@@ -1,12 +1,34 @@
 # Changelog
 
-## Unreleased
+## 3.4.1 - 2026-11-08
+
+### Fixed
+
+- Show the SLA priority, term and respect of issues whose priority (or SLA
+  custom field value) was deactivated. The columns were empty while the
+  respect filter still counted these issues.
+- Keep the same SLA level on every refresh when two levels of one SLA use
+  calendars opening at the same minute: the level with the lowest id wins.
+  The database could previously return either level.
 
 ### Changed
 
 - Request local holiday names from `nagerholidays.com`, the official
   Nager.Date host, instead of `date.nager.at`, which already redirects its
   home page there. Outbound HTTPS to `nagerholidays.com` alone is enough.
+- Stop listing cache refresh under the `view_sla` permission: refreshing
+  already required `manage_sla`. Access is unchanged.
+- Give each core patch its own `InstanceMethods` module, so patched classes
+  no longer receive the methods of the other patches. Remove dead patch and
+  controller code, including a duplicate `retrieve_default_query`.
+
+### Upgrade
+
+- Run the plugin migrations: migration 027 redeploys `sla_get_level`.
+  Existing caches are kept; refresh or purge them to apply the level rule to
+  issues already cached.
+- Allow outbound HTTPS to `nagerholidays.com`; `date.nager.at` is no longer
+  used.
 
 ## 3.4.0 - 2026-11-07
 
