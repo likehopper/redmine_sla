@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- Show the SLA priority, term and respect of issues whose priority (or SLA
+  custom field value) was deactivated. The columns were empty while the
+  respect filter still counted these issues.
+
 ## 3.4.0 - 2026-11-07
 
 ### Added
