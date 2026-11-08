@@ -104,40 +104,40 @@ module RedmineSla
 
         end
       end
-    end
 
-    module InstanceMethods
+      module InstanceMethods
 
-      # Extended column_value to support SLA-specific columns.
-      #
-      # For:
-      #   - :get_sla_level → display a link to the SLA level
-      #   - get_sla_respect_* methods → display an SLA respect icon
-      #
-      # For all other columns, fall back to the original implementation.
-      def column_value_with_custom_sla_priority_id(column, item, value, options = {})
+        # Extended column_value to support SLA-specific columns.
+        #
+        # For:
+        #   - :get_sla_level → display a link to the SLA level
+        #   - get_sla_respect_* methods → display an SLA respect icon
+        #
+        # For all other columns, fall back to the original implementation.
+        def column_value_with_custom_sla_priority_id(column, item, value, options = {})
 
-        content =
-          if (item.is_a?(Issue) || item.is_a?(TimeEntry) || item.is_a?(SlaCache))
-            case column.name
-            when :get_sla_level
-              # Link to the SLA level page when SLA level is present
-              link_to(
-                item.get_sla_level.name,
-                sla_level_url(item.get_sla_level, only_path: true),
-                title: sla_description_tooltip(item.get_sla_level)
-              ) if !item.get_sla_level.nil?
+          content =
+            if (item.is_a?(Issue) || item.is_a?(TimeEntry) || item.is_a?(SlaCache))
+              case column.name
+              when :get_sla_level
+                # Link to the SLA level page when SLA level is present
+                link_to(
+                  item.get_sla_level.name,
+                  sla_level_url(item.get_sla_level, only_path: true),
+                  title: sla_description_tooltip(item.get_sla_level)
+                ) if !item.get_sla_level.nil?
 
-            # SLA respect columns for Issue, TimeEntry or SlaCache queries
-            when /^get_sla_respect/
-              sla_respect_icon_tag(item.send(column.name))
+              # SLA respect columns for Issue, TimeEntry or SlaCache queries
+              when /^get_sla_respect/
+                sla_respect_icon_tag(item.send(column.name))
+              end
             end
-          end
 
-        # If content wasn't handled by SLA logic, call the original method.
-        content.nil? ? column_value_without_custom_sla_priority_id(column, item, value) : content
+          # If content wasn't handled by SLA logic, call the original method.
+          content.nil? ? column_value_without_custom_sla_priority_id(column, item, value) : content
+        end
+
       end
-
     end
 
   end

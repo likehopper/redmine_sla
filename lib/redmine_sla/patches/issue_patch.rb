@@ -133,13 +133,11 @@ module RedmineSla
       # Trigger to update sla_cache when necessary.
       #
       # This hook is called when the module is included into Issue:
-      #   - extends the base with ClassMethods
       #   - includes InstanceMethods
       #   - registers an after_save callback to refresh SLA cache when
       #     project or tracker changes.
       def self.included(base)
         base.prepend(ReloadMethods)
-        base.extend(ClassMethods)
         base.send(:include, InstanceMethods)
         base.class_eval do
           # After issue update, if project or tracker changed then refresh sla_cache !!!
@@ -148,20 +146,16 @@ module RedmineSla
         end
       end
 
-    end
-
-    module ClassMethods
-    end
-
-    module InstanceMethods
-      # Refresh SLA cache after an issue is updated, if project or tracker changed.
-      def sla_cache_update
-        # If project or tracker changed then the SLA cache must be refreshed
-        unless ( self.project_id == self.project_id_before_last_save && self.tracker_id == self.tracker_id_before_last_save )
-          SlaCache.find(self.id).refresh
+      module InstanceMethods
+        # Refresh SLA cache after an issue is updated, if project or tracker changed.
+        def sla_cache_update
+          # If project or tracker changed then the SLA cache must be refreshed
+          unless ( self.project_id == self.project_id_before_last_save && self.tracker_id == self.tracker_id_before_last_save )
+            SlaCache.find(self.id).refresh
+          end
+        rescue ActiveRecord::RecordNotFound
+          # Ignore missing SLA cache entries
         end
-      rescue ActiveRecord::RecordNotFound
-        # Ignore missing SLA cache entries
       end
     end
 
