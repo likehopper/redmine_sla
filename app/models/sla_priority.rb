@@ -50,8 +50,10 @@ class SlaPriority
   end
 
   # For display one SlaPriority by Priority in Query/Filter
+  # Inactive priorities stay on older issues and the SQL filters still match
+  # them: resolve them too, so displayed values agree with filter results.
   def find_by_priority_id(priority_id)
-    priority = IssuePriority.active.find_by(id: priority_id)
+    priority = IssuePriority.find_by(id: priority_id)
     return nil if priority.nil?
     self.create_value(priority.id, priority.name)
   end  
@@ -67,7 +69,7 @@ class SlaPriority
     pairs = SlaLevel.joins(:sla_level_terms).distinct.pluck(:custom_field_id, :sla_priority_id)
 
     nil_priority_ids = pairs.select { |cf_id, _| cf_id.nil? }.map(&:last).compact.uniq
-    preloaded = IssuePriority.active.where(id: nil_priority_ids).index_by(&:id)
+    preloaded = IssuePriority.where(id: nil_priority_ids).index_by(&:id)
 
     pairs.filter_map { |custom_field_id, sla_priority_id|
       if custom_field_id.nil?
