@@ -28,6 +28,7 @@
 # ------------------------------------------------------------------------------
 
 class SlaLevelTermsController < ApplicationController
+  include RedmineSla::DefaultQueryRetrieval
 
   accept_api_auth :index, :create, :show, :update, :destroy
   
@@ -49,7 +50,7 @@ class SlaLevelTermsController < ApplicationController
   # List SLA Level Terms with query/pagination support.
   def index
     use_session = !request.format.csv?
-    retrieve_default_query(use_session)
+    retrieve_default_query(SlaLevelTermQuery, use_session)
     retrieve_query(SlaLevelTermQuery, use_session)
 
     @entity_count = @query.sla_level_terms.count
@@ -199,27 +200,6 @@ class SlaLevelTermsController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render_404
   end
-
-  # Load default query if none is selected.
-  def retrieve_default_query(use_session)
-    return if params[:query_id].present?
-    return if api_request?
-    return if params[:set_filter]
-
-    if params[:without_default].present?
-      params[:set_filter] = 1
-      return
-    end
-
-    if use_session && session[:sla_level_term_query]
-      query_id = session[:sla_level_term_query].values_at(:id)
-      return if SlaLevelTermQuery.where(id: query_id).exists?
-    end
-
-    if default_query = SlaLevelTermQuery.default
-      params[:query_id] = default_query.id
-    end
-  end  
 
   # Scope from the query object.
   def sla_level_term_scope(options = {})

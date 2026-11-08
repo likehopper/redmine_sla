@@ -217,26 +217,6 @@ class SlaTypesController < ApplicationController
     render_404
   end
 
-  # Restore or initialize default query
-  def retrieve_default_query(use_session)
-    return if params[:query_id].present?
-    return if api_request? || params[:set_filter]
-
-    if params[:without_default].present?
-      params[:set_filter] = 1
-      return
-    end
-
-    if use_session && session[:sla_type_query]
-      query_id = session[:sla_type_query].values_at(:id)
-      return if SlaTypeQuery.where(id: query_id).exists?
-    end
-
-    if (default = SlaTypeQuery.default)
-      params[:query_id] = default.id
-    end
-  end
-
   # Query scope
   def sla_type_scope(options = {})
     @query.results_scope(options)

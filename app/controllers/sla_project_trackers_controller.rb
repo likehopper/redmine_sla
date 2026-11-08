@@ -28,6 +28,7 @@
 # ------------------------------------------------------------------------------
 
 class SlaProjectTrackersController < ApplicationController
+  include RedmineSla::DefaultQueryRetrieval
   default_search_scope :sla_project_trackers
 
   accept_api_auth :index, :create, :update, :destroy
@@ -55,7 +56,7 @@ class SlaProjectTrackersController < ApplicationController
   # Can be filtered per project or globally.
   def index
     use_session = !request.format.csv?
-    retrieve_default_query(use_session) 
+    retrieve_default_query(SlaProjectTrackerQuery, use_session) 
     retrieve_query(SlaProjectTrackerQuery)
 
     @entity_count = @query.sla_project_trackers.count
@@ -213,27 +214,6 @@ private
   rescue ActiveRecord::RecordNotFound
     render_404
   end  
-
-  # Load default SlaProjectTrackerQuery if none is explicitly chosen.
-  def retrieve_default_query(use_session)
-    return if params[:query_id].present?
-    return if api_request?
-    return if params[:set_filter]
-
-    if params[:without_default].present?
-      params[:set_filter] = 1
-      return
-    end
-
-    if !params[:set_filter] && use_session && session[:sla_project_tracker_query]
-      query_id, project_id = session[:sla_project_tracker_query].values_at(:id, :project_id)
-      return if SlaProjectTrackerQuery.where(id: query_id).exists? && project_id == @project&.id
-    end
-
-    if default_query = SlaProjectTrackerQuery.default(project: @project)
-      params[:query_id] = default_query.id
-    end
-  end
 
   # Returns the SlaProjectTrackerQuery scope for index and report actions.
   def sla_project_tracker_scope(options = {})

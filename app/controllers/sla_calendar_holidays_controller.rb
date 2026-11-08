@@ -175,27 +175,6 @@ class SlaCalendarHolidaysController < ApplicationController
     render_404
   end
 
-  # Load the default query if none is explicitly selected.
-  def retrieve_default_query(use_session)
-    return if params[:query_id].present?
-    return if api_request?
-    return if params[:set_filter]
-
-    if params[:without_default].present?
-      params[:set_filter] = 1
-      return
-    end
-
-    if !params[:set_filter] && use_session && session[:sla_calendar_holiday_query]
-      query_id = session[:sla_calendar_holiday_query].values_at(:id)
-      return if SlaCalendarHolidayQuery.where(id: query_id).exists?
-    end
-
-    if default_query = SlaCalendarHolidayQuery.default()
-      params[:query_id] = default_query.id
-    end
-  end   
-
   # Returns the SlaCalendarHolidayQuery scope for index and report actions.
   def sla_calendar_holiday_scope(options = {})
     @query.results_scope(options)
