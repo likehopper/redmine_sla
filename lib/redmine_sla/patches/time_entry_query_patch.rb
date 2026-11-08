@@ -109,114 +109,114 @@ module RedmineSla
 
         end
       end
-    end
 
-    # Instance methods injected into TimeEntryQuery
-    module InstanceMethods
+      # Instance methods injected into TimeEntryQuery
+      module InstanceMethods
 
-      def available_filters_with_sla_time_entry
+        def available_filters_with_sla_time_entry
 
-        if @available_filters.blank? &&
-           project&.module_enabled?(:sla) &&
-           (User.current.admin? ||
-            User.current.allowed_to?(:view_sla, project, global: true))
+          if @available_filters.blank? &&
+             project&.module_enabled?(:sla) &&
+             (User.current.admin? ||
+              User.current.allowed_to?(:view_sla, project, global: true))
 
-          #
-          # SLA LEVEL FILTER
-          #
-          values = SlaLevel
-                     .joins(:sla_project_trackers)
-                     .where("sla_project_trackers.project_id = ?", project.id)
-                     .select("sla_levels.id, sla_levels.name")
-                     .distinct
-                     .pluck(:name, :id)
+            #
+            # SLA LEVEL FILTER
+            #
+            values = SlaLevel
+                       .joins(:sla_project_trackers)
+                       .where("sla_project_trackers.project_id = ?", project.id)
+                       .select("sla_levels.id, sla_levels.name")
+                       .distinct
+                       .pluck(:name, :id)
 
-          add_available_filter(
-            'slas.sla_level_id',
-            name:   l("sla_label.sla_level.singular"),
-            type:   :list,
-            values: values
-          ) unless available_filters_without_sla_time_entry.key?('slas.sla_level_id')
+            add_available_filter(
+              'slas.sla_level_id',
+              name:   l("sla_label.sla_level.singular"),
+              type:   :list,
+              values: values
+            ) unless available_filters_without_sla_time_entry.key?('slas.sla_level_id')
 
-          #
-          # SLA LEVEL COLUMN
-          #
-          time_entry_get_sla_level = QueryColumn.new(
-            :get_sla_level,
-            caption:  l("sla_label.sla_level.singular"),
-            groupable: true,
-            sortable: "sla_query_level.name"
-          )
+            #
+            # SLA LEVEL COLUMN
+            #
+            time_entry_get_sla_level = QueryColumn.new(
+              :get_sla_level,
+              caption:  l("sla_label.sla_level.singular"),
+              groupable: true,
+              sortable: "sla_query_level.name"
+            )
 
-          def time_entry_get_sla_level.group_by_statement
-            self.sortable
-          end
-
-          def time_entry_get_sla_level.group_value(record)
-            record.get_sla_level&.name
-          end
-
-          self.available_columns << time_entry_get_sla_level
-
-          #
-          # SLA TYPES: dynamic columns and filters
-          #
-          if ActiveRecord::Base.connection.table_exists?('sla_types')
-
-            SlaType
-              .joins(:sla_project_trackers)
-              .where("sla_project_trackers.project_id = ?", project.id)
-              .select("sla_types.id, sla_types.name, sla_types.position")
-              .distinct
-              .order(:position)
-              .each do |sla_type|
-
-              # SLA RESPECT FILTER
-              add_available_filter(
-                "slas.sla_respect_#{sla_type.id}",
-                name:   l(:label_sla_respect) + " " + sla_type.name,
-                type:   :list,
-                values: [[l(:general_text_Yes), '1'], [l(:general_text_No), '0']]
-              ) unless available_filters_without_sla_time_entry.key?("slas.sla_respect_#{sla_type.id}")
-
-              # Dynamic SQL filter handler
-              if !singleton_methods.include? "sql_for_slas_sla_respect_#{sla_type.id}_field".to_sym
-                define_singleton_method("sql_for_slas_sla_respect_#{sla_type.id}_field") do |field, operator, value|
-                  sql_for_slas_sla_respect_field(field, operator, value, sla_type.id)
-                end
-              end
-
-              #
-              # SLA RESPECT COLUMN
-              #
-              name_to_sym = "get_sla_respect_#{sla_type.id}".to_sym
-
-              self.available_columns.delete_if { |c| c.name == name_to_sym }
-
-              time_entry_get_sla_respect = QueryColumn.new(
-                name_to_sym,
-                caption:  l(:label_sla_respect) + " " + sla_type.name,
-                groupable: true,
-                sortable: RedmineSla::NativeQueryColumns.respect_expression(sla_type.id)
-              )
-
-              def time_entry_get_sla_respect.group_by_statement
-                self.sortable
-              end
-
-              self.available_columns << time_entry_get_sla_respect
-
+            def time_entry_get_sla_level.group_by_statement
+              self.sortable
             end
+
+            def time_entry_get_sla_level.group_value(record)
+              record.get_sla_level&.name
+            end
+
+            self.available_columns << time_entry_get_sla_level
+
+            #
+            # SLA TYPES: dynamic columns and filters
+            #
+            if ActiveRecord::Base.connection.table_exists?('sla_types')
+
+              SlaType
+                .joins(:sla_project_trackers)
+                .where("sla_project_trackers.project_id = ?", project.id)
+                .select("sla_types.id, sla_types.name, sla_types.position")
+                .distinct
+                .order(:position)
+                .each do |sla_type|
+
+                # SLA RESPECT FILTER
+                add_available_filter(
+                  "slas.sla_respect_#{sla_type.id}",
+                  name:   l(:label_sla_respect) + " " + sla_type.name,
+                  type:   :list,
+                  values: [[l(:general_text_Yes), '1'], [l(:general_text_No), '0']]
+                ) unless available_filters_without_sla_time_entry.key?("slas.sla_respect_#{sla_type.id}")
+
+                # Dynamic SQL filter handler
+                if !singleton_methods.include? "sql_for_slas_sla_respect_#{sla_type.id}_field".to_sym
+                  define_singleton_method("sql_for_slas_sla_respect_#{sla_type.id}_field") do |field, operator, value|
+                    sql_for_slas_sla_respect_field(field, operator, value, sla_type.id)
+                  end
+                end
+
+                #
+                # SLA RESPECT COLUMN
+                #
+                name_to_sym = "get_sla_respect_#{sla_type.id}".to_sym
+
+                self.available_columns.delete_if { |c| c.name == name_to_sym }
+
+                time_entry_get_sla_respect = QueryColumn.new(
+                  name_to_sym,
+                  caption:  l(:label_sla_respect) + " " + sla_type.name,
+                  groupable: true,
+                  sortable: RedmineSla::NativeQueryColumns.respect_expression(sla_type.id)
+                )
+
+                def time_entry_get_sla_respect.group_by_statement
+                  self.sortable
+                end
+
+                self.available_columns << time_entry_get_sla_respect
+
+              end
+            end
+
+          else
+            # Fall back to original implementation
+            return available_filters_without_sla_time_entry
           end
 
-        else
-          # Fall back to original implementation
-          return available_filters_without_sla_time_entry
+          @available_filters
         end
 
-        @available_filters
       end
-
     end
   end
 end

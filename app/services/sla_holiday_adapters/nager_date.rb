@@ -27,6 +27,10 @@ module SlaHolidayAdapters
   class NagerDate
     class Error < StandardError; end
     BASE_URL = 'https://nagerholidays.com/api/v4'
+    # Local names exist only in the legacy v3 API. The official host serves it
+    # too: date.nager.at already redirects its home page there, and Net::HTTP
+    # does not follow redirects.
+    LOCAL_NAMES_BASE_URL = 'https://nagerholidays.com/api/v3'
 
     def available_countries
       rows = request('/Countries/Available')
@@ -46,7 +50,7 @@ module SlaHolidayAdapters
       country = country.to_s.upcase
       raise Error, 'invalid_selection' unless year.match?(/\A\d{1,4}\z/) && year.to_i.between?(1, 9999) && country.match?(/\A[A-Z]{2}\z/)
       rows = if language == 'local'
-               request("/PublicHolidays/#{year.to_i}/#{country}", base_url: 'https://date.nager.at/api/v3')
+               request("/PublicHolidays/#{year.to_i}/#{country}", base_url: LOCAL_NAMES_BASE_URL)
              else
                request("/Holidays/#{country}/#{year.to_i}")
              end

@@ -9,10 +9,6 @@
 #     - sortable/queryable columns,
 #     - dynamic methods per SLA type.
 #
-#   This patch also removes legacy overrides that broke compatibility with
-#   modern Redmine versions (5/6) and Rails 6/7, particularly the
-#   `sql_for_field_with_sla` alias which previously caused SQL errors.
-#
 #   All SLA logic injected here affects the Redmine issue list (issues#index)
 #   including filtering, grouping, and sorting.
 
@@ -48,16 +44,6 @@ module RedmineSla
           
           alias_method :available_filters_without_sla_issue, :available_filters
           alias_method :available_filters, :available_filters_with_sla_issue
-
-          # --- CRITICAL: remove obsolete sql_for_field_with_sla override -----------
-          if self.method_defined?(:sql_for_field)
-            # Remove the old alias if it still exists
-            undef_method :sql_for_field_with_sla rescue nil
-
-            # Ensure we return to Redmine’s own implementation
-            alias_method :sql_for_field, :sql_for_field_without_sla rescue nil
-          end
-          # --------------------------------------------------------------------------
 
           # Build SQL condition for SLA “respect” filters
           def sql_for_slas_sla_respect_field(field, operator, value, sla_type_id)
@@ -119,126 +105,126 @@ module RedmineSla
         end
       end
 
-    end
 
-    # Instance methods injected into IssueQuery
-    module InstanceMethods
+      # Instance methods injected into IssueQuery
+      module InstanceMethods
 
-      # Extends Redmine’s available filters:
-      #   - adds SLA level filter + column
-      #   - adds SLA respect filters + columns per SLA type
-      def available_filters_with_sla_issue
-        # Debug tracing
-        Rails.logger.debug "--- REDMINE_SLA TRACE: available_filters_with_sla_issue CALL ---"
+        # Extends Redmine’s available filters:
+        #   - adds SLA level filter + column
+        #   - adds SLA respect filters + columns per SLA type
+        def available_filters_with_sla_issue
+          # Debug tracing
+          Rails.logger.debug "--- REDMINE_SLA TRACE: available_filters_with_sla_issue CALL ---"
 
-        is_filters_blank = @available_filters.blank?
-        is_module_enabled = project&.module_enabled?(:sla)
-        is_user_allowed = (
-          User.current.admin? ||
-          User.current.allowed_to?(:view_sla, project, global: true)
-        )
-
-        if is_filters_blank && is_module_enabled && is_user_allowed
-
-          #
-          # SLA LEVEL filter + column
-          #
-          values = SlaLevel
-                      .joins(:sla_project_trackers)
-                      .where("sla_project_trackers.project_id = ?", project.id)
-                      .select("sla_levels.id, sla_levels.name")
-                      .distinct
-                      .pluck(:name, :id)
-
-          add_available_filter(
-            'slas.sla_level_id',
-            name:   l("sla_label.sla_level.singular"),
-            type:   :list,
-            values: values
-          ) unless available_filters_without_sla_issue.key?('slas.sla_level_id')
-
-          # SLA Level column
-          issue_get_sla_level = QueryColumn.new(
-            :get_sla_level,
-            caption:     l("sla_label.sla_level.singular"),
-            groupable:   true,
-            value_object: true,
-            sortable: "sla_query_level.name"
+          is_filters_blank = @available_filters.blank?
+          is_module_enabled = project&.module_enabled?(:sla)
+          is_user_allowed = (
+            User.current.admin? ||
+            User.current.allowed_to?(:view_sla, project, global: true)
           )
 
-          def issue_get_sla_level.group_by_statement
-            self.sortable
-          end
+          if is_filters_blank && is_module_enabled && is_user_allowed
 
-          def issue_get_sla_level.group_value(record)
-            record.get_sla_level&.name
-          end
+            #
+            # SLA LEVEL filter + column
+            #
+            values = SlaLevel
+                        .joins(:sla_project_trackers)
+                        .where("sla_project_trackers.project_id = ?", project.id)
+                        .select("sla_levels.id, sla_levels.name")
+                        .distinct
+                        .pluck(:name, :id)
 
-          self.available_columns << issue_get_sla_level
+            add_available_filter(
+              'slas.sla_level_id',
+              name:   l("sla_label.sla_level.singular"),
+              type:   :list,
+              values: values
+            ) unless available_filters_without_sla_issue.key?('slas.sla_level_id')
 
-          #
-          # SLA RESPECT filters + dynamic columns (one per SLA type)
-          #
-          if ActiveRecord::Base.connection.table_exists?('sla_types')
+            # SLA Level column
+            issue_get_sla_level = QueryColumn.new(
+              :get_sla_level,
+              caption:     l("sla_label.sla_level.singular"),
+              groupable:   true,
+              value_object: true,
+              sortable: "sla_query_level.name"
+            )
 
-            sla_types_for_project =
-              SlaType
-                .joins(:sla_project_trackers)
-                .where("sla_project_trackers.project_id = ?", project.id)
-                .select("sla_types.id, sla_types.name, sla_types.position")
-                .distinct
-                .order(:position)
-                .to_a
+            def issue_get_sla_level.group_by_statement
+              self.sortable
+            end
 
-            sla_types_for_project.each do |sla_type|
+            def issue_get_sla_level.group_value(record)
+              record.get_sla_level&.name
+            end
 
-              add_available_filter(
-                "slas.sla_respect_#{sla_type.id}",
-                name: l(:label_sla_respect) + " " + sla_type.name,
-                type: :list,
-                values: [[l(:general_text_Yes), '1'], [l(:general_text_No), '0']]
-              ) unless available_filters_without_sla_issue.key?("slas.sla_respect_#{sla_type.id}")
+            self.available_columns << issue_get_sla_level
 
-              # Dynamic SQL handler for filtering
-              if !singleton_methods.include? "sql_for_slas_sla_respect_#{sla_type.id}_field".to_sym
-                define_singleton_method("sql_for_slas_sla_respect_#{sla_type.id}_field") do |field, operator, value|
-                  sql_for_slas_sla_respect_field(field, operator, value, sla_type.id)
+            #
+            # SLA RESPECT filters + dynamic columns (one per SLA type)
+            #
+            if ActiveRecord::Base.connection.table_exists?('sla_types')
+
+              sla_types_for_project =
+                SlaType
+                  .joins(:sla_project_trackers)
+                  .where("sla_project_trackers.project_id = ?", project.id)
+                  .select("sla_types.id, sla_types.name, sla_types.position")
+                  .distinct
+                  .order(:position)
+                  .to_a
+
+              sla_types_for_project.each do |sla_type|
+
+                add_available_filter(
+                  "slas.sla_respect_#{sla_type.id}",
+                  name: l(:label_sla_respect) + " " + sla_type.name,
+                  type: :list,
+                  values: [[l(:general_text_Yes), '1'], [l(:general_text_No), '0']]
+                ) unless available_filters_without_sla_issue.key?("slas.sla_respect_#{sla_type.id}")
+
+                # Dynamic SQL handler for filtering
+                if !singleton_methods.include? "sql_for_slas_sla_respect_#{sla_type.id}_field".to_sym
+                  define_singleton_method("sql_for_slas_sla_respect_#{sla_type.id}_field") do |field, operator, value|
+                    sql_for_slas_sla_respect_field(field, operator, value, sla_type.id)
+                  end
                 end
+
+                # SLA RESPECT column
+                name_to_sym = "get_sla_respect_#{sla_type.id}".to_sym
+
+                self.available_columns.delete_if { |c| c.name == name_to_sym }
+
+                issue_get_sla_respect = QueryColumn.new(
+                  name_to_sym,
+                  caption: l(:label_sla_respect) + " " + sla_type.name,
+                  groupable: true,
+                  value_object: true,
+                  sortable: RedmineSla::NativeQueryColumns.respect_expression(sla_type.id)
+                )
+
+                def issue_get_sla_respect.group_by_statement
+                  self.sortable
+                end
+
+                self.available_columns << issue_get_sla_respect
+
               end
 
-              # SLA RESPECT column
-              name_to_sym = "get_sla_respect_#{sla_type.id}".to_sym
-
-              self.available_columns.delete_if { |c| c.name == name_to_sym }
-
-              issue_get_sla_respect = QueryColumn.new(
-                name_to_sym,
-                caption: l(:label_sla_respect) + " " + sla_type.name,
-                groupable: true,
-                value_object: true,
-                sortable: RedmineSla::NativeQueryColumns.respect_expression(sla_type.id)
-              )
-
-              def issue_get_sla_respect.group_by_statement
-                self.sortable
-              end
-
-              self.available_columns << issue_get_sla_respect
-
+            else
+              Rails.logger.debug "--- REDMINE_SLA TRACE: 'sla_types' table missing, skipping SLA columns ---"
             end
 
           else
-            Rails.logger.debug "--- REDMINE_SLA TRACE: 'sla_types' table missing, skipping SLA columns ---"
+            Rails.logger.debug "--- REDMINE_SLA TRACE: EXIT: filters not initialized. ---"
+            return available_filters_without_sla_issue
           end
 
-        else
-          Rails.logger.debug "--- REDMINE_SLA TRACE: EXIT: filters not initialized. ---"
-          return available_filters_without_sla_issue
+          @available_filters
         end
 
-        @available_filters
       end
-
     end
 
   end

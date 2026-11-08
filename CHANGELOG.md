@@ -1,5 +1,42 @@
 # Changelog
 
+## 3.4.1 - 2026-11-08
+
+### Fixed
+
+- Show the SLA priority, term and respect of issues whose priority (or SLA
+  custom field value) was deactivated. The columns were empty while the
+  respect filter still counted these issues.
+- Keep the same SLA level on every refresh when two levels of one SLA use
+  calendars opening at the same minute: the level with the lowest id wins.
+  The database could previously return either level.
+
+### Changed
+
+- Request local holiday names from `nagerholidays.com`, the official
+  Nager.Date host, instead of `date.nager.at`, which already redirects its
+  home page there. Outbound HTTPS to `nagerholidays.com` alone is enough.
+- Stop listing cache refresh under the `view_sla` permission: refreshing
+  already required `manage_sla`. Access is unchanged.
+- Give each core patch its own `InstanceMethods` module, so patched classes
+  no longer receive the methods of the other patches. Remove dead patch and
+  controller code, including a duplicate `retrieve_default_query`.
+
+### Upgrade
+
+- Run the plugin migrations: migration 027 redeploys `sla_get_level`.
+  Existing caches are kept; refresh or purge them to apply the level rule to
+  issues already cached.
+- Allow outbound HTTPS to `nagerholidays.com`; `date.nager.at` is no longer
+  used.
+
+### Tests
+
+- Release matrix on Redmine 5.1.13/6.1.4/7.0.1 with PostgreSQL 17.7, MariaDB
+  10.11.19 and strict MySQL 8.0.46: 10,788 tests / 68,332 assertions, no
+  failures or errors, 12 expected skips. Upgrade from 3.4.0 checked on the
+  nine combinations. See [Testing](doc/TESTING.md).
+
 ## 3.4.0 - 2026-11-07
 
 ### Added

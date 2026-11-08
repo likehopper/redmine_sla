@@ -89,8 +89,8 @@ Redmine::Plugin.register :redmine_sla do
       slas:              [:index, :show],
       sla_levels:        [:index, :show],
       sla_calendars:     [:index, :show],
-      sla_caches:        [:index, :show, :refresh, :context_menu],
-      sla_cache_spents:  [:index, :show, :refresh, :context_menu]
+      sla_caches:        [:index, :show, :context_menu],
+      sla_cache_spents:  [:index, :show, :context_menu]
     }, require: :member
 
     # Full SLA management

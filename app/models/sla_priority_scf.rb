@@ -32,9 +32,10 @@ class SlaPriorityScf < SlaPriority
   end
 
   # For display one SlaPriorityScf by priority_id in IssueHelper
+  # Like SlaPriority, resolve inactive values still set on issues.
   def find_by_priority_id(priority_id)
     return nil if priority_id.nil?
-    priority = @scf.enumerations.active.find_by(id: priority_id)
+    priority = @scf.enumerations.find_by(id: priority_id)
     return nil if priority.nil?
     self.create_value(priority.id, priority.name)
   end

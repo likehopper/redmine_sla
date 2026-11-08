@@ -43,7 +43,6 @@ class SlaCachesController < ApplicationController
   before_action :find_sla_caches,       only: [ :refresh, :destroy, :context_menu ]
   before_action :find_issue_for_explain, only: [ :explain ]
   before_action :authorize_cache_management, only: [ :refresh, :destroy, :purge ]
-  # before_action :check_routing_users, :only => [ :index, :show, :refresh, :destroy, :purge ]
   
   rescue_from Query::StatementInvalid, :with => :query_statement_invalid
   rescue_from Query::QueryError,       :with => :query_error
@@ -115,7 +114,7 @@ class SlaCachesController < ApplicationController
       begin
         sla_cache.reload.refresh
       rescue ::ActiveRecord::RecordNotFound
-        error = l(:label_sla_msgerror)
+        # Swallow the error: the record has been removed meanwhile
       end
     end  
     respond_to do |format|
