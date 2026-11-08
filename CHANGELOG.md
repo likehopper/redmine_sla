@@ -1,15 +1,5 @@
 # Changelog
 
-## Unreleased
-
-### Changed
-
-- Give each core patch its own `InstanceMethods` module, so patched classes
-  no longer receive the methods of the other patches. Remove dead patch and
-  controller code.
-- Stop listing cache refresh under the `view_sla` permission: refreshing
-  already required `manage_sla`. Access is unchanged.
-
 ## 3.4.0 - 2026-11-07
 
 ### Added
