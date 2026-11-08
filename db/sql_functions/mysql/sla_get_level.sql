@@ -195,7 +195,9 @@ BEGIN
       -- calendar days above can otherwise pull in one day too many.
       AND GREATEST(v_issue_created_on, TIMESTAMP(calendar.day_date, sla_schedules.start_time)) <= DATE_ADD(v_issue_created_on, INTERVAL 7 DAY)
 
-    ORDER BY GREATEST(v_issue_created_on, TIMESTAMP(calendar.day_date, sla_schedules.start_time))
+    -- Levels of one SLA can use calendars opening at the same minute: break
+    -- the tie on the level id so a refresh never switches level by chance.
+    ORDER BY GREATEST(v_issue_created_on, TIMESTAMP(calendar.day_date, sla_schedules.start_time)), sla_levels.id
     LIMIT 1;
 
     -- No matching SLA level found within search window → clear cache + return NULL
