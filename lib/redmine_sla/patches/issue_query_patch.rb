@@ -9,10 +9,6 @@
 #     - sortable/queryable columns,
 #     - dynamic methods per SLA type.
 #
-#   This patch also removes legacy overrides that broke compatibility with
-#   modern Redmine versions (5/6) and Rails 6/7, particularly the
-#   `sql_for_field_with_sla` alias which previously caused SQL errors.
-#
 #   All SLA logic injected here affects the Redmine issue list (issues#index)
 #   including filtering, grouping, and sorting.
 
@@ -48,16 +44,6 @@ module RedmineSla
           
           alias_method :available_filters_without_sla_issue, :available_filters
           alias_method :available_filters, :available_filters_with_sla_issue
-
-          # --- CRITICAL: remove obsolete sql_for_field_with_sla override -----------
-          if self.method_defined?(:sql_for_field)
-            # Remove the old alias if it still exists
-            undef_method :sql_for_field_with_sla rescue nil
-
-            # Ensure we return to Redmine’s own implementation
-            alias_method :sql_for_field, :sql_for_field_without_sla rescue nil
-          end
-          # --------------------------------------------------------------------------
 
           # Build SQL condition for SLA “respect” filters
           def sql_for_slas_sla_respect_field(field, operator, value, sla_type_id)
