@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Remove a duplicate `retrieve_default_query` definition from the
+  tracker-to-SLA mapping controller. Behavior is unchanged.
+
 ## 3.4.0 - 2026-11-07
 
 ### Added

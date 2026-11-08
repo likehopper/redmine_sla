@@ -233,30 +233,7 @@ private
     if default_query = SlaProjectTrackerQuery.default(project: @project)
       params[:query_id] = default_query.id
     end
-  end    
-
-  # NOTE:
-  # The following method is a duplicate definition of retrieve_default_query
-  # kept as-is to avoid changing the original code behavior.
-  def retrieve_default_query(use_session)
-    return if params[:query_id].present?
-    return if api_request?
-    return if params[:set_filter]
-
-    if params[:without_default].present?
-      params[:set_filter] = 1
-      return
-    end
-
-    if !params[:set_filter] && use_session && session[:sla_project_tracker_query]
-      query_id, project_id = session[:sla_project_tracker_query].values_at(:id, :project_id)
-      return if SlaProjectTrackerQuery.where(id: query_id).exists? && project_id == @project&.id
-    end
-
-    if default_query = SlaProjectTrackerQuery.default(project: @project)
-      params[:query_id] = default_query.id
-    end
-  end  
+  end
 
   # Returns the SlaProjectTrackerQuery scope for index and report actions.
   def sla_project_tracker_scope(options = {})
