@@ -59,6 +59,8 @@ class SlaHolidayNagerDateTest < ApplicationSlaUnitsTestCase
   test 'local language uses the provider local name' do
     row = { 'date' => '2026-01-01', 'localName' => "Jour de l’an", 'name' => 'New Year',
             'countryCode' => 'FR', 'global' => true, 'counties' => nil, 'types' => ['Public'] }
+    # Same official host as the v4 API: one outbound HTTPS rule is enough.
+    Net::HTTP.expects(:new).with('nagerholidays.com', 443).returns(@http)
     @http.expects(:get).with('/api/v3/PublicHolidays/2026/FR', 'Accept' => 'application/json').returns(response([row]))
     result = @adapter.holidays(year: 2026, country: 'FR', language: 'local')
     assert_equal "Jour de l’an", result.first['name']

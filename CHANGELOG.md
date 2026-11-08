@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Request local holiday names from `nagerholidays.com`, the official
+  Nager.Date host, instead of `date.nager.at`, which already redirects its
+  home page there. Outbound HTTPS to `nagerholidays.com` alone is enough.
+
 ## 3.4.0 - 2026-11-07
 
 ### Added
