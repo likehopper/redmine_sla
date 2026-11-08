@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- Keep the same SLA level on every refresh when two levels of one SLA use
+  calendars opening at the same minute: the level with the lowest id wins.
+  The database could previously return either level.
+
+### Upgrade
+
+- Run the plugin migrations: migration 027 redeploys `sla_get_level`.
+  Existing caches are kept; refresh or purge them to apply the rule to
+  issues already cached.
+
 ## 3.4.0 - 2026-11-07
 
 ### Added
