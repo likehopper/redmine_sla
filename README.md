@@ -501,3 +501,16 @@ on [Flaticon](https://www.flaticon.com/). See [image credits](assets/images/icon
 
 SVG icons from [Tabler Icons](https://tabler.io/icons) (MIT, (c) 2020-2024 Pawel Kuna),
 the same set Redmine core uses. The plugin's own are in `assets/images/icon_sets/tabler/icons.svg`.
+
+### Contributors
+
+Thanks to everyone who contributed to the plugin:
+
+- [rammuralidhar](https://github.com/rammuralidhar): grouping by related issues
+  and SLA level display in time entries ([#10](https://github.com/likehopper/redmine_sla/pull/10)).
+- [tlaguz](https://github.com/tlaguz): Rails 7.1 and Zeitwerk compatibility
+  ([#22](https://github.com/likehopper/redmine_sla/pull/22)).
+- [sandrrero4](https://github.com/sandrrero4): namespacing fix
+  ([#29](https://github.com/likehopper/redmine_sla/pull/29)).
+- [joaoperfig](https://github.com/joaoperfig): Tabler icon set
+  ([#89](https://github.com/likehopper/redmine_sla/pull/89)).
