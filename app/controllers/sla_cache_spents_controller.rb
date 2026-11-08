@@ -20,6 +20,7 @@
 # ------------------------------------------------------------------------------
 
 class SlaCacheSpentsController < ApplicationController
+  include RedmineSla::DefaultQueryRetrieval
   default_search_scope :sla_cache_spents
 
   
@@ -50,7 +51,7 @@ class SlaCacheSpentsController < ApplicationController
   # List SLA cache spents with Redmine's generic query system
   def index
     use_session = !request.format.csv?
-    retrieve_default_query(use_session)
+    retrieve_default_query(SlaCacheSpentQuery, use_session)
     retrieve_query(SlaCacheSpentQuery, use_session)
 
     # Base scope used by all formats
@@ -227,27 +228,6 @@ class SlaCacheSpentsController < ApplicationController
     raise ActiveRecord::RecordNotFound if @sla_cache_spents.empty?
   rescue ActiveRecord::RecordNotFound
     render_404
-  end
-
-  # Initialize the default query for the current context (project / global)
-  def retrieve_default_query(use_session)
-    return if params[:query_id].present?
-    return if api_request?
-    return if params[:set_filter]
-
-    if params[:without_default].present?
-      params[:set_filter] = 1
-      return
-    end
-
-    if !params[:set_filter] && use_session && session[:sla_cache_spent_query]
-      query_id, project_id = session[:sla_cache_spent_query].values_at(:id, :project_id)
-      return if SlaCacheSpentQuery.where(id: query_id).exists? && project_id == @project&.id
-    end
-
-    if (default_query = SlaCacheSpentQuery.default(project: @project))
-      params[:query_id] = default_query.id
-    end
   end
 
   # Returns the SlaCacheSpentQuery scope for index and report actions

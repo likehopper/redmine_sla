@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Share the default query selection of the SLA list controllers in
+  `RedmineSla::DefaultQueryRetrieval`. Remove the eight unused copies.
+  Behavior is unchanged.
+
 ## 3.4.1 - 2026-11-08
 
 ### Fixed

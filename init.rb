@@ -33,6 +33,7 @@ require "chronic_duration"
 # Load database-specific SQL helpers before models and migrations reference them
 require_relative "lib/redmine_sla/db_dialect"
 require_relative "lib/redmine_sla/invalidates_sla_cache"
+require_relative "lib/redmine_sla/default_query_retrieval"
 
 # Load icon rendering helpers and native view patches before plugin registration
 require_relative "lib/redmine_sla/helpers/sla_icons_helper"

@@ -216,27 +216,6 @@ class SlaSchedulesController < ApplicationController
     render_404
   end
 
-  # Restore or load default query
-  def retrieve_default_query(use_session)
-    return if params[:query_id].present?
-    return if api_request?
-    return if params[:set_filter]
-
-    if params[:without_default].present?
-      params[:set_filter] = 1
-      return
-    end
-
-    if use_session && session[:sla_schedule_query]
-      query_id = session[:sla_schedule_query].values_at(:id)
-      return if SlaScheduleQuery.where(id: query_id).exists?
-    end
-
-    if default_query = SlaScheduleQuery.default()
-      params[:query_id] = default_query.id
-    end
-  end    
-
   # Apply SlaScheduleQuery results
   def sla_schedule_scope(options = {})
     @query.results_scope(options)
