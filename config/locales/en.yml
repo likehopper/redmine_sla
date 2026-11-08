@@ -16,6 +16,10 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 # File: redmine_sla/config/locales/en.yml
 en:
+  label_sla_locale_settings: Locale
+  label_sla_gauge_style: SLA gauge style
+  label_sla_icon_set: Icon set
+  label_sla_icons_credit: Icons created by
   permission_view_sla: View SLA
   permission_manage_sla: Manage SLA
 
@@ -366,7 +370,6 @@ en:
   label_sla_notice: SLA are all stored in a <a href="%{url}">cache</a>. SLA are generated when values ​​are displayed in issues.
   label_sla_warning: The changes (%{changes}) involved an update of the SLA!
   label_sla_term: Term
-  label_sla_icons_credit: Icons created by
 
   button_sla_explain: Explain
   label_sla_explain_title: SLA explanation
@@ -402,6 +405,8 @@ en:
   sla_holiday_import_country: "Country"
   sla_holiday_import_default_country: "Default holiday country"
   sla_holiday_import_country_hint: "ISO country code, e.g. FR. Leave blank to choose at import time."
+  sla_time_zone_change_note: "Changing the time zone applies to new calculations only: SLA times already calculated are not recalculated."
+  sla_time_zone_change_warning: "The time zone will change. SLA times already calculated keep the previous zone: inform the users concerned."
   sla_holiday_import_language_local: "Local language of the country"
   sla_holiday_import_description: "Retrieve public holidays from Nager.Date in English or the local language of the country, with the year appended to each name. Existing dates and calendar associations are preserved."
   sla_holiday_import_selection_hint: "National holidays are selected by default. Check regional holidays before selecting them. Entries on the same date are combined."

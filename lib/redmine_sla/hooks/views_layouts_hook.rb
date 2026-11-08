@@ -34,7 +34,7 @@ module RedmineSla
       #   An HTML <link> tag referencing the plugin stylesheet:
       #     public/plugin_assets/redmine_sla/stylesheets/redmine_sla.css
       def view_layouts_base_html_head(context = {})
-        return stylesheet_link_tag(:redmine_sla, plugin: 'redmine_sla')
+        stylesheet_link_tag(:redmine_sla, plugin: 'redmine_sla')
       end
     end
   end

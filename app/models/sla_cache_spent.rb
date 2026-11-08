@@ -76,6 +76,9 @@ class SlaCacheSpent < ActiveRecord::Base
   # Class method for refresh cache
   def refresh
     RedmineSla::DbDialect.ensure_recursion_depth!
+    # sla_get_spent only adds the minutes since the row's last update:
+    # delete the row so the total is recalculated from the SLA start.
+    self.class.where(id: self.id).delete_all
     ActiveRecord::Base.connection.execute(self.class.sanitize_sql(["SELECT sla_get_spent(?,?) ; ", self.sla_cache.issue_id, self.sla_type.id]))
   end
 

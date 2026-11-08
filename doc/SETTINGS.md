@@ -3,26 +3,26 @@
 The plugin settings are accessible on `http://[redmine-host]/settings/plugin/redmine_sla`.
 
 
-## Time zone
+## Locale
 
-Globally change the timezone used in the calculation of SLAs.
+The **Locale** tab contains the time zone used for SLA calculations (default:
+`Etc/UTC`) and the optional default holiday country. Use an ISO country code such
+as `FR`, or leave it blank to choose during [holiday import](HOLIDAY_IMPORT.md).
 
-Default: Etc/UTC
+A new time zone applies to new calculations only: SLA times already calculated
+keep the previous zone. The page shows a reminder to inform users when another
+zone is selected. Purge the SLA caches to recalculate existing times.
 
+![Locale settings](screenshots/icon-sets/flaticon-locale.png)
 
 ## Display
 
-Allows you to choose between displaying the SLA as a bar or as a pie chart.
+The **Display** tab selects the SLA gauge style (default: `bar - simple`) and
+[icon set](ICON_SETS.md): **Flaticon / Magnific** by default, or **Tabler Icons**.
+Flaticon credits appear at the bottom of the SLA sidebar; Tabler has no visible
+credit. Save the settings to apply the choice.
 
-Default: bar - simple
-
-## Default holiday country
-
-Optional ISO country code (for example `FR`) preselected by the
-[public holiday import](HOLIDAY_IMPORT.md). Leave blank to choose the
-country at import time.
-
-Default: blank
+![Display settings](screenshots/icon-sets/tabler-display.png)
 
 ## Roles and permissions
 

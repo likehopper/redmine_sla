@@ -19,7 +19,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 -%>
 <% @sla_project_trackers = SlaProjectTracker.visible.in_project(@project) %>
 <div class="contextual">
-  <%= link_to l('sla_label.sla_project_tracker.new'), new_project_sla_project_tracker_path(@project), class: 'icon icon-add' %>
+  <%= link_to sla_icon('add', l('sla_label.sla_project_tracker.new')), new_project_sla_project_tracker_path(@project), class: 'icon icon-add' %>
 </div>
 <h3><%= l('sla_label.sla_project_tracker.plural') %></h3>
 <% if @sla_project_trackers.count > 0 %>
@@ -46,11 +46,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
           <td class="sla"><%= sla_project_tracker.sla.name  %></td>
           <td class="buttons">
             <% if User.current.admin? || User.current.allowed_to?(:manage_sla, @project) %>
-              <%= link_to l(:button_edit),
+              <%= link_to sla_icon('edit', l(:button_edit), icon_only: true),
                           edit_project_sla_project_tracker_path(@project, sla_project_tracker),
                           title: l(:button_edit),
                           class: 'icon-only icon-edit' %>
-              <%= link_to l(:button_delete),
+              <%= link_to sla_icon('del', l(:button_delete), icon_only: true),
                           project_sla_project_tracker_path(@project, sla_project_tracker, tab: :sla),
                           data: {confirm: l(:text_are_you_sure)},
                           method: :delete,

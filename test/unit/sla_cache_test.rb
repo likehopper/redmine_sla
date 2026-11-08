@@ -77,6 +77,19 @@ class SlaCacheTest < ApplicationSlaUnitsTestCase
     assert_not SlaCacheSpent.unscoped.exists?
   end
 
+  test "refresh recalculates spent time instead of keeping a wrong total" do
+    project = Project.find_by!(identifier: 'project-sla-tests-tma')
+    issue = Issue.find_by!(project: project, subject: 'Bug with simple SLA')
+    gtr = 2 # counts New and Assigned; 90 minutes for this closed issue
+    spent = SlaCacheSpent.find_by_issue_and_type_id(issue, gtr)
+    assert_equal 90, spent.spent
+    spent.update_column(:spent, 999)
+
+    SlaCache.find_by!(issue_id: issue.id).refresh
+
+    assert_equal 90, SlaCacheSpent.find_by!(issue_id: issue.id, sla_type_id: gtr).spent
+  end
+
   # --- Visibility ---
   # visible? calls issue.visible? without a user argument, so it falls back to
   # User.current. We must set User.current to a user that has :view_issues on

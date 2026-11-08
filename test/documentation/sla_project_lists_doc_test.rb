@@ -61,13 +61,14 @@ class SlaProjectListsDocTest < ApplicationSlaSystemTestCase
     "/projects?#{URI.encode_www_form([['set_filter', '1'], ['display_type', 'board'], ['f[]', '']])}"
   end
 
-  # Board links carrying the SLA icon, checked through the rendered
-  # ::after background so that a missing stylesheet would be detected.
+  # Check the inline marker produced by the selected icon set.
   def board_identifiers_with_icon
     page.evaluate_script(<<~JS)
       Array.from(document.querySelectorAll('#projects-index a.project'))
         .filter(function(a) {
-          return window.getComputedStyle(a, '::after').backgroundImage.indexOf('sla_16') !== -1;
+          var icon = a.querySelector('.sla-project-marker img, .sla-project-marker svg');
+          if (!icon || icon.getBoundingClientRect().width === 0) return false;
+          return icon.tagName.toLowerCase() === 'img' ? icon.complete && icon.naturalWidth > 0 : !!icon.querySelector('use[href]');
         })
         .map(function(a) { return a.getAttribute('href').split('/').pop(); })
         .sort()

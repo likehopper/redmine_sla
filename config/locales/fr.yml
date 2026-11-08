@@ -16,6 +16,10 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 # File: redmine_sla/config/locales/fr.yml
 fr:
+  label_sla_locale_settings: Paramètres régionaux
+  label_sla_gauge_style: Style des jauges SLA
+  label_sla_icon_set: Jeu d’icônes
+  label_sla_icons_credit: Icônes réalisées par
   permission_view_sla: Voir les SLA
   permission_manage_sla: Configurer les SLA
 
@@ -366,7 +370,6 @@ fr:
   label_sla_notice: Les SLA sont tous stockés dans un <a href="%{url}">cache</a>. Les SLA sont générés à l'affichage des valeurs dans les demandes.
   label_sla_warning: Les changements (%{changes}) ont impliqués une mise à jour des SLA !
   label_sla_term: Délais
-  label_sla_icons_credit: Icônes réalisées par
 
   button_sla_explain: Expliquer
   label_sla_explain_title: Explication du SLA
@@ -403,6 +406,8 @@ fr:
   sla_holiday_import_country: "Pays"
   sla_holiday_import_default_country: "Pays par défaut des jours fériés"
   sla_holiday_import_country_hint: "Code ISO du pays, par exemple FR. Laisser vide pour choisir lors de l'import."
+  sla_time_zone_change_note: "Le changement de fuseau horaire ne s'applique qu'aux nouveaux calculs : les délais SLA déjà calculés ne sont pas recalculés."
+  sla_time_zone_change_warning: "Le fuseau horaire va changer. Les délais SLA déjà calculés gardent l'ancien fuseau : prévenez les utilisateurs concernés."
   sla_holiday_import_language_local: "Langue locale du pays"
   sla_holiday_import_description: "Récupérer les jours fériés depuis Nager.Date en anglais ou dans la langue locale du pays, avec l’année ajoutée au nom. Les dates existantes et les associations aux calendriers sont conservées."
   sla_holiday_import_selection_hint: "Les jours nationaux sont présélectionnés. Vérifiez les jours régionaux avant de les sélectionner. Les entrées d'une même date sont réunies."

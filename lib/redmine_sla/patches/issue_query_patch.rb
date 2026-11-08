@@ -160,7 +160,7 @@ module RedmineSla
           # SLA Level column
           issue_get_sla_level = QueryColumn.new(
             :get_sla_level,
-            caption:     "📢 " + l("sla_label.sla_level.singular"),
+            caption:     l("sla_label.sla_level.singular"),
             groupable:   true,
             value_object: true,
             sortable: "sla_query_level.name"
@@ -213,7 +213,7 @@ module RedmineSla
 
               issue_get_sla_respect = QueryColumn.new(
                 name_to_sym,
-                caption: "⏰ " + l(:label_sla_respect) + " " + sla_type.name,
+                caption: l(:label_sla_respect) + " " + sla_type.name,
                 groupable: true,
                 value_object: true,
                 sortable: RedmineSla::NativeQueryColumns.respect_expression(sla_type.id)

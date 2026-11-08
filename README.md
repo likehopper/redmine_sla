@@ -1,7 +1,7 @@
-# <img src="assets/images/sla_64.png" width="64" height="64" alt=""> Redmine SLA
+# Redmine SLA
 
 ![Redmine Version](https://img.shields.io/badge/Redmine-5.x+-blue)
-![Ruby](https://img.shields.io/badge/Ruby-2.7+-red)
+![Ruby](https://img.shields.io/badge/Ruby-3.0+-red)
 ![Rails](https://img.shields.io/badge/Rails-6.1+-brightgreen)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-11+-blue)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0+-blue)
@@ -14,7 +14,7 @@
 
 ## Overview
 
-Current version: **3.3.4**. See the [changelog](CHANGELOG.md) for release details.
+Current version: **3.4.0**. See the [changelog](CHANGELOG.md) for release details.
 
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
@@ -192,7 +192,7 @@ Fully manageable through UI and REST API:
 | Name               | requirement                                       |
 |--------------------|---------------------------------------------------|
 | `Redmine`          | >= 5.0                                            |
-| `Ruby`             | >= 2.7                                            |
+| `Ruby`             | >= 3.0                                            |
 | `Rails`            | >= 6.1                                            |
 | `Database`         | PostgreSQL >= 11, MySQL >= 8.0 or MariaDB >= 10.2 |
 
@@ -283,6 +283,17 @@ rake redmine:plugins:migrate NAME=redmine_sla
 Plugin is ready to use.
 
 ------------------------------------------------------------------------
+
+## Upgrade to 3.4.0
+
+Version **3.4.0** requires Ruby 3.0 or later. It adds configurable icon sets
+(see [Icon sets](doc/ICON_SETS.md)) and fixes SLA calculations: time zones
+with `_`, digits, `+` or `-`, spent time counted twice by concurrent requests,
+refresh keeping wrong totals, counted status changes and tracker mapping saves.
+Update the plugin files, run `bundle exec rake redmine:plugins:migrate
+RAILS_ENV=production` (migrations 025 and 026 redeploy SQL functions), then
+restart Redmine. Existing SLA caches are kept: purge them to recalculate
+values computed before the upgrade. See the [changelog](CHANGELOG.md).
 
 ## Upgrade to 3.3.4
 
@@ -473,5 +484,10 @@ Restart application server.
 
 ## Credits
 
-Icons created by [Magnific](https://www.flaticon.com/fr/auteurs/magnific)
-on [Flaticon](https://www.flaticon.com/). See the [image credits](assets/images/CREDITS.md).
+The icon set can be selected in the plugin settings. See [Icon sets](doc/ICON_SETS.md).
+
+Flaticon icons were created by [Magnific](https://www.flaticon.com/fr/auteurs/magnific)
+on [Flaticon](https://www.flaticon.com/). See [image credits](assets/images/icon_sets/flaticon/CREDITS.md).
+
+SVG icons from [Tabler Icons](https://tabler.io/icons) (MIT, (c) 2020-2024 Pawel Kuna),
+the same set Redmine core uses. The plugin's own are in `assets/images/icon_sets/tabler/icons.svg`.

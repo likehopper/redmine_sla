@@ -54,6 +54,12 @@ BEGIN
     RETURN NULL ;
   END IF ;
 
+  -- The spent total is incremental: serialize concurrent calls for this issue
+  -- so that the second one waits for the first to commit, then reads its
+  -- total (READ COMMITTED gives each following statement a fresh snapshot)
+  -- instead of adding the same minutes again.
+  PERFORM 1 FROM "sla_caches" WHERE "sla_caches"."id" = v_sla_cache.id FOR UPDATE ;
+
   -- Retrieve the specific terms (thresholds/rules) for this SLA type and level
   SELECT
     *

@@ -1,0 +1,23 @@
+name: Tabler Icons
+format: svg_sprite
+icons:
+  sla: clock-record
+  sla_level: heart-handshake
+  sla_status: clipboard-check
+  sla_holiday: beach
+  sla_calendar: calendar-code
+  sla_calendar_holiday: calendar-heart
+  sla_schedule: calendar-week
+  sla_level_term: alarm-minus
+  sla_cache_spent: alarm
+  sla_project_tracker: building-cog
+  sla_cache: database-search
+  sla_type: list
+  refresh: refresh
+  sla_respect: clipboard-check
+  sla_spent: time
+  sla_term: alarm-minus
+  sla_remain: hourglass
+credit:
+  display: false
+file: icons.svg

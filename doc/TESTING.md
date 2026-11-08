@@ -1,5 +1,159 @@
 # Testing
 
+## Version 3.4.0 release matrix
+
+Validated on **2026-11-07 and 2026-11-08** in isolated local containers, one
+fresh database per suite, with no shared instance or production deployment.
+Source snapshot: `release/3.4.0` at `4482c94` (icon sets, time zone parsing and
+spent-time fixes). The system suites of Redmine 6 and 7 were rerun on `0453e41`,
+which only changes `test/system/sla_icon_url_prefix_test.rb` (see below).
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1189 / 7409 | 1189 / 7406 | 1189 / 7406 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1249 / 7846 | 1189 / 7302 | 1189 / 7302 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1189 / 7859 | 1189 / 7856 | 1189 / 7856 |
+
+Cells record **tests / assertions**. Total: **10,761 tests / 68,242 assertions**,
+zero failures or errors, 12 expected skips (the two PostgreSQL-specific tests on
+each MariaDB/MySQL combination). Each combination ran 286 unit, 470 functional,
+358 integration/API, 39 Chromium system and 30 standalone icon/HTML tests, plus
+6 role/project documentation tests; Redmine 6/PostgreSQL ran all 66
+documentation tests instead.
+
+Rails session SQL modes, as measured: MySQL `ONLY_FULL_GROUP_BY,
+NO_AUTO_VALUE_ON_ZERO, STRICT_TRANS_TABLES, STRICT_ALL_TABLES, NO_ZERO_IN_DATE,
+NO_ZERO_DATE, ERROR_FOR_DIVISION_BY_ZERO, NO_ENGINE_SUBSTITUTION`; MariaDB
+`NO_AUTO_VALUE_ON_ZERO, STRICT_TRANS_TABLES, STRICT_ALL_TABLES,
+ERROR_FOR_DIVISION_BY_ZERO, NO_AUTO_CREATE_USER, NO_ENGINE_SUBSTITUTION`.
+
+**Upgrade from 3.3.4**, on each of the nine combinations: migrate a database with
+3.3.4 (migration 024), load the fixtures and run `update_sla scope=all`, replace
+the plugin with 3.4.0 and run `redmine:plugins:migrate`. Migrations 025 and 026
+applied; the 72 SLA caches, 138 spent rows (18,455 minutes) and the
+`sla_view_roll_statuses` view (397 rows) were unchanged after migration and after
+a new `update_sla scope=all`.
+
+New regression tests reproduce each fix before it: concurrent spent time
+(180 instead of 90), refresh (999 kept instead of 90), counted statuses and
+tracker mappings (caches left or recalculated in the request) and time zones
+(`America/New_York` failing on PostgreSQL and NULL on MariaDB/MySQL,
+`Etc/GMT+12` read as `Etc/GMT`). They failed on the previous code on the three
+databases and pass with the fixes.
+
+Notes on the runs:
+
+- The first Redmine 7/PostgreSQL system run had intermittent context-menu
+  failures. They came from `sla_icon_url_prefix_test.rb`, which left importmap
+  module URLs cached with its `/redmine` prefix: the importmap cache sweeper only
+  exists when classes reload. With seed 30488 the suite failed 7 tests with that
+  file and none without it. `0453e41` clears the map directly; seeds 30488 and
+  14243 then pass, and the six Redmine 6/7 system suites were rerun green.
+- One Redmine 6/MySQL system run failed the URL-prefix test once while two
+  browsers ran in parallel. Its seed (26232) passed three times on replay, with
+  the old and new test file: a timing failure under load, not an order
+  dependency.
+- Rails 8.1 loads `db/schema.rb` when `db:migrate` creates a database. The
+  isolated runner deletes that file before each fresh database so a schema dumped
+  by a previous run does not hide the plugin migrations. Redmine upgrades migrate
+  an existing database and are not affected.
+
+Commands, from the Redmine root with `RAILS_ENV=test`, automatic test schema
+loading disabled (`config.active_record.maintain_test_schema = false`) and
+`GOOGLE_CHROME_OPTS_ARGS=headless,disable-gpu,no-sandbox,disable-dev-shm-usage`:
+
+```sh
+bundle exec rake db:drop db:create db:migrate redmine:plugins:migrate
+bundle exec rake redmine:plugins:redmine_sla:build_fixture
+bundle exec rails test plugins/redmine_sla/test/unit   # also functional, integration
+bundle exec ruby -Itest -e 'files, options = ARGV.partition { |a| a.end_with?(".rb") }; ARGV.replace(options); files.each { |path| require File.expand_path(path) }' plugins/redmine_sla/test/system/*_test.rb
+```
+
+The Rake test tasks (`redmine:plugins:test:*`) reload `db/schema.rb` and drop the
+plugin's SQL functions and views; use the commands above. Regenerated the two
+locale screenshots, which now show the time zone note.
+
+## Icon manifest review follow-up (2026-11-06)
+
+After the full matrix below, manifest loading was hardened and size keys were
+normalized. Targeted checks on the updated files passed in the existing isolated
+PostgreSQL 17.7 installations:
+
+| Redmine | Catalogue | HTML rendering | Chromium workflows and URL mount |
+| --- | --- | --- | --- |
+| 5.1.13 | 12 / 179 | 14 / 87 | 3 / 402 |
+| 6.1.4 | 12 / 179 | 14 / 87 | 3 / 202 |
+| 7.0.1 | 12 / 179 | 14 / 87 | 3 / 204 |
+
+Cells record tests / assertions: **87 tests / 1,606 assertions**, zero failures,
+errors or skips. The catalogue tests reject invalid YAML, empty manifests,
+unsupported formats, malformed credits and invalid/duplicate sizes, while quoted
+integer sizes resolve correctly and valid sets remain available.
+
+The browser tests exercise both sets through settings and native views, plus a
+real Rack mount under `/redmine`: login, settings submission, SLA views, asset URL
+prefixes, HTTP responses, sprite symbols and loaded raster images. Importmap's
+URL cache is cleared when changing mounts to isolate the test from other cases.
+The standalone HTML tests now use Rails' actual `relative_url_root` configuration
+instead of overriding `image_path`.
+
+Run from the Redmine root with `RAILS_ENV=test` in the prepared test installation:
+
+```sh
+bundle exec ruby plugins/redmine_sla/test/standalone/icon_set_test.rb
+bundle exec ruby plugins/redmine_sla/test/standalone/sla_icons_helper_test.rb
+bundle exec ruby -Itest -e 'ARGV.each { |path| require File.expand_path(path) }' plugins/redmine_sla/test/system/sla_icon_sets_test.rb plugins/redmine_sla/test/system/sla_icon_url_prefix_test.rb
+```
+
+SHA-256 over the four changed Ruby files (path, NUL, contents, NUL, in the order
+`icon_set.rb`, `icon_set_test.rb`, `sla_icons_helper_test.rb`,
+`sla_icon_url_prefix_test.rb`): `e7a3450e5be002a7799a194e12a697aa589cdc00d00646635ca8e385a1589815`.
+The full nine-cell matrix below predates this follow-up and was not rerun for
+these corrections. No production deployment or publication occurred.
+
+## Unreleased: configurable icon sets (initial matrix)
+
+Validated on **2026-11-06** on the integration snapshot identified below, in isolated
+containers and freshly migrated databases. Cells record **tests / assertions**.
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 strict | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1165 / 7012 | 1165 / 7009 | 1165 / 7009 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1225 / 7649 | 1165 / 7105 | 1165 / 7105 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1165 / 7660 | 1165 / 7657 | 1165 / 7657 |
+
+Total: **10,545 tests / 65,863 assertions / 0 failures / 0 errors**. The 12 expected
+migration skips are the two PostgreSQL-specific migration tests on each
+MariaDB/MySQL combination. MySQL sessions retain `ONLY_FULL_GROUP_BY`,
+`STRICT_TRANS_TABLES` and `STRICT_ALL_TABLES`. MariaDB uses strict mode without
+`ONLY_FULL_GROUP_BY`.
+
+Each combination ran 1,097 unit/functional/integration/API tests, 37 Chromium
+system tests, 25 standalone icon/HTML tests and 6 role/project documentation
+tests. Redmine 6/PostgreSQL ran all 66 documentation tests instead.
+
+Image regression coverage includes asset selection and immutable resolved assets,
+size variants, missing-role fallbacks, custom file/sprite sets, HTML escaping,
+credits, native menu/project markers, distinct header icons and selector-only
+symbols. Browser tests fetch the actual image/SVG assets. Native sorting, exports
+and permission-aware project markers are covered as well.
+
+The validation databases were migrated explicitly with SQL routines/views intact;
+automatic test-schema loading was disabled after Rails initialization. The isolated
+MySQL server allowed stored-function creation (`log_bin_trust_function_creators=1`).
+These environment settings are not plugin configuration changes.
+
+All **251 existing documentation screenshots** were regenerated on Redmine 6.1.4,
+with **14 new icon-set illustrations**. The README issue image was refreshed.
+The reference capture environment includes DejaVu Sans and FreeSerif fallback fonts.
+The 151 local Markdown image references were checked; none are missing.
+
+Implementation, asset and test-input snapshot SHA-256:
+`e75fb3e6ad24c21a0b35b59e976138aa6718f757fecda3914cbfecaa682e121b`.
+
+No merge, tag, release or production deployment. Historical results below describe
+their own snapshots.
+
 ## Version 3.3.3 issue SLA block for configured trackers
 
 Validated on **2026-10-25** in isolated local test containers, after integrating

@@ -24,7 +24,7 @@ class SlaProjectTrackerTest < ApplicationSlaUnitsTestCase
 
   # Fixture: (project_id: 1, tracker_id: 1, sla_id: 1) already exists.
   # Validation tests use .valid? only — no save — to avoid the after_save
-  # callback that triggers SlaCache refresh on the full data set.
+  # callback that deletes SlaCache rows (see sla_cache_invalidation_test.rb).
 
   # --- Passing cases ---
 

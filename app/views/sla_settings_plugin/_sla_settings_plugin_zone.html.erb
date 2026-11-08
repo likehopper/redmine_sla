@@ -23,5 +23,22 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     # select_tag 'settings[sla_time_zone]', options_for_select(ActiveSupport::TimeZone::MAPPING.map {|k,v| [k,v]},
   %>
   <%= select_tag 'settings[sla_time_zone]', options_for_select(ActiveSupport::TimeZone::MAPPING.map {|k,v| [v,v]},
-    @settings["sla_time_zone"]) %>
+    @settings["sla_time_zone"]), data: { saved_value: @settings["sla_time_zone"] } %>
+  <em class="info"><%= l(:sla_time_zone_change_note) %></em>
+  <span id="sla_time_zone_change_warning" class="warning" style="display: none;"><%= l(:sla_time_zone_change_warning) %></span>
+</p>
+<%= javascript_tag do %>
+  // Warn as soon as the selection differs from the saved zone, without blocking the save.
+  $(function() {
+    var select = $('#settings_sla_time_zone');
+    select.on('change', function() {
+      $('#sla_time_zone_change_warning').toggle(select.val() !== String(select.data('saved-value') || ''));
+    });
+  });
+<% end %>
+
+<p>
+  <%= label_tag 'settings_sla_holiday_country', l(:sla_holiday_import_default_country) %>
+  <%= text_field_tag 'settings[sla_holiday_country]', @settings['sla_holiday_country'], id: 'settings_sla_holiday_country', size: 2, maxlength: 2, pattern: '[A-Za-z]{2}' %>
+  <em class="info"><%= l(:sla_holiday_import_country_hint) %></em>
 </p>

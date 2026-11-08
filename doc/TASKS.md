@@ -9,6 +9,17 @@ Generate screenshots for the different examples
 Usage: `rake redmine:plugins:test:documentation NAME=redmine_sla RAILS_ENV=test TESTOPTS="-v -w -b" SUITE=example-05`
 Also runs `test/documentation/sla_project_lists_doc_test.rb`, which writes the [project lists](PROJECT_LISTS.md) screenshots to `tmp/redmine_sla/screenshots/project-lists/`.
 
+To regenerate the icon-set illustrations on the reference Redmine 6 environment:
+
+```sh
+RAILS_ENV=test SLA_ICON_SCREENSHOTS=1 GOOGLE_CHROME_OPTS_ARGS="--headless,--no-sandbox,--disable-dev-shm-usage" bundle exec ruby -Itest plugins/redmine_sla/test/system/sla_icon_sets_test.rb
+```
+
+The tests check both sets and write their captures to
+`tmp/redmine_sla/screenshots/icon-sets/`. Copy the generated screenshot directories
+to `plugins/redmine_sla/doc/screenshots/` after reviewing them. The reference captures use DejaVu Sans and FreeSerif as Unicode fallback fonts.
+Use an isolated, explicitly migrated test database with its SQL functions preserved.
+
 ## update_sla.rake
 Update SLA manualy or by crontab
 Usage: `rake redmine:plugins:redmine_sla:update_sla RAILS_ENV=development --trace`

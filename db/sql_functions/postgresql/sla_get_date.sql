@@ -15,12 +15,12 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program. If not, see <https://www.gnu.org/licenses/>.
 -- File: redmine_sla/db/sql_functions/postgresql/sla_get_date.sql
--- Remove the existing function to ensure a clean redeployment
-DROP FUNCTION IF EXISTS sla_get_date CASCADE ;
+-- CREATE OR REPLACE keeps the views and functions that depend on this one:
+-- a DROP ... CASCADE would remove them on redeployment.
 
 -- Normalize a timestamp to the SLA timezone and truncate to the minute.
 -- This function is used everywhere a consistent datetime reference is required.
-CREATE FUNCTION sla_get_date(p_date TIMESTAMP WITHOUT TIME ZONE)
+CREATE OR REPLACE FUNCTION sla_get_date(p_date TIMESTAMP WITHOUT TIME ZONE)
   RETURNS TIMESTAMP WITHOUT TIME ZONE
   LANGUAGE sql
 AS $BODY$
@@ -43,8 +43,9 @@ SELECT DATE_TRUNC(
     (
       SELECT COALESCE(
         (
-          -- Extract SLA timezone from Redmine plugin settings (YAML-like blob)
-          SELECT SUBSTRING(value FROM 'sla_time_zone: ([a-z,A-Z,/]*)')
+          -- Extract SLA timezone from Redmine plugin settings (YAML-like blob).
+          -- IANA names also use digits, "_", "+" and "-" (America/New_York, Etc/GMT+12).
+          SELECT SUBSTRING(value FROM 'sla_time_zone: ([A-Za-z0-9_+/-]+)')
           FROM settings
           WHERE name LIKE 'plugin_redmine_sla'
         ),

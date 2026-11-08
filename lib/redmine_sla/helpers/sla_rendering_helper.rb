@@ -41,24 +41,25 @@ module RedmineSla
       #   HTML-safe <span> tag containing a contextual icon.
       #
       # Notes:
-      #   - Uses Redmine's built-in "icon" CSS classes.
-      #   - `raw('&nbsp;')` ensures icon alignment on certain Redmine themes.
+      #   - Uses Redmine's sprite icons ("checked" / "close") and the core
+      #     "icon-ok" / "icon-error" classes, which colour them green / red.
       #   - The icon includes a tooltip (title) for accessibility.
       def sla_respect_icon_tag(respect_status)
         return if respect_status.nil?
 
-        icon_class = respect_status ? 'icon-ok' : 'icon-not-ok'
+        icon_name  = respect_status ? 'checked' : 'close'
+        icon_class = respect_status ? 'icon-ok' : 'icon-error'
         text       = respect_status ? l(:general_text_Yes) : l(:general_text_No)
 
         # The content_tag creates a <span> element with:
-        #   - a forced non-breaking space for visual rendering,
+        #   - the sprite icon, its label hidden,
         #   - a CSS icon class,
         #   - a tooltip containing localized text.
         content_tag(
           'span',
-          raw('&nbsp;'),
+          sla_icon(icon_name, text, icon_only: true),
           title: text,
-          class: "icon #{icon_class}"
+          class: "icon-only #{icon_class}"
         )
       end
 

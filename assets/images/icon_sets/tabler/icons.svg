@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+<!--
+  Icons from Tabler Icons (https://tabler.io/icons), MIT licence,
+  Copyright (c) 2020-2024 Pawel Kuna. Same source and release (v3.43.0) Redmine
+  core uses for its own sprite, so these match visually. Structure mirrors
+  Redmine's app/assets/images/icons.svg: stroke, fill and stroke-width come from
+  the svg.icon-svg rule in core's stylesheet, so they are deliberately not set here.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" class="icon--sprite">
+  <defs>
+    <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--alarm">
+      <path d="M5 13a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"/>
+      <path d="M12 10l0 3l2 0"/>
+      <path d="M7 4l-2.75 2"/>
+      <path d="M17 4l2.75 2"/>
+    </symbol>
+    <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--alarm-minus">
+      <path d="M5 13a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"/>
+      <path d="M7 4l-2.75 2"/>
+      <path d="M17 4l2.75 2"/>
+      <path d="M10 13h4"/>
+    </symbol>
+    <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--arrow-down">
+      <path d="M12 5l0 14"/>
+      <path d="M18 13l-6 6"/>
+      <path d="M6 13l6 6"/>
+    </symbol>
+    <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--arrow-right">
+      <path d="M5 12l14 0"/>
+      <path d="M13 18l6 -6"/>
+      <path d="M13 6l6 6"/>
+    </symbol>
+    <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--beach">
+      <path d="M17.553 16.75a7.5 7.5 0 0 0 -10.606 0"/>
+      <path d="M18 3.804a6 6 0 0 0 -8.196 2.196l10.392 6a6 6 0 0 0 -2.196 -8.196"/>
+      <path d="M16.732 10c1.658 -2.87 2.225 -5.644 1.268 -6.196c-.957 -.552 -3.075 1.326 -4.732 4.196"/>
+      <path d="M15 9l-3 5.196"/>
+      <path d="M3 19.25a2.4 2.4 0 0 1 1 -.25a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 1 .25"/>
+    </symbol>
+    <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--building-cog">
+      <path d="M3 21h9"/>
+      <path d="M9 8h1"/>
+      <path d="M9 12h1"/>
+      <path d="M9 16h1"/>
+      <path d="M14 8h1"/>
+      <path d="M14 12h1"/>
+      <path d="M5 21v-16c0 -.53 .211 -1.039 .586 -1.414c.375 -.375 .884 -.586 1.414 -.586h10c.53 0 1.039 .211 1.414 .586c.375 .375 .586 .884 .586 1.414v7"/>
+      <path d="M16 18c0 .53 .211 1.039 .586 1.414c.375 .375 .884 .586 1.414 .586c.53 0 1.039 -.211 1.414 -.586c.375 -.375 .586 -.884 .586 -1.414c0 -.53 -.211 -1.039 -.586 -1.414c-.375 -.375 -.884 -.586 -1.414 -.586c-.53 0 -1.039 .211 -1.414 .586c-.375 .375 -.586 .884 -.586 1.414"/>
+      <path d="M18 14.5v1.5"/>
+      <path d="M18 20v1.5"/>
+      <path d="M21.032 16.25l-1.299 .75"/>
+      <path d="M16.27 19l-1.3 .75"/>
+      <path d="M14.97 16.25l1.3 .75"/>
+      <path d="M19.733 19l1.3 .75"/>
+    </symbol>
+    <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--calendar-code">
+      <path d="M11.5 21h-5.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v6"/>
+      <path d="M16 3v4"/>
+      <path d="M8 3v4"/>
+      <path d="M4 11h16"/>
+      <path d="M20 21l2 -2l-2 -2"/>
+      <path d="M17 17l-2 2l2 2"/>
+    </symbol>
+    <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--calendar-heart">
+      <path d="M11.5 21h-5.5a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4"/>
+      <path d="M16 3v4"/>
+      <path d="M8 3v4"/>
+      <path d="M4 11h16"/>
+      <path d="M18 22l3.35 -3.284a2.143 2.143 0 0 0 .005 -3.071a2.242 2.242 0 0 0 -3.129 -.006l-.224 .22l-.223 -.22a2.242 2.242 0 0 0 -3.128 -.006a2.143 2.143 0 0 0 -.006 3.071l3.355 3.296"/>
+    </symbol>
+    <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--calendar-week">
+      <path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12"/>
+      <path d="M16 3v4"/>
+      <path d="M8 3v4"/>
+      <path d="M4 11h16"/>
+      <path d="M7 14h.013"/>
+      <path d="M10.01 14h.005"/>
+      <path d="M13.01 14h.005"/>
+      <path d="M16.015 14h.005"/>
+      <path d="M13.015 17h.005"/>
+      <path d="M7.01 17h.005"/>
+      <path d="M10.01 17h.005"/>
+    </symbol>
+    <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--clipboard-check">
+      <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2"/>
+      <path d="M9 5a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2"/>
+      <path d="M9 14l2 2l4 -4"/>
+    </symbol>
+    <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--clock-record">
+      <path d="M21 12.3a9 9 0 1 0 -8.683 8.694"/>
+      <path d="M12 7v5l2 2"/>
+      <path d="M16 19a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+    </symbol>
+    <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--database-search">
+      <path d="M4 6c0 1.657 3.582 3 8 3s8 -1.343 8 -3s-3.582 -3 -8 -3s-8 1.343 -8 3"/>
+      <path d="M4 6v6c0 1.657 3.582 3 8 3m8 -3.5v-5.5"/>
+      <path d="M4 12v6c0 1.657 3.582 3 8 3"/>
+      <path d="M15 18a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/>
+      <path d="M20.2 20.2l1.8 1.8"/>
+    </symbol>
+    <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--heart-handshake">
+      <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"/>
+      <path d="M12 6l-3.293 3.293a1 1 0 0 0 0 1.414l.543 .543c.69 .69 1.81 .69 2.5 0l1 -1a3.182 3.182 0 0 1 4.5 0l2.25 2.25"/>
+      <path d="M12.5 15.5l2 2"/>
+      <path d="M15 13l2 2"/>
+    </symbol>
+    <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--list">
+      <path d="M9 6l11 0"/>
+      <path d="M9 12l11 0"/>
+      <path d="M9 18l11 0"/>
+      <path d="M5 6l0 .01"/>
+      <path d="M5 12l0 .01"/>
+      <path d="M5 18l0 .01"/>
+    </symbol>
+    <symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--refresh">
+      <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/>
+      <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/>
+    </symbol>
+<symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--time">
+      <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"/>
+      <path d="M12 7v5l3 3"/>
+    </symbol>
+<symbol viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" id="icon--hourglass">
+      <path d="M6.5 7h11"/>
+      <path d="M6.5 17h11"/>
+      <path d="M6 20v-2a6 6 0 1 1 12 0v2a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1z"/>
+      <path d="M6 4v2a6 6 0 1 0 12 0v-2a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1z"/>
+    </symbol>
+  </defs>
+</svg>

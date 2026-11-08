@@ -20,12 +20,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 <% html_title( ( @project.nil? ? l(:sla_label_global_settings) : l(:field_slas) ) ) %>
 <div class="content"> 
   <div class="contextual">
-    <%= link_to l('sla_label.sla_cache.purge'), ( @project.nil? ? purge_sla_caches_path : purge_project_sla_caches_path(@project) ),
+    <%= link_to sla_icon('del', l('sla_label.sla_cache.purge')), ( @project.nil? ? purge_sla_caches_path : purge_project_sla_caches_path(@project) ),
           title: l('sla_label.sla_cache.purge'), class: 'icon icon-del',
           method: :patch, :data => {:confirm => l(:text_are_you_sure)} if User.current.admin? || (@project && User.current.allowed_to?(:manage_sla, @project))
     %>
   </div>
   <div class="title-sla-settings title-sla_cache">
+    <%= sla_icon('sla_cache', context: :heading, plugin: 'redmine_sla') %>
     <%= title (@project.nil? ? l('sla_label.sla_cache.index') : l(:field_slas) ) %>
     <p><%= sanitize(l(:label_sla_notice, url: sla_caches_url)) %></p>
   </div>
@@ -72,7 +73,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
   <% end %>
   <% if @entity_count > Setting.issues_export_limit.to_i %>
   <p class="icon icon-warning">
-    <%= l(:setting_issues_export_limit) %>: <%= Setting.issues_export_limit.to_i %>
+    <%= sla_icon('warning', l(:setting_issues_export_limit)) %>: <%= Setting.issues_export_limit.to_i %>
   </p>
   <% end %>
   <p class="buttons">

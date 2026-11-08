@@ -40,10 +40,11 @@ BEGIN
     -- REGEXP_SUBSTR has no capture-group extraction in MySQL and "." does not
     -- cross the newlines in that YAML blob, so the zone name is isolated by
     -- matching "sla_time_zone: <zone>" on its own line, then trimming the prefix.
+    -- IANA names also use digits, "_", "+" and "-" (America/New_York, Etc/GMT+12).
     SELECT COALESCE(
         (
             SELECT SUBSTRING(
-                REGEXP_SUBSTR(value, 'sla_time_zone: [a-zA-Z/]+'),
+                REGEXP_SUBSTR(value, 'sla_time_zone: [A-Za-z0-9_+/-]+'),
                 LENGTH('sla_time_zone: ') + 1
             )
             FROM settings

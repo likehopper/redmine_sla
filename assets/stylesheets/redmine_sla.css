@@ -234,45 +234,18 @@
 
 /*** Administration ***/
 
-#admin-menu a.redmine-sla { background-image:url('../images/sla_16.png'); }
-
-.title-sla-settings h2 {
-  background-position: 0% 0%;
-  background-repeat: no-repeat;
-  padding-left: 36px;
-  height: 32px;
+/* Page headings use the selected icon set at 24px. */
+.title-sla-settings {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 8px;
+  margin-bottom: 10px;
 }
-
-.icon-sla { background-image:url('../images/sla_16.png'); }
-.title-sla h2 { background-image:url('../images/sla_32.png'); }
-.icon-sla_type { background-image:url('../images/sla_type_16.png'); }
-.title-sla_type h2 { background-image:url('../images/sla_type_32.png'); }
-.icon-sla_status { background-image:url('../images/sla_status_16.png'); }
-.title-sla_status h2 { background-image:url('../images/sla_status_32.png'); }
-.icon-sla_holiday { background-image:url('../images/sla_holiday_16.png'); }
-.title-sla_holiday h2 { background-image:url('../images/sla_holiday_32.png'); }
-.icon-sla_calendar { background-image:url('../images/sla_calendar_16.png'); }
-.title-sla_calendar h2 { background-image:url('../images/sla_calendar_32.png'); }
-.icon-sla_calendar_holiday { background-image:url('../images/sla_calendar_holiday_16.png'); }
-.title-sla_calendar_holiday h2 { background-image:url('../images/sla_calendar_holiday_32.png'); }
-.icon-sla_schedule { background-image:url('../images/sla_schedule_16.png'); }
-.title-sla_schedule h2 { background-image:url('../images/sla_schedule_32.png'); }
-.icon-sla_level { background-image:url('../images/sla_level_16.png'); }
-.title-sla_level h2 { background-image:url('../images/sla_level_32.png'); }
-.icon-sla_level_term { background-image:url('../images/sla_level_term_16.png'); }
-.title-sla_level_term h2 { background-image:url('../images/sla_level_term_32.png'); }
-.icon-sla_project_tracker { background-image:url('../images/sla_project_tracker_16.png'); }
-.title-sla_project_tracker h2 { background-image:url('../images/sla_project_tracker_32.png'); }
-.icon-sla_cache { background-image:url('../images/sla_cache_16.png'); }
-.title-sla_cache h2 { background-image:url('../images/sla_cache_32.png'); }
-.icon-sla_cache_spent { background-image:url('../images/sla_cache_spent_16.png'); }
-.title-sla_cache_spent h2 { background-image:url('../images/sla_cache_spent_32.png'); }
-
-.icon-sla_cache_refresh { background-image:url('../images/sla_cache_refresh_16.png'); }
-.icon-sla_cache_spent_refresh { background-image:url('../images/sla_cache_spent_refresh_16.png'); }
-
-.redmine_sla_footer { border-top: 1px solid#bbb; font-size: 0.9em; color: #aaa; padding: 5px; text-align:center;}
-.redmine_sla_flaticon_logo { width: 16px; height: 16px; margin-right: 3px; vertical-align: text-bottom; }
+.title-sla-settings h2 { margin-bottom: 0; }
+/* anything else in the heading block (e.g. the SLA caches notice) gets its own line */
+.title-sla-settings > :not(h2):not(svg) { flex-basis: 100%; }
+.title-sla-settings svg.s24 { width: 24px; height: 24px; flex-shrink: 0; }
 
 /*** SLA Explain view ***/
 tr.sla-explain-selected { background-color: #e3f3d3; }
@@ -284,13 +257,37 @@ tr.sla-explain-no-schedule td { color: #999; font-style: italic; }
 #sla-level-terms-table .sla-type-hidden { display: none; }
 #sla-level-terms-table.sla-types-all-visible .sla-type-hidden { display: table-cell; }
 
-/* Project board (projects#index): SLA icon after the name of projects with visible SLAs */
-#projects-index a.project.has-sla::after {
-  content: "";
-  display: inline-block;
+.sla-project-marker { margin-inline-start: 4px; }
+
+/* Icon dimensions are explicit for both raster images and SVG sprites. */
+.sla-icon-image, .sla-icon-svg { display: inline-block; vertical-align: middle; flex-shrink: 0; }
+.sla-icon-label { margin-left: 4px; }
+.sla-icon-label-hidden { position: absolute; top: 0; left: 0; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+.icon:has(> .sla-icon-image), .icon:has(> .sla-icon-svg) { background-image: none; padding-left: 0; }
+.title-sla-settings > .sla-icon-image { flex-basis: auto; }
+.redmine_sla_footer { border-top: 1px solid #bbb; font-size: 0.9em; color: #777; padding: 5px; text-align: center; }
+.sla-credit-logo { vertical-align: middle; }
+/* Redmine 5's icon-only links reserve padding for a background and clip children.
+   Inline icons need their own box and an anchor for the accessible label. */
+.icon-only:has(> .sla-icon-svg), .icon-only:has(> .sla-icon-image) {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 16px;
   height: 16px;
-  margin-left: 4px;
-  vertical-align: text-bottom;
-  background: url('../images/sla_16.png') no-repeat center / 16px 16px;
+  padding: 0;
+  background-image: none;
+  overflow: hidden;
 }
+.icon-only:has(> .sla-icon-svg)::after,
+.icon-only:has(> .sla-icon-image)::after { content: none; }
+
+/* Keep attribution at the bottom of the sidebar as its content grows. */
+#sidebar:has(#sla-icon-credit),
+#sidebar-wrapper:has(#sla-icon-credit) {
+  display: flex;
+  flex-direction: column;
+}
+#sidebar-wrapper:has(#sla-icon-credit) { flex: 1; }
+#sidebar #sla-icon-credit { margin-top: auto; padding-top: 12px; }

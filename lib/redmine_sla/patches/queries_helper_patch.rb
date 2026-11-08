@@ -34,6 +34,7 @@ module RedmineSla
     module QueriesHelperPatch
 
       def self.included(base)
+        base.prepend(RedmineSla::Patches::ColumnHeadersPatch)
         base.send(:include, InstanceMethods)
         base.send(:include, RedmineSla::Helpers::SlaRenderingHelper)
         

@@ -19,13 +19,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 -%>
 <ul>
   <% if @sla_level_term_ids.count == 1 %>
-    <li><%= context_menu_link l(:button_show), sla_level_term_path(@sla_level_term), class: 'icon icon-magnifier', disabled: !@can[:show] %></li>
-    <li><%= context_menu_link l('sla_label.sla_level_term.edit'), sla_terms_sla_level_path(@sla_level_term.sla_level),
+    <li><%= context_menu_link sla_icon('zoom-in', l(:button_show)), sla_level_term_path(@sla_level_term), class: 'icon icon-magnifier', disabled: !@can[:show] %></li>
+    <li><%= context_menu_link sla_icon('sla_level_term', l('sla_label.sla_level_term.edit'), plugin: 'redmine_sla'), sla_terms_sla_level_path(@sla_level_term.sla_level),
           title: l('sla_label.sla_level_term.edit'),
           class: 'icon icon-sla_level_term'
     -%></li>
   <% end %>
-  <li><%= context_menu_link l(:button_delete),
+  <li><%= context_menu_link sla_icon('del', l(:button_delete)),
             sla_level_terms_path(id: @sla_level_term_ids, back_url: @back),
             method: :delete, class: 'icon icon-del', disabled: !@can[:delete],
             data: { confirm: l('sla_label.sla_level_term.count',count: @sla_level_term_ids.count)+"\n"+l(:text_are_you_sure) }

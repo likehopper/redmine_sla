@@ -18,7 +18,13 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 -%>
 <p>
-  <label for="settings_sla_display"><%= l(:label_display) %></label>
+  <label for="settings_sla_display"><%= l(:label_sla_gauge_style) %></label>
   <%= select_tag 'settings[sla_display]', options_for_select(['none','bar - simple','bar - rounded','pie - flat','pie - plain','pie - modern'],
     @settings["sla_display"]) %>
+</p>
+
+
+<p>
+  <%= label_tag 'settings_sla_icon_set', l(:label_sla_icon_set) %>
+  <%= select_tag 'settings[sla_icon_set]', options_for_select(RedmineSla::IconSet.all.map { |id, set| [set.name, id] }, @settings['sla_icon_set'].presence || RedmineSla::IconSet::DEFAULT) %>
 </p>

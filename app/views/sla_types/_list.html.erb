@@ -43,15 +43,15 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             <td class="buttons">
               <%= reorder_handle(entity) if @can_reorder -%>
               <%= if entity.visible?
-                    link_to l(:button_show), sla_type_path(entity),
+                    link_to sla_icon('zoom-in', l(:button_show), icon_only: true), sla_type_path(entity),
                             title: l(:button_show), class: 'icon-only icon-magnifier'
                   end -%>
               <%= if entity.editable?
-                    link_to l(:button_edit), edit_sla_type_path(entity),
+                    link_to sla_icon('edit', l(:button_edit), icon_only: true), edit_sla_type_path(entity),
                             title: l(:button_edit), class: 'icon-only icon-edit'
                   end -%>
               <%= if entity.deletable?
-                    link_to l(:button_delete), sla_type_path(entity),
+                    link_to sla_icon('del', l(:button_delete), icon_only: true), sla_type_path(entity),
                             data: {confirm: l(:text_are_you_sure)}, method: :delete,
                             title: l(:button_delete), class: 'icon-only icon-del'
                   end -%>

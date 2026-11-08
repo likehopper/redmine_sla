@@ -1,5 +1,80 @@
 # Changelog
 
+## 3.4.0 - 2026-11-07
+
+### Added
+
+- Select Flaticon / Magnific or Tabler Icons in plugin display settings, with
+  context-specific sizes and manifest-driven credits.
+- Add local icon sets alongside the bundled sets using the same manifest format.
+- Distinct SLA column-header icons and monochrome markers in column selectors;
+  exports retain plain-text captions.
+
+### Changed
+
+- Require Ruby 3.0 or later: view patches rely on prepending to helper modules
+  that are already included.
+- Group locale settings (time zone and holiday country) separately from display
+  settings (gauges and icons).
+- Order cache columns as issue, start date, update date and SLA level, with
+  deadline, spent time, remaining time and respect per type. Custom orders remain.
+- Centralize asset resolution in `IconSet`; keep HTML rendering in helpers and
+  native-view adaptations in patches. Support Redmine 5 direct assets and the
+  Redmine 6/7 asset catalogue.
+- Refresh documentation screenshots for the current interface.
+
+### Fixed
+
+- Stop icon resolution from recursing when the Tabler fallback set is missing.
+- Ignore malformed local icon manifests with a warning. Normalize quoted image
+  sizes and reject invalid or duplicate sizes before rendering.
+- Avoid tiled icons on recent Redmine versions, clipped list actions and duplicate
+  symbols in SLA headers. Preserve native sorting and column-selector behavior.
+- Read every time zone offered in the settings. Names with `_`, digits, `+` or
+  `-` were truncated: `America/New_York` failed on PostgreSQL and returned no
+  SLA on MySQL/MariaDB, and `Etc/GMT+12` was read as `Etc/GMT`.
+- Warn in the settings that changing the time zone does not recalculate SLA
+  times already calculated, and show a reminder to inform users when another
+  zone is selected.
+- Count spent time once when the same issue is calculated concurrently,
+  for example by two users displaying the same issue list, or by the
+  `update_sla` task while users browse. Both calls could add the same
+  minutes.
+- Refreshing an SLA cache or a spent cache now recalculates spent time
+  from the SLA start. It previously kept the stored total and only added
+  the minutes since its last update.
+- Changing the statuses counted by an SLA type now invalidates the spent
+  time of that type. Totals already calculated kept the previous rule.
+- Saving or deleting a tracker-to-SLA mapping no longer recalculates every
+  SLA cache of the project inside the request, which could time out on
+  large projects. The caches of the previous and new project/tracker pairs
+  are deleted, then rebuilt when issues are displayed or by the
+  `update_sla` task (use `scope=miss` for closed issues).
+
+### Upgrade
+
+- Requires Ruby 3.0 or later.
+- Run the plugin migrations: migration 025 redeploys `sla_get_spent` and
+  migration 026 redeploys `sla_get_date`. Existing caches are kept.
+- SLA times already calculated are not corrected automatically: spent totals
+  inflated by concurrent calculations, and times calculated with a truncated
+  time zone. To recalculate them, purge the SLA caches, or refresh the
+  affected caches. Purged caches are recalculated on demand or by the
+  `update_sla` task.
+
+### Tests
+
+- Release matrix on Redmine 5.1.13/6.1.4/7.0.1 with PostgreSQL 17.7, MariaDB
+  10.11.19 and strict MySQL 8.0.46: 10,761 tests / 68,242 assertions, no
+  failures or errors, 12 expected skips. Upgrade from 3.3.4 with populated
+  caches checked on the nine combinations. See [Testing](doc/TESTING.md).
+- Regression tests for each calculation fix, failing on the previous code on
+  the three databases.
+- Clear the importmap cache after the URL-prefix system test, which broke
+  context menus in later system tests on Redmine 7.
+- Regenerate 251 existing screenshots and add 14 icon-set illustrations on
+  Redmine 6.1.4; the locale screenshots show the time zone note.
+
 ## 3.3.4 - 2026-10-25
 
 ### Fixed

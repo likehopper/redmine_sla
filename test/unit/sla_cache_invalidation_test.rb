@@ -465,7 +465,121 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     assert_equal cache_ids, SlaCache.unscoped.order(:id).pluck(:id)
   end
 
+  test "changing a counted status invalidates only spent caches of its type" do
+    assert_only_spent_types_invalidated([2]) do
+      SlaStatus.find(3).update!(status_id: 3)
+    end
+  end
+
+  test "moving a counted status to another type invalidates both types" do
+    assert_only_spent_types_invalidated([1, 2]) do
+      SlaStatus.find(3).update!(sla_type_id: 1)
+    end
+  end
+
+  test "creating a counted status invalidates spent caches of its type" do
+    assert_only_spent_types_invalidated([1]) do
+      SlaStatus.create!(sla_type_id: 1, status_id: 2)
+    end
+  end
+
+  test "destroying a counted status invalidates spent caches of its type" do
+    assert_only_spent_types_invalidated([2]) do
+      SlaStatus.find(3).destroy!
+    end
+  end
+
+  test "saving an unchanged counted status preserves caches" do
+    assert_caches_preserved do
+      SlaStatus.find(3).save!
+    end
+  end
+
+  test "changing a mapping's SLA deletes its caches without recalculating them" do
+    mapping = mapping_with_caches
+    other_sla = Sla.where.not(id: mapping.sla_id).first
+
+    assert_only_pairs_invalidated([[mapping.project_id, mapping.tracker_id]]) do
+      assert_no_sla_function_calls { mapping.update!(sla_id: other_sla.id) }
+    end
+  end
+
+  test "moving a mapping to another tracker deletes caches of both trackers" do
+    mapping = mapping_with_caches
+    free_tracker = Tracker.where.not(
+      id: SlaProjectTracker.where(project_id: mapping.project_id).select(:tracker_id)
+    ).first
+    pairs = [[mapping.project_id, mapping.tracker_id], [mapping.project_id, free_tracker.id]]
+
+    assert_only_pairs_invalidated(pairs) do
+      assert_no_sla_function_calls { mapping.update!(tracker_id: free_tracker.id) }
+    end
+  end
+
+  test "destroying a mapping deletes its caches" do
+    mapping = mapping_with_caches
+
+    assert_only_pairs_invalidated([[mapping.project_id, mapping.tracker_id]]) do
+      assert_no_sla_function_calls { mapping.destroy! }
+    end
+  end
+
+  test "saving an unchanged mapping preserves caches" do
+    assert_caches_preserved do
+      mapping_with_caches.save!
+    end
+  end
+
   private
+
+  def mapping_with_caches
+    SlaProjectTracker.order(:id).detect do |mapping|
+      SlaCache.unscoped.where(project_id: mapping.project_id, tracker_id: mapping.tracker_id).exists?
+    end
+  end
+
+  def caches_for_pairs(pairs)
+    pairs.map { |project_id, tracker_id| SlaCache.unscoped.where(project_id: project_id, tracker_id: tracker_id) }
+         .reduce(:or)
+  end
+
+  def assert_only_pairs_invalidated(pairs)
+    affected_ids = caches_for_pairs(pairs).pluck(:id)
+    assert_not_empty affected_ids
+    unaffected_ids = SlaCache.unscoped.where.not(id: affected_ids).order(:id).pluck(:id)
+    assert_not_empty unaffected_ids
+
+    yield
+
+    assert_empty caches_for_pairs(pairs)
+    assert_empty SlaCacheSpent.unscoped.where(sla_cache_id: affected_ids)
+    assert_equal unaffected_ids, SlaCache.unscoped.where(id: unaffected_ids).order(:id).pluck(:id)
+  end
+
+  # Recalculation belongs to later reads, not to the configuration request.
+  def assert_no_sla_function_calls(&block)
+    calls = []
+    subscriber = lambda do |*args|
+      sql = args.last[:sql]
+      calls << sql if sql.match?(/\bsla_get_(level|spent)\s*\(/i)
+    end
+    ActiveSupport::Notifications.subscribed(subscriber, 'sql.active_record', &block)
+    assert_empty calls, calls.join("\n")
+  end
+
+  # Counted statuses never change the SLA level: level caches stay.
+  def assert_only_spent_types_invalidated(type_ids)
+    cache_ids = SlaCache.unscoped.order(:id).pluck(:id)
+    assert_not_empty SlaCacheSpent.unscoped.where(sla_type_id: type_ids).pluck(:id)
+    unaffected_spent_ids = SlaCacheSpent.unscoped.where.not(sla_type_id: type_ids).order(:id).pluck(:id)
+
+    yield
+
+    assert_empty SlaCacheSpent.unscoped.where(sla_type_id: type_ids)
+    assert_equal unaffected_spent_ids,
+                 SlaCacheSpent.unscoped.where.not(sla_type_id: type_ids).order(:id).pluck(:id)
+    assert_equal cache_ids, SlaCache.unscoped.order(:id).pluck(:id)
+  end
 
   def custom_field_level_ids
     SlaLevel.unscoped.where(custom_field_id: 1).pluck(:id)
