@@ -1,5 +1,35 @@
 # Testing
 
+## Version 3.4.1 release matrix
+
+Validated on **2026-11-08** with the isolated runner and commands of the 3.4.0
+matrix below (same images, database versions and SQL modes). Source snapshot:
+`release/3.4.1` at `8be3bc4`.
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1192 / 7419 | 1192 / 7416 | 1192 / 7416 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1252 / 7856 | 1192 / 7312 | 1192 / 7312 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1192 / 7869 | 1192 / 7866 | 1192 / 7866 |
+
+Cells record **tests / assertions**. Total: **10,788 tests / 68,332 assertions**,
+zero failures or errors, 12 expected PostgreSQL-only skips. Each combination ran
+289 unit, 470 functional, 358 integration/API, 39 Chromium system and 30
+standalone tests, plus 6 role/project documentation tests (all 66 on Redmine
+6/PostgreSQL).
+
+**Upgrade from 3.4.0** (tag `v3.4.0`) on the nine combinations: migration 027
+applied; the 72 caches, 138 spent rows (18,455 minutes) and the
+`sla_view_roll_statuses` view (397 rows) were unchanged after migration and
+after `update_sla scope=all`.
+
+New regression tests failed on 3.4.0 before the fixes: inactive priorities on
+the three databases, and the level tie on PostgreSQL (level 11 chosen instead of
+1; MariaDB and MySQL happened to return the lowest id). The adapter test checks
+that local names use `nagerholidays.com`; a live call with the adapter returned
+204 countries and 11 French public holidays for 2028 in English and local
+names.
+
 ## Version 3.4.0 release matrix
 
 Validated on **2026-11-07 and 2026-11-08** in isolated local containers, one

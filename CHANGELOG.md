@@ -30,6 +30,13 @@
 - Allow outbound HTTPS to `nagerholidays.com`; `date.nager.at` is no longer
   used.
 
+### Tests
+
+- Release matrix on Redmine 5.1.13/6.1.4/7.0.1 with PostgreSQL 17.7, MariaDB
+  10.11.19 and strict MySQL 8.0.46: 10,788 tests / 68,332 assertions, no
+  failures or errors, 12 expected skips. Upgrade from 3.4.0 checked on the
+  nine combinations. See [Testing](doc/TESTING.md).
+
 ## 3.4.0 - 2026-11-07
 
 ### Added
