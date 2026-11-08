@@ -1,5 +1,26 @@
 # Changelog
 
+## 3.4.2 - 2026-11-08
+
+### Changed
+
+- Share the default query selection of the SLA list controllers in
+  `RedmineSla::DefaultQueryRetrieval`. Remove the eight unused copies.
+  Behavior is unchanged.
+- Credit external contributors in the README.
+
+### Upgrade
+
+- Update the plugin files and restart Redmine. No new migration relative
+  to 3.4.1.
+
+### Tests
+
+- Release matrix on Redmine 5.1.13/6.1.4/7.0.1 with PostgreSQL 17.7, MariaDB
+  10.11.19 and strict MySQL 8.0.46: 10,842 tests / 68,431 assertions, no
+  failures or errors, 12 expected skips. Upgrade from 3.4.1 checked on the
+  nine combinations. See [Testing](doc/TESTING.md).
+
 ## 3.4.1 - 2026-11-08
 
 ### Fixed

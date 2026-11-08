@@ -203,27 +203,6 @@ class SlaStatusesController < ApplicationController
     render_404
   end
 
-  # Restore or initialize default query for SLA statuses.
-  def retrieve_default_query(use_session)
-    return if params[:query_id].present?
-    return if api_request?
-    return if params[:set_filter]
-
-    if params[:without_default].present?
-      params[:set_filter] = 1
-      return
-    end
-
-    if !params[:set_filter] && use_session && session[:sla_status_query]
-      query_id = session[:sla_status_query].values_at(:id)
-      return if SlaStatusQuery.where(id: query_id).exists?
-    end
-
-    if default_query = SlaStatusQuery.default
-      params[:query_id] = default_query.id
-    end
-  end  
-
   # Returns the SlaStatusQuery scope for index and report actions.
   def sla_status_scope(options = {})
     @query.results_scope(options)

@@ -31,6 +31,7 @@
 # ------------------------------------------------------------------------------
 
 class SlaCachesController < ApplicationController
+  include RedmineSla::DefaultQueryRetrieval
   default_search_scope :sla_caches
   
   accept_api_auth :index, :show, :refresh, :destroy, :purge
@@ -60,7 +61,7 @@ class SlaCachesController < ApplicationController
   # Supports HTML, API, Atom and CSV export.
   def index
     use_session = !request.format.csv?
-    retrieve_default_query(use_session) 
+    retrieve_default_query(SlaCacheQuery, use_session) 
     retrieve_query(SlaCacheQuery, use_session)
 
     scope = sla_cache_scope.
@@ -287,27 +288,6 @@ private
   rescue ActiveRecord::RecordNotFound
     render_404
   end
-
-  # Retrieve the default SlaCacheQuery if no query is selected by the user.
-  def retrieve_default_query(use_session)
-    return if params[:query_id].present?
-    return if api_request?
-    return if params[:set_filter]
-
-    if params[:without_default].present?
-      params[:set_filter] = 1
-      return
-    end
-
-    if !params[:set_filter] && use_session && session[:sla_cache_query]
-      query_id, project_id = session[:sla_cache_query].values_at(:id, :project_id)
-      return if SlaCacheQuery.where(id: query_id).exists? && project_id == @project&.id
-    end
-
-    if default_query = SlaCacheQuery.default(project: @project)
-      params[:query_id] = default_query.id
-    end
-  end  
 
   # Returns the SlaCacheQuery scope for index and report actions.
   def sla_cache_scope(options = {})

@@ -14,7 +14,7 @@
 
 ## Overview
 
-Current version: **3.4.1**. See the [changelog](CHANGELOG.md) for release details.
+Current version: **3.4.2**. See the [changelog](CHANGELOG.md) for release details.
 
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
@@ -284,6 +284,12 @@ Plugin is ready to use.
 
 ------------------------------------------------------------------------
 
+## Upgrade to 3.4.2
+
+Version **3.4.2** shares the default query selection of the SLA lists in one
+module and credits external contributors. Behavior is unchanged. Update the
+plugin files and restart Redmine; no new migration relative to 3.4.1.
+
 ## Upgrade to 3.4.1
 
 Version **3.4.1** shows SLA values for issues whose priority was deactivated,
@@ -501,3 +507,16 @@ on [Flaticon](https://www.flaticon.com/). See [image credits](assets/images/icon
 
 SVG icons from [Tabler Icons](https://tabler.io/icons) (MIT, (c) 2020-2024 Pawel Kuna),
 the same set Redmine core uses. The plugin's own are in `assets/images/icon_sets/tabler/icons.svg`.
+
+### Contributors
+
+Thanks to everyone who contributed to the plugin:
+
+- [rammuralidhar](https://github.com/rammuralidhar): grouping by related issues
+  and SLA level display in time entries ([#10](https://github.com/likehopper/redmine_sla/pull/10)).
+- [tlaguz](https://github.com/tlaguz): Rails 7.1 and Zeitwerk compatibility
+  ([#22](https://github.com/likehopper/redmine_sla/pull/22)).
+- [sandrrero4](https://github.com/sandrrero4): namespacing fix
+  ([#29](https://github.com/likehopper/redmine_sla/pull/29)).
+- [joaoperfig](https://github.com/joaoperfig): Tabler icon set
+  ([#89](https://github.com/likehopper/redmine_sla/pull/89)).
