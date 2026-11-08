@@ -64,14 +64,16 @@
 
 ### Tests
 
-- Follow-up manifest and real URL-prefix checks on Redmine 5/6/7: 87 tests /
-  1,606 assertions, no failures/errors/skips. The full matrix below predates
-  this follow-up.
-- Local Redmine 5.1.13/6.1.4/7.0.1 matrix on PostgreSQL 17.7, MariaDB 10.11.19
-  and strict MySQL 8.0.46: 10,545 tests / 65,863 assertions, no failures/errors,
-  12 expected migration skips. See [Testing](doc/TESTING.md).
+- Release matrix on Redmine 5.1.13/6.1.4/7.0.1 with PostgreSQL 17.7, MariaDB
+  10.11.19 and strict MySQL 8.0.46: 10,761 tests / 68,242 assertions, no
+  failures or errors, 12 expected skips. Upgrade from 3.3.4 with populated
+  caches checked on the nine combinations. See [Testing](doc/TESTING.md).
+- Regression tests for each calculation fix, failing on the previous code on
+  the three databases.
+- Clear the importmap cache after the URL-prefix system test, which broke
+  context menus in later system tests on Redmine 7.
 - Regenerate 251 existing screenshots and add 14 icon-set illustrations on
-  Redmine 6.1.4, including both sets and their selector/header distinctions.
+  Redmine 6.1.4; the locale screenshots show the time zone note.
 
 ## 3.3.4 - 2026-10-25
 

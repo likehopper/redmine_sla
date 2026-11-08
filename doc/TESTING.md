@@ -1,5 +1,78 @@
 # Testing
 
+## Version 3.4.0 release matrix
+
+Validated on **2026-11-07 and 2026-11-08** in isolated local containers, one
+fresh database per suite, with no shared instance or production deployment.
+Source snapshot: `release/3.4.0` at `4482c94` (icon sets, time zone parsing and
+spent-time fixes). The system suites of Redmine 6 and 7 were rerun on `0453e41`,
+which only changes `test/system/sla_icon_url_prefix_test.rb` (see below).
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1189 / 7409 | 1189 / 7406 | 1189 / 7406 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1249 / 7846 | 1189 / 7302 | 1189 / 7302 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1189 / 7859 | 1189 / 7856 | 1189 / 7856 |
+
+Cells record **tests / assertions**. Total: **10,761 tests / 68,242 assertions**,
+zero failures or errors, 12 expected skips (the two PostgreSQL-specific tests on
+each MariaDB/MySQL combination). Each combination ran 286 unit, 470 functional,
+358 integration/API, 39 Chromium system and 30 standalone icon/HTML tests, plus
+6 role/project documentation tests; Redmine 6/PostgreSQL ran all 66
+documentation tests instead.
+
+Rails session SQL modes, as measured: MySQL `ONLY_FULL_GROUP_BY,
+NO_AUTO_VALUE_ON_ZERO, STRICT_TRANS_TABLES, STRICT_ALL_TABLES, NO_ZERO_IN_DATE,
+NO_ZERO_DATE, ERROR_FOR_DIVISION_BY_ZERO, NO_ENGINE_SUBSTITUTION`; MariaDB
+`NO_AUTO_VALUE_ON_ZERO, STRICT_TRANS_TABLES, STRICT_ALL_TABLES,
+ERROR_FOR_DIVISION_BY_ZERO, NO_AUTO_CREATE_USER, NO_ENGINE_SUBSTITUTION`.
+
+**Upgrade from 3.3.4**, on each of the nine combinations: migrate a database with
+3.3.4 (migration 024), load the fixtures and run `update_sla scope=all`, replace
+the plugin with 3.4.0 and run `redmine:plugins:migrate`. Migrations 025 and 026
+applied; the 72 SLA caches, 138 spent rows (18,455 minutes) and the
+`sla_view_roll_statuses` view (397 rows) were unchanged after migration and after
+a new `update_sla scope=all`.
+
+New regression tests reproduce each fix before it: concurrent spent time
+(180 instead of 90), refresh (999 kept instead of 90), counted statuses and
+tracker mappings (caches left or recalculated in the request) and time zones
+(`America/New_York` failing on PostgreSQL and NULL on MariaDB/MySQL,
+`Etc/GMT+12` read as `Etc/GMT`). They failed on the previous code on the three
+databases and pass with the fixes.
+
+Notes on the runs:
+
+- The first Redmine 7/PostgreSQL system run had intermittent context-menu
+  failures. They came from `sla_icon_url_prefix_test.rb`, which left importmap
+  module URLs cached with its `/redmine` prefix: the importmap cache sweeper only
+  exists when classes reload. With seed 30488 the suite failed 7 tests with that
+  file and none without it. `0453e41` clears the map directly; seeds 30488 and
+  14243 then pass, and the six Redmine 6/7 system suites were rerun green.
+- One Redmine 6/MySQL system run failed the URL-prefix test once while two
+  browsers ran in parallel. Its seed (26232) passed three times on replay, with
+  the old and new test file: a timing failure under load, not an order
+  dependency.
+- Rails 8.1 loads `db/schema.rb` when `db:migrate` creates a database. The
+  isolated runner deletes that file before each fresh database so a schema dumped
+  by a previous run does not hide the plugin migrations. Redmine upgrades migrate
+  an existing database and are not affected.
+
+Commands, from the Redmine root with `RAILS_ENV=test`, automatic test schema
+loading disabled (`config.active_record.maintain_test_schema = false`) and
+`GOOGLE_CHROME_OPTS_ARGS=headless,disable-gpu,no-sandbox,disable-dev-shm-usage`:
+
+```sh
+bundle exec rake db:drop db:create db:migrate redmine:plugins:migrate
+bundle exec rake redmine:plugins:redmine_sla:build_fixture
+bundle exec rails test plugins/redmine_sla/test/unit   # also functional, integration
+bundle exec ruby -Itest -e 'files, options = ARGV.partition { |a| a.end_with?(".rb") }; ARGV.replace(options); files.each { |path| require File.expand_path(path) }' plugins/redmine_sla/test/system/*_test.rb
+```
+
+The Rake test tasks (`redmine:plugins:test:*`) reload `db/schema.rb` and drop the
+plugin's SQL functions and views; use the commands above. Regenerated the two
+locale screenshots, which now show the time zone note.
+
 ## Icon manifest review follow-up (2026-11-06)
 
 After the full matrix below, manifest loading was hardened and size keys were
