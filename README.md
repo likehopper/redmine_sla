@@ -14,7 +14,7 @@
 
 ## Overview
 
-Current version: **3.4.1**. See the [changelog](CHANGELOG.md) for release details.
+Current version: **3.4.2**. See the [changelog](CHANGELOG.md) for release details.
 
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
@@ -283,6 +283,12 @@ rake redmine:plugins:migrate NAME=redmine_sla
 Plugin is ready to use.
 
 ------------------------------------------------------------------------
+
+## Upgrade to 3.4.2
+
+Version **3.4.2** shares the default query selection of the SLA lists in one
+module and credits external contributors. Behavior is unchanged. Update the
+plugin files and restart Redmine; no new migration relative to 3.4.1.
 
 ## Upgrade to 3.4.1
 

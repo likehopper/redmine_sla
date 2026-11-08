@@ -1,12 +1,18 @@
 # Changelog
 
-## Unreleased
+## 3.4.2 - 2026-11-08
 
 ### Changed
 
 - Share the default query selection of the SLA list controllers in
   `RedmineSla::DefaultQueryRetrieval`. Remove the eight unused copies.
   Behavior is unchanged.
+- Credit external contributors in the README.
+
+### Upgrade
+
+- Update the plugin files and restart Redmine. No new migration relative
+  to 3.4.1.
 
 ## 3.4.1 - 2026-11-08
 
