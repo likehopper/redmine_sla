@@ -1,12 +1,17 @@
 # Changelog
 
-## Unreleased
+## 3.5.0 - 2026-11-09
 
-### Fixed
+### Changed
 
 - Show the project SLA tab only to users with `view_sla`, as documented in
   the settings guide. A role with `manage_sla` alone saw the tab, but the page
-  answered 403.
+  answered 403. Such roles no longer see the tab: grant `view_sla` too.
+
+### Upgrade
+
+- Update the plugin files and restart Redmine. No new migration relative
+  to 3.4.2. Check that roles with `manage_sla` also have `view_sla`.
 
 ## 3.4.2 - 2026-11-08
 
