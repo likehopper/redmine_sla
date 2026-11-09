@@ -1,5 +1,29 @@
 # Testing
 
+## Version 3.5.0 release matrix
+
+Validated on **2026-11-09** with the isolated runner and commands of the 3.4.0
+matrix below. Source snapshot: `release/3.5.0` at `f368d49`.
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1205 / 7443 | 1205 / 7440 | 1205 / 7440 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1265 / 7880 | 1205 / 7336 | 1205 / 7336 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1205 / 7893 | 1205 / 7890 | 1205 / 7890 |
+
+Cells record **tests / assertions**. Total: **10,905 tests / 68,548 assertions**,
+zero failures or errors, 12 expected PostgreSQL-only skips. Each combination ran
+295 unit, 477 functional, 358 integration/API, 39 Chromium system and 30
+standalone tests, plus 6 role/project documentation tests (all 66 on Redmine
+6/PostgreSQL). The seven new functional tests cover the project SLA tab for
+each permission combination and with the SLA module disabled. MySQL ran with
+`ONLY_FULL_GROUP_BY` and `STRICT_TRANS_TABLES`. The documentation screenshots
+regenerated on Redmine 6/PostgreSQL are identical to the committed ones.
+
+**Upgrade from 3.4.2** (tag `v3.4.2`) on the nine combinations: no new
+migration (latest 027); caches, spent rows and views unchanged after
+`redmine:plugins:migrate` and `update_sla scope=all`.
+
 ## Version 3.4.2 release matrix
 
 Validated on **2026-11-08** with the isolated runner and commands of the 3.4.0
