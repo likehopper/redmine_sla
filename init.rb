@@ -80,7 +80,9 @@ Redmine::Plugin.register :redmine_sla do
   menu :project_menu, :redmine_sla,
     { controller: 'sla_caches', action: 'index' },
     caption: :sla_label_abbreviation,
-    param: :project_id
+    param: :project_id,
+    # The cache list requires :view_sla; :manage_sla alone would lead to a 403.
+    if: ->(project) { User.current.allowed_to?(:view_sla, project) }
 
   # Define permissions
   project_module :sla do
