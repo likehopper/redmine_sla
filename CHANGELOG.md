@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- Show the project SLA tab only to users with `view_sla`, as documented in
+  the settings guide. A role with `manage_sla` alone saw the tab, but the page
+  answered 403.
+
 ## 3.4.2 - 2026-11-08
 
 ### Changed

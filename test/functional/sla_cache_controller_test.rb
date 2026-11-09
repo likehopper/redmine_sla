@@ -82,6 +82,17 @@ class SlaCachesControllerTest < ApplicationSlaFunctionalsTestCase
     assert_response :forbidden
   end
 
+  # Reading caches requires :view_sla; :manage_sla alone does not imply it.
+  test "manage_sla without view_sla cannot read the project cache list" do
+    user = User.find_by!(login: "other")
+    role = Role.create!(name: "SLA manage only", permissions: [:view_project, :manage_sla])
+    Member.create!(project: Project.find(1), principal: user, role_ids: [role.id])
+    @request.session[:user_id] = user.id
+
+    get :index, params: { project_id: "project-sla-tests-tma" }
+    assert_response :forbidden
+  end
+
   test "should NoRoute on get new as anonymous" do
     assert_raises ActionController::UrlGenerationError do
       get :new
