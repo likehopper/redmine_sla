@@ -19,6 +19,10 @@ The affected SLAs are determined by the changed configuration:
 - Deleting or reassigning a native issue priority affects SLAs with terms for
   that priority. Redmine's reassignment uses `update_all`, so issue callbacks
   do not run.
+- Deleting an SLA type affects SLAs whose levels have terms of that type. The
+  database foreign key deletes those terms without callbacks, so the type
+  captures the SLAs before its deletion. Saving a type (name, description,
+  position) preserves caches.
 
 Name and description edits that do not alter calculations preserve caches.
 Failed saves do not invalidate; transaction rollbacks restore cache deletions
@@ -43,7 +47,7 @@ the affected cache explicitly.
 
 ## Tests
 
-`sla_cache_invalidation_test.rb` covers configuration, issue-priority,
+`sla_cache_invalidation_test.rb` covers configuration, SLA type, issue-priority,
 custom-field, enumeration, project/tracker mapping and status changes.
 `sla_issue_cache_freshness_test.rb` verifies that issue saves delete stale
 caches without calling the SLA SQL calculation functions; the next read

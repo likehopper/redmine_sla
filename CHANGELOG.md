@@ -10,6 +10,8 @@
 - Refresh issue SLA caches when a native priority or a custom-field priority
   changes. Invalidate competing levels when terms, priority fields,
   enumerations or native priorities change.
+- Invalidate caches of SLAs whose levels have terms of a deleted SLA type: the
+  database cascade removed those terms without invalidating the caches.
 - Explain the same priority-filtered candidates used by the calculation.
 - Add a concise calendar-by-priority example with documentation fixtures that
   assert the selected level and capture the issue and explanation screens.
