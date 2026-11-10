@@ -285,4 +285,69 @@ class SlaTypesControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end  
 
+  ### Access audit: SLA types are managed by administrators only ###
+
+  test "should redirect on get show as anonymous" do
+    get :show, params: { id: 1 }
+    assert_redirected_to %r{#{signin_path}}
+  end
+
+  test "should render new and context menu on SLA types as admin" do
+    @request.session[:user_id] = 1
+    get :new
+    assert_response :success
+    get :context_menu, params: { ids: [1] }
+    assert_response :success
+    assert_select "a[href=?]", edit_sla_type_path(1)
+  end
+
+  test "should create, update, delete and bulk delete SLA types as admin" do
+    @request.session[:user_id] = 1
+    assert_difference "SlaType.count", 1 do
+      post :create, params: { sla_type: { name: "Created SLA type" } }
+    end
+    assert_redirected_to sla_types_path
+    patch :update, params: { id: 1, sla_type: { name: "Updated SLA type" } }
+    assert_redirected_to sla_types_path
+    assert_equal "Updated SLA type", SlaType.find(1).name
+    deletables = create_deletable_sla_types
+    assert_difference "SlaType.count", -1 do
+      delete :destroy, params: { id: deletables.first.id }
+    end
+    assert_difference "SlaType.count", -2 do
+      delete :destroy, params: { ids: deletables.drop(1).map(&:id) }
+    end
+    assert_redirected_to sla_types_path
+  end
+
+  { "anonymous" => nil, "project SLA manager" => 2, "reporter without SLA permission" => 5 }.each do |label, user_id|
+    test "should deny new and context menu on SLA types to #{label}" do
+      @request.session[:user_id] = user_id
+      get :new
+      assert_access_denied(user_id)
+      get :context_menu, params: { ids: [1] }
+      assert_access_denied(user_id)
+    end
+
+    test "should deny SLA type writes to #{label} without changing data" do
+      deletables = create_deletable_sla_types
+      assert_denied_without_change(user_id, SlaType.find(1)) do
+        post :create, params: { sla_type: { name: "Denied SLA type" } }
+        assert_access_denied(user_id)
+        patch :update, params: { id: 1, sla_type: { name: "Denied SLA type change", position: 2 } }
+        assert_access_denied(user_id)
+        delete :destroy, params: { id: deletables.first.id }
+        assert_access_denied(user_id)
+        delete :destroy, params: { ids: deletables.map(&:id) }
+        assert_access_denied(user_id)
+      end
+      assert_equal deletables.size, SlaType.where(id: deletables.map(&:id)).count
+    end
+  end
+
+  # Fresh types without terms or statuses, so a leaked destroy would really delete them.
+  def create_deletable_sla_types
+    Array.new(3) { |index| SlaType.create!(name: "Deletable SLA type #{index}") }
+  end
+
 end

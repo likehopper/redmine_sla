@@ -24,5 +24,23 @@ module SlaAssertionHelperTest
     attribute_selector = attributes.map { |key, value| "[#{key}=\"#{value}\"]" }.join
     assert_select "#{selector}#{attribute_selector}", 0, message
   end
-  
+
+  # Anonymous users are sent to the login page, logged-in users get 403.
+  def assert_access_denied(user_id)
+    if user_id
+      assert_response :forbidden
+    else
+      assert_redirected_to %r{#{signin_path}}
+    end
+  end
+
+  # Runs denied requests as user_id and checks they changed neither the
+  # record nor the number of records of its class.
+  def assert_denied_without_change(user_id, record, &requests)
+    @request.session[:user_id] = user_id
+    attributes_before = record.reload.attributes
+    assert_no_difference -> { record.class.count }, &requests
+    assert_equal attributes_before, record.reload.attributes
+  end
+
 end

@@ -90,6 +90,48 @@ class SlaIssueBlockTest < ApplicationSlaIntegrationTestCase
     end
   end
 
+  test 'a reader sees the level name and the spent over term values' do
+    log_user('developer', 'developer')
+
+    get "/issues/#{@issue.id}"
+    assert_response :success
+    assert_select 'div.sla.attribute a', text: SlaLevel.find(1).name
+    assert_select 'div.sla.attribute strong', minimum: 1
+    assert_select 'div.sla.attribute td', text: %r{/}
+  end
+
+  test 'a member without view permission does not receive the level name' do
+    log_user('reporter', 'reporter')
+
+    get "/issues/#{@issue.id}"
+    assert_response :success
+    assert_select 'div.sla.attribute', 0
+    assert_level_name_hidden
+  end
+
+  test 'anonymous, non-members and members of other projects do not see the block on a public project' do
+    @issue.project.update_column(:is_public, true)
+    [Role.anonymous, Role.non_member].each { |role| role.add_permission!(:view_issues) }
+    # sysadmin holds view_sla in projects 2 and 3 only.
+    assert User.find_by_login!('sysadmin').allowed_to?(:view_sla, nil, global: true)
+
+    with_settings login_required: '0' do
+      get "/issues/#{@issue.id}"
+      assert_response :success
+      assert_select 'div.sla.attribute', 0
+      assert_level_name_hidden
+
+      %w[other sysadmin].each do |login|
+        reset!
+        log_user(login, login)
+        get "/issues/#{@issue.id}"
+        assert_response :success
+        assert_select 'div.sla.attribute', 0
+        assert_level_name_hidden
+      end
+    end
+  end
+
   test 'a reader sees the applicable level without a management link' do
     log_user('developer', 'developer')
 
@@ -98,5 +140,12 @@ class SlaIssueBlockTest < ApplicationSlaIntegrationTestCase
     assert_select 'div.sla.attribute', 1
     assert_select 'div.sla.attribute a[href="/sla/levels/1"]'
     assert_select "div.sla.attribute a[href='/issues/#{@issue.id}/sla_explain']", 0
+  end
+
+  private
+
+  def assert_level_name_hidden
+    assert_equal 1, @issue.get_sla_cache.sla_level_id
+    assert_not response.body.include?(SlaLevel.find(1).name), 'issue page exposes the SLA level'
   end
 end
