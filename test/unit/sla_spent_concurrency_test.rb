@@ -43,13 +43,18 @@ class SlaSpentConcurrencyTest < ApplicationSlaUnitsTestCase
     # Closed issue: the calculation window ends at closed_on, so the expected
     # total does not depend on the time the test runs.
     assert @issue.closed?
+    # The rows are committed (no test transaction) and shared with the test
+    # files running later in this process: keep them to restore in teardown.
+    @saved_spent_rows = SlaCacheSpent.where(issue_id: @issue.id).map(&:attributes)
     SlaCacheSpent.where(issue_id: @issue.id).delete_all
   end
 
   def teardown
-    # Leave no extra total behind for the tests sharing this database:
-    # the spent cache is recalculated on demand.
-    SlaCacheSpent.where(issue_id: @issue.id).delete_all if @issue
+    return unless @issue
+
+    SlaCacheSpent.where(issue_id: @issue.id).delete_all
+    # Same ids and timestamps: the database is left exactly as found.
+    SlaCacheSpent.insert_all(@saved_spent_rows) if @saved_spent_rows.present?
   end
 
   test "two concurrent calculations count the spent time once" do
