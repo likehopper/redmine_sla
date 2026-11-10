@@ -119,6 +119,12 @@ module RedmineSla
           content =
             if (item.is_a?(Issue) || item.is_a?(TimeEntry) || item.is_a?(SlaCache))
               case column.name
+              when :get_sla_level, /^get_sla_respect/
+                # A list can include subproject rows where the user lacks view_sla.
+                return '' unless RedmineSla::SlaQueryVisibility.visible?(item.project)
+              end
+
+              case column.name
               when :get_sla_level
                 # Link to the SLA level page when SLA level is present
                 link_to(

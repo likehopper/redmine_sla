@@ -30,6 +30,7 @@
 
 require_dependency 'issue_query'
 require_relative '../native_query_columns'
+require_relative '../sla_query_visibility'
 
 module RedmineSla
   module Patches
@@ -64,7 +65,10 @@ module RedmineSla
             selection = "
               SELECT 1
               FROM issues AS sla_issues
-              LEFT JOIN sla_caches ON ( sla_issues.id = sla_caches.issue_id )
+              LEFT JOIN sla_caches ON (
+                sla_issues.id = sla_caches.issue_id
+                AND sla_issues.project_id IN (#{RedmineSla::SlaQueryVisibility.visible_project_ids_sql})
+              )
               LEFT JOIN sla_levels ON ( sla_caches.sla_level_id = sla_levels.id )
               LEFT JOIN custom_values ON (
                 sla_levels.custom_field_id = custom_values.custom_field_id
@@ -98,6 +102,7 @@ module RedmineSla
             "(#{Issue.table_name}.id IN (
               SELECT sla_issues.id FROM issues AS sla_issues
               LEFT JOIN sla_caches ON sla_caches.issue_id = sla_issues.id
+                AND sla_issues.project_id IN (#{RedmineSla::SlaQueryVisibility.visible_project_ids_sql})
               WHERE #{condition}
             ))"
           end
@@ -143,7 +148,7 @@ module RedmineSla
             ) unless available_filters_without_sla_issue.key?('slas.sla_level_id')
 
             # SLA Level column
-            issue_get_sla_level = QueryColumn.new(
+            issue_get_sla_level = RedmineSla::SlaQueryColumn.new(
               :get_sla_level,
               caption:     l("sla_label.sla_level.singular"),
               groupable:   true,
@@ -156,7 +161,7 @@ module RedmineSla
             end
 
             def issue_get_sla_level.group_value(record)
-              record.get_sla_level&.name
+              value(record)&.name
             end
 
             self.available_columns << issue_get_sla_level
@@ -196,7 +201,7 @@ module RedmineSla
 
                 self.available_columns.delete_if { |c| c.name == name_to_sym }
 
-                issue_get_sla_respect = QueryColumn.new(
+                issue_get_sla_respect = RedmineSla::SlaQueryColumn.new(
                   name_to_sym,
                   caption: l(:label_sla_respect) + " " + sla_type.name,
                   groupable: true,

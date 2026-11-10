@@ -30,6 +30,7 @@
 
 require_dependency 'time_entry_query'
 require_relative '../native_query_columns'
+require_relative '../sla_query_visibility'
 
 module RedmineSla
   module Patches
@@ -66,7 +67,10 @@ module RedmineSla
             selection = "
               SELECT 1
               FROM issues AS sla_issues
-              LEFT JOIN sla_caches ON ( sla_issues.id = sla_caches.issue_id )
+              LEFT JOIN sla_caches ON (
+                sla_issues.id = sla_caches.issue_id
+                AND sla_issues.project_id IN (#{RedmineSla::SlaQueryVisibility.visible_project_ids_sql})
+              )
               LEFT JOIN sla_levels ON ( sla_caches.sla_level_id = sla_levels.id )
               LEFT JOIN custom_values ON (
                 sla_levels.custom_field_id = custom_values.custom_field_id
@@ -103,6 +107,7 @@ module RedmineSla
             "(#{Issue.table_name}.id IN (
               SELECT sla_issues.id FROM issues AS sla_issues
               LEFT JOIN sla_caches ON sla_caches.issue_id = sla_issues.id
+                AND sla_issues.project_id IN (#{RedmineSla::SlaQueryVisibility.visible_project_ids_sql})
               WHERE #{condition}
             )#{missing_issue})"
           end
@@ -140,7 +145,7 @@ module RedmineSla
             #
             # SLA LEVEL COLUMN
             #
-            time_entry_get_sla_level = QueryColumn.new(
+            time_entry_get_sla_level = RedmineSla::SlaQueryColumn.new(
               :get_sla_level,
               caption:  l("sla_label.sla_level.singular"),
               groupable: true,
@@ -152,7 +157,7 @@ module RedmineSla
             end
 
             def time_entry_get_sla_level.group_value(record)
-              record.get_sla_level&.name
+              value(record)&.name
             end
 
             self.available_columns << time_entry_get_sla_level
@@ -192,7 +197,7 @@ module RedmineSla
 
                 self.available_columns.delete_if { |c| c.name == name_to_sym }
 
-                time_entry_get_sla_respect = QueryColumn.new(
+                time_entry_get_sla_respect = RedmineSla::SlaQueryColumn.new(
                   name_to_sym,
                   caption:  l(:label_sla_respect) + " " + sla_type.name,
                   groupable: true,
