@@ -40,6 +40,7 @@ require_relative "lib/redmine_sla/helpers/sla_icons_helper"
 require_relative "lib/redmine_sla/patches/column_headers_patch"
 require_relative "lib/redmine_sla/patches/admin_menu_icons_patch"
 require_relative "lib/redmine_sla/patches/project_icons_patch"
+require_relative "lib/redmine_sla/patches/issue_priority_patch"
 
 # Load custom pluralization rules (e.g., "sla_cache" → "sla_caches")
 require_relative "config/initializers/inflections.rb"
@@ -145,6 +146,10 @@ RedmineApp::Application.config.after_initialize do
   # Invalidate SLA caches when Redmine changes or reassigns enumerations
   unless CustomFieldEnumeration.included_modules.include? RedmineSla::Patches::CustomFieldEnumerationPatch
     CustomFieldEnumeration.send(:include, RedmineSla::Patches::CustomFieldEnumerationPatch)
+  end
+
+  unless IssuePriority.included_modules.include? RedmineSla::Patches::IssuePriorityPatch
+    IssuePriority.send(:include, RedmineSla::Patches::IssuePriorityPatch)
   end
 
   # Extend Issue with SLA computation methods

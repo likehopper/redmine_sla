@@ -107,8 +107,9 @@ class SlaLevelTerm < ActiveRecord::Base
     errors.add(:sla_priority_id, :invalid) unless priority_scope.exists?(sla_priority_id)
   end
 
-  def sla_cache_level_ids_for_invalidation
-    [sla_level_id, attribute_in_database("sla_level_id")].compact.uniq
+  def sla_ids_for_cache_invalidation
+    level_ids = [sla_level_id, attribute_in_database("sla_level_id")].compact.uniq
+    SlaLevel.unscoped.where(id: level_ids).distinct.pluck(:sla_id)
   end
 
 end

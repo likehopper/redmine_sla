@@ -8,7 +8,7 @@
 #     - calculation of SLA terms, spent time and remaining time,
 #     - boolean SLA respect flag,
 #     - dynamic helper methods per SLA type,
-#     - automatic SLA cache refresh when project or tracker changes.
+#     - SLA cache invalidation when selection inputs change.
 #
 # Redmine SLA - Redmine Plugin 
 #
@@ -134,27 +134,36 @@ module RedmineSla
       #
       # This hook is called when the module is included into Issue:
       #   - includes InstanceMethods
-      #   - registers an after_save callback to refresh SLA cache when
-      #     project or tracker changes.
+      #   - registers an after_save callback to invalidate stale SLA caches.
       def self.included(base)
         base.prepend(ReloadMethods)
         base.send(:include, InstanceMethods)
         base.class_eval do
-          # After issue update, if project or tracker changed then refresh sla_cache !!!
-          after_save :sla_cache_update
+          after_save :invalidate_sla_cache_if_level_inputs_changed
           after_save :clear_sla_memoized_values
         end
       end
 
       module InstanceMethods
-        # Refresh SLA cache after an issue is updated, if project or tracker changed.
-        def sla_cache_update
-          # If project or tracker changed then the SLA cache must be refreshed
-          unless ( self.project_id == self.project_id_before_last_save && self.tracker_id == self.tracker_id_before_last_save )
-            SlaCache.find(self.id).refresh
+        private
+
+        # Rebuild the level and spent caches on the next read, outside the
+        # issue-save request. Custom-field values are persisted by Redmine's
+        # earlier after_save callback, but retain their pre-save value here.
+        def invalidate_sla_cache_if_level_inputs_changed
+          return unless saved_change_to_project_id? || saved_change_to_tracker_id? ||
+                        saved_change_to_priority_id? || sla_priority_custom_value_changed?
+
+          SlaCache.invalidate_issue(id)
+        end
+
+        def sla_priority_custom_value_changed?
+          changed_field_ids = custom_field_values.each_with_object([]) do |field_value, ids|
+            ids << field_value.custom_field_id if field_value.value_was != field_value.value
           end
-        rescue ActiveRecord::RecordNotFound
-          # Ignore missing SLA cache entries
+          return false if changed_field_ids.empty?
+
+          SlaLevel.unscoped.where(custom_field_id: changed_field_ids.uniq).exists?
         end
       end
     end

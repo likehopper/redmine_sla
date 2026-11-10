@@ -25,11 +25,12 @@
 require File.expand_path('../../application_sla_units_test_case', __FILE__)
 
 class SlaIssueCacheFreshnessTest < ApplicationSlaUnitsTestCase
-  test "saving a priority change refreshes memoized contractual terms" do
+  test "saving a priority change deletes the cache and defers recalculation" do
     issue = Issue.find(4)
     assert_equal 1680, issue.get_sla_term(1)
 
-    issue.update!(priority_id: 2)
+    assert_no_sla_function_calls { issue.update!(priority_id: 2) }
+    assert_not SlaCache.unscoped.exists?(issue_id: issue.id)
 
     assert_equal 840, Issue.find(issue.id).get_sla_term(1)
     assert_equal 840, issue.get_sla_term(1)
@@ -48,30 +49,57 @@ class SlaIssueCacheFreshnessTest < ApplicationSlaUnitsTestCase
   test "saving a tracker change refreshes a memoized SLA level" do
     issue = Issue.find(4)
     assert_not_nil issue.get_sla_level
-    issue.update!(tracker_id: 1)
+    assert_no_sla_function_calls { issue.update!(tracker_id: 1) }
+    assert_not SlaCache.unscoped.exists?(issue_id: issue.id)
 
-    assert_equal Issue.find(issue.id).get_sla_level&.id, issue.get_sla_level&.id
+    fresh_level = Issue.find(issue.id).get_sla_level
+    assert_not_nil fresh_level
+    assert_equal fresh_level.id, issue.get_sla_level&.id
     assert_equal Issue.find(issue.id).get_sla_term(1), issue.get_sla_term(1)
   end
 
-  test "saving a project change refreshes memoized cache and spent time" do
+  test "saving a project change refreshes cache and spent time for another matching SLA" do
+    issue = Issue.find(34)
+    original_level = issue.get_sla_level
+    assert_not_nil original_level
+    issue.get_sla_cache
+    issue.get_sla_term(1)
+    issue.get_sla_spent(1)
+
+    assert_no_sla_function_calls { issue.update!(project_id: 3) }
+
+    fresh_issue = Issue.find(issue.id)
+    assert_not_nil fresh_issue.get_sla_cache
+    assert_not_nil fresh_issue.get_sla_level
+    assert_not_equal original_level.id, fresh_issue.get_sla_level.id
+    assert_not_nil fresh_issue.get_sla_term(1)
+    assert_not_nil fresh_issue.get_sla_spent(1)
+    assert_equal fresh_issue.get_sla_level.id, issue.get_sla_level.id
+    assert_equal fresh_issue.get_sla_term(1), issue.get_sla_term(1)
+    assert_equal fresh_issue.get_sla_spent(1), issue.get_sla_spent(1)
+  end
+
+  test "saving a project change clears the cache when no level matches the priority" do
     issue = Issue.find(4)
     issue.get_sla_cache
     issue.get_sla_term(1)
     issue.get_sla_spent(1)
 
-    issue.update!(project_id: 4)
+    assert_no_sla_function_calls { issue.update!(project_id: 4) }
 
     fresh_issue = Issue.find(issue.id)
-    assert_equal 4, issue.get_sla_cache.project_id
-    assert_equal fresh_issue.get_sla_level.id, issue.get_sla_level.id
+    assert_nil issue.get_sla_cache
+    assert_nil fresh_issue.get_sla_cache
+    assert_not SlaCache.unscoped.exists?(issue_id: issue.id)
+    assert_nil fresh_issue.get_sla_level
+    assert_nil issue.get_sla_level
     assert_nil fresh_issue.get_sla_term(1)
     assert_nil issue.get_sla_term(1)
     assert_nil fresh_issue.get_sla_spent(1)
     assert_nil issue.get_sla_spent(1)
   end
 
-  test "saving a custom field change refreshes memoized contractual terms" do
+  test "saving a custom-field priority change deletes the cache and defers recalculation" do
     issue = Issue.find(66)
     initial_term = issue.get_sla_term(1)
     assert_not_nil initial_term
@@ -82,9 +110,22 @@ class SlaIssueCacheFreshnessTest < ApplicationSlaUnitsTestCase
     assert_not_nil alternative
 
     issue.custom_field_values = {level.custom_field_id.to_s => alternative.sla_priority_id.to_s}
-    issue.save!
+    assert_no_sla_function_calls { issue.save! }
+    assert_not SlaCache.unscoped.exists?(issue_id: issue.id)
 
     assert_equal alternative.term, Issue.find(issue.id).get_sla_term(1)
     assert_equal alternative.term, issue.get_sla_term(1)
+  end
+
+  private
+
+  def assert_no_sla_function_calls
+    calls = []
+    subscriber = lambda do |*args|
+      sql = args.last[:sql]
+      calls << sql if sql.match?(/\bsla_get_(level|spent)\s*\(/i)
+    end
+    ActiveSupport::Notifications.subscribed(subscriber, 'sql.active_record') { yield }
+    assert_empty calls, calls.join("\n")
   end
 end

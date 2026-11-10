@@ -103,9 +103,27 @@ class SlaCache < ActiveRecord::Base
       SlaCache.where(project: project.id).delete_all
     end
   end
+
+  # Cache rows are keyed by level, but any configuration change can change the
+  # winning level for an issue. Invalidate every cached level in each SLA.
+  def self.invalidate_slas(sla_ids)
+    sla_ids = Array(sla_ids).compact.uniq
+    return if sla_ids.empty?
+
+    levels = SlaLevel.unscoped.where(sla_id: sla_ids).select(:id)
+    unscoped.where(sla_level_id: levels).delete_all
+  end
+
+  def self.invalidate_project_tracker(project_id, tracker_id)
+    unscoped.where(project_id: project_id, tracker_id: tracker_id).delete_all
+  end
+
+  def self.invalidate_issue(issue_id)
+    unscoped.where(issue_id: issue_id).delete_all
+  end
     
   def self.destroy_by_issue_id(issue_id)
-    SlaCache.where(issue: issue_id).delete_all
+    invalidate_issue(issue_id)
   end              
 
   # For SlaCacheQuery#GroupBy: get_sla_respect_N / get_sla_remain_N / get_sla_spent_N /
