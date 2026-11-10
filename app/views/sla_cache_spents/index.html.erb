@@ -20,7 +20,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 <% html_title(l(:sla_label_global_settings)) %>
 <div class="content"> 
   <div class="contextual">
-    <%= link_to sla_icon('del', l('sla_label.sla_cache_spent.purge')), ( @project.nil? ? purge_sla_cache_spents_path : purge_project_sla_cache_spents_path(@project) ),
+    <%= link_to sla_icon('del', l('sla_label.sla_cache_spent.purge')), purge_sla_cache_spents_path(project_id: @project&.identifier),
           title: l('sla_label.sla_cache_spent.purge'), class: 'icon icon-del',
           method: :patch, :data => {:confirm => l(:text_are_you_sure)} if User.current.admin? || (@project && User.current.allowed_to?(:manage_sla, @project))
     -%>
@@ -30,6 +30,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     <%= title l('sla_label.sla_cache_spent.index') %>
   </div>
   <%= form_tag(sla_cache_spents_path, method: :get, id: 'query_form') do %>
+    <%= hidden_field_tag('project_id', @project.identifier) if @project %>
     <%= render partial: 'queries/query_form' %>
   <% end %>
   <% if @query.valid? %>
@@ -52,6 +53,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
   <%= form_tag(_sla_cache_spents_path(@project, nil, :format => 'csv'), :method => :get, :id => 'csv-export-form') do %>
   <%= query_as_hidden_field_tags @query %>
   <%= hidden_field_tag('query_name', @query.name) %>
+  <%= hidden_field_tag('project_id', @project.identifier) if @project %>
   <p>
     <label><%= radio_button_tag 'c[]', '', true %> <%= l(:description_selected_columns) %></label><br />
     <label><%= radio_button_tag 'c[]', 'all_inline' %> <%= l(:description_all_columns) %></label>
