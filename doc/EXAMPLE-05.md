@@ -1,6 +1,6 @@
 # EXAMPLE-05 — Complex service levels in working (HO) and non-working hours (HNO)
 
-This final example demonstrates the **most advanced time-calculation behavior** of the Redmine SLA plugin:
+This example demonstrates the **most advanced time-calculation behavior** of the Redmine SLA plugin:
 **combining working hours (HO) and non-working hours (HNO)** within the same service model.
 
 Up to now (EXAMPLE-01 → EXAMPLE-04), all SLAs followed a simple rule:
@@ -304,4 +304,5 @@ With EXAMPLE-05, you learned how to:
 - use the `match` flag to represent HO/HNO behavior
 - build advanced SLA models without custom code
 
-This concludes the progressive SLA documentation examples.
+This concludes the working-hours and non-working-hours example. [EXAMPLE-06](EXAMPLE-06.md)
+shows how to select an SLA calendar based on issue priority.

@@ -14,7 +14,7 @@
 
 ## Overview
 
-Current version: **3.4.2**. See the [changelog](CHANGELOG.md) for release details.
+Current version: **3.6.0**. See the [changelog](CHANGELOG.md) for release details.
 
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
@@ -284,6 +284,17 @@ Plugin is ready to use.
 
 ------------------------------------------------------------------------
 
+## Upgrade to 3.6.0
+
+Version **3.6.0** selects only SLA levels with a term for the issue's current
+priority. Tickets may move to another matching level and calendar; tickets
+with no matching term in any level have no SLA. Migration 028 updates the
+calculation function and removes only cache entries whose selected level is
+no longer eligible. Update the plugin files, run
+`bundle exec rake redmine:plugins:migrate RAILS_ENV=production`, then restart
+Redmine. Review priority coverage before upgrading; see
+[EXAMPLE-06](doc/EXAMPLE-06.md) and the [changelog](CHANGELOG.md).
+
 ## Upgrade to 3.5.2
 
 Version **3.5.2** fixes the SLA spent list opened from a project, which
@@ -507,6 +518,7 @@ Restart application server.
     -   [Example 03](doc/EXAMPLE-03.md)
     -   [Example 04](doc/EXAMPLE-04.md)
     -   [Example 05](doc/EXAMPLE-05.md)
+    -   [Example 06](doc/EXAMPLE-06.md)
 -   [SLA Compute Explanation](doc/COMPUTE.md)
 -   [Plugin settings](doc/SETTINGS.md)
 -   [Projects with SLA](doc/PROJECT_LISTS.md)

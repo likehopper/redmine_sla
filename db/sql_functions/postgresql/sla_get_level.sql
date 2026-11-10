@@ -33,6 +33,7 @@ $BODY$
   ---------------------------------------------------------------------------
   DECLARE v_issue_project_id INTEGER ;
   DECLARE v_issue_tracker_id INTEGER ;
+  DECLARE v_issue_priority_id INTEGER ;
   DECLARE v_issue_created_on TIMESTAMP WITHOUT TIME ZONE ;
   -- DECLARE v_issue_updated_on TIMESTAMP WITHOUT TIME ZONE ;  -- (unused)
   DECLARE v_current_timestamp TIMESTAMP WITHOUT TIME ZONE ;
@@ -114,12 +115,14 @@ BEGIN
   SELECT
     sla_get_date("issues"."created_on"),
     "issues"."tracker_id",
-    "issues"."project_id"
+    "issues"."project_id",
+    "issues"."priority_id"
   INTO
     v_issue_created_on,
     -- v_issue_updated_on,
     v_issue_tracker_id,
-    v_issue_project_id
+    v_issue_project_id,
+    v_issue_priority_id
   FROM "issues"
   WHERE "issues"."id" = p_issue_id ;
 
@@ -233,6 +236,30 @@ BEGIN
     -- Must match project and tracker SLA configuration
     "sla_project_trackers"."project_id" = v_issue_project_id
     AND "sla_project_trackers"."tracker_id" = v_issue_tracker_id
+
+    -- Native priorities remain numeric; custom values are strings and a blank
+    -- value matches no term.
+    AND EXISTS (
+      SELECT 1
+      FROM "sla_level_terms"
+      LEFT JOIN "custom_values"
+        ON (
+          "custom_values"."customized_type" = 'Issue'
+          AND "custom_values"."customized_id" = p_issue_id
+          AND "custom_values"."custom_field_id" = "sla_levels"."custom_field_id"
+        )
+      WHERE "sla_level_terms"."sla_level_id" = "sla_levels"."id"
+        AND (
+          (
+            "sla_levels"."custom_field_id" IS NULL
+            AND "sla_level_terms"."sla_priority_id" = v_issue_priority_id
+          )
+          OR (
+            "sla_levels"."custom_field_id" IS NOT NULL
+            AND CAST("sla_level_terms"."sla_priority_id" AS VARCHAR) = "custom_values"."value"
+          )
+        )
+    )
 
     -- Exclude declared "non-matching" holidays (anti-join: no match found above)
     AND "excluded_holidays"."date" IS NULL

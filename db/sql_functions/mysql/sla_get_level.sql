@@ -43,6 +43,7 @@ NOT DETERMINISTIC
 BEGIN
     DECLARE v_issue_project_id INT DEFAULT NULL;
     DECLARE v_issue_tracker_id INT DEFAULT NULL;
+    DECLARE v_issue_priority_id INT DEFAULT NULL;
     DECLARE v_issue_created_on DATETIME DEFAULT NULL;
     DECLARE v_current_timestamp DATETIME DEFAULT NULL;
 
@@ -93,8 +94,8 @@ BEGIN
     END IF;
 
     -- Load required issue attributes (project, tracker, creation date)
-    SELECT sla_get_date(created_on), tracker_id, project_id
-    INTO v_issue_created_on, v_issue_tracker_id, v_issue_project_id
+    SELECT sla_get_date(created_on), tracker_id, project_id, priority_id
+    INTO v_issue_created_on, v_issue_tracker_id, v_issue_project_id, v_issue_priority_id
     FROM issues
     WHERE id = p_issue_id;
 
@@ -176,6 +177,31 @@ BEGIN
       -- Must match project and tracker SLA configuration
       sla_project_trackers.project_id = v_issue_project_id
       AND sla_project_trackers.tracker_id = v_issue_tracker_id
+
+      -- Native priorities remain numeric; custom values are text and use a
+      -- binary comparison to avoid connection/column collation conflicts.
+      AND EXISTS (
+        SELECT 1
+        FROM sla_level_terms
+        LEFT JOIN custom_values
+          ON (
+            custom_values.customized_type = 'Issue'
+            AND custom_values.customized_id = p_issue_id
+            AND custom_values.custom_field_id = sla_levels.custom_field_id
+          )
+        WHERE sla_level_terms.sla_level_id = sla_levels.id
+          AND (
+            (
+              sla_levels.custom_field_id IS NULL
+              AND sla_level_terms.sla_priority_id = v_issue_priority_id
+            )
+            OR (
+              sla_levels.custom_field_id IS NOT NULL
+              AND CAST(CAST(sla_level_terms.sla_priority_id AS CHAR) AS BINARY) =
+                CAST(custom_values.value AS BINARY)
+            )
+          )
+      )
 
       -- Exclude declared "non-matching" holidays (anti-join: no match found above)
       AND excluded_holidays.`date` IS NULL

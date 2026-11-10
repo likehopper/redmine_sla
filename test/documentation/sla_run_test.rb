@@ -69,6 +69,14 @@ module SlaDocumentationFixtureHelpers
   def load_doc_fixtures!(suite:)
     @current_suite = suite
     @fixtures = doc_fixtures(suite: suite)
+    Array(@fixtures['issue_priorities']).each do |attributes|
+      name = attributes.fetch('name')
+      IssuePriority.find_or_create_by!(name: name) do |priority|
+        priority.position = IssuePriority.maximum(:position).to_i + 1
+        priority.active = true
+        priority.is_default = false
+      end
+    end
   end
 
   def doc_fixtures(suite:)
