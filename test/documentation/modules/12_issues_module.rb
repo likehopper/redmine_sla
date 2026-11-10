@@ -31,26 +31,64 @@ module IssuesDocumentationTest
     created_issues = []
 
     @fixtures['issues'].each.with_index(1) do |(issue_key, defn), idx|
+      defn = issue_definition_for_documentation(defn)
       issue = create_issues_with_history!(defn)
-      created_issues << [issue_key, issue, idx]
+      created_issues << [issue_key, issue, idx, defn]
     end
 
     # Ensure SLA cache is updated after all issues/journals are created.
     # invoke_update_sla_task!
 
     # Visit each issue and take screenshots (issue page + SLA tab).
-    created_issues.each do |issue_key, issue, idx|
-      visit "/issues/#{issue.id}"
-      take_doc_screenshot(format('%02d-01-%02d-%s-issue-show.png', id, idx, issue_key))
+    created_issues.each do |issue_key, issue, idx, defn|
+      capture_screenshots = lambda do
+        visit "/issues/#{issue.id}"
+        if (expected_level = defn['expected_sla_level'])
+          assert_equal expected_level, Issue.find(issue.id).get_sla_level&.name
+        end
+        take_doc_screenshot(format('%02d-01-%02d-%s-issue-show.png', id, idx, issue_key))
 
-      # "Explain" the SLA calculation for this issue (link next to the SLA
-      # block, visible here since we're logged in as admin).
-      click_link l(:button_sla_explain)
-      take_doc_screenshot(format('%02d-02-%02d-%s-issue-explain.png', id, idx, issue_key))
+        # "Explain" the SLA calculation for this issue (link next to the SLA
+        # block, visible here since we're logged in as admin).
+        click_link l(:button_sla_explain)
+        take_doc_screenshot(format('%02d-02-%02d-%s-issue-explain.png', id, idx, issue_key))
+      end
+
+      capture_screenshots.call
     end
   end
 
   private
+
+  def issue_definition_for_documentation(defn)
+    return defn unless defn['created_outside_business_hours']
+
+    shifted = defn.deep_dup
+    history = Array(shifted['history'])
+    anchor = Time.zone.parse(history.first.fetch('at'))
+    created_at = previous_weekday_at_22
+    offset = created_at - anchor
+
+    shifted['start_date'] = created_at.to_date.iso8601
+    shifted['due_date'] = (created_at.to_date + 1).iso8601
+    shifted['history'] = history.map do |step|
+      step.merge('at' => (Time.zone.parse(step.fetch('at')) + offset).strftime('%Y-%m-%d %H:%M:%S'))
+    end
+    shifted
+  end
+
+  def previous_weekday_at_22
+    now = Time.current
+    1.upto(7) do |days_ago|
+      date = now.to_date - (days_ago - 1)
+      next unless date.cwday <= 5
+
+      candidate = Time.zone.local(date.year, date.month, date.day, 22)
+      return candidate if candidate < now
+    end
+
+    raise 'Unable to find a prior weekday for the documentation issue'
+  end
 
   # Create an issue and replay its status transitions as journals in the past.
   def create_issues_with_history!(defn)

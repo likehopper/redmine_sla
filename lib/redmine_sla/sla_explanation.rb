@@ -48,8 +48,10 @@ module RedmineSla
         }
       end
 
-      selected = rows.filter_map { |row| row['start_date'] }.min
-      rows.each { |row| row['selected'] = row['start_date'] == selected if selected }
+      selected_id = rows.reject { |row| row['start_date'].nil? }
+                        .min_by { |row| [row['start_date'], row['sla_level_id']] }
+                        &.fetch('sla_level_id')
+      rows.each { |row| row['selected'] = row['sla_level_id'] == selected_id if selected_id }
       rows.sort_by { |row| [row['start_date'].nil? ? 1 : 0, row['start_date'] || Time.at(0)] }
     end
 
@@ -95,11 +97,30 @@ module RedmineSla
     private
 
     def candidate_levels
-      # Same rule as sla_get_level: no SLA level without the SLA module.
       return [] unless @issue.project&.module_enabled?(:sla)
 
       sla_ids = SlaProjectTracker.where(project_id: @issue.project_id, tracker_id: @issue.tracker_id).pluck(:sla_id)
-      SlaLevel.with_references.where(sla_id: sla_ids).includes(:sla_calendar).distinct.to_a
+      levels = SlaLevel.with_references.where(sla_id: sla_ids).includes(:sla_calendar).distinct.to_a
+      return [] if levels.empty?
+
+      terms_by_level = SlaLevelTerm.where(sla_level_id: levels.map(&:id))
+                                   .pluck(:sla_level_id, :sla_priority_id)
+                                   .group_by(&:first)
+      custom_field_ids = levels.filter_map(&:custom_field_id).uniq
+      values_by_field = CustomValue.where(
+        customized_type: 'Issue',
+        customized_id: @issue.id,
+        custom_field_id: custom_field_ids
+      ).pluck(:custom_field_id, :value).group_by(&:first)
+
+      levels.select do |level|
+        values = if level.custom_field_id.nil?
+                   [@issue.priority_id.to_s]
+                 else
+                   Array(values_by_field[level.custom_field_id]).map(&:last)
+                 end
+        terms_by_level.fetch(level.id, []).any? { |_level_id, priority_id| values.include?(priority_id.to_s) }
+      end
     end
 
     def first_matching_minute(calendar_id)
