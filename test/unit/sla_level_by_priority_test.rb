@@ -111,6 +111,31 @@ class SlaLevelByPriorityTest < ApplicationSlaUnitsTestCase
     assert SlaCache.unscoped.exists?(valid_cache.id)
   end
 
+  test "migration keeps custom-field caches matching a term and removes non-matching or blank ones" do
+    caches = [66, 67, 68].map { |issue_id| SlaCache.find_by_issue_id(issue_id) }
+    caches.each do |cache|
+      assert cache
+      assert_not_nil SlaLevel.find(cache.sla_level_id).custom_field_id
+    end
+    matching_cache, non_matching_cache, blank_cache = caches
+    custom_field_id = SlaLevel.find(matching_cache.sla_level_id).custom_field_id
+    issue_value = ->(cache) {
+      CustomValue.where(customized_type: 'Issue', customized_id: cache.issue_id, custom_field_id: custom_field_id)
+    }
+    assert SlaLevelTerm.exists?(sla_level_id: matching_cache.sla_level_id,
+                                sla_priority_id: issue_value.(matching_cache).pick(:value).to_i)
+    # Bypass callbacks so the stale caches survive until the migration runs.
+    issue_value.(non_matching_cache).update_all(value: '999')
+    issue_value.(blank_cache).update_all(value: '')
+    assert_not SlaLevelTerm.exists?(sla_level_id: non_matching_cache.sla_level_id, sla_priority_id: 999)
+
+    SelectSlaLevelByPriority.new.delete_caches_without_priority_term
+
+    assert SlaCache.unscoped.exists?(matching_cache.id)
+    assert_not SlaCache.unscoped.exists?(non_matching_cache.id)
+    assert_not SlaCache.unscoped.exists?(blank_cache.id)
+  end
+
   private
 
   def configure_priority_levels
