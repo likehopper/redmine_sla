@@ -477,6 +477,60 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     end
   end
 
+  test "destroying a type invalidates SLAs whose levels have terms of that type" do
+    sla_type = SlaType.find(2)
+    level_ids = SlaLevel.unscoped.joins(:sla_level_terms)
+                        .where(sla_level_terms: { sla_type_id: sla_type.id })
+                        .distinct.pluck(:id)
+    level_ids = levels_in_same_sla(level_ids)
+    # SLAs without terms of this type keep their caches.
+    assert SlaCache.unscoped.where.not(sla_level_id: level_ids).exists?
+
+    assert_only_affected_slas_invalidated(level_ids) { sla_type.destroy! }
+    assert_empty SlaLevelTerm.unscoped.where(sla_type_id: sla_type.id)
+  end
+
+  test "type metadata and position changes preserve caches without dependency queries" do
+    sla_type = SlaType.find(2)
+    assert_not_empty SlaLevelTerm.unscoped.where(sla_type_id: sla_type.id)
+    assert_not_equal 1, sla_type.position
+
+    assert_cache_queries(0) do
+      assert_caches_preserved do
+        sla_type.update!(name: "#{sla_type.name} renamed", description: "Updated metadata", position: 1)
+      end
+    end
+    assert_equal 1, sla_type.reload.position
+  end
+
+  test "custom field description and calculation changes invalidate affected SLAs" do
+    field = IssueCustomField.find(1)
+    assert field.is_required
+
+    assert_only_affected_slas_invalidated(custom_field_level_ids) do
+      field.update!(description: 'Updated SLA priority field', is_required: false)
+    end
+  end
+
+  test "renaming a level while changing its calendar invalidates its SLA" do
+    level = SlaLevel.find(4)
+    calendar = SlaCalendar.create!(name: "Renamed level calendar")
+    ids = SlaLevel.unscoped.where(sla_id: level.sla_id).pluck(:id)
+    assert_only_affected_slas_invalidated(ids) do
+      level.update!(name: "#{level.name} renamed", sla_calendar: calendar)
+    end
+  end
+
+  test "renaming a level while moving it invalidates the old and new SLA" do
+    level = SlaLevel.find(4)
+    destination = SlaLevel.find(6).sla
+    assert_not_equal level.sla_id, destination.id
+    ids = SlaLevel.unscoped.where(sla_id: [level.sla_id, destination.id]).pluck(:id)
+    assert_only_affected_slas_invalidated(ids) do
+      level.update!(name: "#{level.name} moved", sla: destination)
+    end
+  end
+
   test "custom field deletion removes affected caches" do
     assert_only_affected_slas_invalidated(custom_field_level_ids) do
       IssueCustomField.find(1).destroy!
@@ -553,6 +607,20 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
 
     assert_only_pairs_invalidated(pairs) do
       assert_no_sla_function_calls { mapping.update!(tracker_id: free_tracker.id) }
+    end
+  end
+
+  test "moving a mapping to another project deletes caches of its old pair" do
+    mapping = mapping_with_caches
+    free_project = Project.where.not(
+      id: SlaProjectTracker.where(tracker_id: mapping.tracker_id).select(:project_id)
+    ).order(:id).first
+    old_pair = [mapping.project_id, mapping.tracker_id]
+    # Only mapped pairs have caches, so the old pair carries the deletions.
+    assert_not_empty caches_for_pairs([old_pair])
+
+    assert_only_pairs_invalidated([old_pair, [free_project.id, mapping.tracker_id]]) do
+      assert_no_sla_function_calls { mapping.update!(project_id: free_project.id) }
     end
   end
 

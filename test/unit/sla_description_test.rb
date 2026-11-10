@@ -154,17 +154,17 @@ class SlaDescriptionTest < ApplicationSlaUnitsTestCase
       assert_equal spent_ids, SlaCacheSpent.unscoped.order(:id).pluck(:id)
     end
 
-    test "#{model_class.name} name and description changes #{model_class == SlaCalendar ? 'preserve' : 'invalidate'} caches" do
+    test "#{model_class.name} name and description changes preserve caches" do
       record = model_class.find(1)
       affected_level_ids = model_class == SlaLevel ? [record.id] : SlaLevel.where(sla_calendar_id: record.id).pluck(:id)
-      affected_caches = SlaCache.unscoped.where(sla_level_id: affected_level_ids)
-      assert_not_empty affected_caches
+      affected_caches = SlaCache.unscoped.where(sla_level_id: affected_level_ids).order(:id)
+      cache_ids = affected_caches.pluck(:id)
+      spent_ids = SlaCacheSpent.unscoped.where(sla_cache_id: cache_ids).order(:id).pluck(:id)
+      assert_not_empty cache_ids
+      assert_not_empty spent_ids
       record.update!(name: "#{record.name} renamed", description: 'Changed together')
-      if model_class == SlaCalendar
-        assert_not_empty affected_caches.reload
-      else
-        assert_empty affected_caches.reload
-      end
+      assert_equal cache_ids, affected_caches.pluck(:id)
+      assert_equal spent_ids, SlaCacheSpent.unscoped.where(sla_cache_id: cache_ids).order(:id).pluck(:id)
     end
   end
 

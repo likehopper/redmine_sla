@@ -27,6 +27,7 @@ class SlaType < ActiveRecord::Base
   has_many :sla_project_trackers, through: :slas
 
   include Redmine::SafeAttributes
+  include RedmineSla::InvalidatesSlaCache
 
   # Redmine models normally get this for free through ApplicationRecord (see
   # lib/redmine/preparation.rb), but this plugin's models inherit directly
@@ -67,5 +68,19 @@ class SlaType < ActiveRecord::Base
   def to_s
     self.name
   end
-  
+
+  private
+
+  # Saves only change metadata or position, and a new type has no terms yet.
+  def sla_cache_preserving_change?
+    true
+  end
+
+  # The database cascade deletes this type's terms without callbacks, which
+  # can make a level ineligible for an issue priority.
+  def sla_ids_for_cache_invalidation
+    terms = SlaLevelTerm.unscoped.where(sla_type_id: id).select(:sla_level_id)
+    SlaLevel.unscoped.where(id: terms).distinct.pluck(:sla_id)
+  end
+
 end
