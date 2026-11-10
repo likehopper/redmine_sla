@@ -78,8 +78,8 @@ class SlaCalendar < ActiveRecord::Base
     persisted? && (changes_to_save.keys - %w[name description]).empty?
   end
 
-  def sla_cache_level_ids_for_invalidation
-    SlaLevel.unscoped.sharing_sla_with_calendars(id).pluck(:id)
+  def sla_ids_for_cache_invalidation
+    SlaLevel.unscoped.where(sla_calendar_id: id).distinct.pluck(:sla_id)
   end
 
 end

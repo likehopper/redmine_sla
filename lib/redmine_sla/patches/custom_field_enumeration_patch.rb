@@ -11,11 +11,11 @@ module RedmineSla
 
       private
 
-      def sla_cache_level_ids_for_invalidation
+      def sla_ids_for_cache_invalidation
         # Redmine can reassign custom values with update_all on deletion.
         # Invalidate every level using the field, including the previous field.
         field_ids = [custom_field_id, attribute_in_database('custom_field_id')].compact.uniq
-        SlaLevel.unscoped.where(custom_field_id: field_ids).pluck(:id)
+        SlaLevel.unscoped.where(custom_field_id: field_ids).distinct.pluck(:sla_id)
       end
     end
   end
