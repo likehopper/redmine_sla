@@ -39,6 +39,25 @@ class SlaCacheSpentTest < ApplicationSlaUnitsTestCase
     assert_equal 90, SlaCacheSpent.find_by!(issue_id: issue.id, sla_type_id: gtr).spent
   end
 
+  test "refresh keeps the other SLA types of the same issue" do
+    project = Project.find_by!(identifier: 'project-sla-tests-tma')
+    issue = Issue.find_by!(project: project, subject: 'Bug with simple SLA')
+    gtr = 2
+    # Non-transactional tests sharing the process may have purged these rows.
+    SlaType.all.each { |sla_type| SlaCacheSpent.find_by_issue_and_type_id(issue, sla_type.id) }
+    spent = SlaCacheSpent.find_by_issue_and_type_id(issue, gtr)
+    assert_not_nil spent
+    other_types = SlaCacheSpent.unscoped.where(issue_id: issue.id).where.not(sla_type_id: gtr)
+    other_ids = other_types.order(:id).pluck(:id)
+    assert_not_empty other_ids
+
+    spent.refresh
+
+    assert_equal other_ids, other_types.order(:id).pluck(:id)
+    assert_not SlaCacheSpent.unscoped.exists?(spent.id)
+    assert SlaCacheSpent.unscoped.exists?(issue_id: issue.id, sla_type_id: gtr)
+  end
+
   test "global spent purge keeps cache rows" do
     cache_ids = SlaCache.unscoped.order(:id).pluck(:id)
     assert_not_empty cache_ids
