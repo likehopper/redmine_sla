@@ -119,34 +119,8 @@ class SlaLevelsControllerTest < ApplicationSlaFunctionalsTestCase
 
   test "should display nested term validation errors" do
     @request.session[:user_id] = 1
-
-    patch :update, params: {
-      id: 1,
-      sla_level: {
-        sla_level_terms_attributes: {
-          "1" => {
-            "1" => { id: 1, term: "-1" }
-          }
-        }
-      }
-    }
-
-    assert_response :success
-    assert_select "#errorExplanation"
-  end
-
-  test "should invalidate a SLA once when updating several nested terms" do
-    @request.session[:user_id] = 1
-    level = SlaLevel.joins(:sla_level_terms)
-                    .group("sla_levels.id").having("COUNT(sla_level_terms.id) >= 2").first
-    terms = level.sla_level_terms.limit(2).to_a
-    attributes = terms.each_with_object({}) do |term, by_type|
-      by_type[term.sla_type_id.to_s] ||= {}
-      by_type[term.sla_type_id.to_s][term.sla_priority_id.to_s] = {
-        id: term.id,
-        term: term.term + 1
-      }
-    end
+    term = SlaLevelTerm.find(1)
+    cache_ids = SlaCache.unscoped.order(:id).pluck(:id)
     deletes = []
     subscriber = lambda do |*args|
       sql = args.last[:sql]
@@ -154,12 +128,23 @@ class SlaLevelsControllerTest < ApplicationSlaFunctionalsTestCase
     end
 
     ActiveSupport::Notifications.subscribed(subscriber, "sql.active_record") do
-      patch :update, params: {id: level.id, sla_level: {sla_level_terms_attributes: attributes}}
+      patch :update, params: {
+        id: 1,
+        sla_level: {
+          sla_level_terms_attributes: {
+            "1" => {
+              "1" => { id: term.id, term: "-1" }
+            }
+          }
+        }
+      }
     end
 
-    assert_redirected_to sla_levels_path
-    assert_equal 1, deletes.size, deletes.join("\n")
-    terms.each { |term| assert_equal term.term + 1, term.reload.term }
+    assert_response :success
+    assert_select "#errorExplanation"
+    assert_empty deletes
+    assert_equal cache_ids, SlaCache.unscoped.order(:id).pluck(:id)
+    assert_not_equal(-1, term.reload.term)
   end
 
   ### As manager #2 ###

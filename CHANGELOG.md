@@ -10,24 +10,19 @@
 - Refresh issue SLA caches when a native priority or a custom-field priority
   changes. Invalidate competing levels when terms, priority fields,
   enumerations or native priorities change.
+- Invalidate the caches of issues reassigned when a native priority is deleted.
+  Redmine performs that reassignment with `update_all`, which bypasses issue
+  callbacks; caches of issues using other priorities are preserved.
 - Invalidate caches of SLAs whose levels have terms of a deleted SLA type: the
   database cascade removed those terms without invalidating the caches.
 - Explain the same priority-filtered candidates used by the calculation.
 - Add a concise calendar-by-priority example with documentation fixtures that
   assert the selected level and capture the issue and explanation screens.
 
-### Fixed
-
-- Invalidate the caches of issues reassigned when a native priority is deleted.
-  Redmine performs that reassignment with `update_all`, which bypasses issue
-  callbacks; a competing native-priority level could otherwise remain hidden
-  behind a stale custom-priority level.
-
 ### Changed
 
-- Batch cache invalidation when several terms of one SLA level are edited in a
-  single request. The affected SLA is now invalidated once after the nested
-  update instead of issuing one identical cache deletion per term.
+- Show the cache-purge warning when a nested term update also changes the SLA
+  level's priority custom field.
 
 ### Upgrade
 

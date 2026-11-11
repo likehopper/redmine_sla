@@ -114,9 +114,7 @@ class SlaLevelsController < ApplicationController
     end
 
     saved = if nested_terms
-              SlaLevel.transaction do
-                RedmineSla::InvalidatesSlaCache.batch { @sla_level.update(sla_level_params) }
-              end
+              @sla_level.update(sla_level_params)
             else
               @sla_level.save
             end

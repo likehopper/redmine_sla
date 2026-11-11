@@ -148,9 +148,6 @@ RedmineApp::Application.config.after_initialize do
     CustomFieldEnumeration.send(:include, RedmineSla::Patches::CustomFieldEnumerationPatch)
   end
 
-  unless IssuePriority.included_modules.include? RedmineSla::Patches::IssuePriorityPatch
-    IssuePriority.send(:include, RedmineSla::Patches::IssuePriorityPatch)
-  end
   unless IssuePriority.ancestors.include? RedmineSla::Patches::IssuePriorityReassignmentPatch
     IssuePriority.prepend(RedmineSla::Patches::IssuePriorityReassignmentPatch)
   end
