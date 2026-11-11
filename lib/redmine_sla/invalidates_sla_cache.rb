@@ -29,33 +29,6 @@ module RedmineSla
   module InvalidatesSlaCache
     extend ActiveSupport::Concern
 
-    BATCH_KEY = :redmine_sla_cache_invalidation_batch
-
-    class << self
-      def batch
-        if Thread.current[BATCH_KEY]
-          yield
-        else
-          begin
-            Thread.current[BATCH_KEY] = []
-            result = yield
-            SlaCache.invalidate_slas(Thread.current[BATCH_KEY]) if result
-            result
-          ensure
-            Thread.current[BATCH_KEY] = nil
-          end
-        end
-      end
-
-      def invalidate(sla_ids)
-        if Thread.current[BATCH_KEY]
-          Thread.current[BATCH_KEY].concat(Array(sla_ids).compact)
-        else
-          SlaCache.invalidate_slas(sla_ids)
-        end
-      end
-    end
-
     included do
       before_save :capture_sla_cache_sla_ids_for_save
       after_save :invalidate_sla_cache
@@ -80,7 +53,7 @@ module RedmineSla
     end
 
     def invalidate_sla_cache
-      RedmineSla::InvalidatesSlaCache.invalidate(@sla_ids_for_cache_invalidation)
+      SlaCache.invalidate_slas(@sla_ids_for_cache_invalidation)
     ensure
       @sla_ids_for_cache_invalidation = nil
     end

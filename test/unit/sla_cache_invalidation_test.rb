@@ -464,17 +464,19 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     assert_equal unaffected_ids, SlaCache.unscoped.order(:id).pluck(:id)
   end
 
-  test "deleting and reassigning a native priority invalidates affected SLAs" do
+  test "deleting and reassigning a native priority invalidates only reassigned issues" do
     priority = IssuePriority.find(1)
-    level_ids = SlaLevel.unscoped.joins(:sla_level_terms)
-                        .where(custom_field_id: nil, sla_level_terms: { sla_priority_id: priority.id })
-                        .distinct.pluck(:id)
-    level_ids = levels_in_same_sla(level_ids)
+    issue_ids = Issue.where(priority_id: priority.id).pluck(:id)
+    affected_cache_ids = SlaCache.unscoped.where(issue_id: issue_ids).pluck(:id)
+    preserved_cache_ids = SlaCache.unscoped.where.not(issue_id: issue_ids).order(:id).pluck(:id)
     replacement = IssuePriority.where.not(id: priority.id).first
+    assert_not_empty affected_cache_ids
+    assert_not_empty preserved_cache_ids
 
-    assert_only_affected_slas_invalidated(level_ids) do
-      priority.destroy(replacement)
-    end
+    priority.destroy(replacement)
+
+    assert_empty SlaCache.unscoped.where(id: affected_cache_ids)
+    assert_equal preserved_cache_ids, SlaCache.unscoped.order(:id).pluck(:id)
   end
 
   test "reassigning a native priority invalidates issues that gain a competing native level" do
