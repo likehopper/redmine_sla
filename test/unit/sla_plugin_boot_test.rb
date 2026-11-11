@@ -35,8 +35,9 @@ class SlaPluginBootTest < ActiveSupport::TestCase
       'RedmineSla::DbDialect must load before plugin registration'
   end
 
-  test 'database dialect and SLA query load in a fresh Rails process' do
+  test 'plugin eager loads with its database dialect in a fresh Rails process' do
     script = <<~'RUBY'
+      Rails.application.eager_load!
       adapter = RedmineSla::DbDialect.adapter
       columns = SlaQuery.new.available_columns.map(&:name)
 

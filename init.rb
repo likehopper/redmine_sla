@@ -40,7 +40,7 @@ require_relative "lib/redmine_sla/helpers/sla_icons_helper"
 require_relative "lib/redmine_sla/patches/column_headers_patch"
 require_relative "lib/redmine_sla/patches/admin_menu_icons_patch"
 require_relative "lib/redmine_sla/patches/project_icons_patch"
-require_relative "lib/redmine_sla/patches/issue_priority_patch"
+require_relative "lib/redmine_sla/patches/issue_priority_reassignment_patch"
 
 # Load custom pluralization rules (e.g., "sla_cache" → "sla_caches")
 require_relative "config/initializers/inflections.rb"

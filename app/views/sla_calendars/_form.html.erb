@@ -17,7 +17,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 -%>
-<%= javascript_include_tag :redmine_sla, :plugin => 'redmine_sla' %>
 <%= form_with model: @sla_calendar, id: 'sla-calendar-form', local: true do |sla_calendar_form| %>
   <%= error_messages_for @sla_calendar %>
   <%= error_messages_for @sla_schedule %>

@@ -34,6 +34,7 @@ class SlaIconSetsSystemTest < ApplicationSlaSystemTestCase
 
       visit '/admin'
       assert_set_asset('#admin-menu a.redmine-sla', set_id)
+      assert_inline_menu_icon_alignment('#admin-menu a.redmine-sla')
       capture_icon_doc(set_id, 'administration')
 
       visit '/projects?set_filter=1&display_type=board'
@@ -61,11 +62,12 @@ class SlaIconSetsSystemTest < ApplicationSlaSystemTestCase
       sources = %w[term spent remain respect].map { |kind| icon_source(find("th.get_sla_#{kind}_1")) }
       assert_equal 4, sources.uniq.length
       find('#options legend').click
-      assert_selector '#selected_c option[value="sla_level"]', text: '◇'
-      assert_selector '#selected_c option[value="get_sla_term_1"]', text: '◷'
-      assert_selector '#selected_c option[value="get_sla_spent_1"]', text: '◎'
-      assert_selector '#selected_c option[value="get_sla_remain_1"]', text: "\u231B\uFE0E"
-      assert_selector '#selected_c option[value="get_sla_respect_1"]', text: '☷'
+      markers = RedmineSla::IconSet.fetch(set_id).markers
+      assert_selector '#selected_c option[value="sla_level"]', text: markers.fetch('sla_level')
+      assert_selector '#selected_c option[value="get_sla_term_1"]', text: markers.fetch('sla_term')
+      assert_selector '#selected_c option[value="get_sla_spent_1"]', text: markers.fetch('sla_spent')
+      assert_selector '#selected_c option[value="get_sla_remain_1"]', text: markers.fetch('sla_remain')
+      assert_selector '#selected_c option[value="get_sla_respect_1"]', text: markers.fetch('sla_respect')
       capture_icon_doc(set_id, 'columns')
 
       visit "/issues/#{project.issues.find(7).id}"
@@ -92,6 +94,21 @@ class SlaIconSetsSystemTest < ApplicationSlaSystemTestCase
 
   def assert_no_text_in_header(name, pattern)
     refute_match pattern, find("th.#{name}").text
+  end
+
+  def assert_inline_menu_icon_alignment(selector)
+    geometry = page.evaluate_script(<<~JS)
+      (() => {
+        const link = document.querySelector(#{selector.to_json});
+        const icon = link.querySelector('.sla-icon-image, .sla-icon-svg');
+        return {
+          padding: parseFloat(getComputedStyle(link).paddingLeft),
+          offset: icon.getBoundingClientRect().left - link.getBoundingClientRect().left
+        };
+      })()
+    JS
+    assert_in_delta 0, geometry.fetch('padding'), 0.5
+    assert_in_delta 0, geometry.fetch('offset'), 0.5
   end
 
   def capture_icon_doc(set_id, name)

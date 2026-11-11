@@ -61,6 +61,13 @@ module RedmineSla
       @manifest.fetch('icons').keys
     end
 
+    def markers
+      fallback = self.class.all[FALLBACK]
+      return @markers unless fallback && fallback != self
+
+      fallback.markers.merge(@markers).freeze
+    end
+
     def credit
       @manifest.fetch('credit', {})
     end
@@ -115,6 +122,11 @@ module RedmineSla
           raise ArgumentError, "credit.#{key} must contain name and url"
         end
       end
+      markers = @manifest.fetch('markers', {})
+      unless markers.is_a?(Hash) && markers.all? { |role, marker| valid_string?(role) && valid_string?(marker) }
+        raise ArgumentError, 'markers must map role names to nonempty strings'
+      end
+      @markers = markers.to_h { |role, marker| [role.dup.freeze, marker.dup.freeze] }.freeze
     end
 
     def valid_string?(value)
