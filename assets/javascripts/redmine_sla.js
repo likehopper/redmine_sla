@@ -27,3 +27,24 @@ function add_fields(link, association, content) {
   var regexp = new RegExp("new_" + association, "g")
   $(link).before(content.replace(regexp, new_id));
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  var markers = {
+    level: '◇',
+    spent: '◎',
+    term: '◷',
+    remain: '\u231B\uFE0E',
+    respect: '☷'
+  };
+
+  document.querySelectorAll('#available_c option, #selected_c option').forEach(function(option) {
+    var match = option.value.match(/^get_sla_(spent|term|remain|respect)_\d+$/);
+    var role = option.value === 'get_sla_level' || option.value === 'sla_level' ? 'level' :
+      option.value === 'spent' ? 'spent' : match && match[1];
+
+    if (role && !option.dataset.slaMarker) {
+      option.text = markers[role] + ' ' + option.text;
+      option.dataset.slaMarker = role;
+    }
+  });
+});

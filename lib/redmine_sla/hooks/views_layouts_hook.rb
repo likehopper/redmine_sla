@@ -3,9 +3,8 @@
 
 # File: redmine_sla/lib/redmine_sla/hooks/views_layouts_hook.rb
 # Purpose:
-#   Register a layout-level view hook that injects the plugin's stylesheet
-#   into Redmine's global layout (<head> section), so SLA-specific styles are
-#   available across all pages.
+#   Register a layout-level view hook that injects the plugin's assets into
+#   Redmine's global layout (<head> section).
 
 # Redmine SLA - Redmine Plugin
 #
@@ -25,16 +24,18 @@
 
 module RedmineSla
   module Hooks
-    # Layout hook used to inject the plugin stylesheet in the global layout.
+    # Layout hook used to inject the plugin assets in the global layout.
     # The hook is called when rendering the <head> section of Redmine's layout.
     class ViewsLayoutsHook < Redmine::Hook::ViewListener
 
       # Called by Redmine in the <head> section of the base layout.
       # Returns:
-      #   An HTML <link> tag referencing the plugin stylesheet:
-      #     public/plugin_assets/redmine_sla/stylesheets/redmine_sla.css
+      #   HTML tags referencing the plugin stylesheet and JavaScript.
       def view_layouts_base_html_head(context = {})
-        stylesheet_link_tag(:redmine_sla, plugin: 'redmine_sla')
+        safe_join([
+          stylesheet_link_tag(:redmine_sla, plugin: 'redmine_sla'),
+          javascript_include_tag(:redmine_sla, plugin: 'redmine_sla')
+        ], "\n")
       end
     end
   end
