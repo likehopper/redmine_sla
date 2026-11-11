@@ -477,6 +477,35 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     end
   end
 
+  test "reassigning a native priority invalidates issues that gain a competing native level" do
+    issue = Issue.find(66)
+    old_priority = issue.priority
+    replacement = IssuePriority.find_by!(name: "High")
+    custom_level = issue.get_sla_level
+    assert_not_nil custom_level.custom_field_id
+
+    calendar = SlaCalendar.create!(name: "Native replacement priority calendar")
+    SlaSchedule.create!(sla_calendar: calendar, dow: issue.created_on.wday,
+                        start_time: "00:00", end_time: "23:59", match: true)
+    native_level = SlaLevel.find(1)
+    SlaLevelTerm.where(sla_level_id: native_level.id).delete_all
+    native_level.update!(sla: custom_level.sla, sla_calendar: calendar, custom_field: nil)
+    SlaLevelTerm.create!(sla_level: native_level, sla_type: SlaType.first,
+                         sla_priority_id: replacement.id, term: 30)
+    assert_not SlaLevelTerm.joins(:sla_level)
+                               .where(sla_levels: {sla_id: custom_level.sla_id, custom_field_id: nil},
+                                      sla_priority_id: old_priority.id).exists?
+
+    cache = SlaCache.find_by_issue_id(issue.id)
+    assert_equal custom_level.id, cache.sla_level_id
+
+    old_priority.destroy(replacement)
+
+    assert_not SlaCache.unscoped.exists?(cache.id)
+    assert_equal replacement.id, issue.reload.priority_id
+    assert_equal native_level.id, SlaCache.find_by_issue_id(issue.id).sla_level_id
+  end
+
   test "destroying a type invalidates SLAs whose levels have terms of that type" do
     sla_type = SlaType.find(2)
     level_ids = SlaLevel.unscoped.joins(:sla_level_terms)

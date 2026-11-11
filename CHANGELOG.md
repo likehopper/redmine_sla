@@ -16,6 +16,19 @@
 - Add a concise calendar-by-priority example with documentation fixtures that
   assert the selected level and capture the issue and explanation screens.
 
+### Fixed
+
+- Invalidate the caches of issues reassigned when a native priority is deleted.
+  Redmine performs that reassignment with `update_all`, which bypasses issue
+  callbacks; a competing native-priority level could otherwise remain hidden
+  behind a stale custom-priority level.
+
+### Changed
+
+- Batch cache invalidation when several terms of one SLA level are edited in a
+  single request. The affected SLA is now invalidated once after the nested
+  update instead of issuing one identical cache deletion per term.
+
 ### Upgrade
 
 - Migration 028 redeploys `sla_get_level` and deletes only cache entries whose

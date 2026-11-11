@@ -135,6 +135,33 @@ class SlaLevelsControllerTest < ApplicationSlaFunctionalsTestCase
     assert_select "#errorExplanation"
   end
 
+  test "should invalidate a SLA once when updating several nested terms" do
+    @request.session[:user_id] = 1
+    level = SlaLevel.joins(:sla_level_terms)
+                    .group("sla_levels.id").having("COUNT(sla_level_terms.id) >= 2").first
+    terms = level.sla_level_terms.limit(2).to_a
+    attributes = terms.each_with_object({}) do |term, by_type|
+      by_type[term.sla_type_id.to_s] ||= {}
+      by_type[term.sla_type_id.to_s][term.sla_priority_id.to_s] = {
+        id: term.id,
+        term: term.term + 1
+      }
+    end
+    deletes = []
+    subscriber = lambda do |*args|
+      sql = args.last[:sql]
+      deletes << sql if sql.match?(/\ADELETE FROM ["`]?sla_caches["`]?/i)
+    end
+
+    ActiveSupport::Notifications.subscribed(subscriber, "sql.active_record") do
+      patch :update, params: {id: level.id, sla_level: {sla_level_terms_attributes: attributes}}
+    end
+
+    assert_redirected_to sla_levels_path
+    assert_equal 1, deletes.size, deletes.join("\n")
+    terms.each { |term| assert_equal term.term + 1, term.reload.term }
+  end
+
   ### As manager #2 ###
 
   test "should return success on get index as manager" do
