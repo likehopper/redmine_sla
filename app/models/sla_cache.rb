@@ -118,8 +118,13 @@ class SlaCache < ActiveRecord::Base
     unscoped.where(project_id: project_id, tracker_id: tracker_id).delete_all
   end
 
+  def self.invalidate_issues(issue_ids)
+    issue_ids = Array(issue_ids).compact.uniq
+    unscoped.where(issue_id: issue_ids).delete_all if issue_ids.any?
+  end
+
   def self.invalidate_issue(issue_id)
-    unscoped.where(issue_id: issue_id).delete_all
+    invalidate_issues(issue_id)
   end
     
   def self.destroy_by_issue_id(issue_id)

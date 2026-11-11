@@ -151,6 +151,9 @@ RedmineApp::Application.config.after_initialize do
   unless IssuePriority.included_modules.include? RedmineSla::Patches::IssuePriorityPatch
     IssuePriority.send(:include, RedmineSla::Patches::IssuePriorityPatch)
   end
+  unless IssuePriority.ancestors.include? RedmineSla::Patches::IssuePriorityReassignmentPatch
+    IssuePriority.prepend(RedmineSla::Patches::IssuePriorityReassignmentPatch)
+  end
 
   # Extend Issue with SLA computation methods
   unless Issue.included_modules.include? RedmineSla::Patches::IssuePatch

@@ -106,17 +106,22 @@ class SlaLevelsController < ApplicationController
   def update
     @sla_level.safe_attributes = params[:sla_level]
 
-    # When nested SLA Level Terms are present, normalize params structure first.
-    if !params[:sla_level][:sla_level_terms_attributes].nil?
-      @sla_level.update(sla_level_params)
-    end
+    nested_terms = !params[:sla_level][:sla_level_terms_attributes].nil?
 
     # If the custom field changes, SLA cache must eventually be purged.
     if @sla_level.custom_field_id_changed?
       flash[:warning] = l('sla_label.sla_level.purge')
-    end    
+    end
 
-    if @sla_level.save
+    saved = if nested_terms
+              SlaLevel.transaction do
+                RedmineSla::InvalidatesSlaCache.batch { @sla_level.update(sla_level_params) }
+              end
+            else
+              @sla_level.save
+            end
+
+    if saved
       respond_to do |format|
         format.html do 
           flash[:notice] = l(
@@ -130,7 +135,7 @@ class SlaLevelsController < ApplicationController
     else
       respond_to do |format|
         format.html do
-          if params[:sla_level][:sla_level_terms_attributes].nil?
+          if !nested_terms
             render :action => 'edit'
           else
             render :action => 'sla_terms'
