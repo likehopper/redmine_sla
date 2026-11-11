@@ -1,5 +1,28 @@
 # Changelog
 
+## 3.5.1 - 2026-11-11
+
+### Fixed
+
+- Hide the SLA level and SLA respect values of subproject issues from users
+  without `view_sla` in that subproject. Issue and time entry lists, CSV and
+  PDF exports, grouping, sorting and the SLA filters now check the permission
+  on the project of each row, not only on the queried project.
+
+### Upgrade
+
+- Update the plugin files and restart Redmine. No new migration relative
+  to 3.5.0.
+
+### Tests
+
+- Test denied access next to allowed access on the SLA pages, the project
+  pages and the API: anonymous users, non-members, roles without `view_sla`
+  or `manage_sla`, disabled SLA module and other projects. Denied writes must
+  leave the database unchanged.
+- The spent concurrency test restores the rows it deletes, so later tests no
+  longer depend on the test order.
+
 ## 3.5.0 - 2026-11-09
 
 ### Changed
