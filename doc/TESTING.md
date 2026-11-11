@@ -1,5 +1,46 @@
 # Testing
 
+## Version 3.5.2 release matrix
+
+Validated on **2026-11-11** in isolated local containers. Source snapshot:
+`release/3.5.2` at `907a43a`; the following commit only records this matrix.
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1403 / 15518 | 1403 / 15515 | 1403 / 15515 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1463 / 16035 | 1403 / 15491 | 1403 / 15491 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1403 / 16145 | 1403 / 16142 | 1403 / 16142 |
+
+Cells record **tests / assertions**. Total: **12,687 tests / 141,994
+assertions**, zero failures or errors, and 12 expected PostgreSQL-only skips.
+Each combination ran 1,328 unit/functional/integration/API tests, 39 Chromium
+system tests, 30 standalone icon/HTML tests and 6 role/project documentation
+tests. Redmine 6/PostgreSQL ran all 66 documentation tests instead.
+
+The regression coverage opens the spent list with a `project_id`, checks its
+project-scoped rows, purge link and filter/CSV forms, submits the CSV export,
+and checks the refresh, destroy and purge redirects. It also retains the SLA
+visibility query-count regression merged from `main`. MySQL ran with
+`ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES` and `STRICT_ALL_TABLES`; MariaDB and
+MySQL results are reported separately.
+
+The Redmine 7/MySQL database was recreated before its final successful run
+because its first run contained stale cache rows and time-entry primary keys.
+The stale `db/schema.rb` was excluded during recreation so plugin migrations
+could rebuild the SQL functions and views. This was an environment preparation
+failure, not an application assertion failure.
+
+All 251 generated documentation screenshots were refreshed on Redmine
+6.1.4/PostgreSQL. The permission and project-list captures are pixel-identical
+to the committed images. Representative project-list, permission and SLA
+explanation captures were visually reviewed without rendering or error-page
+problems. Historical example captures with dynamic data differences were not
+replaced because this release does not change those documented workflows.
+
+There is no migration relative to 3.5.1. Validation used isolated test data;
+no production deployment or representative performance benchmark was
+performed.
+
 ## Version 3.5.0 release matrix
 
 Validated on **2026-11-09** with the isolated runner and commands of the 3.4.0

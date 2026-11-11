@@ -114,8 +114,8 @@ class SlaListBlockColumnsTest < ApplicationSlaIntegrationTestCase
     end
   end
 
-  { 'Resolver' => true, 'Reporter' => false }.each do |role_name, level_visible|
-    test "parent issue list #{level_visible ? 'shows' : 'hides'} the subproject SLA level with the #{role_name} role there" do
+  { 'Resolver' => true, 'Reporter' => false }.each do |role_name, sla_visible|
+    test "parent issue list #{sla_visible ? 'shows' : 'hides'} the subproject SLA values with the #{role_name} role there" do
       subproject_issue = create_subproject_issue_with_sla(Role.find_by!(name: role_name))
       log_user('developer', 'developer')
 
@@ -123,14 +123,15 @@ class SlaListBlockColumnsTest < ApplicationSlaIntegrationTestCase
         get '/projects/project-sla-tests-tma/issues', params: ISSUE_LIST_PARAMS
       end
       assert_response :success
-      # The parent project row keeps its level: the column itself is offered.
+      # The parent project row keeps its SLA values: the columns are offered.
       assert_select "tr#issue-#{sla_issue.id} td.get_sla_level a", text: sla_issue_level.name
-      assert_select "tr#issue-#{subproject_issue.id} td.get_sla_level a", level_visible ? 1 : 0
+      assert_select "tr#issue-#{subproject_issue.id} td.get_sla_level a", sla_visible ? 1 : 0
+      assert_select "tr#issue-#{subproject_issue.id} td.get_sla_respect_1 span.icon-only", sla_visible ? 1 : 0
     end
   end
 
-  { 'Resolver' => true, 'Reporter' => false }.each do |role_name, level_visible|
-    test "parent issue CSV export #{level_visible ? 'includes' : 'omits'} the subproject SLA level with the #{role_name} role there" do
+  { 'Resolver' => true, 'Reporter' => false }.each do |role_name, sla_visible|
+    test "parent issue CSV export #{sla_visible ? 'includes' : 'omits'} the subproject SLA values with the #{role_name} role there" do
       subproject_issue = create_subproject_issue_with_sla(Role.find_by!(name: role_name))
       log_user('developer', 'developer')
 
@@ -142,38 +143,44 @@ class SlaListBlockColumnsTest < ApplicationSlaIntegrationTestCase
       parent_row = rows.detect { |row| row.first == sla_issue.id.to_s }
       level_index = parent_row.index(sla_issue_level.name)
       assert level_index, 'the parent project row exports its SLA level'
+      respect_index = rows.first.index { |heading| heading.start_with?(l(:label_sla_respect)) }
+      assert respect_index, 'the CSV exports its SLA respect column'
       subproject_row = rows.detect { |row| row.first == subproject_issue.id.to_s }
       assert subproject_row, 'the subproject issue is exported'
-      if level_visible
+      if sla_visible
         assert_equal sla_issue_level.name, subproject_row[level_index]
+        assert subproject_row[respect_index].present?, 'the visible SLA respect value is exported'
       else
         assert_nil subproject_row[level_index].presence
+        assert_nil subproject_row[respect_index].presence
       end
     end
 
-    test "parent issue grouping and filters #{level_visible ? 'count' : 'ignore'} the subproject SLA level with the #{role_name} role there" do
+    test "parent issue grouping and filters #{sla_visible ? 'count' : 'ignore'} the subproject SLA values with the #{role_name} role there" do
       subproject_issue = create_subproject_issue_with_sla(Role.find_by!(name: role_name))
       subproject_issue.get_sla_spent(1)
       assert SlaCacheSpent.exists?(issue_id: subproject_issue.id, sla_type_id: 1)
       developer = User.find_by_login!('developer')
 
       with_settings display_subprojects_issues: '1' do
-        all_counts = sla_level_group_counts(User.find(1))
-        developer_counts = sla_level_group_counts(developer)
-        hidden = level_visible ? 0 : 1
-        assert_equal all_counts[sla_issue_level.name] - hidden, developer_counts[sla_issue_level.name]
+        hidden = sla_visible ? 0 : 1
+        level_counts = sla_group_counts('get_sla_level', sla_issue_level.name, User.find(1), developer)
+        respect = subproject_issue.get_sla_respect(1)
+        respect_counts = sla_group_counts('get_sla_respect_1', respect, User.find(1), developer)
+        assert_equal level_counts.first - hidden, level_counts.last
+        assert_equal respect_counts.first - hidden, respect_counts.last
 
         by_level = filtered_issue_ids(developer, 'slas.sla_level_id', '=', [sla_issue_level.id.to_s])
         by_respect = filtered_issue_ids(developer, 'slas.sla_respect_1', '*', [''])
         assert_includes by_level, sla_issue.id
-        assert_equal level_visible, by_level.include?(subproject_issue.id)
-        assert_equal level_visible, by_respect.include?(subproject_issue.id)
+        assert_equal sla_visible, by_level.include?(subproject_issue.id)
+        assert_equal sla_visible, by_respect.include?(subproject_issue.id)
         # The administrator sees every row: the hidden case is a permission effect.
         assert_includes filtered_issue_ids(User.find(1), 'slas.sla_respect_1', '*', ['']), subproject_issue.id
       end
     end
 
-    test "parent time entry list #{level_visible ? 'shows' : 'hides'} the subproject SLA level with the #{role_name} role there" do
+    test "parent time entry list #{sla_visible ? 'shows' : 'hides'} the subproject SLA values with the #{role_name} role there" do
       subproject_issue = create_subproject_issue_with_sla(Role.find_by!(name: role_name))
       subproject_issue.project.enable_module!(:time_tracking)
       entry = TimeEntry.create!(project: subproject_issue.project, issue: subproject_issue, user: User.find_by_login!('developer'),
@@ -183,12 +190,52 @@ class SlaListBlockColumnsTest < ApplicationSlaIntegrationTestCase
 
       with_settings display_subprojects_issues: '1' do
         get '/projects/project-sla-tests-tma/time_entries',
-            params: { set_filter: 1, f: ['spent_on'], op: { spent_on: '*' }, c: %w[issue get_sla_level], per_page: 100 }
+            params: { set_filter: 1, f: ['spent_on'], op: { spent_on: '*' },
+                      c: %w[issue get_sla_level get_sla_respect_1], per_page: 100 }
       end
       assert_response :success
       assert_select "tr#time-entry-#{entry.id}", 1
-      assert_select "tr#time-entry-#{entry.id} td.get_sla_level a", level_visible ? 1 : 0
+      assert_select "tr#time-entry-#{entry.id} td.get_sla_level a", sla_visible ? 1 : 0
+      assert_select "tr#time-entry-#{entry.id} td.get_sla_respect_1 span.icon-only", sla_visible ? 1 : 0
     end
+  end
+
+  test "SLA query columns hide both object values used by exports" do
+    hidden_issue = create_subproject_issue_with_sla(Role.find_by!(name: 'Reporter'))
+    User.current = User.find_by_login!('developer')
+    query = IssueQuery.new(name: '_', project: Project.find(1))
+    query.available_filters
+    columns = query.available_columns.index_by(&:name)
+
+    assert_equal sla_issue_level, columns.fetch(:get_sla_level).value_object(sla_issue)
+    assert_not_nil columns.fetch(:get_sla_respect_1).value_object(sla_issue)
+    assert_nil columns.fetch(:get_sla_level).value_object(hidden_issue)
+    assert_nil columns.fetch(:get_sla_respect_1).value_object(hidden_issue)
+  ensure
+    User.current = nil
+  end
+
+  test "SLA column visibility queries do not grow with the subproject count" do
+    issues = 5.times.map do |index|
+      create_subproject_issue_with_sla(Role.find_by!(name: 'Resolver'), suffix: index)
+    end
+
+    query_counts = [1, 5].map do |limit|
+      User.current = User.find_by_login!('developer')
+      query = IssueQuery.new(name: '_', project: Project.find(1))
+      query.available_filters
+      columns = query.available_columns.select { |column| [:get_sla_level, :get_sla_respect_1].include?(column.name) }
+
+      sla_visibility_queries do
+        issues.first(limit).each { |issue| columns.each { |column| column.value(issue) } }
+      end.size
+    ensure
+      User.current = nil
+    end
+
+    assert_operator query_counts.first, :>, 0
+    assert_equal query_counts.first, query_counts.last,
+                 'SLA column authorization must use a fixed number of visibility queries'
   end
 
   test "SLA type list keeps one reorderable row per type" do
@@ -209,14 +256,16 @@ class SlaListBlockColumnsTest < ApplicationSlaIntegrationTestCase
     SlaLevel.find(1)
   end
 
-  # Issue counts per SLA level name in project 1 and its subprojects, as seen by user.
-  def sla_level_group_counts(user)
-    User.current = user
-    query = IssueQuery.new(name: '_', project: Project.find(1), group_by: 'get_sla_level')
-    query.add_filter('status_id', '*', [''])
-    query.result_count_by_group
-  ensure
-    User.current = nil
+  # Counts for one SLA group in project 1 and its subprojects, as seen by two users.
+  def sla_group_counts(group_by, key, *users)
+    users.map do |user|
+      User.current = user
+      query = IssueQuery.new(name: '_', project: Project.find(1), group_by: group_by)
+      query.add_filter('status_id', '*', [''])
+      query.result_count_by_group[key].to_i
+    ensure
+      User.current = nil
+    end
   end
 
   def filtered_issue_ids(user, field, operator, values)
@@ -242,17 +291,29 @@ class SlaListBlockColumnsTest < ApplicationSlaIntegrationTestCase
 
   # Subproject of project 1 using the same SLA on the bug tracker, where the
   # developer holds the given role.
-  def create_subproject_issue_with_sla(role)
-    subproject = Project.create!(name: 'SLA subproject', identifier: 'sla-subproject',
+  def create_subproject_issue_with_sla(role, suffix: nil)
+    identifier = ['sla-subproject', suffix].compact.join('-')
+    subproject = Project.create!(name: "SLA subproject #{suffix}".strip, identifier: identifier,
                                  is_public: false, tracker_ids: [1],
                                  enabled_module_names: %w[issue_tracking sla])
     subproject.set_parent!(Project.find(1))
     Member.create!(project: subproject, principal: User.find_by_login!('developer'), role_ids: [role.id])
     SlaProjectTracker.create!(project: subproject, tracker_id: 1, sla_id: 1)
-    issue = Issue.create!(project: subproject, tracker_id: 1, subject: 'Subproject SLA issue',
+    issue = Issue.create!(project: subproject, tracker_id: 1, subject: "Subproject SLA issue #{suffix}".strip,
                           author_id: 1, status_id: sla_issue.status_id, priority_id: sla_issue.priority_id,
                           created_on: sla_issue.created_on)
     assert_equal 1, SlaCache.find_by_issue_id(issue.id)&.sla_level_id
+    assert_not_nil issue.get_sla_respect(1)
     issue
+  end
+
+  def sla_visibility_queries
+    statements = []
+    subscriber = lambda do |*arguments|
+      sql = arguments.last[:sql]
+      statements << sql if sql.match?(/\bFROM\s+["`]?(?:members|enabled_modules|projects)["`]?\b/i)
+    end
+    ActiveSupport::Notifications.subscribed(subscriber, 'sql.active_record') { yield }
+    statements
   end
 end
