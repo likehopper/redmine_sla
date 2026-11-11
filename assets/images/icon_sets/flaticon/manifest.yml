@@ -66,6 +66,12 @@ icons:
     16: sla_level_term_16.png
   sla_remain:
     16: sla_cache_spent_refresh_16.png
+markers:
+  sla_level: ◇
+  sla_spent: 🚀
+  sla_term: 🏁
+  sla_remain: 🏃
+  sla_respect: ⏰
 credit:
   display: true
   logo: flaticon-32.png

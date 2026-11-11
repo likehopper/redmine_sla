@@ -18,6 +18,12 @@ icons:
   sla_spent: time
   sla_term: alarm-minus
   sla_remain: hourglass
+markers:
+  sla_level: ◇
+  sla_spent: ◎
+  sla_term: ◷
+  sla_remain: "\u231B\uFE0E"
+  sla_respect: ☷
 credit:
   display: false
 file: icons.svg

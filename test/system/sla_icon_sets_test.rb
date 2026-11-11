@@ -61,11 +61,12 @@ class SlaIconSetsSystemTest < ApplicationSlaSystemTestCase
       sources = %w[term spent remain respect].map { |kind| icon_source(find("th.get_sla_#{kind}_1")) }
       assert_equal 4, sources.uniq.length
       find('#options legend').click
-      assert_selector '#selected_c option[value="sla_level"]', text: '◇'
-      assert_selector '#selected_c option[value="get_sla_term_1"]', text: '◷'
-      assert_selector '#selected_c option[value="get_sla_spent_1"]', text: '◎'
-      assert_selector '#selected_c option[value="get_sla_remain_1"]', text: "\u231B\uFE0E"
-      assert_selector '#selected_c option[value="get_sla_respect_1"]', text: '☷'
+      markers = RedmineSla::IconSet.fetch(set_id).markers
+      assert_selector '#selected_c option[value="sla_level"]', text: markers.fetch('sla_level')
+      assert_selector '#selected_c option[value="get_sla_term_1"]', text: markers.fetch('sla_term')
+      assert_selector '#selected_c option[value="get_sla_spent_1"]', text: markers.fetch('sla_spent')
+      assert_selector '#selected_c option[value="get_sla_remain_1"]', text: markers.fetch('sla_remain')
+      assert_selector '#selected_c option[value="get_sla_respect_1"]', text: markers.fetch('sla_respect')
       capture_icon_doc(set_id, 'columns')
 
       visit "/issues/#{project.issues.find(7).id}"

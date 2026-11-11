@@ -32,9 +32,11 @@ module RedmineSla
       # Returns:
       #   HTML tags referencing the plugin stylesheet and JavaScript.
       def view_layouts_base_html_head(context = {})
+        icon_set = RedmineSla::IconSet.fetch(Setting.plugin_redmine_sla['sla_icon_set'])
         safe_join([
           stylesheet_link_tag(:redmine_sla, plugin: 'redmine_sla'),
-          javascript_include_tag(:redmine_sla, plugin: 'redmine_sla')
+          javascript_include_tag(:redmine_sla, plugin: 'redmine_sla',
+                                  data: {sla_markers: icon_set.markers.to_json})
         ], "\n")
       end
     end
