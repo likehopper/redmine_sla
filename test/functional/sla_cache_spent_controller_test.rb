@@ -143,7 +143,7 @@ class SlaCacheSpentsControllerTest < ApplicationSlaFunctionalsTestCase
       put :update, params: { id: project_spent(1).id }
     end
     assert_raises ActionController::UrlGenerationError do
-      patch :update, params: { id: project_spent(1).id } 
+      patch :update, params: { id: project_spent(1).id }
     end
   end 
 
@@ -215,7 +215,7 @@ class SlaCacheSpentsControllerTest < ApplicationSlaFunctionalsTestCase
       put :update, params: { id: project_spent(1).id }
     end
     assert_raises ActionController::UrlGenerationError do
-      patch :update, params: { id: project_spent(1).id } 
+      patch :update, params: { id: project_spent(1).id }
     end
   end  
 
@@ -293,7 +293,7 @@ class SlaCacheSpentsControllerTest < ApplicationSlaFunctionalsTestCase
       put :update, params: { id: project_spent(1).id }
     end
     assert_raises ActionController::UrlGenerationError do
-      patch :update, params: { id: project_spent(1).id } 
+      patch :update, params: { id: project_spent(1).id }
     end
   end
   
@@ -372,7 +372,7 @@ class SlaCacheSpentsControllerTest < ApplicationSlaFunctionalsTestCase
       put :update, params: { id: project_spent(1).id }
     end
     assert_raises ActionController::UrlGenerationError do
-      patch :update, params: { id: project_spent(1).id } 
+      patch :update, params: { id: project_spent(1).id }
     end
   end
 
@@ -438,7 +438,7 @@ class SlaCacheSpentsControllerTest < ApplicationSlaFunctionalsTestCase
       put :update, params: { id: project_spent(1).id }
     end
     assert_raises ActionController::UrlGenerationError do
-      patch :update, params: { id: project_spent(1).id } 
+      patch :update, params: { id: project_spent(1).id }
     end
   end
 
@@ -504,7 +504,7 @@ class SlaCacheSpentsControllerTest < ApplicationSlaFunctionalsTestCase
       put :update, params: { id: project_spent(1).id }
     end
     assert_raises ActionController::UrlGenerationError do
-      patch :update, params: { id: project_spent(1).id } 
+      patch :update, params: { id: project_spent(1).id }
     end
   end  
 
@@ -700,6 +700,21 @@ class SlaCacheSpentsControllerTest < ApplicationSlaFunctionalsTestCase
       assert_select "form#query_form input[type=hidden][name=project_id][value=project-sla-tests-tma]", 1
       assert_select "form#csv-export-form input[type=hidden][name=project_id][value=project-sla-tests-tma]", 1
     end
+  end
+
+  test "project spent CSV keeps the project context" do
+    @request.session[:user_id] = 2
+    get :index, params: {
+      project_id: "project-sla-tests-tma",
+      format: :csv,
+      "issue.status_id" => "*"
+    }
+
+    assert_response :success
+    assert_match %r{\Atext/csv}, response.media_type
+    project_ids = @controller.instance_variable_get(:@entities).map(&:project_id)
+    assert_not_empty project_ids
+    assert_equal [1], project_ids.uniq
   end
 
   # Separate test: Rails 6.1 functional tests reuse the controller instance,
