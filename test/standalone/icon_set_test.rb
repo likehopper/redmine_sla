@@ -37,6 +37,14 @@ class IconSetTest < Minitest::Test
                  RedmineSla::IconSet.fetch('tabler').markers)
   end
 
+  def test_admin_menu_alignment_does_not_depend_on_has_selector_support
+    css = File.read(File.expand_path('../../assets/stylesheets/redmine_sla.css', __dir__)).gsub(%r{/\*.*?\*/}m, '')
+    rule = css.scan(/([^{}]+)\{([^{}]*)\}/).find { |selectors, _| selectors.strip == '#admin-menu a.redmine-sla' }
+
+    refute_nil rule
+    assert_match(/padding-left:\s*0/, rule.last)
+  end
+
   def test_custom_sets_inherit_missing_markers_from_the_fallback
     set = RedmineSla::IconSet.new('custom', {
       'name' => 'Custom', 'format' => 'files', 'icons' => {}, 'markers' => {'sla_spent' => '$'}
