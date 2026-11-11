@@ -42,6 +42,74 @@ class SlaProjectVisibilityTest < ApplicationSlaUnitsTestCase
     assert_equal [1], SlaCalendar.visible.order(:id).pluck(:id)
   end
 
+  test "visible catalog scopes are empty without view_sla, for non-members and anonymous" do
+    # reporter: member without SLA permission; other: no membership.
+    [User.find(5), User.find(6), User.anonymous].each do |user|
+      assert_catalogs_hidden_from(user)
+    end
+  end
+
+  test "visible catalog scopes stay empty for anonymous and non-members of a public project" do
+    Project.find(1).update_column(:is_public, true)
+    [Role.anonymous, Role.non_member].each { |role| role.add_permission!(:view_issues) }
+    assert Project.find(1).visible?(User.find(6))
+
+    [User.find(6), User.anonymous].each do |user|
+      assert_catalogs_hidden_from(user)
+    end
+  end
+
+  test "visible catalog scopes of a member of other projects only include those projects" do
+    sysadmin = User.find(4) # Resolver in projects 2 and 3.
+    assert_equal [3, 4, 5, 6], Sla.visible(sysadmin).order(:id).pluck(:id)
+    assert_equal [3, 4, 5, 6, 7, 8], SlaLevel.visible(sysadmin).order(:id).pluck(:id)
+    assert_empty Sla.visible(sysadmin).where(id: [1, 2, 7, 8])
+  end
+
+  test "visible catalog scopes exclude projects with the SLA module disabled" do
+    Project.find(4).disable_module!(:sla)
+    assert_equal [1, 2], Sla.visible.order(:id).pluck(:id)
+    assert_equal [1, 2], SlaLevel.visible.order(:id).pluck(:id)
+  end
+
+  test "visible catalog scopes exclude archived projects" do
+    Project.find(4).update_column(:status, Project::STATUS_ARCHIVED)
+    assert_equal [1, 2], Sla.visible.order(:id).pluck(:id)
+    assert_equal [1, 2], SlaLevel.visible.order(:id).pluck(:id)
+  end
+
+  test "visible cache scopes include only projects where the user has view_sla" do
+    [SlaCache, SlaCacheSpent].each do |klass|
+      assert_equal [1, 4], klass.visible.distinct.pluck(:project_id).sort, klass.name
+      assert_operator klass.where(project_id: [2, 3]).count, :>, 0, klass.name
+    end
+  end
+
+  test "visible cache scopes are empty without view_sla, for non-members and anonymous" do
+    [User.find(5), User.find(6), User.anonymous].each do |user|
+      [SlaCache, SlaCacheSpent].each do |klass|
+        assert_operator klass.count, :>, 0
+        assert_empty klass.visible(user), "#{klass.name} visible to #{user.login.presence || 'anonymous'}"
+      end
+    end
+  end
+
+  test "visible cache scopes exclude a project whose SLA module is disabled without purge" do
+    # Bypass the purge callback: rows left behind must still be hidden.
+    EnabledModule.where(project_id: 4, name: 'sla').delete_all
+    [SlaCache, SlaCacheSpent].each do |klass|
+      assert_operator klass.where(project_id: 4).count, :>, 0, klass.name
+      assert_equal [1], klass.visible.distinct.pluck(:project_id), klass.name
+    end
+  end
+
+  test "visible project tracker scope requires manage_sla" do
+    assert_equal SlaProjectTracker.count, SlaProjectTracker.visible(User.find(2)).count
+    [User.find(3), User.find(5), User.find(6), User.anonymous].each do |user|
+      assert_empty SlaProjectTracker.visible(user), user.login
+    end
+  end
+
   test "project scopes include only catalogs used by that project" do
     project = Project.find(1)
 
@@ -144,6 +212,15 @@ class SlaProjectVisibilityTest < ApplicationSlaUnitsTestCase
     [IssueQuery, TimeEntryQuery].each do |klass|
       assert_empty klass.new(project: project).available_filters.keys.grep(/\Aslas\./)
     end
+  end
+
+  private
+
+  def assert_catalogs_hidden_from(user)
+    assert_operator Sla.visible(User.find(1)).count, :>, 0
+    assert_empty Sla.visible(user), "SLAs visible to #{user.login.presence || 'anonymous'}"
+    assert_empty SlaLevel.visible(user), "SLA levels visible to #{user.login.presence || 'anonymous'}"
+    assert_empty SlaCalendar.visible(user), "SLA calendars visible to #{user.login.presence || 'anonymous'}"
   end
 
 end

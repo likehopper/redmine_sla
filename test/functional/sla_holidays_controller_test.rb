@@ -351,4 +351,88 @@ class SlaHolidaysControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
+  ### Access audit: SLA holidays are managed by administrators only ###
+
+  test "should render new and context menu on SLA holidays as admin" do
+    @request.session[:user_id] = 1
+    get :new
+    assert_response :success
+    get :context_menu, params: { ids: [1] }
+    assert_response :success
+    assert_select "a[href=?]", edit_sla_holiday_path(1)
+  end
+
+  test "should create, update, delete with calendar links and bulk delete SLA holidays as admin" do
+    @request.session[:user_id] = 1
+    assert_difference "SlaHoliday.count", 1 do
+      post :create, params: { sla_holiday: { name: "Created SLA holiday", date: "2099-12-25" } }
+    end
+    assert_redirected_to sla_holidays_path
+    patch :update, params: { id: 1, sla_holiday: { name: "Updated SLA holiday" } }
+    assert_redirected_to sla_holidays_path
+    assert_equal "Updated SLA holiday", SlaHoliday.find(1).name
+    linked_calendar_count = SlaCalendarHoliday.where(sla_holiday_id: 1).count
+    assert_operator linked_calendar_count, :>, 0
+    assert_difference -> { SlaCalendarHoliday.count } => -linked_calendar_count, -> { SlaHoliday.count } => -1 do
+      delete :destroy, params: { id: 1 }
+    end
+    deletables = create_deletable_sla_holidays
+    assert_difference "SlaHoliday.count", -3 do
+      delete :destroy, params: { ids: deletables.map(&:id) }
+    end
+    assert_redirected_to sla_holidays_path
+  end
+
+  { "anonymous" => nil, "project SLA manager" => 2, "reporter without SLA permission" => 5 }.each do |label, user_id|
+    test "should deny new and context menu on SLA holidays to #{label}" do
+      @request.session[:user_id] = user_id
+      get :new
+      assert_access_denied(user_id)
+      get :context_menu, params: { ids: [1] }
+      assert_access_denied(user_id)
+    end
+
+    test "should deny SLA holiday writes to #{label} without changing data" do
+      deletables = create_deletable_sla_holidays
+      assert SlaCalendarHoliday.exists?(sla_holiday_id: 1)
+      assert_no_difference "SlaCalendarHoliday.count" do
+        assert_denied_without_change(user_id, SlaHoliday.find(1)) do
+          post :create, params: { sla_holiday: { name: "Denied SLA holiday", date: "2099-12-25" } }
+          assert_access_denied(user_id)
+          patch :update, params: { id: 1, sla_holiday: { name: "Denied SLA holiday change" } }
+          assert_access_denied(user_id)
+          delete :destroy, params: { id: 1 }
+          assert_access_denied(user_id)
+          delete :destroy, params: { ids: deletables.map(&:id) }
+          assert_access_denied(user_id)
+        end
+      end
+      assert_equal deletables.size, SlaHoliday.where(id: deletables.map(&:id)).count
+    end
+
+    # The token is signed for the requesting user, so only the admin check can stop the import.
+    test "should deny holiday import actions to #{label} without fetching or writing" do
+      @request.session[:user_id] = user_id
+      SlaHolidayAdapters::NagerDate.any_instance.expects(:available_countries).never
+      SlaHolidayAdapters::NagerDate.any_instance.expects(:holidays).never
+      token = Rails.application.message_verifier(:sla_holiday_import).generate({
+        'user_id' => (user_id || User.anonymous.id), 'expires_at' => 15.minutes.from_now.to_i,
+        'holidays' => [{ 'date' => '2099-07-14', 'name' => 'Denied import 2099' }]
+      })
+      assert_no_difference "SlaHoliday.count" do
+        get :import_form
+        assert_access_denied(user_id)
+        post :preview_import, params: { year: '2099', country: 'FR' }
+        assert_access_denied(user_id)
+        post :import_holidays, params: { preview_token: token, selected: ['0'] }
+        assert_access_denied(user_id)
+      end
+    end
+  end
+
+  # Fresh holidays without calendar links, on dates absent from the fixtures.
+  def create_deletable_sla_holidays
+    Array.new(3) { |index| SlaHoliday.create!(name: "Deletable SLA holiday #{index}", date: Date.new(2099, 1, index + 1)) }
+  end
+
 end

@@ -121,15 +121,19 @@ module RedmineSla
               case column.name
               when :get_sla_level
                 # Link to the SLA level page when SLA level is present
-                link_to(
-                  item.get_sla_level.name,
-                  sla_level_url(item.get_sla_level, only_path: true),
-                  title: sla_description_tooltip(item.get_sla_level)
-                ) if !item.get_sla_level.nil?
+                if value
+                  link_to(
+                    value.name,
+                    sla_level_url(value, only_path: true),
+                    title: sla_description_tooltip(value)
+                  )
+                else
+                  ''
+                end
 
               # SLA respect columns for Issue, TimeEntry or SlaCache queries
               when /^get_sla_respect/
-                sla_respect_icon_tag(item.send(column.name))
+                value.nil? ? '' : sla_respect_icon_tag(value)
               end
             end
 

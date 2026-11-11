@@ -293,4 +293,73 @@ class SlaCalendarsControllerTest < ApplicationSlaFunctionalsTestCase
     assert_response :forbidden
   end
 
+  ### Access audit: SLA calendars are managed by administrators only ###
+
+  test "should render new and context menu on SLA calendars as admin" do
+    @request.session[:user_id] = 1
+    get :new
+    assert_response :success
+    get :context_menu, params: { ids: [1] }
+    assert_response :success
+    assert_select "a[href=?]", edit_sla_calendar_path(1)
+  end
+
+  test "should create, update with nested schedules, delete and bulk delete SLA calendars as admin" do
+    @request.session[:user_id] = 1
+    assert_difference "SlaCalendar.count", 1 do
+      post :create, params: { sla_calendar: { name: "Created SLA calendar" } }
+    end
+    assert_redirected_to sla_calendars_path
+    schedule = SlaCalendar.find(1).sla_schedules.first
+    assert_difference "SlaSchedule.count", -1 do
+      patch :update, params: { id: 1, sla_calendar: { name: "Updated SLA calendar",
+        sla_schedules_attributes: { "0" => { id: schedule.id, _destroy: "1" } } } }
+    end
+    assert_redirected_to sla_calendars_path
+    assert_equal "Updated SLA calendar", SlaCalendar.find(1).name
+    deletables = create_deletable_sla_calendars
+    assert_difference "SlaCalendar.count", -1 do
+      delete :destroy, params: { id: deletables.first.id }
+    end
+    assert_difference "SlaCalendar.count", -2 do
+      delete :destroy, params: { ids: deletables.drop(1).map(&:id) }
+    end
+    assert_redirected_to sla_calendars_path
+  end
+
+  # Users 2 and 3 may view calendars of their projects (manage_sla / view_sla), user 5 has no SLA permission.
+  { "anonymous" => nil, "project SLA manager" => 2, "Resolver with view_sla" => 3, "reporter without SLA permission" => 5 }.each do |label, user_id|
+    test "should deny new and context menu on SLA calendars to #{label}" do
+      @request.session[:user_id] = user_id
+      get :new
+      assert_access_denied(user_id)
+      get :context_menu, params: { ids: [1] }
+      assert_access_denied(user_id)
+    end
+
+    test "should deny SLA calendar writes to #{label} without changing data" do
+      deletables = create_deletable_sla_calendars
+      schedule = SlaCalendar.find(1).sla_schedules.first
+      assert_no_difference "SlaSchedule.count" do
+        assert_denied_without_change(user_id, SlaCalendar.find(1)) do
+          post :create, params: { sla_calendar: { name: "Denied SLA calendar" } }
+          assert_access_denied(user_id)
+          patch :update, params: { id: 1, sla_calendar: { name: "Denied SLA calendar change",
+            sla_schedules_attributes: { "0" => { id: schedule.id, _destroy: "1" } } } }
+          assert_access_denied(user_id)
+          delete :destroy, params: { id: deletables.first.id }
+          assert_access_denied(user_id)
+          delete :destroy, params: { ids: deletables.map(&:id) }
+          assert_access_denied(user_id)
+        end
+      end
+      assert_equal deletables.size, SlaCalendar.where(id: deletables.map(&:id)).count
+    end
+  end
+
+  # Fresh calendars without levels, so a leaked destroy would really delete them.
+  def create_deletable_sla_calendars
+    Array.new(3) { |index| SlaCalendar.create!(name: "Deletable SLA calendar #{index}") }
+  end
+
 end

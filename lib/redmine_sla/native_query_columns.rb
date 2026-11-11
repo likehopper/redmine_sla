@@ -34,7 +34,9 @@ module RedmineSla
       statement = order_options.to_s
       type_ids = statement.scan(/\bsla_query_(?:term|spent)_(\d+)\b/).flatten.uniq
       if statement.include?('sla_query_level.') || type_ids.any?
-        joins << "LEFT JOIN sla_caches AS sla_query_level_cache ON sla_query_level_cache.issue_id = issues.id"
+        # Rows of projects without view_sla sort and group as if they had no SLA.
+        joins << "LEFT JOIN sla_caches AS sla_query_level_cache ON sla_query_level_cache.issue_id = issues.id " \
+                 "AND issues.project_id IN (#{RedmineSla::SlaQueryVisibility.visible_project_ids_sql})"
         joins << "LEFT JOIN sla_levels AS sla_query_level ON sla_query_level.id = sla_query_level_cache.sla_level_id"
       end
       if type_ids.any?

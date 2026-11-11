@@ -502,4 +502,65 @@ class SlasControllerTest < ApplicationSlaFunctionalsTestCase
     assert_response :forbidden
   end
 
+  ### Access audit: the global SLA configuration is managed by administrators only ###
+
+  test "should render new and context menu on SLAs as admin" do
+    @request.session[:user_id] = 1
+    get :new
+    assert_response :success
+    get :context_menu, params: { ids: [1] }
+    assert_response :success
+    assert_select "a[href=?]", "/sla/slas/1/edit"
+  end
+
+  test "should create, update, delete and bulk delete SLAs as admin" do
+    @request.session[:user_id] = 1
+    assert_difference "Sla.count", 1 do
+      post :create, params: { sla: { name: "Created SLA" } }
+    end
+    assert_redirected_to slas_path
+    patch :update, params: { id: 1, sla: { name: "Updated SLA" } }
+    assert_redirected_to slas_path
+    assert_equal "Updated SLA", Sla.find(1).name
+    deletables = create_deletable_slas
+    assert_difference "Sla.count", -1 do
+      delete :destroy, params: { id: deletables.first.id }
+    end
+    assert_difference "Sla.count", -2 do
+      delete :destroy, params: { ids: deletables.drop(1).map(&:id) }
+    end
+    assert_redirected_to slas_path
+  end
+
+  # Users 2 and 3 may view SLAs of their projects (manage_sla / view_sla), user 5 has no SLA permission.
+  { "anonymous" => nil, "project SLA manager" => 2, "Resolver with view_sla" => 3, "reporter without SLA permission" => 5 }.each do |label, user_id|
+    test "should deny new and context menu on SLAs to #{label}" do
+      @request.session[:user_id] = user_id
+      get :new
+      assert_access_denied(user_id)
+      get :context_menu, params: { ids: [1] }
+      assert_access_denied(user_id)
+    end
+
+    test "should deny SLA writes to #{label} without changing data" do
+      deletables = create_deletable_slas
+      assert_denied_without_change(user_id, Sla.find(1)) do
+        post :create, params: { sla: { name: "Denied SLA" } }
+        assert_access_denied(user_id)
+        patch :update, params: { id: 1, sla: { name: "Denied SLA change" } }
+        assert_access_denied(user_id)
+        delete :destroy, params: { id: deletables.first.id }
+        assert_access_denied(user_id)
+        delete :destroy, params: { ids: deletables.map(&:id) }
+        assert_access_denied(user_id)
+      end
+      assert_equal deletables.size, Sla.where(id: deletables.map(&:id)).count
+    end
+  end
+
+  # Fresh SLAs without levels or project links, so a leaked destroy would really delete them.
+  def create_deletable_slas
+    Array.new(3) { |index| Sla.create!(name: "Deletable SLA #{index}") }
+  end
+
 end

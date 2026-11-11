@@ -210,6 +210,60 @@ class SlaProjectListsProjectsControllerTest < ApplicationSlaFunctionalsTestCase
     assert_equal [1], board_project_ids_with_icon
   end
 
+  test "public project: anonymous and non-members see the project without its SLAs" do
+    Project.find(1).update_column(:is_public, true)
+    with_settings login_required: '0' do
+      [nil, 'other'].each do |login|
+        log_in(login)
+        get :index, params: list_params(c: %w[name identifier slas])
+        assert_response :success
+        assert_equal [1], listed_project_ids
+        refute sla_column_offered?
+        refute sla_filter_offered?
+        assert_empty project_ids_with_sla_cell
+        SLA_NAMES[1].each do |name|
+          assert_not response.body.include?(name), "project list exposes #{name}"
+        end
+
+        get :index, params: { display_type: 'board', set_filter: 1, f: [''] }
+        assert_empty board_project_ids_with_icon
+      end
+    end
+  end
+
+  test "public project: a member of other projects only sees the SLAs of those projects" do
+    Project.find(1).update_column(:is_public, true)
+    log_in('sysadmin') # Resolver with view_sla in projects 2 and 3.
+
+    get :index, params: list_params
+    assert_equal [1, 2, 3], listed_project_ids
+    assert_equal [2, 3], project_ids_with_sla_cell
+
+    get :index, params: list_params(any_sla_filter)
+    assert_equal [2, 3], listed_project_ids
+    Sla.where(id: [3, 4, 5, 6]).pluck(:name).each { |name| assert_includes response.body, name }
+    SLA_NAMES[1].each do |name|
+      assert_not response.body.include?(name), "SLA filter exposes #{name}"
+    end
+
+    get :index, params: list_params(no_sla_filter)
+    assert_equal [1], listed_project_ids
+
+    get :index, params: { display_type: 'board', set_filter: 1, f: [''] }
+    assert_equal [2, 3], board_project_ids_with_icon
+  end
+
+  test "SLA filter on a hidden SLA does not reveal the projects using it" do
+    log_in('developer')
+    # SLA 3 is only assigned to project 2, where the developer is not a member.
+    get :index, params: list_params(f: ['sla_id', ''], op: { sla_id: '=' }, v: { sla_id: ['3'] })
+    assert_response :success
+    assert_empty listed_project_ids
+
+    get :index, params: list_params(f: ['sla_id', ''], op: { sla_id: '=' }, v: { sla_id: ['1'] })
+    assert_equal [1], listed_project_ids
+  end
+
   test "anonymous: no SLA column, filter or icon" do
     with_settings login_required: '0' do
       get :index, params: list_params

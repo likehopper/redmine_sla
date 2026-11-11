@@ -286,4 +286,64 @@ class SlaSchedulesControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
+  ### Access audit: SLA schedules are managed by administrators only ###
+
+  test "should create, update, delete and bulk delete SLA schedules as admin with data changes" do
+    @request.session[:user_id] = 1
+    assert_difference "SlaSchedule.count", 1 do
+      post :create, params: { sla_schedule: valid_create_params }
+    end
+    assert_equal true, @sla_schedule.match
+    patch :update, params: { id: @sla_schedule.id, sla_schedule: { match: "0" } }
+    assert_redirected_to sla_schedules_path
+    assert_equal false, @sla_schedule.reload.match
+    deletables = deletable_sla_schedules
+    assert_difference "SlaSchedule.count", -1 do
+      delete :destroy, params: { id: deletables.first.id }
+    end
+    assert_difference "SlaSchedule.count", -2 do
+      delete :destroy, params: { ids: deletables.drop(1).map(&:id) }
+    end
+    assert_redirected_to sla_schedules_path
+  end
+
+  # Even view_sla (user 3) does not reach schedules: they are part of the global configuration.
+  { "project SLA manager" => 2, "Resolver with view_sla" => 3, "reporter without SLA permission" => 5 }.each do |label, user_id|
+    test "should forbid showing a SLA schedule to #{label}" do
+      @request.session[:user_id] = user_id
+      get :show, params: { id: @sla_schedule.id }
+      assert_response :forbidden
+    end
+  end
+
+  { "anonymous" => nil, "project SLA manager" => 2, "reporter without SLA permission" => 5 }.each do |label, user_id|
+    test "should deny new and context menu on SLA schedules to #{label}" do
+      @request.session[:user_id] = user_id
+      get :new
+      assert_access_denied(user_id)
+      get :context_menu, params: { ids: [@sla_schedule.id] }
+      assert_access_denied(user_id)
+    end
+
+    test "should deny SLA schedule writes to #{label} without changing data" do
+      deletables = deletable_sla_schedules
+      assert_denied_without_change(user_id, @sla_schedule) do
+        post :create, params: { sla_schedule: valid_create_params }
+        assert_access_denied(user_id)
+        patch :update, params: { id: @sla_schedule.id, sla_schedule: { match: "0" } }
+        assert_access_denied(user_id)
+        delete :destroy, params: { id: deletables.first.id }
+        assert_access_denied(user_id)
+        delete :destroy, params: { ids: deletables.map(&:id) }
+        assert_access_denied(user_id)
+      end
+      assert_equal deletables.size, SlaSchedule.where(id: deletables.map(&:id)).count
+    end
+  end
+
+  # Schedules have no dependents, so fixture rows other than @sla_schedule are deletable.
+  def deletable_sla_schedules
+    SlaSchedule.where.not(id: @sla_schedule.id).order(:id).limit(3).to_a
+  end
+
 end

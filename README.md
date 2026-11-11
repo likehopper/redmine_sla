@@ -284,6 +284,13 @@ Plugin is ready to use.
 
 ------------------------------------------------------------------------
 
+## Upgrade to 3.5.1
+
+Version **3.5.1** hides the SLA values of subproject issues from users without
+*View SLA* in that subproject, in lists, exports, grouping, sorting and
+filters. Update the plugin files and restart Redmine; no new migration
+relative to 3.5.0.
+
 ## Upgrade to 3.5.0
 
 Version **3.5.0** shows the project SLA tab only to users with *View SLA*.

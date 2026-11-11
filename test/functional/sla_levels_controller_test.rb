@@ -293,4 +293,78 @@ class SlaLevelsControllerTest < ApplicationSlaFunctionalsTestCase
     assert_response :forbidden
   end
 
+  ### Access audit: SLA levels are managed by administrators only ###
+
+  test "should render new and context menu on SLA levels as admin" do
+    @request.session[:user_id] = 1
+    get :new
+    assert_response :success
+    get :context_menu, params: { ids: [1] }
+    assert_response :success
+    assert_select "a[href=?]", edit_sla_level_path(1)
+  end
+
+  test "should create, update with nested terms, delete and bulk delete SLA levels as admin" do
+    @request.session[:user_id] = 1
+    assert_difference "SlaLevel.count", 1 do
+      post :create, params: { sla_level: { name: "Created SLA level", sla_id: 3, sla_calendar_id: 1 } }
+    end
+    assert_redirected_to sla_levels_path
+    patch :update, params: { id: 1, sla_level: { name: "Updated SLA level" } }
+    assert_redirected_to sla_levels_path
+    assert_equal "Updated SLA level", SlaLevel.find(1).name
+    assert_difference "SlaLevelTerm.count", -1 do
+      patch :update, params: { id: 1, sla_level: { sla_level_terms_attributes: { "1" => { "1" => { id: 1, term: "" } } } } }
+    end
+    assert_not SlaLevelTerm.exists?(1)
+    deletables = create_deletable_sla_levels
+    assert_difference "SlaLevel.count", -1 do
+      delete :destroy, params: { id: deletables.first.id }
+    end
+    assert_difference "SlaLevel.count", -2 do
+      delete :destroy, params: { ids: deletables.drop(1).map(&:id) }
+    end
+    assert_redirected_to sla_levels_path
+  end
+
+  # Users 2 and 3 may view levels of their projects (manage_sla / view_sla), user 5 has no SLA permission.
+  { "anonymous" => nil, "project SLA manager" => 2, "Resolver with view_sla" => 3, "reporter without SLA permission" => 5 }.each do |label, user_id|
+    test "should deny new, terms form and context menu on SLA levels to #{label}" do
+      @request.session[:user_id] = user_id
+      get :new
+      assert_access_denied(user_id)
+      get :sla_terms, params: { id: 1 }
+      assert_access_denied(user_id)
+      get :context_menu, params: { ids: [1] }
+      assert_access_denied(user_id)
+    end
+
+    test "should deny SLA level writes to #{label} without changing data" do
+      deletables = create_deletable_sla_levels
+      term_attributes = SlaLevelTerm.find(1).attributes
+      assert_no_difference "SlaLevelTerm.count" do
+        assert_denied_without_change(user_id, SlaLevel.find(1)) do
+          post :create, params: { sla_level: { name: "Denied SLA level", sla_id: 3, sla_calendar_id: 1 } }
+          assert_access_denied(user_id)
+          patch :update, params: { id: 1, sla_level: { name: "Denied SLA level change" } }
+          assert_access_denied(user_id)
+          patch :update, params: { id: 1, sla_level: { sla_level_terms_attributes: { "1" => { "1" => { id: 1, term: "" } } } } }
+          assert_access_denied(user_id)
+          delete :destroy, params: { id: deletables.first.id }
+          assert_access_denied(user_id)
+          delete :destroy, params: { ids: deletables.map(&:id) }
+          assert_access_denied(user_id)
+        end
+      end
+      assert_equal term_attributes, SlaLevelTerm.find(1).attributes
+      assert_equal deletables.size, SlaLevel.where(id: deletables.map(&:id)).count
+    end
+  end
+
+  # Fresh levels without terms or caches, so a leaked destroy would really delete them.
+  def create_deletable_sla_levels
+    sla = Sla.create!(name: "SLA for deletable levels")
+    Array.new(3) { |index| SlaLevel.create!(name: "Deletable SLA level #{index}", sla: sla, sla_calendar_id: index + 1) }
+  end
+
 end

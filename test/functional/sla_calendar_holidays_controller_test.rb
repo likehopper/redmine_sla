@@ -180,7 +180,7 @@ class SlaCalendarHolidaysControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
-  test "should return success on get show as reporter" do
+  test "should return 403 on get show as reporter" do
     @request.session[:user_id] = 5
     with_settings :default_language => "en" do
       get(:show, :params => {:id => 1})
@@ -188,7 +188,7 @@ class SlaCalendarHolidaysControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
-  test "should return success on get edit as reporter" do
+  test "should return 403 on get edit as reporter" do
     @request.session[:user_id] = 5
     with_settings :default_language => "en" do
       get(:edit, :params => {:id => 1})
@@ -206,7 +206,7 @@ class SlaCalendarHolidaysControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
-  test "should return success on get show as other" do
+  test "should return 403 on get show as other" do
     @request.session[:user_id] = 6
     with_settings :default_language => "en" do
       get(:show, :params => {:id => 1})
@@ -214,12 +214,72 @@ class SlaCalendarHolidaysControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
-  test "should return success on get edit as other" do
+  test "should return 403 on get edit as other" do
     @request.session[:user_id] = 6
     with_settings :default_language => "en" do
       get(:edit, :params => {:id => 1})
       assert_response 403
     end
+  end
+
+  ### Access audit: calendar holidays are managed by administrators only ###
+
+  test "should render new and context menu on calendar holidays as admin" do
+    @request.session[:user_id] = 1
+    get :new
+    assert_response :success
+    get :context_menu, params: { ids: [1] }
+    assert_response :success
+    assert_select "a[href=?]", edit_sla_calendar_holiday_path(1)
+  end
+
+  test "should create, update, delete and bulk delete calendar holidays as admin" do
+    @request.session[:user_id] = 1
+    holiday = create_unlinked_sla_holiday
+    assert_difference "SlaCalendarHoliday.count", 1 do
+      post :create, params: { sla_calendar_holiday: { sla_calendar_id: 1, sla_holiday_id: holiday.id, match: "1" } }
+    end
+    assert_redirected_to sla_calendar_holidays_path
+    assert_equal false, SlaCalendarHoliday.find(1).match
+    patch :update, params: { id: 1, sla_calendar_holiday: { match: "1" } }
+    assert_redirected_to sla_calendar_holidays_path
+    assert_equal true, SlaCalendarHoliday.find(1).match
+    assert_difference "SlaCalendarHoliday.count", -1 do
+      delete :destroy, params: { id: 2 }
+    end
+    assert_difference "SlaCalendarHoliday.count", -2 do
+      delete :destroy, params: { ids: [3, 4] }
+    end
+    assert_redirected_to sla_calendar_holidays_path
+  end
+
+  { "anonymous" => nil, "project SLA manager" => 2, "reporter without SLA permission" => 5 }.each do |label, user_id|
+    test "should deny new and context menu on calendar holidays to #{label}" do
+      @request.session[:user_id] = user_id
+      get :new
+      assert_access_denied(user_id)
+      get :context_menu, params: { ids: [1] }
+      assert_access_denied(user_id)
+    end
+
+    test "should deny calendar holiday writes to #{label} without changing data" do
+      holiday = create_unlinked_sla_holiday
+      assert_denied_without_change(user_id, SlaCalendarHoliday.find(1)) do
+        post :create, params: { sla_calendar_holiday: { sla_calendar_id: 1, sla_holiday_id: holiday.id, match: "1" } }
+        assert_access_denied(user_id)
+        patch :update, params: { id: 1, sla_calendar_holiday: { match: "1" } }
+        assert_access_denied(user_id)
+        delete :destroy, params: { id: 2 }
+        assert_access_denied(user_id)
+        delete :destroy, params: { ids: [3, 4] }
+        assert_access_denied(user_id)
+      end
+      assert_equal 3, SlaCalendarHoliday.where(id: [2, 3, 4]).count
+    end
+  end
+
+  def create_unlinked_sla_holiday
+    SlaHoliday.create!(name: "Unlinked SLA holiday", date: Date.new(2099, 12, 25))
   end
 
 end
