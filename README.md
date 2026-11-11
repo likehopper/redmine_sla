@@ -284,6 +284,12 @@ Plugin is ready to use.
 
 ------------------------------------------------------------------------
 
+## Upgrade to 3.5.2
+
+Version **3.5.2** fixes the SLA spent list opened from a project, which
+answered HTTP 500, as did its refresh, destroy and purge actions. Update the
+plugin files and restart Redmine; no new migration relative to 3.5.1.
+
 ## Upgrade to 3.5.1
 
 Version **3.5.1** hides the SLA values of subproject issues from users without

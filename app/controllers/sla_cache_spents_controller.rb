@@ -113,7 +113,8 @@ class SlaCacheSpentsController < ApplicationController
     respond_to do |format|
       format.html do
         flash[:notice] = l(:notice_successful_refresh)
-        redirect_to_referer_or(@project.nil? ? sla_cache_spents_path : project_sla_cache_spents_path(@project))
+        # Spents have no project route: the list filters on the project_id parameter.
+        redirect_to_referer_or(sla_cache_spents_path(project_id: @project&.identifier))
       end
       format.api { render_api_ok }
     end
@@ -125,7 +126,8 @@ class SlaCacheSpentsController < ApplicationController
     respond_to do |format|
       format.html do
         flash[:notice] = l(:notice_successful_purge)
-        redirect_to_referer_or(@project.nil? ? sla_cache_spents_path : project_sla_cache_spents_path(@project))
+        # Spents have no project route: the list filters on the project_id parameter.
+        redirect_to_referer_or(sla_cache_spents_path(project_id: @project&.identifier))
       end
       format.api { render_api_ok }
     end
@@ -143,7 +145,8 @@ class SlaCacheSpentsController < ApplicationController
     respond_to do |format|
       format.html do
         flash[:notice] = l(:notice_successful_delete)
-        redirect_to_referer_or(@project.nil? ? sla_cache_spents_path : project_sla_cache_spents_path(@project))
+        # Spents have no project route: the list filters on the project_id parameter.
+        redirect_to_referer_or(sla_cache_spents_path(project_id: @project&.identifier))
       end
       format.api { render_api_ok }
     end

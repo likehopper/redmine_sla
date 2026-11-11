@@ -20,12 +20,12 @@
 
 module SlaCacheSpentsHelper
 
+  # Spents have no project route: the project context is the project_id
+  # parameter. GET forms must repeat it as a hidden field, since browsers
+  # drop the query string of a GET form action.
   def _sla_cache_spents_path(project, issue, *args)
-    if project
-      project_sla_cache_spents_path(project, *args)
-    else
-      sla_cache_spents_path(*args)
-    end
+    options = args.extract_options!
+    sla_cache_spents_path(*args, options.merge(project_id: project&.identifier))
   end
 
 end
