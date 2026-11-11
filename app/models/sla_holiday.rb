@@ -65,9 +65,9 @@ class SlaHoliday < ActiveRecord::Base
     persisted? && (changes_to_save.keys - %w[name]).empty?
   end
 
-  def sla_cache_level_ids_for_invalidation
+  def sla_ids_for_cache_invalidation
     calendar_ids = SlaCalendarHoliday.unscoped.where(sla_holiday_id: id).pluck(:sla_calendar_id)
-    SlaLevel.unscoped.sharing_sla_with_calendars(calendar_ids).pluck(:id)
+    SlaLevel.unscoped.where(sla_calendar_id: calendar_ids).distinct.pluck(:sla_id)
   end
 
 end

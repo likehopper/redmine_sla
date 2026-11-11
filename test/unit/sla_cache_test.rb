@@ -90,6 +90,24 @@ class SlaCacheTest < ApplicationSlaUnitsTestCase
     assert_equal 90, SlaCacheSpent.find_by!(issue_id: issue.id, sla_type_id: gtr).spent
   end
 
+  test "refresh keeps the spent rows of other issues" do
+    project = Project.find_by!(identifier: 'project-sla-tests-tma')
+    issue = Issue.find_by!(project: project, subject: 'Bug with simple SLA')
+    # Non-transactional tests sharing the process may have purged these rows.
+    SlaType.all.each { |sla_type| SlaCacheSpent.find_by_issue_and_type_id(issue, sla_type.id) }
+    refreshed_ids = SlaCacheSpent.unscoped.where(issue_id: issue.id).pluck(:id)
+    other_ids = SlaCacheSpent.unscoped.where.not(issue_id: issue.id).order(:id).pluck(:id)
+    assert_not_empty refreshed_ids
+    assert_not_empty other_ids
+
+    SlaCache.find_by!(issue_id: issue.id).refresh
+
+    assert_equal other_ids, SlaCacheSpent.unscoped.where.not(issue_id: issue.id).order(:id).pluck(:id)
+    # The refreshed issue's rows are rebuilt, not kept.
+    assert SlaCacheSpent.unscoped.where(issue_id: issue.id).exists?
+    assert_empty SlaCacheSpent.unscoped.where(id: refreshed_ids)
+  end
+
   # --- Visibility ---
   # visible? calls issue.visible? without a user argument, so it falls back to
   # User.current. We must set User.current to a user that has :view_issues on

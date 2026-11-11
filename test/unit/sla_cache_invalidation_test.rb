@@ -35,48 +35,48 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     end
   end
 
-  test "schedule update invalidates caches of all competing levels" do
+  test "schedule update invalidates all caches of affected SLAs" do
     schedule = SlaSchedule.unscoped.detect { |record| level_ids_for(record.sla_calendar).any? }
 
-    assert_only_levels_invalidated(level_ids_for(schedule.sla_calendar)) do
+    assert_only_affected_slas_invalidated(level_ids_for(schedule.sla_calendar)) do
       schedule.update!(match: !schedule.match)
     end
   end
 
-  test "holiday date update invalidates caches for every linked calendar" do
+  test "holiday date update invalidates caches for SLAs using linked calendars" do
     calendar_holiday = SlaCalendarHoliday.unscoped.detect do |record|
       level_ids_for(record.sla_calendar).any?
     end
     holiday = calendar_holiday.sla_holiday
     level_ids = linked_calendar_ids(holiday).flat_map { |id| level_ids_for(SlaCalendar.find(id)) }
 
-    assert_only_levels_invalidated(level_ids) do
+    assert_only_affected_slas_invalidated(level_ids) do
       holiday.update!(date: "2030-02-03")
     end
   end
 
-  test "calendar holiday update invalidates caches of all competing levels" do
+  test "calendar holiday update invalidates all caches of affected SLAs" do
     calendar_holiday = SlaCalendarHoliday.unscoped.detect do |record|
       level_ids_for(record.sla_calendar).any?
     end
 
-    assert_only_levels_invalidated(level_ids_for(calendar_holiday.sla_calendar)) do
+    assert_only_affected_slas_invalidated(level_ids_for(calendar_holiday.sla_calendar)) do
       calendar_holiday.update!(match: !calendar_holiday.match)
     end
   end
 
-  test "level update invalidates only its own caches" do
+  test "level name changes preserve SLA caches" do
     level = SlaLevel.unscoped.find(SlaCache.unscoped.first.sla_level_id)
 
-    assert_only_levels_invalidated([level.id]) do
+    assert_caches_preserved do
       level.update!(name: "#{level.name} updated")
     end
   end
 
-  test "level term update invalidates only caches using its level" do
+  test "level term update invalidates all caches of its SLA" do
     term = SlaLevelTerm.unscoped.where(sla_level_id: cached_level_ids).first
 
-    assert_only_levels_invalidated([term.sla_level_id]) do
+    assert_only_affected_slas_invalidated(levels_in_same_sla([term.sla_level_id])) do
       term.update!(term: term.term + 1)
     end
   end
@@ -84,7 +84,7 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
   test "destroying a schedule invalidates caches using its calendar" do
     schedule = SlaSchedule.unscoped.detect { |record| level_ids_for(record.sla_calendar).any? }
 
-    assert_only_levels_invalidated(level_ids_for(schedule.sla_calendar)) do
+    assert_only_affected_slas_invalidated(level_ids_for(schedule.sla_calendar)) do
       schedule.destroy!
     end
   end
@@ -106,7 +106,7 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
 
   test "creating a schedule invalidates its calendar caches" do
     calendar = calendar_with_cached_level
-    assert_only_levels_invalidated(level_ids_for(calendar)) do
+    assert_only_affected_slas_invalidated(level_ids_for(calendar)) do
       SlaSchedule.create!(sla_calendar: calendar, dow: 6,
                           start_time: "09:00", end_time: "10:00", match: true)
     end
@@ -115,7 +115,7 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
   test "creating a calendar holiday invalidates its calendar caches" do
     calendar = calendar_with_cached_level
     holiday = SlaHoliday.create!(name: "New exclusion", date: "2030-01-01")
-    assert_only_levels_invalidated(level_ids_for(calendar)) do
+    assert_only_affected_slas_invalidated(level_ids_for(calendar)) do
       SlaCalendarHoliday.create!(sla_calendar: calendar, sla_holiday: holiday, match: false)
     end
   end
@@ -124,7 +124,7 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     schedule = SlaSchedule.unscoped.find_by!(sla_calendar_id: 1)
     destination = SlaCalendar.find(2)
     ids = level_ids_for(schedule.sla_calendar) + level_ids_for(destination)
-    assert_only_levels_invalidated(ids) do
+    assert_only_affected_slas_invalidated(ids) do
       schedule.update!(sla_calendar: destination, dow: 6,
                        start_time: "09:00", end_time: "10:00")
     end
@@ -135,7 +135,7 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     destination = SlaCalendar.find(2)
     holiday = SlaHoliday.create!(name: "Moved exclusion", date: "2030-01-01")
     ids = level_ids_for(link.sla_calendar) + level_ids_for(destination)
-    assert_only_levels_invalidated(ids) do
+    assert_only_affected_slas_invalidated(ids) do
       link.update!(sla_calendar: destination, sla_holiday: holiday)
     end
   end
@@ -143,7 +143,7 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
   test "replacing a linked holiday invalidates its calendar" do
     link = SlaCalendarHoliday.unscoped.find_by!(sla_calendar_id: 1)
     holiday = SlaHoliday.create!(name: "Replacement exclusion", date: "2030-01-01")
-    assert_only_levels_invalidated(level_ids_for(link.sla_calendar)) do
+    assert_only_affected_slas_invalidated(level_ids_for(link.sla_calendar)) do
       link.update!(sla_holiday: holiday)
     end
   end
@@ -151,18 +151,18 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
   test "destroying a linked holiday invalidates all its calendar caches" do
     holiday = SlaCalendarHoliday.unscoped.find_by!(sla_calendar_id: 1).sla_holiday
     ids = linked_calendar_ids(holiday).flat_map { |id| level_ids_for(SlaCalendar.find(id)) }
-    assert_only_levels_invalidated(ids) { holiday.destroy! }
+    assert_only_affected_slas_invalidated(ids) { holiday.destroy! }
     assert_empty SlaCalendarHoliday.unscoped.where(sla_holiday_id: holiday.id)
   end
 
   test "destroying a calendar holiday invalidates its calendar caches" do
     link = SlaCalendarHoliday.unscoped.find_by!(sla_calendar_id: 1)
-    assert_only_levels_invalidated(level_ids_for(link.sla_calendar)) { link.destroy! }
+    assert_only_affected_slas_invalidated(level_ids_for(link.sla_calendar)) { link.destroy! }
   end
 
   test "destroying a calendar invalidates its caches and spent caches" do
     calendar = calendar_with_cached_level
-    assert_only_levels_invalidated(level_ids_for(calendar)) { calendar.destroy! }
+    assert_only_affected_slas_invalidated(level_ids_for(calendar)) { calendar.destroy! }
     assert_empty SlaSchedule.unscoped.where(sla_calendar_id: calendar.id)
     assert_empty SlaCalendarHoliday.unscoped.where(sla_calendar_id: calendar.id)
   end
@@ -170,7 +170,7 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
   test "nested schedule deletion invalidates its calendar caches" do
     calendar = calendar_with_cached_level
     schedule = calendar.sla_schedules.first
-    assert_only_levels_invalidated(level_ids_for(calendar)) do
+    assert_only_affected_slas_invalidated(level_ids_for(calendar)) do
       calendar.update!(sla_schedules_attributes: [{id: schedule.id, _destroy: "1"}])
     end
     assert_not SlaSchedule.exists?(schedule.id)
@@ -183,7 +183,7 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     assert_not_empty spent_ids
     SlaCalendar.transaction(requires_new: true) do
       schedule = calendar.sla_schedules.first
-      assert_only_levels_invalidated(level_ids_for(calendar)) do
+      assert_only_affected_slas_invalidated(level_ids_for(calendar)) do
         schedule.update!(match: !schedule.match)
       end
       raise ActiveRecord::Rollback
@@ -192,21 +192,21 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     assert_equal spent_ids, SlaCacheSpent.unscoped.order(:id).pluck(:id)
   end
 
-  test "changing a competing calendar invalidates caches on the other level of the same SLA" do
+  test "changing a competing calendar invalidates all caches of the same SLA" do
     level = SlaLevel.find(4)
     competing = SlaLevel.find(5)
     assert_equal level.sla_id, competing.sla_id
     assert_not_equal level.sla_calendar_id, competing.sla_calendar_id
     schedule = SlaSchedule.unscoped.find_by!(sla_calendar_id: competing.sla_calendar_id)
-    assert_only_levels_invalidated([level.id, competing.id]) do
+    assert_only_affected_slas_invalidated([level.id, competing.id]) do
       schedule.update!(match: !schedule.match)
     end
   end
 
-  test "creating a level invalidates existing candidates for the same SLA" do
+  test "creating a level invalidates all existing caches for the same SLA" do
     level = SlaLevel.find(4)
     calendar = SlaCalendar.create!(name: "Additional candidate calendar")
-    assert_only_levels_invalidated(SlaLevel.unscoped.where(sla_id: level.sla_id).pluck(:id)) do
+    assert_only_affected_slas_invalidated(SlaLevel.unscoped.where(sla_id: level.sla_id).pluck(:id)) do
       SlaLevel.create!(name: "Additional candidate", sla_id: level.sla_id, sla_calendar: calendar)
     end
   end
@@ -215,38 +215,49 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     level = SlaLevel.find(4)
     destination = SlaLevel.find(6).sla
     ids = SlaLevel.unscoped.where(sla_id: [level.sla_id, destination.id]).pluck(:id)
-    assert_only_levels_invalidated(ids) { level.update!(sla: destination) }
+    assert_only_affected_slas_invalidated(ids) { level.update!(sla: destination) }
   end
 
-  test "moving a term invalidates both levels" do
+  test "changing a level priority field removes its terms and invalidates once" do
+    level = SlaLevel.find(9)
+    assert_not_empty level.sla_level_terms
+
+    assert_only_affected_slas_invalidated([level.id]) do
+      assert_cache_deletes(1) { level.update!(custom_field_id: 2) }
+    end
+
+    assert_empty SlaLevelTerm.where(sla_level_id: level.id)
+  end
+
+  test "moving a term invalidates caches of both affected SLAs" do
     term = SlaLevelTerm.unscoped.find_by!(sla_level_id: 1)
     destination = SlaLevel.find(2)
-    assert_only_levels_invalidated([term.sla_level_id, destination.id]) do
+    assert_only_affected_slas_invalidated(levels_in_same_sla([term.sla_level_id, destination.id])) do
       term.update!(sla_level: destination, sla_type_id: 2)
     end
   end
 
-  test "changing a level calendar invalidates its competing levels" do
+  test "changing a level calendar invalidates all caches of its SLA" do
     level = SlaLevel.find(4)
     calendar = SlaCalendar.create!(name: "Replacement candidate calendar")
     ids = SlaLevel.unscoped.where(sla_id: level.sla_id).pluck(:id)
-    assert_only_levels_invalidated(ids) { level.update!(sla_calendar: calendar) }
+    assert_only_affected_slas_invalidated(ids) { level.update!(sla_calendar: calendar) }
   end
 
-  test "creating a term invalidates its level caches" do
-    assert_only_levels_invalidated([2]) do
+  test "creating a term invalidates all caches of its SLA" do
+    assert_only_affected_slas_invalidated(levels_in_same_sla([2])) do
       SlaLevelTerm.create!(sla_level_id: 2, sla_type_id: 2, sla_priority_id: 1, term: 120)
     end
   end
 
-  test "destroying a term invalidates its level caches" do
+  test "destroying a term invalidates all caches of its SLA" do
     term = SlaLevelTerm.unscoped.find_by!(sla_level_id: 1)
-    assert_only_levels_invalidated([term.sla_level_id]) { term.destroy! }
+    assert_only_affected_slas_invalidated(levels_in_same_sla([term.sla_level_id])) { term.destroy! }
   end
 
   test "destroying a level invalidates its caches and spent caches" do
     level = SlaLevel.find(4)
-    assert_only_levels_invalidated([level.id]) { level.destroy! }
+    assert_only_affected_slas_invalidated([level.id]) { level.destroy! }
   end
 
   test "a changed competing schedule recalculates the selected level on next read" do
@@ -279,7 +290,7 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
   test "holiday name and date changes still invalidate linked calendars" do
     holiday = SlaCalendarHoliday.unscoped.find_by!(sla_calendar_id: 1).sla_holiday
     ids = linked_calendar_ids(holiday).flat_map { |id| level_ids_for(SlaCalendar.find(id)) }
-    assert_only_levels_invalidated(ids) do
+    assert_only_affected_slas_invalidated(ids) do
       holiday.update!(name: "Renamed and moved holiday", date: "2030-02-03")
     end
   end
@@ -287,7 +298,7 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
   test "calendar rename with nested schedule changes still invalidates competing levels" do
     calendar = calendar_with_cached_level
     schedule = calendar.sla_schedules.first
-    assert_only_levels_invalidated(level_ids_for(calendar)) do
+    assert_only_affected_slas_invalidated(level_ids_for(calendar)) do
       calendar.update!(name: "Renamed with schedule", sla_schedules_attributes: [
         {id: schedule.id, match: schedule.match ? "0" : "1"}
       ])
@@ -305,7 +316,7 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     ids = level_ids_for(calendar)
     assert_operator calendar.sla_schedules.count, :>, 1
     calendar.name = "Unsaved metadata"
-    assert_only_levels_invalidated(ids) do
+    assert_only_affected_slas_invalidated(ids) do
       assert_cache_queries(2) { calendar.destroy! }
     end
     assert_empty SlaCalendarHoliday.unscoped.where(sla_calendar_id: calendar.id)
@@ -320,7 +331,7 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     Rake::Task['sla:update'].execute
     ids = linked_calendar_ids(holiday).flat_map { |id| level_ids_for(SlaCalendar.find(id)) }
     assert_operator holiday.sla_calendar_holidays.count, :>, 1
-    assert_only_levels_invalidated(ids) do
+    assert_only_affected_slas_invalidated(ids) do
       assert_cache_queries(3) { holiday.destroy! }
     end
     assert_empty SlaCalendarHoliday.unscoped.where(sla_holiday_id: holiday.id)
@@ -338,7 +349,7 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     ensure
       SlaSchedule.skip_callback(:destroy, :before, abort_destroy)
     end
-    assert_only_levels_invalidated(level_ids_for(calendar)) do
+    assert_only_affected_slas_invalidated(level_ids_for(calendar)) do
       assert_cache_queries(2) { calendar.destroy! }
     end
   end
@@ -377,8 +388,8 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     end
   end
 
-  test "custom field update invalidates only levels using that field" do
-    assert_only_levels_invalidated(custom_field_level_ids) do
+  test "custom field update invalidates caches of SLAs using that field" do
+    assert_only_affected_slas_invalidated(custom_field_level_ids) do
       IssueCustomField.find(1).update!(is_required: false)
     end
   end
@@ -402,43 +413,157 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     assert_equal spent_ids, SlaCacheSpent.unscoped.order(:id).pluck(:id)
   end
 
-  test "enumeration update invalidates only levels using its field" do
-    assert_only_levels_invalidated(custom_field_level_ids) do
+  test "enumeration update invalidates caches of SLAs using its field" do
+    assert_only_affected_slas_invalidated(custom_field_level_ids) do
       CustomFieldEnumeration.find(1).update!(active: false)
     end
   end
 
-  test "enumeration creation invalidates only levels using its field" do
-    assert_only_levels_invalidated(custom_field_level_ids) do
+  test "enumeration creation invalidates caches of SLAs using its field" do
+    assert_only_affected_slas_invalidated(custom_field_level_ids) do
       CustomFieldEnumeration.create!(custom_field_id: 1, name: 'New priority', position: 5)
     end
   end
 
-  test "moving an enumeration invalidates levels using its previous field" do
-    assert_only_levels_invalidated(custom_field_level_ids) do
+  test "moving an enumeration invalidates caches of SLAs using its previous field" do
+    assert_only_affected_slas_invalidated(custom_field_level_ids) do
       CustomFieldEnumeration.find(1).update!(custom_field_id: 2)
     end
   end
 
-  test "enumeration deletion without reassignment invalidates affected levels" do
-    assert_only_levels_invalidated(custom_field_level_ids) do
+  test "enumeration deletion without reassignment invalidates affected SLAs" do
+    assert_only_affected_slas_invalidated(custom_field_level_ids) do
       CustomFieldEnumeration.find(4).destroy
     end
   end
 
-  test "enumeration deletion with reassignment invalidates affected levels" do
+  test "enumeration deletion with reassignment invalidates affected SLAs" do
     enumeration = CustomFieldEnumeration.find(1)
     values = enumeration.custom_values.pluck(:id)
     assert_not_empty values
 
-    assert_only_levels_invalidated(custom_field_level_ids) do
+    assert_only_affected_slas_invalidated(custom_field_level_ids) do
       enumeration.destroy(CustomFieldEnumeration.find(2))
     end
     assert_equal ['2'], CustomValue.where(id: values).distinct.pluck(:value)
   end
 
+  test "saving an issue custom priority change deletes only that issue cache" do
+    issue = Issue.find(66)
+    cache = SlaCache.find_by_issue_id(issue.id)
+    assert cache
+    unaffected_ids = SlaCache.unscoped.where.not(id: cache.id).order(:id).pluck(:id)
+    current_value = issue.custom_field_values.find { |value| value.custom_field_id == 1 }.value
+    replacement_value = current_value == '1' ? '2' : '1'
+
+    issue.custom_field_values = { '1' => replacement_value }
+    assert_no_sla_function_calls { issue.save! }
+
+    assert_not SlaCache.unscoped.exists?(cache.id)
+    assert_not SlaCacheSpent.unscoped.exists?(sla_cache_id: cache.id)
+    assert_equal unaffected_ids, SlaCache.unscoped.order(:id).pluck(:id)
+  end
+
+  test "deleting and reassigning a native priority invalidates only reassigned issues" do
+    priority = IssuePriority.find(1)
+    issue_ids = Issue.where(priority_id: priority.id).pluck(:id)
+    affected_cache_ids = SlaCache.unscoped.where(issue_id: issue_ids).pluck(:id)
+    preserved_cache_ids = SlaCache.unscoped.where.not(issue_id: issue_ids).order(:id).pluck(:id)
+    replacement = IssuePriority.where.not(id: priority.id).first
+    assert_not_empty affected_cache_ids
+    assert_not_empty preserved_cache_ids
+
+    priority.destroy(replacement)
+
+    assert_empty SlaCache.unscoped.where(id: affected_cache_ids)
+    assert_equal preserved_cache_ids, SlaCache.unscoped.order(:id).pluck(:id)
+  end
+
+  test "reassigning a native priority invalidates issues that gain a competing native level" do
+    issue = Issue.find(66)
+    old_priority = issue.priority
+    replacement = IssuePriority.find_by!(name: "High")
+    custom_level = issue.get_sla_level
+    assert_not_nil custom_level.custom_field_id
+
+    calendar = SlaCalendar.create!(name: "Native replacement priority calendar")
+    SlaSchedule.create!(sla_calendar: calendar, dow: issue.created_on.wday,
+                        start_time: "00:00", end_time: "23:59", match: true)
+    native_level = SlaLevel.find(1)
+    SlaLevelTerm.where(sla_level_id: native_level.id).delete_all
+    native_level.update!(sla: custom_level.sla, sla_calendar: calendar, custom_field: nil)
+    SlaLevelTerm.create!(sla_level: native_level, sla_type: SlaType.first,
+                         sla_priority_id: replacement.id, term: 30)
+    assert_not SlaLevelTerm.joins(:sla_level)
+                               .where(sla_levels: {sla_id: custom_level.sla_id, custom_field_id: nil},
+                                      sla_priority_id: old_priority.id).exists?
+
+    cache = SlaCache.find_by_issue_id(issue.id)
+    assert_equal custom_level.id, cache.sla_level_id
+
+    old_priority.destroy(replacement)
+
+    assert_not SlaCache.unscoped.exists?(cache.id)
+    assert_equal replacement.id, issue.reload.priority_id
+    assert_equal native_level.id, SlaCache.find_by_issue_id(issue.id).sla_level_id
+  end
+
+  test "destroying a type invalidates SLAs whose levels have terms of that type" do
+    sla_type = SlaType.find(2)
+    level_ids = SlaLevel.unscoped.joins(:sla_level_terms)
+                        .where(sla_level_terms: { sla_type_id: sla_type.id })
+                        .distinct.pluck(:id)
+    level_ids = levels_in_same_sla(level_ids)
+    # SLAs without terms of this type keep their caches.
+    assert SlaCache.unscoped.where.not(sla_level_id: level_ids).exists?
+
+    assert_only_affected_slas_invalidated(level_ids) { sla_type.destroy! }
+    assert_empty SlaLevelTerm.unscoped.where(sla_type_id: sla_type.id)
+  end
+
+  test "type metadata and position changes preserve caches without dependency queries" do
+    sla_type = SlaType.find(2)
+    assert_not_empty SlaLevelTerm.unscoped.where(sla_type_id: sla_type.id)
+    assert_not_equal 1, sla_type.position
+
+    assert_cache_queries(0) do
+      assert_caches_preserved do
+        sla_type.update!(name: "#{sla_type.name} renamed", description: "Updated metadata", position: 1)
+      end
+    end
+    assert_equal 1, sla_type.reload.position
+  end
+
+  test "custom field description and calculation changes invalidate affected SLAs" do
+    field = IssueCustomField.find(1)
+    assert field.is_required
+
+    assert_only_affected_slas_invalidated(custom_field_level_ids) do
+      field.update!(description: 'Updated SLA priority field', is_required: false)
+    end
+  end
+
+  test "renaming a level while changing its calendar invalidates its SLA" do
+    level = SlaLevel.find(4)
+    calendar = SlaCalendar.create!(name: "Renamed level calendar")
+    ids = SlaLevel.unscoped.where(sla_id: level.sla_id).pluck(:id)
+    assert_only_affected_slas_invalidated(ids) do
+      level.update!(name: "#{level.name} renamed", sla_calendar: calendar)
+    end
+  end
+
+  test "renaming a level while moving it invalidates the old and new SLA" do
+    level = SlaLevel.find(4)
+    destination = SlaLevel.find(6).sla
+    assert_not_equal level.sla_id, destination.id
+    ids = SlaLevel.unscoped.where(sla_id: [level.sla_id, destination.id]).pluck(:id)
+    assert_only_affected_slas_invalidated(ids) do
+      level.update!(name: "#{level.name} moved", sla: destination)
+    end
+  end
+
   test "custom field deletion removes affected caches" do
-    assert_only_levels_invalidated(custom_field_level_ids) do
+    assert_only_affected_slas_invalidated(custom_field_level_ids) do
       IssueCustomField.find(1).destroy!
     end
   end
@@ -516,6 +641,20 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     end
   end
 
+  test "moving a mapping to another project deletes caches of its old pair" do
+    mapping = mapping_with_caches
+    free_project = Project.where.not(
+      id: SlaProjectTracker.where(tracker_id: mapping.tracker_id).select(:project_id)
+    ).order(:id).first
+    old_pair = [mapping.project_id, mapping.tracker_id]
+    # Only mapped pairs have caches, so the old pair carries the deletions.
+    assert_not_empty caches_for_pairs([old_pair])
+
+    assert_only_pairs_invalidated([old_pair, [free_project.id, mapping.tracker_id]]) do
+      assert_no_sla_function_calls { mapping.update!(project_id: free_project.id) }
+    end
+  end
+
   test "destroying a mapping deletes its caches" do
     mapping = mapping_with_caches
 
@@ -582,7 +721,12 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
   end
 
   def custom_field_level_ids
-    SlaLevel.unscoped.where(custom_field_id: 1).pluck(:id)
+    levels_in_same_sla(SlaLevel.unscoped.where(custom_field_id: 1).pluck(:id))
+  end
+
+  def levels_in_same_sla(level_ids)
+    sla_ids = SlaLevel.unscoped.where(id: level_ids).distinct.pluck(:sla_id)
+    SlaLevel.unscoped.where(sla_id: sla_ids).pluck(:id)
   end
 
   def assert_caches_preserved
@@ -610,6 +754,16 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     assert_equal expected, queries.size, queries.join("\n")
   end
 
+  def assert_cache_deletes(expected)
+    queries = []
+    subscriber = lambda do |*args|
+      sql = args.last[:sql]
+      queries << sql if sql.match?(/\ADELETE FROM ["`]?sla_caches["`]?/i)
+    end
+    ActiveSupport::Notifications.subscribed(subscriber, 'sql.active_record') { yield }
+    assert_equal expected, queries.size, queries.join("\n")
+  end
+
   def cached_level_ids
     SlaCache.unscoped.distinct.pluck(:sla_level_id)
   end
@@ -627,9 +781,11 @@ class SlaCacheInvalidationTest < ApplicationSlaUnitsTestCase
     SlaCalendarHoliday.unscoped.where(sla_holiday_id: holiday.id).pluck(:sla_calendar_id)
   end
 
-  def assert_only_levels_invalidated(level_ids)
-    affected_ids = SlaCache.unscoped.where(sla_level_id: level_ids).pluck(:id)
-    unaffected_ids = SlaCache.unscoped.where.not(sla_level_id: level_ids).order(:id).pluck(:id)
+  def assert_only_affected_slas_invalidated(level_ids)
+    sla_ids = SlaLevel.unscoped.where(id: level_ids).distinct.pluck(:sla_id)
+    affected_level_ids = SlaLevel.unscoped.where(sla_id: sla_ids).select(:id)
+    affected_ids = SlaCache.unscoped.where(sla_level_id: affected_level_ids).pluck(:id)
+    unaffected_ids = SlaCache.unscoped.where.not(sla_level_id: affected_level_ids).order(:id).pluck(:id)
     assert_not_empty affected_ids
 
     assert_not_empty SlaCacheSpent.unscoped.where(sla_cache_id: affected_ids).pluck(:id)

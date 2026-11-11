@@ -28,8 +28,8 @@ class SlaProjectTracker < ActiveRecord::Base
   has_many :sla_level_terms, through: :sla_levels
   has_many :sla_types, through: :sla_level_terms
 
-  after_save :sla_cache_update, if: :saved_changes?
-  after_destroy :sla_cache_destroy
+  after_save :invalidate_sla_cache, if: :saved_changes?
+  after_destroy :invalidate_sla_cache
 
   extend Redmine::I18n
   include Redmine::SafeAttributes
@@ -89,18 +89,10 @@ private
   # out: delete them instead, like the other configuration models. They are
   # rebuilt when the issues are displayed, or by the update_sla task.
   # sla_cache_spents are removed by the database foreign key cascade.
-  def sla_cache_update
+  def invalidate_sla_cache
     # The old pair lost this mapping, the new pair gained it.
-    sla_cache_delete(self.project_id_before_last_save, self.tracker_id_before_last_save)
-    sla_cache_delete(self.project_id, self.tracker_id)
-  end
-
-  def sla_cache_destroy
-    sla_cache_delete(self.project_id, self.tracker_id)
-  end
-
-  def sla_cache_delete(project_id, tracker_id)
-    SlaCache.unscoped.where(project_id: project_id, tracker_id: tracker_id).delete_all
+    SlaCache.invalidate_project_tracker(project_id_before_last_save, tracker_id_before_last_save)
+    SlaCache.invalidate_project_tracker(project_id, tracker_id)
   end
 
 end

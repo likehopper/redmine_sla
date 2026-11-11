@@ -1,5 +1,66 @@
 # Changelog
 
+## 3.6.0 - 2026-11-11
+
+### Added
+
+- Select an SLA level only when it has a term for the issue's priority. The
+  existing earliest-start-time rule and level-id tie-breaker apply to the
+  eligible levels. Issues without a matching term no longer have an SLA cache.
+- Refresh issue SLA caches when a native priority or a custom-field priority
+  changes. Invalidate competing levels when terms, priority fields,
+  enumerations or native priorities change.
+- Invalidate the caches of issues reassigned when a native priority is deleted.
+  Redmine performs that reassignment with `update_all`, which bypasses issue
+  callbacks; caches of issues using other priorities are preserved.
+- Invalidate caches of SLAs whose levels have terms of a deleted SLA type: the
+  database cascade removed those terms without invalidating the caches.
+- Explain the same priority-filtered candidates used by the calculation.
+- Add a concise calendar-by-priority example with documentation fixtures that
+  assert the selected level and capture the issue and explanation screens.
+
+### Changed
+
+- Show the cache-purge warning when a nested term update also changes the SLA
+  level's priority custom field.
+
+### Upgrade
+
+- Migration 028 redeploys `sla_get_level` and deletes only cache entries whose
+  selected level has no term for the issue's current priority. Those issues
+  are recalculated on their next read or by `update_sla`.
+- Issues whose old level has no term for their priority will no longer appear
+  as covered by that level. Some will move to another eligible level and
+  calendar; only issues with no eligible level will have no SLA. To find
+  potentially affected cached issues before upgrading:
+
+  ```sql
+  SELECT sla_caches.issue_id, sla_levels.id AS sla_level_id
+  FROM sla_caches
+  INNER JOIN issues ON issues.id = sla_caches.issue_id
+  INNER JOIN sla_levels ON sla_levels.id = sla_caches.sla_level_id
+  WHERE NOT EXISTS (
+    SELECT 1
+    FROM sla_level_terms
+    LEFT JOIN custom_values
+      ON custom_values.customized_type = 'Issue'
+     AND custom_values.customized_id = issues.id
+     AND custom_values.custom_field_id = sla_levels.custom_field_id
+    WHERE sla_level_terms.sla_level_id = sla_levels.id
+      AND (
+        (sla_levels.custom_field_id IS NULL
+         AND sla_level_terms.sla_priority_id = issues.priority_id)
+        OR
+        (sla_levels.custom_field_id IS NOT NULL
+         AND CAST(sla_level_terms.sla_priority_id AS VARCHAR) = custom_values.value)
+      )
+  );
+  ```
+
+  On MySQL/MariaDB, use
+  `CAST(CAST(sla_level_terms.sla_priority_id AS CHAR) AS BINARY) = CAST(custom_values.value AS BINARY)`
+  for the custom-field comparison to avoid collation mismatches.
+
 ## 3.5.2 - 2026-11-11
 
 ### Fixed

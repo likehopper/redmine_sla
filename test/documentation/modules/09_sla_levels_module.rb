@@ -66,7 +66,7 @@ module SlaLevelsDocumentationTest
       
       # Validation and screenshot
       assert_text(l('sla_label.sla_level.notice_successful_create', id: "##{sla_level.id}"))
-      take_doc_screenshot(format("%02d-01-%02d-02-sla_leel-created.png", id, idx))
+      take_doc_screenshot(format("%02d-01-%02d-02-sla_level-created.png", id, idx))
       
     end
 

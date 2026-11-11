@@ -1,0 +1,48 @@
+# File: redmine_sla/test/documentation/example-06/sla_calendars.yml
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# Redmine SLA - service level agreement plugin
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+sla_calendars:
+  - name: "24x7"
+    description: Always-on support calendar.
+    sla_schedules:
+      Sunday:
+        - ["00:00","23:59",true]
+      Monday:
+        - ["00:00","23:59",true]
+      Tuesday:
+        - ["00:00","23:59",true]
+      Wednesday:
+        - ["00:00","23:59",true]
+      Thursday:
+        - ["00:00","23:59",true]
+      Friday:
+        - ["00:00","23:59",true]
+      Saturday:
+        - ["00:00","23:59",true]
+  - name: "Business hours"
+    description: Weekdays from 09:00 to 17:00.
+    sla_schedules:
+      Monday:
+        - ["09:00","17:00",true]
+      Tuesday:
+        - ["09:00","17:00",true]
+      Wednesday:
+        - ["09:00","17:00",true]
+      Thursday:
+        - ["09:00","17:00",true]
+      Friday:
+        - ["09:00","17:00",true]

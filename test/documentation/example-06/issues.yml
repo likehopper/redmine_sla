@@ -1,0 +1,44 @@
+# File: redmine_sla/test/documentation/example-06/issues.yml
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# Redmine SLA - service level agreement plugin
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+issues:
+  priority_urgent:
+    project: project-managed-services
+    tracker: tracker_production_incident
+    subject: Urgent issue uses the 24x7 level
+    start_date: '2026-01-06'
+    due_date: '2026-01-06'
+    created_outside_business_hours: true
+    issue_priority_name: Urgent
+    expected_sla_level: Critical
+    history:
+    - status: New
+      at: '2026-01-06 22:00:00'
+      notes: Created
+  priority_normal:
+    project: project-managed-services
+    tracker: tracker_production_incident
+    subject: Normal issue uses the business-hours level
+    start_date: '2026-01-06'
+    due_date: '2026-01-07'
+    created_outside_business_hours: true
+    issue_priority_name: Normal
+    expected_sla_level: Standard
+    history:
+    - status: New
+      at: '2026-01-06 22:00:00'
+      notes: Created after business hours

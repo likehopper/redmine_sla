@@ -59,6 +59,20 @@ Easy and efficient!
 
 ## SLA Calendars
 
+### Selecting the SLA level
+
+For each issue, only levels belonging to its project/tracker SLA mapping and
+having at least one term for its current priority are candidates. A level's
+priority source is determined independently: the native issue priority when
+`custom_field_id` is blank, or that level's custom-field enumeration otherwise.
+Among eligible levels, the existing rule applies: the earliest matching
+calendar start wins, then the lowest level id breaks a tie. If no eligible
+level has a matching calendar start, no SLA level or cache is returned.
+
+Changing an issue's priority recalculates its level from the issue's creation
+time with the new priority's calendar. Time is not split across the old and new
+priority periods.
+
 The SLA Calendars will finally make it possible to complete the times of activity or non-activity.
 
 

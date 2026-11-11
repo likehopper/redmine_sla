@@ -69,9 +69,9 @@ class SlaCalendarHoliday < ActiveRecord::Base
 
   private
 
-  def sla_cache_level_ids_for_invalidation
+  def sla_ids_for_cache_invalidation
     calendar_ids = [sla_calendar_id, attribute_in_database("sla_calendar_id")].compact.uniq
-    SlaLevel.unscoped.sharing_sla_with_calendars(calendar_ids).pluck(:id)
+    SlaLevel.unscoped.where(sla_calendar_id: calendar_ids).distinct.pluck(:sla_id)
   end
 
 end

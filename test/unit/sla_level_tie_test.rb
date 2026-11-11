@@ -32,6 +32,10 @@ class SlaLevelTieTest < ApplicationSlaUnitsTestCase
     level = SlaLevel.find(SlaCache.find_by_issue_id(issue.id).sla_level_id)
     twin = SlaLevel.create!(name: 'Tie level', sla: level.sla, sla_calendar: copy_calendar(level.sla_calendar),
                             custom_field_id: level.custom_field_id)
+    level.sla_level_terms.each do |term|
+      SlaLevelTerm.create!(sla_level: twin, sla_type_id: term.sla_type_id,
+                           sla_priority_id: term.sla_priority_id, term: term.term)
+    end
     expected = [level.id, twin.id].min
 
     5.times do
@@ -40,6 +44,9 @@ class SlaLevelTieTest < ApplicationSlaUnitsTestCase
       )
       assert_equal expected, SlaCache.find_by!(issue_id: issue.id).sla_level_id
     end
+
+    selected_rows = RedmineSla::SlaExplanation.new(issue).levels.select { |row| row['selected'] }
+    assert_equal [expected], selected_rows.map { |row| row['sla_level_id'] }
   end
 
   private

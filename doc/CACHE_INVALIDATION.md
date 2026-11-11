@@ -1,78 +1,57 @@
 # SLA cache invalidation
 
-Configuration changes invalidate cached calculations without saving or touching
-`SlaLevel` records. `RedmineSla::InvalidatesSlaCache` captures dependencies before
-save or destruction and deletes matching `SlaCache` records afterwards, inside
-the same transaction. The database foreign key deletes their `SlaCacheSpent`
-records. A subsequent read recalculates the SLA level and spent time.
+## Configuration changes
 
-## Dependency rules
+Configuration callbacks capture the affected SLA IDs before saving or
+destroying a record. `RedmineSla::InvalidatesSlaCache` passes those IDs to
+`SlaCache.invalidate_slas`, which deletes every cache row whose level belongs
+to one of those SLAs. The database foreign key also deletes the related
+`SlaCacheSpent` rows. The next issue read, or the `update_sla` task, rebuilds
+the calculation.
 
-- Schedule and calendar-holiday changes invalidate every level of the
-  SLAs using the affected calendars. A cache can reference another competing
-  level (for example HO versus HNO), whose selection is now obsolete.
-- Moving a schedule or calendar-holiday link includes both calendars.
-- Holiday date changes include every linked calendar and its competing levels.
-  Calendar name/description and holiday name changes preserve caches and do not
-  query their cache dependencies. Nested schedule changes still invalidate caches.
-- Creating a level invalidates existing candidates of its SLA. Changing its SLA
-  or calendar invalidates candidates of both the old and new SLA. Other level
-  changes and level destruction invalidate its own caches.
-- Term changes invalidate their level; moving a term includes both levels.
-- Issue custom field changes and deletion, and creating, changing, moving or
-  deleting one of its enumeration values (with or without reassignment),
-  invalidate the levels using that field. Moving a value includes its previous
-  field. Other fields keep their caches.
-- Calendar and holiday destruction also removes their calendar-holiday links.
-  Dependencies are captured before dependent associations are destroyed; the
-  parent invalidates once and removes schedules/links in bulk with Rails
-  `dependent: :delete_all`. Their only destruction callback was the redundant
-  cache invalidation. Direct schedule/link destruction and nested schedule
-  deletion still run their own invalidation callbacks.
-- Validation failure preserves caches. Transaction rollback restores configuration,
-  links and caches together. A metadata-only save also clears any dependencies
-  left by an aborted destruction on the same model instance. Bulk cleanup also
-  avoids reusing dependencies left by an earlier aborted child destruction.
+The affected SLAs are determined by the changed configuration:
 
-## Write-path review (2026-10-24)
+- Calendars, schedules, calendar-holiday links and holidays affect the SLAs
+  using the old or new calendars.
+- Levels and terms affect the old and new SLAs containing those levels.
+- Issue custom fields and their enumerations affect SLAs whose levels use
+  those fields as priority sources.
+- Deleting an SLA type affects SLAs whose levels have terms of that type. The
+  database foreign key deletes those terms without callbacks, so the type
+  captures the SLAs before its deletion. Saving a type (name, description,
+  position) preserves caches.
 
-The controllers for calendars, schedules, calendar-holiday links, holidays,
-levels and terms use Active Record save/update/destroy methods, including bulk
-controller deletions and nested schedules/terms. The holiday importer (3.3.0)
-uses `create!`. These paths execute the invalidation callbacks. The dependent
-schedule/link cleanup uses bulk deletion, covered by the parent's captured
-dependencies. Other configuration writes in these paths do not bypass callbacks.
+Name and description edits that do not alter calculations preserve caches.
+Failed saves do not invalidate; transaction rollbacks restore cache deletions
+with the configuration changes.
 
-Direct SQL and Active Record writes that skip callbacks remain outside this
-mechanism. External scripts must explicitly invalidate affected caches.
-Existing orphaned calendar-holiday links are not repaired by this change.
+## Issue changes
 
-## Validation and query cost
+When an issue's project, tracker, native priority or an SLA priority custom
+field value changes, its cache is deleted. This applies to custom-field values
+saved through `Issue#save`, after Redmine persists them. The cache and spent
+time are rebuilt on the next read, rather than recalculated inside the issue
+save request.
 
-The 35 invalidation tests check affected and unaffected cache/spent rows,
-creation, reassignment, dependent destruction, nested edits, invalid saves,
-rollback and aborted destruction. A real SQL recalculation selects HNO instead
-of HO on the next read after a competing schedule changes.
+Deleting a native priority captures the IDs of the issues Redmine reassigns and
+explicitly deletes only their caches after the core `update_all`. Issue
+callbacks do not run for that operation; caches of issues using other
+priorities are preserved.
 
-The query assertions count dependency SELECTs and cache DELETEs, excluding
-validation queries, child-row deletion, transactions and test verification reads.
-On Redmine 6.1.4 / PostgreSQL 17, the same generated fixtures and added child
-records give the following comparison against the initial 3.1.4 commit
-(`a04ae8b`):
+Project/tracker SLA mappings invalidate caches for the old and new
+project/tracker pair. `SlaStatus` changes do not affect level selection; they
+delete only the spent-time caches for the affected SLA type.
 
-| Operation | Initial implementation | Optimized implementation |
-| --- | --- | --- |
-| Calendar name/description or holiday name edit | Deletes useful caches | Preserves cache/spent rows; 0 invalidation queries |
-| Destroy calendar with 10 schedules and 54 holiday links (10 added) | 130 invalidation queries | 2 (resolve levels, delete caches) |
-| Destroy holiday linked to all 7 fixture calendars | 17 invalidation queries | 3 (resolve calendars, resolve levels, delete caches) |
+The cache deletion entry points are `SlaCache.invalidate_slas`,
+`SlaCache.invalidate_project_tracker`, `SlaCache.invalidate_issues` and
+`SlaCache.invalidate_issue`.
+Direct SQL or Active Record writes that bypass these callbacks must invalidate
+the affected cache explicitly.
 
-The optimized query counts are asserted on every database in the release
-matrix. They stay independent of the number of dependent schedules/links;
-the number of deleted rows still scales with that number, while dependent
-cleanup uses one DELETE per association. These are SQL workload
-measurements in isolated tests, not production latency benchmarks.
+## Tests
 
-The full compatibility results and SQL modes are recorded in
-[Testing](TESTING.md#version-314-competing-level-cache-invalidation).
-MariaDB is tested separately from strict MySQL; its existing `sla_get_spent`
-aggregate-query limitation with `ONLY_FULL_GROUP_BY` remains outside this change.
+`sla_cache_invalidation_test.rb` covers configuration, SLA type, issue-priority,
+custom-field, enumeration, project/tracker mapping and status changes.
+`sla_issue_cache_freshness_test.rb` verifies that issue saves delete stale
+caches without calling the SLA SQL calculation functions; the next read
+recalculates the issue.

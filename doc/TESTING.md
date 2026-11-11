@@ -1,5 +1,49 @@
 # Testing
 
+## Version 3.6.0 release matrix
+
+Validated on **2026-11-11** in isolated local containers. Source snapshot:
+`fix/release-3.6.0-review` at `2fdfaa8`; the following commit only records
+this matrix.
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1429 / 15793 | 1429 / 15784 | 1429 / 15784 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1501 / 16369 | 1429 / 15760 | 1429 / 15760 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1429 / 16421 | 1429 / 16411 | 1429 / 16411 |
+
+Cells record **tests / assertions**. Total: **12,933 tests / 144,493
+assertions**, zero failures or errors, and 18 expected PostgreSQL-only skips.
+Each combination ran 1,354 unit/functional/integration/API tests in one
+process, 39 Chromium system tests, 30 standalone icon/HTML tests and 6
+role/project documentation tests. Redmine 6/PostgreSQL ran all 78
+documentation tests instead, including EXAMPLE-06. MySQL ran with
+`ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES`, `NO_ZERO_IN_DATE`, `NO_ZERO_DATE`
+and `ERROR_FOR_DIVISION_BY_ZERO`; MariaDB and MySQL results are reported
+separately.
+
+On Redmine 6/MariaDB, the first system run failed once in
+`SlaIconUrlPrefixTest` (`.title-sla-settings` not found under the URL mount),
+the known timing failure under parallel load. The test then passed three times
+alone and the whole system suite passed (39 tests / 464 assertions); the table
+records that passing run.
+
+Upgrade from 3.5.2 (tag `v3.5.2`) was checked on the nine combinations with a
+populated database: fixtures, 72 SLA caches, one issue moved to a native
+priority without terms and one issue whose custom-field priority has no term.
+Migration 028 deleted exactly those two caches and kept the other 70; the
+changelog query listed the same two issues before the upgrade; both issues have
+no SLA after recalculation. The priority-selection and cache-invalidation unit
+tests then passed on the upgraded schema (71 tests per combination).
+
+The 292 documentation screenshots regenerated on Redmine 6.1.4/PostgreSQL were
+compared pixel by pixel with the committed images. Project-list and settings
+captures are identical. Example captures differ only in dynamic data (issue
+numbers, current dates and elapsed minutes), so they were not replaced.
+
+Validation used isolated test data; no production deployment or representative
+performance benchmark was performed.
+
 ## Version 3.5.2 release matrix
 
 Validated on **2026-11-11** in isolated local containers. Source snapshot:

@@ -42,8 +42,8 @@ module RedmineSla
 
       private
 
-      def sla_cache_level_ids_for_invalidation
-        SlaLevel.unscoped.where(custom_field_id: id).pluck(:id)
+      def sla_ids_for_cache_invalidation
+        SlaLevel.unscoped.where(custom_field_id: id).distinct.pluck(:sla_id)
       end
 
     end
