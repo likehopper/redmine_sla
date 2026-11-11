@@ -263,7 +263,9 @@ tr.sla-explain-no-schedule td { color: #999; font-style: italic; }
 .sla-icon-image, .sla-icon-svg { display: inline-block; vertical-align: middle; flex-shrink: 0; }
 .sla-icon-label { margin-left: 4px; }
 .sla-icon-label-hidden { position: absolute; top: 0; left: 0; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
-.icon:has(> .sla-icon-image), .icon:has(> .sla-icon-svg) { background-image: none; padding-left: 0; }
+.icon:has(> .sla-icon-image),
+.icon:has(> .sla-icon-svg),
+#admin-menu a.redmine-sla { background-image: none; padding-left: 0; }
 .title-sla-settings > .sla-icon-image { flex-basis: auto; }
 .redmine_sla_footer { border-top: 1px solid #bbb; font-size: 0.9em; color: #777; padding: 5px; text-align: center; }
 .sla-credit-logo { vertical-align: middle; }

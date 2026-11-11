@@ -34,6 +34,7 @@ class SlaIconSetsSystemTest < ApplicationSlaSystemTestCase
 
       visit '/admin'
       assert_set_asset('#admin-menu a.redmine-sla', set_id)
+      assert_inline_menu_icon_alignment('#admin-menu a.redmine-sla')
       capture_icon_doc(set_id, 'administration')
 
       visit '/projects?set_filter=1&display_type=board'
@@ -93,6 +94,21 @@ class SlaIconSetsSystemTest < ApplicationSlaSystemTestCase
 
   def assert_no_text_in_header(name, pattern)
     refute_match pattern, find("th.#{name}").text
+  end
+
+  def assert_inline_menu_icon_alignment(selector)
+    geometry = page.evaluate_script(<<~JS)
+      (() => {
+        const link = document.querySelector(#{selector.to_json});
+        const icon = link.querySelector('.sla-icon-image, .sla-icon-svg');
+        return {
+          padding: parseFloat(getComputedStyle(link).paddingLeft),
+          offset: icon.getBoundingClientRect().left - link.getBoundingClientRect().left
+        };
+      })()
+    JS
+    assert_in_delta 0, geometry.fetch('padding'), 0.5
+    assert_in_delta 0, geometry.fetch('offset'), 0.5
   end
 
   def capture_icon_doc(set_id, name)
