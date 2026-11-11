@@ -221,7 +221,7 @@ Create a level named **“Level Support”** and associate it with:
 
 After saving, Redmine confirms the SLA Level creation.
 
-![SLA Level created](screenshots/example-01/09-01-01-02-sla_leel-created.png)
+![SLA Level created](screenshots/example-01/09-01-01-02-sla_level-created.png)
 
 ---
 

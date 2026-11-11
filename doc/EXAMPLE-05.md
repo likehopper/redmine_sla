@@ -240,7 +240,7 @@ Create multiple SLA Levels if needed:
 
 Verify the list:
 
-![SLA Levels list](screenshots/example-05/09-01-01-02-sla_leel-created.png)
+![SLA Levels list](screenshots/example-05/09-01-01-02-sla_level-created.png)
 
 ---
 
