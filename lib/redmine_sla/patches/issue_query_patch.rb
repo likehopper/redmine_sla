@@ -129,6 +129,7 @@ module RedmineSla
           )
 
           if is_filters_blank && is_module_enabled && is_user_allowed
+            sla_visibility = RedmineSla::SlaQueryVisibility::Resolver.new
 
             #
             # SLA LEVEL filter + column
@@ -153,7 +154,8 @@ module RedmineSla
               caption:     l("sla_label.sla_level.singular"),
               groupable:   true,
               value_object: true,
-              sortable: "sla_query_level.name"
+              sortable: "sla_query_level.name",
+              sla_visibility: sla_visibility
             )
 
             def issue_get_sla_level.group_by_statement
@@ -206,7 +208,8 @@ module RedmineSla
                   caption: l(:label_sla_respect) + " " + sla_type.name,
                   groupable: true,
                   value_object: true,
-                  sortable: RedmineSla::NativeQueryColumns.respect_expression(sla_type.id)
+                  sortable: RedmineSla::NativeQueryColumns.respect_expression(sla_type.id),
+                  sla_visibility: sla_visibility
                 )
 
                 def issue_get_sla_respect.group_by_statement

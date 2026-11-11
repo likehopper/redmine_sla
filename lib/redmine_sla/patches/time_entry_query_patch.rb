@@ -124,6 +124,7 @@ module RedmineSla
              project&.module_enabled?(:sla) &&
              (User.current.admin? ||
               User.current.allowed_to?(:view_sla, project, global: true))
+            sla_visibility = RedmineSla::SlaQueryVisibility::Resolver.new
 
             #
             # SLA LEVEL FILTER
@@ -149,7 +150,8 @@ module RedmineSla
               :get_sla_level,
               caption:  l("sla_label.sla_level.singular"),
               groupable: true,
-              sortable: "sla_query_level.name"
+              sortable: "sla_query_level.name",
+              sla_visibility: sla_visibility
             )
 
             def time_entry_get_sla_level.group_by_statement
@@ -201,7 +203,8 @@ module RedmineSla
                   name_to_sym,
                   caption:  l(:label_sla_respect) + " " + sla_type.name,
                   groupable: true,
-                  sortable: RedmineSla::NativeQueryColumns.respect_expression(sla_type.id)
+                  sortable: RedmineSla::NativeQueryColumns.respect_expression(sla_type.id),
+                  sla_visibility: sla_visibility
                 )
 
                 def time_entry_get_sla_respect.group_by_statement

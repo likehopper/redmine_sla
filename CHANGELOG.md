@@ -27,6 +27,8 @@
   without `view_sla` in that subproject. Issue and time entry lists, CSV and
   PDF exports, grouping, sorting and the SLA filters now check the permission
   on the project of each row, not only on the queried project.
+- Resolve the visible projects once per issue or time entry query, so checking
+  subproject SLA values does not add permission queries for every subproject.
 
 ### Upgrade
 
@@ -41,6 +43,8 @@
   leave the database unchanged.
 - The spent concurrency test restores the rows it deletes, so later tests no
   longer depend on the test order.
+- Cover the subproject SLA level and respect values in rendered lists, CSV and
+  object exports, grouping and filters, with a fixed query-count regression.
 
 ## 3.5.0 - 2026-11-09
 
