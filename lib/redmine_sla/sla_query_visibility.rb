@@ -28,25 +28,50 @@ require_dependency 'query'
 
 module RedmineSla
   module SlaQueryVisibility
-    def self.visible?(project, user = User.current)
-      project.present? && user.allowed_to?(:view_sla, project)
+    def self.visibility_condition(user = User.current)
+      Project.allowed_to_condition(user, :view_sla)
     end
 
     # Projects whose SLA data the user may see, as a subquery for SQL joins.
     def self.visible_project_ids_sql(user = User.current)
-      "SELECT projects.id FROM projects WHERE #{Project.allowed_to_condition(user, :view_sla)}"
+      "SELECT projects.id FROM projects WHERE #{visibility_condition(user)}"
+    end
+
+    # Resolve all visible projects once for the columns of one query. Checking
+    # User#allowed_to? per row would query memberships once per subproject.
+    class Resolver
+      def visible?(project, user = User.current)
+        return false unless project
+
+        refresh(user) unless @user.equal?(user)
+        @visible_project_ids.key?(project.id)
+      end
+
+      private
+
+      def refresh(user)
+        @user = user
+        ids = Project.where(SlaQueryVisibility.visibility_condition(user)).pluck(:id)
+        @visible_project_ids = ids.each_with_object({}) { |id, visible| visible[id] = true }
+      end
     end
   end
 
   # Query column whose value (HTML, CSV, PDF, group) is hidden on rows of
   # projects without view_sla.
   class SlaQueryColumn < QueryColumn
+    def initialize(name, options = {})
+      options = options.dup
+      @sla_visibility = options.delete(:sla_visibility) || SlaQueryVisibility::Resolver.new
+      super(name, options)
+    end
+
     def value(object)
-      super if SlaQueryVisibility.visible?(object.project)
+      super if @sla_visibility.visible?(object.project)
     end
 
     def value_object(object)
-      super if SlaQueryVisibility.visible?(object.project)
+      super if @sla_visibility.visible?(object.project)
     end
   end
 end
