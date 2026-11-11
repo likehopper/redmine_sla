@@ -1,5 +1,24 @@
 # Changelog
 
+## 3.5.2 - 2026-11-11
+
+### Fixed
+
+- Fix the SLA spent list in a project context (`project_id` parameter). The
+  page and the refresh, destroy and purge redirects returned HTTP 500; for
+  the redirects, the change had already been saved. The filter and CSV
+  forms now keep the project.
+
+### Upgrade
+
+- Update the plugin files and restart Redmine. No new migration relative
+  to 3.5.1.
+
+### Tests
+
+- Test the cache and spent pages, their refresh, destroy and purge actions,
+  with allowed and denied users, in global and project contexts.
+
 ## 3.5.1 - 2026-11-11
 
 ### Fixed
