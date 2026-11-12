@@ -1,5 +1,33 @@
 # Testing
 
+## Version 3.6.1 release matrix
+
+Validated on **2026-11-12** in isolated local containers. Source snapshot:
+`hotfix/3.6.1-issue-102` at `5e8af58`; the following commit only records this
+matrix.
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1431 / 15795 | 1431 / 15786 | 1431 / 15786 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1503 / 16371 | 1431 / 15762 | 1431 / 15762 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1431 / 16423 | 1431 / 16413 | 1431 / 16413 |
+
+Cells record **tests / assertions**. Total: **12,951 tests / 144,511
+assertions**, zero failures or errors, and 18 expected PostgreSQL-only skips.
+Each combination ran 1,356 unit/functional/integration/API tests, 39 Chromium
+system tests, 30 standalone icon/HTML tests and 6 role/project documentation
+tests. Redmine 6/PostgreSQL ran all 78 documentation tests instead. MySQL ran
+with `ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES`, `STRICT_ALL_TABLES`,
+`NO_ZERO_IN_DATE`, `NO_ZERO_DATE` and `ERROR_FOR_DIVISION_BY_ZERO`; MariaDB ran
+with `STRICT_TRANS_TABLES` and `STRICT_ALL_TABLES` and is reported separately.
+
+Before the fix, both new boot regressions failed against 3.6.0 with
+`uninitialized constant RedmineSla::Patches::IssuePriorityPatch`. The fixed
+source explicitly eager loads the plugin and runs `zeitwerk:check` in separate
+fresh Rails processes. Both checks pass on every matrix cell, as does a final
+runtime eager load. This release introduces no migration. No production
+deployment was performed.
+
 ## Version 3.6.0 release matrix
 
 Validated on **2026-11-11** in isolated local containers. Source snapshot:
