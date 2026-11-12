@@ -57,4 +57,38 @@ class SlaPluginBootTest < ActiveSupport::TestCase
       stderr: #{stderr}
     MESSAGE
   end
+
+  test 'plugin eager loads in a fresh Rails process' do
+    script = <<~'RUBY'
+      Rails.application.eager_load!
+    RUBY
+
+    command = [RbConfig.ruby, Rails.root.join('bin/rails').to_s, 'runner', script]
+    stdout, stderr, status = Open3.capture3(
+      { 'RAILS_ENV' => Rails.env },
+      *command,
+      chdir: Rails.root.to_s
+    )
+
+    assert status.success?, <<~MESSAGE
+      Fresh Rails eager load failed (exit #{status.exitstatus}).
+      stdout: #{stdout}
+      stderr: #{stderr}
+    MESSAGE
+  end
+
+  test 'Zeitwerk check passes in a fresh Rails process' do
+    command = [RbConfig.ruby, Rails.root.join('bin/rails').to_s, 'zeitwerk:check']
+    stdout, stderr, status = Open3.capture3(
+      { 'RAILS_ENV' => Rails.env },
+      *command,
+      chdir: Rails.root.to_s
+    )
+
+    assert status.success?, <<~MESSAGE
+      Zeitwerk check failed (exit #{status.exitstatus}).
+      stdout: #{stdout}
+      stderr: #{stderr}
+    MESSAGE
+  end
 end
