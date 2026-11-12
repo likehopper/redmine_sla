@@ -148,8 +148,8 @@ RedmineApp::Application.config.after_initialize do
     CustomFieldEnumeration.send(:include, RedmineSla::Patches::CustomFieldEnumerationPatch)
   end
 
-  unless IssuePriority.ancestors.include? RedmineSla::Patches::IssuePriorityReassignmentPatch
-    IssuePriority.prepend(RedmineSla::Patches::IssuePriorityReassignmentPatch)
+  unless IssuePriority.ancestors.include? RedmineSla::Patches::IssuePriorityPatch
+    IssuePriority.prepend(RedmineSla::Patches::IssuePriorityPatch)
   end
 
   # Extend Issue with SLA computation methods

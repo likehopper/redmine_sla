@@ -1,5 +1,21 @@
 # Changelog
 
+## 3.6.1 - 2026-11-12
+
+### Fixed
+
+- Fix application startup under Rails eager loading by matching the
+  `issue_priority_patch.rb` filename with its `IssuePriorityPatch` constant.
+
+### Tests
+
+- Run both an explicit eager load and `zeitwerk:check` in fresh Rails processes
+  so file/constant naming mismatches fail the unit suite.
+
+### Upgrade
+
+- Update the plugin files and restart Redmine. No new migration is required.
+
 ## 3.6.0 - 2026-11-11
 
 ### Added
