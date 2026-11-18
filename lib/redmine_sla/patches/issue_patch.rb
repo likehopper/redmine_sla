@@ -43,6 +43,10 @@ module RedmineSla
         @sla_cache = SlaCache.find_by_issue_id(id)
       end
 
+      def preload_sla_cache(sla_cache)
+        @sla_cache = sla_cache
+      end
+
       # Active Record reloads attributes and associations, but leaves plugin
       # instance variables intact. Discard SLA values read before the reload.
       module ReloadMethods

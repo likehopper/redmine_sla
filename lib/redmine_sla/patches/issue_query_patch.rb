@@ -40,6 +40,7 @@ module RedmineSla
 
       def self.included(base)
         base.prepend(RedmineSla::NativeQueryColumns)
+        base.prepend(SlaCachePreloading)
         base.send(:include, InstanceMethods)
         base.class_eval do
           
@@ -110,6 +111,19 @@ module RedmineSla
         end
       end
 
+      # Batch-load the SLA caches of the displayed page. Respect columns read
+      # the level cache through the level term, and rows of projects without
+      # view_sla render nothing, so only visible rows are evaluated.
+      module SlaCachePreloading
+        def issues(options = {})
+          result = super
+          sla_column = ([group_by_column] + columns).detect { |column| column.is_a?(RedmineSla::SlaQueryColumn) }
+          if sla_column
+            SlaCache.preload_for_issues(result.select { |issue| sla_column.visible_for?(issue.project) })
+          end
+          result
+        end
+      end
 
       # Instance methods injected into IssueQuery
       module InstanceMethods

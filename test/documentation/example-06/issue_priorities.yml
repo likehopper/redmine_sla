@@ -1,5 +1,7 @@
 # File: redmine_sla/test/documentation/example-06/issue_priorities.yml
 # SPDX-License-Identifier: GPL-2.0-or-later
 issue_priorities:
-  - name: Urgent
-  - name: Immediate
+  - id: 5
+    name: Urgent
+  - id: 6
+    name: Immediate

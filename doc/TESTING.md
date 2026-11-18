@@ -1,5 +1,166 @@
 # Testing
 
+## Unreleased: issue-list preload corrections
+
+Validated on **2026-11-19** in isolated, disposable Docker databases with
+Redmine 6.1.4, Ruby 3.4.11 and Rails 7.2.3.2, against a frozen copy of the
+working tree that became this branch's commit, apart from this section
+(source fingerprint, sorted per-file SHA-256 map:
+`08b41d890a5cfae1f165338a2d1c1cd85003d8853e9673d206bef39829024089`).
+The corrections preload SLA caches for SLA respect columns and SLA level
+grouping, skip rows whose project hides SLA values and evaluate the page in a
+fixed issue order. They also move one SQL comment, without changing the
+function logic.
+
+| Engine | Tests | Assertions | Failures / errors | Skips |
+| --- | ---: | ---: | ---: | ---: |
+| PostgreSQL 17.7 | 1363 | 15013 | 0 / 0 | 0 |
+| MariaDB 10.11.19 | 1363 | 15004 | 0 / 0 | 3 |
+| MySQL 8.0.46, strict modes | 1363 | 15004 | 0 / 0 | 3 |
+
+The runs cover the unit, functional and integration suites, migrated from an
+empty database. MySQL retained `ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES`,
+`STRICT_ALL_TABLES`, `NO_ZERO_IN_DATE`, `NO_ZERO_DATE` and
+`ERROR_FOR_DIVISION_BY_ZERO`. Standalone, system and documentation suites,
+Redmine 5.1/7.0 and concurrent-load behavior were not run for these
+corrections. This targeted run does not replace a release matrix.
+
+## Unreleased: full Redmine/database performance matrix
+
+Measured on **2026-11-18** in isolated Docker databases using the working-tree
+plugin (base commit `1df41ce`, source fingerprint
+`8d7e63edcb6c223c91880b3382fba70e07f80940c5ba1776c4bf97c95335e2f1`):
+
+| Redmine | Ruby | Rails | PostgreSQL | MariaDB | MySQL (strict) |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 17.7 | 10.11.19 | 8.0.46 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 17.7 | 10.11.19 | 8.0.46 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 17.7 | 10.11.19 | 8.0.46 |
+
+All **nine combinations** passed both benchmarks: 234 SQL correctness
+assertions and 157 issue-list assertions per combination, **3,519 assertions
+total**, with no failures, errors or skips. The SQL test measured 30 scenarios
+per cell (full/incremental spent calculation, spent-cache hits, and forced/
+cached level selection), with two warmups and ten timed samples. Spent totals
+were checked against an independent oracle. The issue-list test used 1,000
+synthetic issues and page sizes 1, 25 and 100, measuring both absent and
+populated SLA caches. It verified one grouped level-evaluation query and one
+grouped cache-row query per page at every size and on all nine combinations.
+The list timing covers query data loading and SLA-level access, not HTTP
+rendering.
+
+For the five-year, 1,001-status-change full recalculation, median timings were
+**0.288–0.523 s on PostgreSQL**, **3.965–4.112 s on MariaDB**, and
+**0.470–0.502 s on MySQL**. The MariaDB full-recalculation cost is a clear
+follow-up for SQL-plan and procedure review. For a 25-issue page, measured
+IssueQuery load plus SLA-level access was **29–43 ms cold** and **12–19 ms
+warm** across the matrix. The timings are local warm-cache observations, not
+production latency or throughput guarantees; this run measures the current
+working tree and is not a before/after comparison across all nine combinations.
+
+The detailed per-cell timings, raw samples, logs, exact source fingerprint and
+Docker image IDs are retained locally with the campaign and are not published.
+These measurements do not replace the full functional compatibility suite.
+They predate the later preload corrections (SLA respect columns, SLA level
+grouping, rows hidden by SLA visibility and a fixed evaluation order), which
+are validated separately below.
+
+## Unreleased: history-date calculation benchmark
+
+Measured on **2026-11-15** in isolated local databases, using Redmine 6.1.4,
+Ruby 3.4.11 and Rails 7.2.3.2. Source: base `1df41ce` plus the working-tree
+history-date normalization change and migration 029. SQL source SHA-256:
+
+- PostgreSQL: `2cd3c455c45960a7bcc9b860aa71a1622dcf12f5bee9e7ef96818383607c926a`.
+- MariaDB/MySQL: `c1a5a7a1a7fda2203c5f1f1cc1e8d27ab0b1b5fce9feb52a646f5ae89903ff3f`.
+
+The targeted paired workload updates the final hour of a closed, five-year-old
+issue with 1,001 synthetic status journal entries, an all-day calendar, no
+holidays and UTC dates. Both original and candidate function bodies remain
+deployed under temporary names, preserving their cached execution plans.
+Twelve warm calls per variant precede ten measured alternating pairs. Cache
+preparation is outside the timer; every persisted total, including warm-up
+calls, is checked against the independent `days * 1440` oracle. Each engine's
+paired profiler passed 72 assertions, including the separate initial-row check.
+
+| Engine | Original median | Candidate median | Faster candidate pairs |
+| --- | ---: | ---: | ---: |
+| PostgreSQL 17.7 | 113.288 ms | 34.961 ms | 10 / 10 |
+| MariaDB 10.11.19 | 299.725 ms | 57.942 ms | 10 / 10 |
+
+These are warm-cache, driver-round-trip timings on a non-dedicated machine, not
+production latency or throughput guarantees. Separate sequential runs showed
+large changes even in untouched cache-hit and level-selection paths; their
+percentages alone are not reliable evidence of a code gain. Raw samples and
+before/after core-query plans are retained with the local benchmark artifact.
+The retained change normalizes the issue bounds once per calculation; initial
+row-limit experiments were not retained because their local gains did not
+establish a whole-function improvement.
+
+The synthetic dense history repeats the same counted status until closing.
+It isolates history-processing cost, without representing real pause/resume
+frequencies. The complete recalculation's calendar/history join remains a
+separate performance concern. MySQL performance, production deployment,
+browser behavior and the Redmine 5/7 matrix are outside these measurements.
+
+
+Final unit validation on this exact SQL source:
+
+| Engine | Tests | Assertions | Failures / errors | Expected skips |
+| --- | ---: | ---: | ---: | ---: |
+| PostgreSQL 17.7 | 333 | 3304 | 0 / 0 | 0 |
+| MariaDB 10.11.19 | 333 | 3295 | 0 / 0 | 3 |
+| MySQL 8.0.46, strict modes | 333 | 3295 | 0 / 0 | 3 |
+
+The three skips on each MySQL-family engine are PostgreSQL-only migration
+checks. New [history tests](../test/unit/sla_status_history_test.rb) cover
+unrelated notes, absent status history, absent journals and a non-UTC calendar.
+Each PostgreSQL/MariaDB sequential benchmark also passed 234 assertions across
+30 scenarios, with ten retained samples per scenario. These unit and benchmark
+runs do not replace the complete release matrix below.
+
+
+## Unreleased: complete history-date validation matrix
+
+Validated on **2026-11-15** against a frozen copy of base `1df41ce` plus the
+history-date SQL optimization, migration 029, history regression tests and the
+documentation-priority fixture correction. The SQL hashes are those recorded
+above. Source fingerprint (sorted per-file SHA-256 map):
+`7bb30e9f61f2e7568dfd831e3a089dc784bae406812c36dfe12c68b457f30fd1`.
+Concurrent issue-query/cache-preloading changes in the working tree were
+excluded; this matrix does not validate those changes.
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 strict |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1506 / 16401 | 1506 / 16392 | 1506 / 16392 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1506 / 16377 | 1506 / 16368 | 1506 / 16368 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1506 / 17029 | 1506 / 17019 | 1506 / 17019 |
+
+Cells record **tests / assertions**. Total: **13,554 tests / 149,365
+assertions**, zero failures or errors in the final runs, and **18 expected
+PostgreSQL-only migration skips**. Every cell ran 1,357 unit/functional/
+integration/API tests, 32 standalone tests, 39 Chromium system tests and all
+78 documentation tests, including EXAMPLE-06. MySQL retained
+`ONLY_FULL_GROUP_BY`, `STRICT_TRANS_TABLES`, `STRICT_ALL_TABLES`,
+`NO_ZERO_IN_DATE`, `NO_ZERO_DATE` and `ERROR_FOR_DIVISION_BY_ZERO`.
+
+The full documentation suite exposed unstable native-priority IDs in
+EXAMPLE-06 on MariaDB/MySQL: core fixtures reload between steps, and their
+AUTO_INCREMENT sequence does not restore the IDs referenced by earlier terms.
+The failure also reproduced with the original SQL. The example now supplies
+stable priority IDs. All nine final documentation runs pass.
+
+On Redmine 5/MySQL, the first system run failed once in the known URL-prefix
+icon test while waiting for `.title-sla-settings`. The complete system suite
+then passed on a fresh isolated setup (39 tests / 668 assertions); both logs
+are retained. The table records the passing run, not an automatic retry.
+
+Each cell generated 292 documentation captures (2,628 total) outside the
+repository. The MariaDB EXAMPLE-06 urgent-ticket capture was visually checked;
+this is not a full manual or pixel-by-pixel screenshot review. Both dedicated
+test environments were stopped after validation. No production deployment
+or CI execution was performed.
+
 ## Version 3.6.0 release matrix
 
 Validated on **2026-11-11** in isolated local containers. Source snapshot:
