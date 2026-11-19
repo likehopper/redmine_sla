@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 3.6.2 - 2026-11-20
 
 ### Changed
 
@@ -10,11 +10,37 @@
 - Normalize issue creation and closing dates once per spent calculation instead
   of rereading timezone settings for every journal row. History ordering,
   counting rules and incremental caches are preserved.
+- Define column-selector markers per icon set (`markers` in the manifest).
+  Flaticon restores its historical colored markers; Tabler keeps monochrome
+  markers. Column captions and exports remain plain text.
+
+### Fixed
+
+- Decorate SLA column-selector options in the plugin JavaScript instead of
+  overriding Redmine's shared `QueriesHelper` selector methods.
+- Keep the administration-menu SLA icon aligned in browsers without `:has()`
+  support.
 
 ### Upgrade
 
 - Migration 029 redeploys `sla_get_spent`. Existing cache rows remain valid and
   are not purged.
+
+## 3.6.1 - 2026-11-12
+
+### Fixed
+
+- Fix application startup under Rails eager loading by matching the
+  `issue_priority_patch.rb` filename with its `IssuePriorityPatch` constant.
+
+### Tests
+
+- Run both an explicit eager load and `zeitwerk:check` in fresh Rails processes
+  so file/constant naming mismatches fail the unit suite.
+
+### Upgrade
+
+- Update the plugin files and restart Redmine. No new migration is required.
 
 ## 3.6.0 - 2026-11-11
 

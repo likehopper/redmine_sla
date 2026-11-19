@@ -35,9 +35,8 @@ class SlaPluginBootTest < ActiveSupport::TestCase
       'RedmineSla::DbDialect must load before plugin registration'
   end
 
-  test 'plugin eager loads with its database dialect in a fresh Rails process' do
+  test 'database dialect and SLA query load in a fresh Rails process' do
     script = <<~'RUBY'
-      Rails.application.eager_load!
       adapter = RedmineSla::DbDialect.adapter
       columns = SlaQuery.new.available_columns.map(&:name)
 
@@ -54,6 +53,40 @@ class SlaPluginBootTest < ActiveSupport::TestCase
 
     assert status.success?, <<~MESSAGE
       Fresh Rails boot failed (exit #{status.exitstatus}).
+      stdout: #{stdout}
+      stderr: #{stderr}
+    MESSAGE
+  end
+
+  test 'plugin eager loads in a fresh Rails process' do
+    script = <<~'RUBY'
+      Rails.application.eager_load!
+    RUBY
+
+    command = [RbConfig.ruby, Rails.root.join('bin/rails').to_s, 'runner', script]
+    stdout, stderr, status = Open3.capture3(
+      { 'RAILS_ENV' => Rails.env },
+      *command,
+      chdir: Rails.root.to_s
+    )
+
+    assert status.success?, <<~MESSAGE
+      Fresh Rails eager load failed (exit #{status.exitstatus}).
+      stdout: #{stdout}
+      stderr: #{stderr}
+    MESSAGE
+  end
+
+  test 'Zeitwerk check passes in a fresh Rails process' do
+    command = [RbConfig.ruby, Rails.root.join('bin/rails').to_s, 'zeitwerk:check']
+    stdout, stderr, status = Open3.capture3(
+      { 'RAILS_ENV' => Rails.env },
+      *command,
+      chdir: Rails.root.to_s
+    )
+
+    assert status.success?, <<~MESSAGE
+      Zeitwerk check failed (exit #{status.exitstatus}).
       stdout: #{stdout}
       stderr: #{stderr}
     MESSAGE

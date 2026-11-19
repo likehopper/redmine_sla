@@ -14,7 +14,7 @@
 
 ## Overview
 
-Current version: **3.6.0**. See the [changelog](CHANGELOG.md) for release details.
+Current version: **3.6.2**. See the [changelog](CHANGELOG.md) for release details.
 
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
@@ -283,6 +283,19 @@ rake redmine:plugins:migrate NAME=redmine_sla
 Plugin is ready to use.
 
 ------------------------------------------------------------------------
+
+## Upgrade to 3.6.2
+
+Version **3.6.2** loads issue-list SLA caches per page and speeds up spent-time
+calculation. Migration 029 redeploys `sla_get_spent` without purging caches.
+Update the plugin files, run
+`bundle exec rake redmine:plugins:migrate RAILS_ENV=production`, then restart
+Redmine.
+
+## Upgrade to 3.6.1
+
+Version **3.6.1** fixes application startup when Rails eagerly loads the plugin.
+Update the plugin files and restart Redmine; no new migration is required.
 
 ## Upgrade to 3.6.0
 
