@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Issue lists evaluate and load the SLA caches of the displayed page in grouped
+  queries when an SLA level or SLA respect column, or the SLA level grouping, is
+  used. Rows of projects that hide SLA values are not evaluated.
+- Normalize issue creation and closing dates once per spent calculation instead
+  of rereading timezone settings for every journal row. History ordering,
+  counting rules and incremental caches are preserved.
+
+### Upgrade
+
+- Migration 029 redeploys `sla_get_spent`. Existing cache rows remain valid and
+  are not purged.
+
 ## 3.6.0 - 2026-11-11
 
 ### Added

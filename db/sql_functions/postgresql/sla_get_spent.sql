@@ -30,6 +30,8 @@ $BODY$
   DECLARE v_sla_cache sla_caches ;
   DECLARE v_sla_spent sla_cache_spents ;
   DECLARE v_sla_level_terms sla_level_terms ;
+  DECLARE v_history_created_on TIMESTAMP WITHOUT TIME ZONE ;
+  DECLARE v_history_closed_on TIMESTAMP WITHOUT TIME ZONE ;
 BEGIN
 
   RAISE DEBUG 
@@ -104,24 +106,30 @@ BEGIN
   END IF ;
 
   -- Determine the calculation window: from the last cache update (or SLA start) to the closing date (or now)
+  -- Issue bounds are constant throughout this history. Normalize them once
+  -- instead of rereading timezone settings for each journal row.
   SELECT
     COALESCE( v_sla_spent."updated_on", v_sla_cache."start_date" ),
     -- closed_on only while the issue is closed: Redmine keeps it, as the
     -- last closing date, when an issue is reopened.
-    COALESCE( sla_get_date( CASE WHEN "issue_statuses"."is_closed" THEN "issues"."closed_on" END ), v_current_timestamp ),
+    sla_get_date( CASE WHEN "issue_statuses"."is_closed" THEN "issues"."closed_on" END ),
     "issues"."tracker_id",
-    "issues"."project_id"
+    "issues"."project_id",
+    sla_get_date("issues"."created_on")
   INTO
     v_issue_created_on,
-    v_issue_closed_on,
+    v_history_closed_on,
     v_issue_tracker_id,
-    v_issue_project_id
+    v_issue_project_id,
+    v_history_created_on
   FROM
     issues
   INNER JOIN "issue_statuses" ON ( "issue_statuses"."id" = "issues"."status_id" )
   WHERE
     "issues"."id" = p_issue_id
   ;
+
+  v_issue_closed_on := COALESCE(v_history_closed_on, v_current_timestamp) ;
 
   -- Prevent redundant updates if the cache is already newer than the issue's closing date
   IF ( v_sla_spent."updated_on" > v_issue_closed_on ) THEN
@@ -156,9 +164,9 @@ BEGIN
     -- removes that redundancy entirely.
     (
       SELECT DISTINCT issues.id AS issue_id,
-        sla_get_date(first_value(issues.created_on) OVER window_journals) AS issue_created_on,
-        sla_get_date(first_value(CASE WHEN issue_statuses.is_closed THEN issues.closed_on END) OVER window_journals) AS issue_closed_on,
-        sla_get_date(first_value(issues.created_on) OVER window_journals) AS journals_created_on,
+        v_history_created_on AS issue_created_on,
+        v_history_closed_on AS issue_closed_on,
+        v_history_created_on AS journals_created_on,
         COALESCE(first_value(journal_details.old_value::integer) OVER window_journals, issues.status_id) AS journal_detail_old_value,
         COALESCE(first_value(journal_details.old_value::integer) OVER window_journals, issues.status_id) AS journal_detail_value
       FROM issues
@@ -169,8 +177,8 @@ BEGIN
       WINDOW window_journals AS ( PARTITION BY issues.id ORDER BY journal_details.id ASC NULLS LAST )
     ) UNION (
       SELECT issues.id AS issue_id,
-        sla_get_date(issues.created_on) AS issue_created_on,
-        sla_get_date(CASE WHEN issue_statuses.is_closed THEN issues.closed_on END) AS issue_closed_on,
+        v_history_created_on AS issue_created_on,
+        v_history_closed_on AS issue_closed_on,
         sla_get_date(journals.created_on) AS journals_created_on,
         journal_details.old_value::integer AS journal_detail_old_value,
         journal_details.value::integer AS journal_detail_value
