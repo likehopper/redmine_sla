@@ -40,6 +40,7 @@ class SlaQueryQuickWinsTest < ApplicationSlaUnitsTestCase
   end
 
   test "calendar holidays default to newest holiday date first" do
-    assert_equal [["date", "desc"]], SlaCalendarHolidayQuery.new.default_sort_criteria
+    assert_equal ["#{SlaHoliday.table_name}.date DESC", "#{SlaCalendar.table_name}.name ASC"],
+                 SlaCalendarHolidayQuery.new.sort_clause
   end
 end

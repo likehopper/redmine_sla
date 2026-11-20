@@ -61,6 +61,8 @@ class SlaTypeQuery < Query
 
   def sla_types(options={})
     order_option = [group_by_sort_order, (options[:order] || sort_clause)].flatten.reject(&:blank?)
+    # A unique tie-breaker keeps pages stable when sort values repeat (each database orders ties differently).
+    order_option << "#{self.queried_class.table_name}.id ASC"
 
     scope = base_scope.
         includes(((options[:include] || [])).uniq).

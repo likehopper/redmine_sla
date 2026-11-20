@@ -45,8 +45,9 @@ class SlaCalendarHolidayQuery < Query
     }
   end
 
+  # Criteria must name available columns: an unknown name such as 'date' is silently dropped.
   def default_sort_criteria
-    [['date', 'desc']]
+    [['sla_holiday', 'desc'], ['sla_calendar', 'asc']]
   end
 
   def default_columns_names
@@ -59,6 +60,8 @@ class SlaCalendarHolidayQuery < Query
   
   def sla_calendar_holidays(options={})
     order_option = [group_by_sort_order, (options[:order] || sort_clause)].flatten.reject(&:blank?)
+    # A unique tie-breaker keeps pages stable when sort values repeat (each database orders ties differently).
+    order_option << "#{self.queried_class.table_name}.id ASC"
 
     scope = base_scope.
         includes(((options[:include] || [])).uniq).
