@@ -39,10 +39,11 @@ class IconSetTest < Minitest::Test
 
   def test_admin_menu_alignment_does_not_depend_on_has_selector_support
     css = File.read(File.expand_path('../../assets/stylesheets/redmine_sla.css', __dir__)).gsub(%r{/\*.*?\*/}m, '')
-    rule = css.scan(/([^{}]+)\{([^{}]*)\}/).find { |selectors, _| selectors.strip == '#admin-menu a.redmine-sla' }
+    rule = css.scan(/([^{}]+)\{([^{}]*)\}/).find { |selectors, _| selectors.include?('.sla-legacy-menu-icon') }
 
     refute_nil rule
-    assert_match(/padding-left:\s*0/, rule.last)
+    refute_includes rule.first, ':has('
+    assert_match(/margin-left:\s*-20px/, rule.last)
   end
 
   def test_custom_sets_inherit_missing_markers_from_the_fallback

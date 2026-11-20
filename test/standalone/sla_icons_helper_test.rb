@@ -139,6 +139,8 @@ class SlaIconsHelperTest < Minitest::Test
     item = Struct.new(:name, :url).new(:redmine_sla, {controller: 'slas'})
     html = fragment(helper.render_single_menu_node(item, 'SLA settings', item.url, false))
     assert_match(%r{icon_sets/atelier/custom.png}, html.at_css('img')['src'])
+    # Without sprite_icon (Redmine 5) the icon is wrapped to sit in the menu padding slot.
+    refute_nil html.at_css('a > .sla-legacy-menu-icon > img')
     assert_equal '/sla/slas', html.at_css('a')['href']
     assert_equal 'SLA settings', html.text.strip
   end

@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- Themes that draw icons with a font (FontAwesome `::before` glyphs) no longer
+  show a second icon next to the SLA icon on action links, such as "Import
+  holidays" and "New holiday" on the holidays page.
+- Redmine 5: the "SLA global settings" administration menu entry is no longer
+  indented when the theme sets its own left padding on menu links. The SLA icon
+  now sits in that padding, like the other entries.
+
 ## 3.6.3 - 2026-11-20
 
 ### Fixed
