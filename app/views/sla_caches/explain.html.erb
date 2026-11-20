@@ -22,12 +22,14 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 <p><%= l(:label_sla_explain_issue_created_on) %> <strong><%= format_time(@issue_created_on_sla_tz) %></strong></p>
 
-<% if @sla_schedule_summary.any? %>
+<% [[:label_sla_explain_schedule_summary, @sla_schedule_summary],
+      [:label_sla_explain_outside_business_hours_summary, @sla_outside_business_hours_summary]].each do |label, summary| %>
+  <% next if summary.empty? %>
   <p>
-    <%= l(:label_sla_explain_schedule_summary) %>
-    <% @sla_schedule_summary.group_by(&:dow).each do |dow, schedules| %>
+    <%= l(label) %>
+    <% summary.group_by(&:dow).each do |dow, schedules| %>
       <strong><%= I18n.t('date.day_names')[dow] %></strong>
-      <%= schedules.map { |s| "#{s.start_time.strftime('%H:%M')}-#{s.end_time.strftime('%H:%M')}" }.join(', ') %><%= '; ' unless dow == @sla_schedule_summary.map(&:dow).uniq.last %>
+      <%= schedules.map { |s| "#{s.start_time.strftime('%H:%M')}-#{s.end_time.strftime('%H:%M')}" }.join(', ') %><%= '; ' unless dow == summary.map(&:dow).uniq.last %>
     <% end %>
   </p>
 <% end %>
@@ -99,6 +101,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                     <%= row['holiday_name'] %>
                   <% elsif !row['has_schedule'] %>
                     <%= l(:label_sla_explain_no_schedule) %>
+                  <% elsif row['outside_business_hours'] %>
+                    <%= l(:label_sla_explain_outside_business_hours) %>
                   <% else %>
                     -
                   <% end %>
