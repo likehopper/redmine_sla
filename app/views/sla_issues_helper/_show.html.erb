@@ -68,8 +68,8 @@ if User.current.allowed_to?(:view_sla, @project, :global => true) &&
         
       if ( !sla_spent.nil? && !sla_term.nil? ) 
 
-        sla_spent_txt = ChronicDuration.output(sla_spent*60, :format => :short, :limit_to_hours => true, :units => 2, :joiner => '', :keep_zero => true )
-        sla_term_txt = ChronicDuration.output(sla_term*60, :format => :short, :limit_to_hours => true, :units => 2, :joiner => '')
+        sla_spent_txt = sla_duration(sla_spent)
+        sla_term_txt = sla_duration(sla_term)
 
         sla_percent = ( sla_spent * 100 / sla_term ).round()
   -%>

@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- Show SLA durations without a trailing zero unit: "1h" instead of "1h0s",
+  "30m" instead of "30m0s", and "0m" instead of "0s" for no spent time. Applies
+  to the issue SLA block and the SLA level terms page.
+
 ## 3.6.2 - 2026-11-20
 
 ### Changed
