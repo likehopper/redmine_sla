@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 3.6.4 - 2026-11-20
 
 ### Fixed
 
