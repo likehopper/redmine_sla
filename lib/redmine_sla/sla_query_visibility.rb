@@ -66,12 +66,16 @@ module RedmineSla
       super(name, options)
     end
 
+    def visible_for?(project)
+      @sla_visibility.visible?(project)
+    end
+
     def value(object)
-      super if @sla_visibility.visible?(object.project)
+      super if visible_for?(object.project)
     end
 
     def value_object(object)
-      super if @sla_visibility.visible?(object.project)
+      super if visible_for?(object.project)
     end
   end
 end

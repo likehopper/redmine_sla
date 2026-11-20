@@ -22,6 +22,7 @@ duplicate sizes are rejected. Missing roles use Tabler's fallback icons.
 | `name` | Display name |
 | `format` | `files` or `svg_sprite` |
 | `icons` | SLA roles mapped to size/file pairs or sprite symbol IDs |
+| `markers` | Optional text markers for column selectors; missing roles use Tabler's markers |
 | `file` | Sprite filename, for `svg_sprite` |
 | `credit.display` | `true` to show attribution; `false` to hide it |
 | `credit.text` / `text_key` | Literal credit text or translation key |
@@ -47,9 +48,9 @@ Contexts use 16px for menus/lists/columns, 20px for forms and 24px for headings;
 `size:` overrides them. Administration menus follow Redmine’s native size.
 File sets select the nearest suitable size. SVG sprites
 have explicit dimensions and strokes, including on Redmine 5. Column captions
-remain plain text in exports. Column selectors use `◇` for level, `◎` for spent time, `◷` for terms,
-`⌛︎` for remaining time and `☷` for respect. HTML headers keep the selected set’s
-icons independently of these text markers.
+remain plain text in exports. Column selectors use the selected set's `markers`;
+Flaticon restores its historical colored markers while Tabler keeps monochrome
+markers. HTML headers resolve their icons independently of these text markers.
 
 ## Checks
 

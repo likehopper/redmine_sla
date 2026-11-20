@@ -32,6 +32,12 @@ For a query that only needs one association, request it directly:
 SlaCacheSpent.joins(:issue).where(issues: {tracker_id: tracker_id})
 ```
 
+Issue list SLA columns (level and respect) and the SLA level grouping read the
+persisted level cache. When one of them is used, the query evaluates and
+preloads cache rows and levels for the displayed page in batches, skipping rows
+whose project hides SLA values. Keep this preload behind the column check:
+issue queries without SLA columns should not trigger SLA cache evaluation.
+
 Internal cache cleanup intentionally works on base-table rows. Applying list
 joins to a purge could hide historical orphan rows from deletion. Prefer the
 existing project-scoped purge methods after the caller has checked mutation

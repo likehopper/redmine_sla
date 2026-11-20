@@ -28,6 +28,31 @@ class IconSetTest < Minitest::Test
     assert_equal false, RedmineSla::IconSet.fetch('tabler').credit['display']
   end
 
+  def test_markers_are_selected_with_the_set
+    assert_equal({'sla_level' => '◇', 'sla_spent' => '🚀', 'sla_term' => '🏁',
+                  'sla_remain' => '🏃', 'sla_respect' => '⏰'},
+                 RedmineSla::IconSet.fetch('flaticon').markers)
+    assert_equal({'sla_level' => '◇', 'sla_spent' => '◎', 'sla_term' => '◷',
+                  'sla_remain' => "\u231B\uFE0E", 'sla_respect' => '☷'},
+                 RedmineSla::IconSet.fetch('tabler').markers)
+  end
+
+  def test_admin_menu_alignment_does_not_depend_on_has_selector_support
+    css = File.read(File.expand_path('../../assets/stylesheets/redmine_sla.css', __dir__)).gsub(%r{/\*.*?\*/}m, '')
+    rule = css.scan(/([^{}]+)\{([^{}]*)\}/).find { |selectors, _| selectors.strip == '#admin-menu a.redmine-sla' }
+
+    refute_nil rule
+    assert_match(/padding-left:\s*0/, rule.last)
+  end
+
+  def test_custom_sets_inherit_missing_markers_from_the_fallback
+    set = RedmineSla::IconSet.new('custom', {
+      'name' => 'Custom', 'format' => 'files', 'icons' => {}, 'markers' => {'sla_spent' => '$'}
+    })
+    assert_equal '$', set.markers['sla_spent']
+    assert_equal '◷', set.markers['sla_term']
+  end
+
   def test_missing_default_set_keeps_valid_sets_available_for_selection_and_fallback
     sets = RedmineSla::IconSet.all
     tabler = sets.fetch('tabler')
@@ -149,6 +174,7 @@ class IconSetTest < Minitest::Test
         'float-size' => {'name' => 'Bad', 'format' => 'files', 'icons' => {'sla' => {16.5 => 'bad.png'}}},
         'duplicate-size' => {'name' => 'Bad', 'format' => 'files', 'icons' => {'sla' => {16 => 'a.png', '16' => 'b.png'}}},
         'bad-credit' => {'name' => 'Bad', 'format' => 'files', 'icons' => {}, 'credit' => {'author' => {}}},
+        'bad-markers' => {'name' => 'Bad', 'format' => 'files', 'icons' => {}, 'markers' => {'sla' => ''}},
         'empty' => nil,
         'bad-format' => {'name' => 'Bad', 'format' => 'unknown', 'icons' => {}}
       }
@@ -171,7 +197,7 @@ class IconSetTest < Minitest::Test
         assert_equal 'icon_sets/valid/small.png', sets['valid'].resolve('sla', size: 16).path
         assert_equal 'icon_sets/valid/large.png', sets['valid'].resolve('sla', size: 20).path
       end
-      assert_equal 9, stderr.scan('ignoring icon manifest').length
+      assert_equal 10, stderr.scan('ignoring icon manifest').length
     ensure
       RedmineSla::IconSet.instance_variable_set(:@all, previous)
       if original_root

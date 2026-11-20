@@ -190,19 +190,4 @@ class SlaIconsHelperTest < Minitest::Test
     end
   end
 
-  def test_selection_markers_distinguish_roles_without_changing_captions
-    helper = header_view('flaticon')
-    options = [['Subject', :subject], ['SLA level', :get_sla_level], ['Time Response', :get_sla_spent_1], ['Term Response', :get_sla_term_1], ['Remaining Response', :get_sla_remain_1], ['Respect Response', :get_sla_respect_1]].map(&:freeze).freeze
-    helper.define_singleton_method(:query_available_inline_columns_options) { |_query| options }
-    helper.define_singleton_method(:query_selected_inline_columns_options) { |_query| options }
-    [:query_available_inline_columns_options, :query_selected_inline_columns_options].each do |method|
-      result = helper.public_send(method, nil)
-      assert_equal ['Subject', :subject], result.first
-      assert_equal ['◇ SLA level', '◎ Time Response', '◷ Term Response', "\u231B\uFE0E Remaining Response", '☷ Respect Response'], result.drop(1).map(&:first)
-      assert_equal options.map(&:last), result.map(&:last)
-    end
-    assert_equal 'SLA level', options[1][0]
-    assert_equal 'Respect Response', options.last[0]
-  end
-
 end

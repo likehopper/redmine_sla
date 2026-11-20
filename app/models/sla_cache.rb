@@ -67,6 +67,21 @@ class SlaCache < ActiveRecord::Base
     self.find_by(issue_id: issue_id)
   end
 
+  def self.preload_for_issues(issues)
+    issue_ids = issues.map(&:id)
+    return if issue_ids.empty?
+
+    RedmineSla::DbDialect.ensure_recursion_depth!
+    # Evaluate the cache function for every issue in one database round trip.
+    # The statement keeps its cache row locks until it ends: a fixed order
+    # prevents deadlocks between concurrent lists sharing issues.
+    sql = sanitize_sql(["SELECT sla_get_level(issues.id, false) FROM issues WHERE issues.id IN (?) ORDER BY issues.id", issue_ids])
+    ActiveRecord::Base.connection.execute(sql)
+
+    caches_by_issue_id = eager_load(:sla_level).where(issue_id: issue_ids).index_by(&:issue_id)
+    issues.each { |issue| issue.preload_sla_cache(caches_by_issue_id[issue.id]) }
+  end
+
   # Class method for refresh cache
   def refresh
     # First, delete the entry in the sla_cache

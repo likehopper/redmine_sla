@@ -72,6 +72,9 @@ module SlaDocumentationFixtureHelpers
     Array(@fixtures['issue_priorities']).each do |attributes|
       name = attributes.fetch('name')
       IssuePriority.find_or_create_by!(name: name) do |priority|
+        # Core fixtures reload between steps; retain example priority IDs so
+        # terms created in an earlier step still reference the same priority.
+        priority.id = attributes['id'] if attributes['id']
         priority.position = IssuePriority.maximum(:position).to_i + 1
         priority.active = true
         priority.is_default = false
