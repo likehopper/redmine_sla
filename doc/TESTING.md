@@ -1,5 +1,36 @@
 # Testing
 
+## Version 3.6.2 release matrix
+
+Validated on **2026-11-20** in isolated local containers with disposable
+databases. Source snapshot: `release/3.6.2` at `560b527` (merge of `main`
+3.6.1 into `develop/3.6.1`); the following commit only records this matrix.
+Each cell checked that the loaded plugin files match the frozen snapshot.
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1514 / 16432 | 1514 / 16423 | 1514 / 16423 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1514 / 16408 | 1514 / 16399 | 1514 / 16399 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1514 / 17060 | 1514 / 17050 | 1514 / 17050 |
+
+Cells record **tests / assertions**. Total: **13,626 tests / 149,644
+assertions**, zero failures or errors, and 18 expected PostgreSQL-only skips
+on MariaDB/MySQL. Each combination ran 1,365 unit/functional/integration/API
+tests, 32 standalone icon/HTML tests, 39 Chromium system tests and 78
+documentation tests, in that order with seed 0, after migrating a fresh
+database (migrations 001-029). MySQL ran with `ONLY_FULL_GROUP_BY`,
+`STRICT_TRANS_TABLES`, `STRICT_ALL_TABLES`, `NO_ZERO_IN_DATE`, `NO_ZERO_DATE`
+and `ERROR_FOR_DIVISION_BY_ZERO`; MariaDB ran with `STRICT_TRANS_TABLES` and
+`STRICT_ALL_TABLES` and is reported separately. Every suite passed on its first
+run; no retry was needed.
+
+The merge keeps the 3.6.1 `issue_priority_patch.rb` / `IssuePriorityPatch`
+naming. The boot regressions (explicit eager load and `zeitwerk:check` in
+fresh Rails processes) pass on every cell. Documentation tests generated 2,628
+captures outside the repository; they were not reviewed for this release. No
+upgrade test from 3.6.1 on a populated database, no production deployment and
+no CI execution were performed.
+
 ## Version 3.6.2 pre-release: issue-list preload corrections
 
 Validated on **2026-11-19** in isolated, disposable Docker databases with
