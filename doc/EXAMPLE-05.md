@@ -293,6 +293,12 @@ The screenshots below illustrate different timelines:
 ![Issue scenario 3](screenshots/example-05/12-01-03-issue_past_3-issue-show.png)
 ![Issue scenario 4](screenshots/example-05/12-01-04-issue_past_4-issue-show.png)
 
+**Explain** shows how scenario 4 reaches its resolution time: the night and the
+weekend are covered by `match = false` schedules, so they read "Outside
+business hours, time runs" and their minutes are counted.
+
+![Issue scenario 4 explanation](screenshots/example-05/12-02-04-issue_past_4-issue-explain.png)
+
 ---
 
 ## What you learned in this example
