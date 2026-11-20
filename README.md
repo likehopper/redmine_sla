@@ -14,7 +14,7 @@
 
 ## Overview
 
-Current version: **3.6.3**. See the [changelog](CHANGELOG.md) for release details.
+Current version: **3.6.4**. See the [changelog](CHANGELOG.md) for release details.
 
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
@@ -283,6 +283,13 @@ rake redmine:plugins:migrate NAME=redmine_sla
 Plugin is ready to use.
 
 ------------------------------------------------------------------------
+
+## Upgrade to 3.6.4
+
+Version **3.6.4** fixes doubled icons and the indented administration menu entry
+under themes that draw icons with a font, and gives SLA lists a stable order
+across pages (the calendar holidays list now really sorts by date). Update the
+plugin files and restart Redmine; no new migration is required.
 
 ## Upgrade to 3.6.3
 

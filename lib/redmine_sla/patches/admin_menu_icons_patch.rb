@@ -10,6 +10,8 @@ module RedmineSla
 
         size = defined?(IconsHelper::DEFAULT_ICON_SIZE) ? IconsHelper::DEFAULT_ICON_SIZE.to_i : IconSet::CONTEXT_SIZES.fetch(:menu)
         label = sla_icon('sla', caption, context: :menu, size: size, plugin: 'redmine_sla')
+        # Redmine 5 has no SVG menu icons: its menu links keep a padding slot for a background icon.
+        label = content_tag(:span, label, class: 'sla-legacy-menu-icon') unless respond_to?(:sprite_icon)
         super(item, label, url, selected)
       end
     end

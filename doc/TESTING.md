@@ -1,5 +1,54 @@
 # Testing
 
+## Version 3.6.4 release matrix
+
+Validated on **2026-11-20** in isolated local containers with disposable
+databases. Source snapshot: `release/3.6.4` at `ee50f59`; the two following
+commits only replace the five calendar holiday list screenshots (taken from this
+matrix) and record this matrix. Each cell checked that the loaded plugin files
+match the frozen snapshot.
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1528 / 16509 | 1528 / 16500 | 1528 / 16500 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1528 / 16485 | 1528 / 16476 | 1528 / 16476 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1528 / 17142 | 1528 / 17132 | 1528 / 17132 |
+
+Cells record **tests / assertions**. Total: **13,752 tests / 150,352
+assertions**, zero failures or errors in the recorded runs, and 18 expected
+PostgreSQL-only skips on MariaDB/MySQL. Each combination ran 1,379
+unit/functional/integration/API tests, 32 standalone icon/HTML tests, 39
+Chromium system tests and 78 documentation tests, in that order with seed 0,
+after migrating a fresh database (migrations 001-029). SQL modes are those of
+the 3.6.2 matrix below.
+
+One retry: on Redmine 7.0.1/MariaDB, the first system run failed once in the
+intermittent `SlaIconUrlPrefixTest` (`.title-sla-settings` not found after saving
+the settings under a URL mount; the capture shows the saved settings page). The
+suite was rerun on a fresh database and passed, followed by the documentation
+suite; the core and standalone suites kept their first, passing run. A first
+matrix of the previous snapshot `ed59f8c` (icon fix only) also passed after the
+same test failed once on Redmine 5.1.13/PostgreSQL and once on Redmine
+7.0.1/PostgreSQL. This test now fails often enough to deserve a fix.
+
+New regression tests: `SlaQueryStableOrderTest` sorts each of the ten list
+queries on a column other than id and checks that the SQL ends with the row id
+(removing one tie-breaker makes it fail), and pages through the calendar
+holidays, whose fixtures share dates, checking order and coverage (failing on
+3.6.3 code, whose default sort named a missing column). The admin menu
+alignment is covered by the system icon tests: removing the new Redmine 5 rule
+makes them fail (icon 20 px inside the link).
+
+A separate, uncommitted browser probe compared the SLA admin entry with the
+native "Information" entry and counted the icons of the holiday action links on
+Redmine 5.1.13, 6.1.4 and 7.0.1 (PostgreSQL), with the default theme and with
+rules copied from a FontAwesome-based theme. With the 3.6.3 code, Redmine 5 under
+those rules indented the entry by 20 px; with the fix the entry is aligned on all
+three versions. Under the font rules on Redmine 6 and 7, the theme glyph remains
+next to Redmine's native icons, as it does on core links such as "New project".
+No upgrade test on a populated database (no new migration), no production
+deployment and no CI execution were performed.
+
 ## Version 3.6.3 release matrix
 
 Validated on **2026-11-20** in isolated local containers with disposable

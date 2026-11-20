@@ -1,5 +1,24 @@
 # Changelog
 
+## 3.6.4 - 2026-11-20
+
+### Fixed
+
+- Themes that draw icons with a font (FontAwesome `::before` glyphs) no longer
+  show a second icon next to the SLA icon on action links, such as "Import
+  holidays" and "New holiday" on the holidays page.
+- Redmine 5: the "SLA global settings" administration menu entry is no longer
+  indented when the theme sets its own left padding on menu links. The SLA icon
+  now sits in that padding, like the other entries.
+- The "SLA Calendars' Holidays" list is sorted by default by holiday date
+  (newest first), then calendar name. Its default sort named a column that
+  does not exist, so the list came out in an order chosen by the database,
+  different on MySQL and on PostgreSQL/MariaDB.
+- Paginated SLA lists (SLAs, types, statuses, holidays, calendars, calendar
+  holidays, schedules, levels, level terms, project trackers) end their sort
+  with the row id. When several rows share the sorted value, a row could
+  otherwise appear on two pages or on none.
+
 ## 3.6.3 - 2026-11-20
 
 ### Fixed

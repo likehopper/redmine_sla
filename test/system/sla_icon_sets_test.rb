@@ -101,14 +101,19 @@ class SlaIconSetsSystemTest < ApplicationSlaSystemTestCase
       (() => {
         const link = document.querySelector(#{selector.to_json});
         const icon = link.querySelector('.sla-icon-image, .sla-icon-svg');
+        const label = link.querySelector('.sla-icon-label');
+        const left = link.getBoundingClientRect().left;
         return {
           padding: parseFloat(getComputedStyle(link).paddingLeft),
-          offset: icon.getBoundingClientRect().left - link.getBoundingClientRect().left
+          offset: icon.getBoundingClientRect().left - left,
+          label: label.getBoundingClientRect().left - left,
+          iconWidth: icon.getBoundingClientRect().width
         };
       })()
     JS
-    assert_in_delta 0, geometry.fetch('padding'), 0.5
+    # Like native background icons: icon at the link's left edge, label after the padding slot.
     assert_in_delta 0, geometry.fetch('offset'), 0.5
+    assert_in_delta [geometry.fetch('padding'), geometry.fetch('iconWidth') + 4].max, geometry.fetch('label'), 0.5
   end
 
   def capture_icon_doc(set_id, name)
