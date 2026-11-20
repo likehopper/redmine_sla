@@ -247,7 +247,7 @@ Create **Level Support** and configure:
 
 Verify the list:
 
-![SLA Levels list](screenshots/example-04/09-01-01-02-sla_leel-created.png)
+![SLA Levels list](screenshots/example-04/09-01-01-02-sla_level-created.png)
 
 > **Pedagogical takeaway**  
 > The SLA Level is the point where **priority logic is injected**.

@@ -87,7 +87,10 @@ module RedmineSla
             'day' => day,
             'is_holiday' => !holiday.nil?,
             'holiday_name' => holiday&.name,
-            'has_schedule' => schedules.any?(&:match?),
+            # Every schedule lets time run, as in sla_get_spent; match=false
+            # only stops the SLA from starting there (outside business hours).
+            'has_schedule' => schedules.any?,
+            'outside_business_hours' => schedules.any? && schedules.none?(&:match?),
             'minutes_counted' => tracked && !holiday ? counted_minutes(day, from_date, to_date, schedules) : 0
           }
         end

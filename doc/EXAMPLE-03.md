@@ -207,7 +207,7 @@ Both levels can use the **same calendar**.
 
 Verify the list:
 
-![SLA Levels list](screenshots/example-03/09-01-01-02-sla_leel-created.png)
+![SLA Levels list](screenshots/example-03/09-01-01-02-sla_level-created.png)
 
 ---
 

@@ -69,7 +69,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
           &nbsp
         <% else
             sla_term = sla_level_term[:term]
-            sla_term_txt = ChronicDuration.output(sla_term*60, :format => :short, :limit_to_hours => true, :units => 2, :joiner => '')
+            sla_term_txt = sla_duration(sla_term)
         -%>
           <%= sla_term_txt -%>
         <% end -%>

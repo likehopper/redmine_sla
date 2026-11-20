@@ -46,6 +46,12 @@ module IssuesDocumentationTest
         if (expected_level = defn['expected_sla_level'])
           assert_equal expected_level, Issue.find(issue.id).get_sla_level&.name
         end
+        # The scenario subjects (e.g. "GTI=OK GTR=KO") must match the result.
+        Hash(defn['expected_sla_respect']).each do |sla_type_name, expected_respect|
+          sla_type = SlaType.find_by!(name: sla_type_name)
+          assert_equal expected_respect, Issue.find(issue.id).get_sla_respect(sla_type.id),
+                       "#{issue_key}: unexpected #{sla_type_name} respect"
+        end
         take_doc_screenshot(format('%02d-01-%02d-%s-issue-show.png', id, idx, issue_key))
 
         # "Explain" the SLA calculation for this issue (link next to the SLA

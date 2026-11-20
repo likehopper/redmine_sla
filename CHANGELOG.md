@@ -1,5 +1,22 @@
 # Changelog
 
+## 3.6.3 - 2026-11-20
+
+### Fixed
+
+- The Explain page no longer reports "No schedule" for days covered only by
+  `match = false` schedules: time runs there and the minutes are counted. These
+  days now read "Outside business hours, time runs", and the page lists those
+  schedules under the business hours.
+- EXAMPLE-05: the "GTI=OK GTR=KO" scenario was resolved within its 8-hour term.
+  It is now resolved at 18:00 (9 hours), and the documentation run checks the
+  response and resolution results of each scenario.
+- Rename the misspelled `sla_leel-created.png` screenshots of EXAMPLE-01 to
+  EXAMPLE-05 to `sla_level-created.png`.
+- Show SLA durations without a trailing zero unit: "1h" instead of "1h0s",
+  "30m" instead of "30m0s", and "0m" instead of "0s" for no spent time. Applies
+  to the issue SLA block and the SLA level terms page.
+
 ## 3.6.2 - 2026-11-20
 
 ### Changed

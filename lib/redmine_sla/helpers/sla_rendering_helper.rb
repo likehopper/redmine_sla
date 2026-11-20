@@ -104,6 +104,13 @@ module RedmineSla
         tooltip = sla_description_tooltip(object)
         tooltip ? content_tag('span', name, title: tooltip) : name
       end
+
+      # Short duration of an SLA term or spent time, given in minutes:
+      # "4h30m", "1h", "1554h". ChronicDuration's keep_zero option would also
+      # print a trailing zero unit ("1h0s"), so zero is handled here instead.
+      def sla_duration(minutes)
+        ChronicDuration.output(minutes.to_i * 60, format: :short, limit_to_hours: true, units: 2, joiner: '') || '0m'
+      end
     end
   end
 end

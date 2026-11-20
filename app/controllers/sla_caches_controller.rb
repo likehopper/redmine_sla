@@ -172,12 +172,13 @@ class SlaCachesController < ApplicationController
 
     @sla_level_explanation = explanation.levels
 
-    # Business hours of the selected level's calendar, shown once at the top
-    # rather than repeated on every day row below.
+    # Schedules of the selected level's calendar, shown once at the top
+    # rather than repeated on every day row below: business hours (match)
+    # first, then the hours where time keeps running but the SLA cannot start.
     selected_level = @sla_level_explanation.to_a.find { |row| row['selected'] }
-    @sla_schedule_summary = selected_level ?
-      SlaSchedule.where(sla_calendar_id: selected_level['sla_calendar_id'], match: true).order(:dow, :start_time) :
-      SlaSchedule.none
+    schedules = selected_level ?
+      SlaSchedule.where(sla_calendar_id: selected_level['sla_calendar_id']).order(:dow, :start_time).to_a : []
+    @sla_schedule_summary, @sla_outside_business_hours_summary = schedules.partition(&:match?)
 
     @sla_spent_explanations = SlaType.sorted.filter_map { |sla_type|
       rows = explanation.spent(sla_type.id)

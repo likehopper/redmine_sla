@@ -233,7 +233,7 @@ Create **Level Support** linked to:
 
 Verify it appears:
 
-![SLA Levels list](screenshots/example-02/09-01-01-02-sla_leel-created.png)
+![SLA Levels list](screenshots/example-02/09-01-01-02-sla_level-created.png)
 
 ---
 

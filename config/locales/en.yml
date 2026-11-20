@@ -388,7 +388,9 @@ en:
   label_sla_explain_day: Day
   label_sla_explain_day_note: Note
   label_sla_explain_no_schedule: No schedule
+  label_sla_explain_outside_business_hours: Outside business hours, time runs
   label_sla_explain_schedule_summary: "Business hours:"
+  label_sla_explain_outside_business_hours_summary: "Outside business hours, time runs:"
   label_sla_explain_minutes: Minutes counted
   label_sla_explain_total_minutes: Total minutes counted
   label_sla_spent: Spent

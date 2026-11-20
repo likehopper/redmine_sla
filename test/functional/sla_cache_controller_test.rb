@@ -757,6 +757,24 @@ class SlaCachesControllerTest < ApplicationSlaFunctionalsTestCase
     end
   end
 
+  # A match=false schedule lets time run but no SLA start there. The page must
+  # list it apart from business hours and not call its day "No schedule".
+  test "should explain days outside business hours as counted on get explain" do
+    issue = Issue.find_by!(project: Project.find_by!(identifier: 'project-sla-tests-tma'), subject: 'Bug with a weekend')
+    issue.get_sla_level.sla_calendar.sla_schedules.create!(dow: 6, start_time: '00:00', end_time: '23:59', match: false)
+    # The schedule change invalidated the cache; Explain reads it, never builds it.
+    Issue.find(issue.id).get_sla_spent(2)
+    @request.session[:user_id] = 1
+    with_settings :default_language => "en" do
+      get :explain, params: { id: issue.id }
+      assert_response :success
+      assert_select 'p', text: /Business hours:.*Monday.*09:30-12:29/m
+      assert_select 'p', text: /Outside business hours, time runs:\s*Saturday\s*00:00-23:59/m
+      assert_select 'tr', text: /11\/06\/2021\s*Outside business hours, time runs\s*yes\s*1440/
+      assert_select 'tr.sla-explain-no-schedule', text: /11\/07\/2021\s*No schedule\s*yes\s*0/
+    end
+  end
+
   test "should forbidden on get explain as admin when the SLA module is disabled" do
     issue_id = SlaCache.where(project: 1).order(:id).first.issue_id
     Project.find(1).disable_module!(:sla)

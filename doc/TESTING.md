@@ -1,5 +1,42 @@
 # Testing
 
+## Version 3.6.3 release matrix
+
+Validated on **2026-11-20** in isolated local containers with disposable
+databases. Source snapshot: `release/3.6.3` at `7430297`; the following commit
+only records this matrix. Each cell checked that the loaded plugin files match
+the frozen snapshot.
+
+| Redmine | Ruby | Rails | PostgreSQL 17.7 | MariaDB 10.11.19 | MySQL 8.0.46 |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.13 | 3.2.11 | 6.1.7.10 | 1517 / 16463 | 1517 / 16454 | 1517 / 16454 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1517 / 16439 | 1517 / 16430 | 1517 / 16430 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1517 / 17095 | 1517 / 17085 | 1517 / 17085 |
+
+Cells record **tests / assertions**. Total: **13,653 tests / 149,935
+assertions**, zero failures or errors in the recorded runs, and 18 expected
+PostgreSQL-only skips on MariaDB/MySQL. Each combination ran 1,368
+unit/functional/integration/API tests, 32 standalone icon/HTML tests, 39
+Chromium system tests and 78 documentation tests, in that order with seed 0,
+after migrating a fresh database (migrations 001-029). SQL modes are those of
+the 3.6.2 matrix below.
+
+One retry: on Redmine 6.1.4/PostgreSQL, the first system run failed once in
+`SlaIconUrlPrefixTest` (`.title-sla-settings` not found after saving the
+settings under a URL mount; the capture shows the saved page). This test was
+already intermittent on 3.6.0. The cell was rerun on a fresh database: its
+system and documentation suites passed; core and standalone kept their first,
+passing run. Redmine 7.0.1/PostgreSQL, not started before the stop, then ran in
+full and passed.
+
+New regression tests cover the Explain page for `match = false` schedules
+(unit and functional, both failing on 3.6.2 code) and the response/resolution
+results of the EXAMPLE-05 scenarios (documentation). The committed issue
+screenshots and EXAMPLE-05 explanations come from a Redmine 6.1.4/PostgreSQL
+documentation run of this source and were compared visually with the previous
+ones. No upgrade test on a populated database (no new migration), no
+production deployment and no CI execution were performed.
+
 ## Version 3.6.2 release matrix
 
 Validated on **2026-11-20** in isolated local containers with disposable
