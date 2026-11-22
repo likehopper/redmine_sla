@@ -18,7 +18,7 @@
 fr:
   label_sla_locale_settings: Paramètres régionaux
   label_sla_gauge_style: Style des jauges SLA
-  label_sla_icon_set: Jeu d’icônes
+  label_sla_icon_set: Jeu d'icônes
   label_sla_icons_credit: Icônes réalisées par
   permission_view_sla: Voir les SLA
   permission_manage_sla: Configurer les SLA
@@ -277,13 +277,13 @@ fr:
         zero: Aucun Jour férié d'un calendrier de SLA
         one: Un Jour férié d'un calendrier de SLA
         other: "%{count} Jours fériés des calendriers de SLA"      
-      index: Lister kes Jours fériés d'un calendrier de SLA
+      index: Lister les jours fériés d'un calendrier de SLA
       new: Ajouter des Jours fériés d'un calendrier de SLA
       show: Voir des Jours fériés d'un calendrier de SLA
       edit: Editer des Jours fériés d'un calendrier de SLA
       save: Enregistrer des Jours fériés d'un calendrier de SLA
       delete: Supprimer des Jours fériés d'un calendrier de SLA
-      exists: Ce jour férié existe déja dans ce calendrier de SLA
+      exists: Ce jour férié existe déjà dans ce calendrier de SLA
 
     # SlaLevel
     sla_level:
@@ -411,7 +411,7 @@ fr:
   sla_time_zone_change_note: "Le changement de fuseau horaire ne s'applique qu'aux nouveaux calculs : les délais SLA déjà calculés ne sont pas recalculés."
   sla_time_zone_change_warning: "Le fuseau horaire va changer. Les délais SLA déjà calculés gardent l'ancien fuseau : prévenez les utilisateurs concernés."
   sla_holiday_import_language_local: "Langue locale du pays"
-  sla_holiday_import_description: "Récupérer les jours fériés depuis Nager.Date en anglais ou dans la langue locale du pays, avec l’année ajoutée au nom. Les dates existantes et les associations aux calendriers sont conservées."
+  sla_holiday_import_description: "Récupérer les jours fériés depuis Nager.Date en anglais ou dans la langue locale du pays, avec l'année ajoutée au nom. Les dates existantes et les associations aux calendriers sont conservées."
   sla_holiday_import_selection_hint: "Les jours nationaux sont présélectionnés. Vérifiez les jours régionaux avant de les sélectionner. Les entrées d'une même date sont réunies."
   sla_holiday_import_scope: "Portée"
   sla_holiday_import_existing: "Jour férié existant"
