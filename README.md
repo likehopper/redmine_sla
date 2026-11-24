@@ -330,16 +330,16 @@ plugin files and restart Redmine; no new migration relative to 3.5.1.
 ## Upgrade to 3.5.1
 
 Version **3.5.1** hides the SLA values of subproject issues from users without
-*View SLA* in that subproject, in lists, exports, grouping, sorting and
+*View SLAs* in that subproject, in lists, exports, grouping, sorting and
 filters. Update the plugin files and restart Redmine; no new migration
 relative to 3.5.0.
 
 ## Upgrade to 3.5.0
 
-Version **3.5.0** shows the project SLA tab only to users with *View SLA*.
-A role with *Manage SLA* alone no longer sees a tab that answered 403. Update
+Version **3.5.0** shows the project SLA tab only to users with *View SLAs*.
+A role with *Manage SLAs* alone no longer sees a tab that answered 403. Update
 the plugin files and restart Redmine; no new migration relative to 3.4.2.
-Check that roles with *Manage SLA* also have *View SLA*.
+Check that roles with *Manage SLAs* also have *View SLAs*.
 
 ## Upgrade to 3.4.2
 
@@ -408,7 +408,7 @@ relative to 3.2.0. The Redmine server needs outbound HTTPS access to
 Version **3.2.0** adds an **SLA** column and filter to the project lists
 (`Projects` in list mode and `Administration > Projects`) and an SLA icon in
 the project board view. Administrators see every project; other users only
-see the SLAs of projects where they have *View SLA* or *Manage SLA*. See
+see the SLAs of projects where they have *View SLAs* or *Manage SLAs*. See
 [Projects with SLA](doc/PROJECT_LISTS.md). Update the plugin files and restart
 Redmine; this release introduces no new migration relative to 3.1.5.
 

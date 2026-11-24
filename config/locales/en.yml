@@ -20,8 +20,9 @@ en:
   label_sla_gauge_style: SLA gauge style
   label_sla_icon_set: Icon set
   label_sla_icons_credit: Icons created by
-  permission_view_sla: View SLA
-  permission_manage_sla: Manage SLA
+  permission_view_sla: View SLAs
+  permission_manage_sla: Manage SLAs
+  project_module_sla: SLA
 
   msgerror: Error message
 
@@ -136,6 +137,9 @@ en:
         sla_type: *sla_type
         sla_type_id: *sla_type
         sla_priority_id: *sla_priority_id
+        # Internal copy of sla_priority_id when the priority comes from a custom field
+        custom_field_enumeration: *sla_priority_id
+        custom_field_enumeration_id: *sla_priority_id
         term: *term
       sla_cache:
         sla_cache: *sla_cache

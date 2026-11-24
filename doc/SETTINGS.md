@@ -38,8 +38,8 @@ module, tick the permissions it needs:
 
 | Permission | Grants |
 |---|---|
-| `view_sla` (View SLA) | SLA block on issues, SLA columns and filters in issue/time-entry lists, the project SLA menu, and read-only access to the project's SLAs, levels, calendars and caches |
-| `manage_sla` (Manage SLA) | Tracker-to-SLA mappings in project settings and the Explain action. Cache refresh, deletion and project purge also require `view_sla`. |
+| `view_sla` (View SLAs) | SLA block on issues, SLA columns and filters in issue/time-entry lists, the project SLA menu, and read-only access to the project's SLAs, levels, calendars and caches |
+| `manage_sla` (Manage SLAs) | Tracker-to-SLA mappings in project settings and the Explain action. Cache refresh, deletion and project purge also require `view_sla`. |
 
 Grant **both permissions** to project managers: `manage_sla` does not include
 `view_sla`. Either permission grants access to the SLA column, filter and board

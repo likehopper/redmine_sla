@@ -21,7 +21,8 @@ fr:
   label_sla_icon_set: Jeu d'icônes
   label_sla_icons_credit: Icônes réalisées par
   permission_view_sla: Voir les SLA
-  permission_manage_sla: Configurer les SLA
+  permission_manage_sla: Gérer les SLA
+  project_module_sla: SLA
 
   msgerror: Message d'erreur
 
@@ -136,6 +137,9 @@ fr:
         sla_type: *sla_type
         sla_type_id: *sla_type
         sla_priority_id: *sla_priority_id
+        # Internal copy of sla_priority_id when the priority comes from a custom field
+        custom_field_enumeration: *sla_priority_id
+        custom_field_enumeration_id: *sla_priority_id
         term: *term
       sla_cache:
         sla_cache: *sla_cache
