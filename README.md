@@ -14,7 +14,7 @@
 
 ## Overview
 
-Current version: **3.6.4**. See the [changelog](CHANGELOG.md) for release details.
+Current version: **3.7.0**. See the [changelog](CHANGELOG.md) for release details.
 
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
@@ -283,6 +283,15 @@ rake redmine:plugins:migrate NAME=redmine_sla
 Plugin is ready to use.
 
 ------------------------------------------------------------------------
+
+## Upgrade to 3.7.0
+
+Version **3.7.0** corrects and completes the English and French translations
+with the Redmine core wording. The permissions are now named *View SLAs* and
+*Manage SLAs* (identifiers unchanged), and on Redmine 6 and 7 the SLA forms and
+validation messages use translated field names again. The French issue start
+date shows the core "Début" label again on every page. Update the plugin files
+and restart Redmine; no new migration is required.
 
 ## Upgrade to 3.6.4
 
