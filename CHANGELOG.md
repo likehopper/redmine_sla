@@ -1,5 +1,25 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- The plugin no longer redefines Redmine core labels. In French, the issue
+  start date was labelled "Date de début" on every Redmine page instead of the
+  core "Début"; the duplicated "Name" and "Status" labels are removed too.
+- Labels that were displayed as missing translations now exist: the bulk delete
+  confirmation of SLA project trackers, the flash messages after creating or
+  updating an SLA term, and the titles of the SLA cache Atom feeds.
+- French and English labels are corrected and use Redmine core wording
+  ("Modifier", "Sauvegarder", "Demande"; "Issue"). Object names are capitalized
+  the same way in every list, form and button, for example "SLA Calendar
+  Holidays" and "SLA Project Trackers" instead of "SLA Calendars' Holidays" and
+  "SLA projects' trackers". English plurals are fixed ("List SLAs", "SLA Cache
+  Spent Times" instead of "SLA Cache Spents"). The SLA schedule day field is
+  now named "Day" instead of "Dow", including in API validation errors ("Day
+  cannot be blank").
+- Invisible characters are removed from the English cache notice.
+
 ## 3.6.4 - 2026-11-20
 
 ### Fixed

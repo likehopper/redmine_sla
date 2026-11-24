@@ -144,8 +144,8 @@ module ProjectSettingsDocumentationTest
       sla_tracker_mappings = project_config['sla_trackers'] || {}
 
       sla_tracker_mappings.each.with_index(1) do |(tracker_label, sla_name), mapping_idx|
-        # Open "New SLA project's trackers" form
-        click_link "New SLA project's trackers"
+        # Open "New SLA Project Tracker" form
+        click_link "New SLA Project Tracker"
 
         # Now on /projects/:id/settings/sla/new
         select tracker_label.to_s, from: 'sla_project_tracker_tracker_id'

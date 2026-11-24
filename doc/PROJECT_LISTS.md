@@ -10,7 +10,7 @@ project trackers):
     project with SLAs.
 
 The detailed project / tracker / SLA assignments remain available in
-**Administration > SLA Global settings > SLA projects' trackers** (group
+**Administration > SLA Global settings > SLA Project Trackers** (group
 the list by project).
 
 ## Who sees what
