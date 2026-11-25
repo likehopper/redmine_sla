@@ -14,7 +14,7 @@
 
 ## Overview
 
-Current version: **3.6.4**. See the [changelog](CHANGELOG.md) for release details.
+Current version: **3.7.0**. See the [changelog](CHANGELOG.md) for release details.
 
 -   Website: https://github.com/likehopper/redmine_sla
 -   Code repository: git@github.com:likehopper/redmine_sla.git
@@ -284,6 +284,15 @@ Plugin is ready to use.
 
 ------------------------------------------------------------------------
 
+## Upgrade to 3.7.0
+
+Version **3.7.0** corrects and completes the English and French translations
+with the Redmine core wording. The permissions are now named *View SLAs* and
+*Manage SLAs* (identifiers unchanged), and on Redmine 6 and 7 the SLA forms and
+validation messages use translated field names again. The French issue start
+date shows the core "Début" label again on every page. Update the plugin files
+and restart Redmine; no new migration is required.
+
 ## Upgrade to 3.6.4
 
 Version **3.6.4** fixes doubled icons and the indented administration menu entry
@@ -330,16 +339,16 @@ plugin files and restart Redmine; no new migration relative to 3.5.1.
 ## Upgrade to 3.5.1
 
 Version **3.5.1** hides the SLA values of subproject issues from users without
-*View SLA* in that subproject, in lists, exports, grouping, sorting and
+*View SLAs* in that subproject, in lists, exports, grouping, sorting and
 filters. Update the plugin files and restart Redmine; no new migration
 relative to 3.5.0.
 
 ## Upgrade to 3.5.0
 
-Version **3.5.0** shows the project SLA tab only to users with *View SLA*.
-A role with *Manage SLA* alone no longer sees a tab that answered 403. Update
+Version **3.5.0** shows the project SLA tab only to users with *View SLAs*.
+A role with *Manage SLAs* alone no longer sees a tab that answered 403. Update
 the plugin files and restart Redmine; no new migration relative to 3.4.2.
-Check that roles with *Manage SLA* also have *View SLA*.
+Check that roles with *Manage SLAs* also have *View SLAs*.
 
 ## Upgrade to 3.4.2
 
@@ -408,7 +417,7 @@ relative to 3.2.0. The Redmine server needs outbound HTTPS access to
 Version **3.2.0** adds an **SLA** column and filter to the project lists
 (`Projects` in list mode and `Administration > Projects`) and an SLA icon in
 the project board view. Administrators see every project; other users only
-see the SLAs of projects where they have *View SLA* or *Manage SLA*. See
+see the SLAs of projects where they have *View SLAs* or *Manage SLAs*. See
 [Projects with SLA](doc/PROJECT_LISTS.md). Update the plugin files and restart
 Redmine; this release introduces no new migration relative to 3.1.5.
 

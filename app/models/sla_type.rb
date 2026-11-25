@@ -18,7 +18,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-class SlaType < ActiveRecord::Base
+class SlaType < SlaApplicationRecord
 
   has_many :sla_level_terms
 
@@ -29,9 +29,9 @@ class SlaType < ActiveRecord::Base
   include Redmine::SafeAttributes
   include RedmineSla::InvalidatesSlaCache
 
-  # Redmine models normally get this for free through ApplicationRecord (see
-  # lib/redmine/preparation.rb), but this plugin's models inherit directly
-  # from ActiveRecord::Base, so it needs including explicitly here.
+  # SlaApplicationRecord already provides Redmine::Acts::Positioned on every
+  # supported Redmine version; including it again is harmless and keeps
+  # acts_as_positioned explicit for readers of this model.
   include Redmine::Acts::Positioned
   acts_as_positioned
 

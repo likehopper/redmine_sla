@@ -162,7 +162,7 @@ class Redmine::ApiTest::SlaSchedulesTest < ApplicationSlaApiTestCase
     end
     assert_response :unprocessable_entity
     assert_equal 'application/xml', @response.media_type
-    assert_select 'errors error', :text => "Dow cannot be blank"
+    assert_select 'errors error', :text => "Day cannot be blank"
   end
 
   test "POST /sla/schedules.xml with invalid parameters should unprocessable_entity for admin" do
@@ -224,7 +224,7 @@ test "POST /sla/schedules.xml with valid parameters should success for admin" do
     end
     assert_response :unprocessable_entity
     assert_equal 'application/xml', @response.media_type
-    assert_select 'errors', :text => "Dow cannot be blank"
+    assert_select 'errors', :text => "Day cannot be blank"
   end
 
   test "PUT /sla/schedules/:id.xml with valid parameters should update the sla_schedule" do

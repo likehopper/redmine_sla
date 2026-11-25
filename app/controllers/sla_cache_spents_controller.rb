@@ -76,7 +76,7 @@ class SlaCacheSpentsController < ApplicationController
         entities = scope.limit(Setting.feeds_limit.to_i)
                         .reorder("#{SlaCacheSpent.table_name}.updated_on DESC")
                         .to_a
-        render_feed(entities, title: l(:label_sla_cache_spent))
+        render_feed(entities, title: l('sla_label.sla_cache_spent.plural'))
       end
       format.csv do
         # Export all entities that match the current query

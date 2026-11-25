@@ -84,7 +84,7 @@ class SlaCachesController < ApplicationController
         entities = scope.
           limit(Setting.feeds_limit.to_i).
           reorder("#{SlaCache.table_name}.updated_on DESC").to_a
-        render_feed(entities, :title => l(:label_sla_cache))
+        render_feed(entities, :title => l('sla_label.sla_cache.plural'))
       end
       format.csv do
         # Export all entities (no pagination)

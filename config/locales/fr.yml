@@ -17,11 +17,12 @@
 # File: redmine_sla/config/locales/fr.yml
 fr:
   label_sla_locale_settings: Paramètres régionaux
-  label_sla_gauge_style: Style des jauges SLA
-  label_sla_icon_set: Jeu d’icônes
+  label_sla_gauge_style: Style des jauges de SLA
+  label_sla_icon_set: Jeu d'icônes
   label_sla_icons_credit: Icônes réalisées par
   permission_view_sla: Voir les SLA
-  permission_manage_sla: Configurer les SLA
+  permission_manage_sla: Gérer les SLA
+  project_module_sla: SLA
 
   msgerror: Message d'erreur
 
@@ -40,7 +41,7 @@ fr:
     end_time: &end_time Heure de fin
     date: &date Date
     updated_on: &updated_on Mis-à-jour
-    sla_priority_id: &sla_priority_id Priorité SLA
+    sla_priority_id: &sla_priority_id Priorité de SLA
     match: &match Correspondance
     term: &term Engagement
     status: &status Statut
@@ -51,14 +52,14 @@ fr:
     sla_type: &sla_type Type de SLA
     sla_level: &sla_level Niveau de SLA
     sla_cache: &sla_cache Cache de SLA
-    sla_cache_spent: &sla_cache_spent Délai du cache de SLA
-    custom_field: &custom_field SLA Champs personnalisés
+    sla_cache_spent: &sla_cache_spent Délai du Cache de SLA
+    custom_field: &custom_field Champ personnalisé de SLA
 
+  # field_name, field_start_date and field_status come from Redmine core:
+  # redefining them here would override the core labels on every page.
   field_id: id
   field_sla: *sla
   field_slas: *slas
-  field_name: *name
-  field_start_date: *start_date
   field_end_date: *end_date
   field_dow: *dow
   field_start_time: *start_time
@@ -67,7 +68,6 @@ fr:
   field_sla_priority_id: *sla_priority_id
   field_match: *match
   field_term: *term
-  field_status: *status
   field_spent: *spent
   field_sla_holiday: *sla_holiday
   field_sla_calendar: *sla_calendar
@@ -99,8 +99,8 @@ fr:
         name: *name
         sla: *sla
         sla_id: *sla
-        sla_type: *sla_level
-        sla_type_id: *sla_level
+        sla_type: *sla_type
+        sla_type_id: *sla_type
         sla_calendar: *sla_calendar
         sla_calendar_id: *sla_calendar
       sla_status:
@@ -117,8 +117,8 @@ fr:
       sla_schedules:
         sla_calendar_id: *sla_calendar
       sla_schedule:
-        sla_shedule: *sla_schedule
-        sla_shedule_id: *sla_schedule
+        sla_schedule: *sla_schedule
+        sla_schedule_id: *sla_schedule
         sla_calendar: *sla_calendar
         sla_calendar_id: *sla_calendar
         dow: *dow
@@ -137,6 +137,9 @@ fr:
         sla_type: *sla_type
         sla_type_id: *sla_type
         sla_priority_id: *sla_priority_id
+        # Internal copy of sla_priority_id when the priority comes from a custom field
+        custom_field_enumeration: *sla_priority_id
+        custom_field_enumeration_id: *sla_priority_id
         term: *term
       sla_cache:
         sla_cache: *sla_cache
@@ -168,11 +171,11 @@ fr:
         zero: Aucun SLA
         one: Un SLA
         other: "%{count} SLA"
-      index: Listes les SLA
+      index: Lister les SLA
       new: Ajouter un SLA
       show: Voir un SLA
-      edit: Editer un SLA
-      save: Enregistrer un SLA
+      edit: Modifier un SLA
+      save: Sauvegarder un SLA
       delete: Supprimer un SLA
       miss: SLA absent
       notice_successful_create: "SLA %{id} créé."
@@ -189,10 +192,10 @@ fr:
       index: Lister les Types de SLA
       new: Ajouter un Type de SLA
       show: Voir un Type de SLA
-      edit: Editer un Type de SLA
-      save: Enregistrer un Type de SLA
+      edit: Modifier un Type de SLA
+      save: Sauvegarder un Type de SLA
       delete: Supprimer un Type de SLA
-      miss: Absence du Type de SLA
+      miss: Type de SLA absent
       notice_successful_create: "Type de SLA %{id} créé."
       notice_successful_update: "Type de SLA %{id} mis à jour."
 
@@ -207,17 +210,17 @@ fr:
       index: Lister les Statuts de SLA
       new: Ajouter un Statut de SLA
       show: Voir un Statut de SLA
-      edit: Editer un Statut de SLA
-      save: Enregistrer un Statut de SLA
+      edit: Modifier un Statut de SLA
+      save: Sauvegarder un Statut de SLA
       delete: Supprimer un Statut de SLA
       miss: Statut de SLA absent
       notice_successful_create: "Statut de SLA %{id} créé."
       notice_successful_update: "Statut de SLA %{id} mis à jour."
 
-    # SlaHoliday
+    # SlaHoliday
     sla_holiday:
       singular: *sla_holiday
-      plural:  Jours fériés de SLA
+      plural: Jours fériés de SLA
       count:
         zero: Aucun Jour férié de SLA
         one: Un Jour férié de SLA
@@ -225,8 +228,8 @@ fr:
       index: Lister les Jours fériés de SLA
       new: Ajouter un Jour férié de SLA
       show: Voir un Jour férié de SLA
-      edit: Editer un Jour férié de SLA
-      save: Enregistrer un Jour férié de SLA
+      edit: Modifier un Jour férié de SLA
+      save: Sauvegarder un Jour férié de SLA
       delete: Supprimer un Jour férié de SLA
       miss: Jour férié de SLA absent
       notice_successful_create: "Jour férié de SLA %{id} créé."
@@ -243,8 +246,8 @@ fr:
       index: Lister les Calendriers de SLA
       new: Ajouter un Calendrier de SLA
       show: Voir un Calendrier de SLA
-      edit: Editer un Calendrier de SLA
-      save: Enregistrer un Calendrier de SLA
+      edit: Modifier un Calendrier de SLA
+      save: Sauvegarder un Calendrier de SLA
       delete: Supprimer un Calendrier de SLA
       miss: Calendrier de SLA absent
       notice_successful_create: "Calendrier de SLA %{id} créé."
@@ -261,125 +264,131 @@ fr:
       index: Lister les Horaires de SLA
       new: Ajouter un Horaire de SLA
       show: Voir un Horaire de SLA
-      edit: Editer un Horaire de SLA
-      save: Enregistrer un Horaire de SLA
+      edit: Modifier un Horaire de SLA
+      save: Sauvegarder un Horaire de SLA
       delete: Supprimer un Horaire de SLA
       miss: Horaire de SLA absent
-      exists: Ce crénau existe déjà
+      exists: Ce créneau existe déjà
       overlaps: Les horaires se recouvrent
       inconsistency: Les horaires sont incohérents
 
     # SlaCalendarHoliday
     sla_calendar_holiday:
-      plural: Jours fériés des calendriers de SLA
-      singular: Jour férié d'un calendrier de SLA
+      singular: Jour férié d'un Calendrier de SLA
+      plural: Jours fériés des Calendriers de SLA
       count:
-        zero: Aucun Jour férié d'un calendrier de SLA
-        one: Un Jour férié d'un calendrier de SLA
-        other: "%{count} Jours fériés des calendriers de SLA"      
-      index: Lister kes Jours fériés d'un calendrier de SLA
-      new: Ajouter des Jours fériés d'un calendrier de SLA
-      show: Voir des Jours fériés d'un calendrier de SLA
-      edit: Editer des Jours fériés d'un calendrier de SLA
-      save: Enregistrer des Jours fériés d'un calendrier de SLA
-      delete: Supprimer des Jours fériés d'un calendrier de SLA
-      exists: Ce jour férié existe déja dans ce calendrier de SLA
+        zero: Aucun Jour férié d'un Calendrier de SLA
+        one: Un Jour férié d'un Calendrier de SLA
+        other: "%{count} Jours fériés des Calendriers de SLA"
+      index: Lister les Jours fériés des Calendriers de SLA
+      new: Ajouter un Jour férié d'un Calendrier de SLA
+      show: Voir un Jour férié d'un Calendrier de SLA
+      edit: Modifier un Jour férié d'un Calendrier de SLA
+      save: Sauvegarder un Jour férié d'un Calendrier de SLA
+      delete: Supprimer un Jour férié d'un Calendrier de SLA
+      exists: Ce jour férié existe déjà dans ce calendrier de SLA
 
-    # SlaLevel
+    # SlaLevel
     sla_level:
       singular: Niveau de SLA
       plural: Niveaux de SLA
       count:
         zero: Aucun Niveau de SLA
         one: Un Niveau de SLA
-        other: "%{count} Niveaux de SLA"      
+        other: "%{count} Niveaux de SLA"
       index: Lister les Niveaux de SLA
       new: Ajouter un Niveau de SLA
       show: Voir un Niveau de SLA
-      edit: Editer un Niveau de SLA
-      save: Enregistrer un Niveau de SLA
+      edit: Modifier un Niveau de SLA
+      save: Sauvegarder un Niveau de SLA
       delete: Supprimer un Niveau de SLA
       purge: Purge de tous les Engagements de SLA du Niveau de SLA
       miss: Niveau de SLA absent
       notice_successful_create: "Niveau de SLA %{id} créé."
       notice_successful_update: "Niveau de SLA %{id} mis à jour."
 
-    # SlaLevelTerm
+    # SlaLevelTerm
     sla_level_term:
       singular: Engagement de SLA
       plural: Engagements de SLA
       count:
         zero: Aucun Engagement de SLA
         one: Un Engagement de SLA
-        other: "%{count} Engagements de SLA"      
+        other: "%{count} Engagements de SLA"
       index: Lister les Engagements de SLA
       new: Ajouter un Engagement de SLA
       show: Voir un Engagement de SLA
-      edit: Editer un Engagement de SLA
-      save: Enregistrer un Engagement de SLA
+      edit: Modifier un Engagement de SLA
+      save: Sauvegarder un Engagement de SLA
       delete: Supprimer un Engagement de SLA
       miss: Engagement de SLA absent
       exists: Cet engagement existe déjà
       negative: Un engagement négatif est impossible
+      notice_successful_create: "Engagement de SLA %{id} créé."
+      notice_successful_update: "Engagement de SLA %{id} mis à jour."
       show_hidden_types: Afficher les types de SLA masqués
 
     # SlaProjectTracker
     sla_project_tracker:
       singular: Tracker de projet de SLA
       plural: Trackers de projet de SLA
+      count:
+        zero: Aucun Tracker de projet de SLA
+        one: Un Tracker de projet de SLA
+        other: "%{count} Trackers de projet de SLA"
       index: Lister les Trackers de projet de SLA
       new: Ajouter un Tracker de projet de SLA
-      edit: Editer un Tracker de projet de SLA
+      edit: Modifier un Tracker de projet de SLA
       delete: Supprimer un Tracker de projet de SLA
-      save: Enregistrer un Tracker de projet de SLA
+      save: Sauvegarder un Tracker de projet de SLA
       exists: Ce tracker existe déjà
       miss_project: Aucun projet disponible
 
-    # SlaCache
+    # SlaCache
     sla_cache:
       singular: Cache de SLA
       plural: Caches de SLA
       count:
-        zero: Pas de Cache SLA
+        zero: Aucun Cache de SLA
         one: Un Cache de SLA
         other: "%{count} Caches de SLA"
       index: Lister les Caches de SLA
       show: Voir un Cache de SLA
-      delete: Supprimer de Cache de SLA
-      purge: Purge de Cache de SLA
-      miss: Cache de SLA manquant
+      delete: Supprimer un Cache de SLA
+      purge: Purger les Caches de SLA
+      miss: Cache de SLA absent
 
-    # SlaCacheSpent
+    # SlaCacheSpent
     sla_cache_spent:
-      singular: Délai du cache de SLA
-      plural: Délais du cache de SLA
+      singular: Délai du Cache de SLA
+      plural: Délais du Cache de SLA
       count:
-        zero: Pas de délai du cache SLA
-        one: Un délai du cache de SLA
-        other: "%{count} délais du cache de SLA"
-      index: Lister les délais des caches de SLA
-      show: Voir un délai du cache de SLA
-      delete: Supprimer de délai du cache de SLA
-      purge: Purge de délai du cache de SLA
-      miss: Délai du cache de SLA manquant
-      manage: Gestion de délai du cache de SLA
+        zero: Aucun Délai du Cache de SLA
+        one: Un Délai du Cache de SLA
+        other: "%{count} Délais du Cache de SLA"
+      index: Lister les Délais du Cache de SLA
+      show: Voir un Délai du Cache de SLA
+      delete: Supprimer un Délai du Cache de SLA
+      purge: Purger les Délais du Cache de SLA
+      miss: Délai du Cache de SLA absent
+      manage: Gestion des Délais du Cache de SLA
 
   # Autres
   label_sla_title_horaire_am: Horaires AM
   label_sla_title_horaire_pm: Horaires PM
   label_sla_notice: Les SLA sont tous stockés dans un <a href="%{url}">cache</a>. Les SLA sont générés à l'affichage des valeurs dans les demandes.
-  label_sla_warning: Les changements (%{changes}) ont impliqués une mise à jour des SLA !
+  label_sla_warning: Les changements (%{changes}) ont impliqué une mise à jour des SLA !
   label_sla_term: Délais
 
   button_sla_explain: Expliquer
   label_sla_explain_title: Explication du SLA
-  label_sla_explain_level: Sélection du niveau SLA
+  label_sla_explain_level: Sélection du niveau de SLA
   label_sla_explain_no_level: Aucun SLA n'est configuré pour ce projet/tracker, ou aucun horaire correspondant n'a été trouvé dans la fenêtre de recherche.
   label_sla_explain_matched: Correspond
   label_sla_explain_selected: Retenu
-  label_sla_explain_issue_created_on: "Ticket créé le :"
+  label_sla_explain_issue_created_on: "Demande créée le :"
   label_sla_explain_spent: Temps passé, par type de SLA
-  label_sla_explain_no_term: Aucun niveau SLA ne s'applique à ce ticket, le temps passé ne peut donc pas être calculé.
+  label_sla_explain_no_term: Aucun niveau de SLA ne s'applique à cette demande, le temps passé ne peut donc pas être calculé.
   label_sla_explain_from_status: Statut de départ
   label_sla_explain_to_status: Statut d'arrivée
   label_sla_explain_from_date: Du
@@ -408,15 +417,15 @@ fr:
   sla_holiday_import_country: "Pays"
   sla_holiday_import_default_country: "Pays par défaut des jours fériés"
   sla_holiday_import_country_hint: "Code ISO du pays, par exemple FR. Laisser vide pour choisir lors de l'import."
-  sla_time_zone_change_note: "Le changement de fuseau horaire ne s'applique qu'aux nouveaux calculs : les délais SLA déjà calculés ne sont pas recalculés."
-  sla_time_zone_change_warning: "Le fuseau horaire va changer. Les délais SLA déjà calculés gardent l'ancien fuseau : prévenez les utilisateurs concernés."
+  sla_time_zone_change_note: "Le changement de fuseau horaire ne s'applique qu'aux nouveaux calculs : les délais de SLA déjà calculés ne sont pas recalculés."
+  sla_time_zone_change_warning: "Le fuseau horaire va changer. Les délais de SLA déjà calculés gardent l'ancien fuseau : prévenez les utilisateurs concernés."
   sla_holiday_import_language_local: "Langue locale du pays"
-  sla_holiday_import_description: "Récupérer les jours fériés depuis Nager.Date en anglais ou dans la langue locale du pays, avec l’année ajoutée au nom. Les dates existantes et les associations aux calendriers sont conservées."
+  sla_holiday_import_description: "Récupérer les jours fériés depuis Nager.Date en anglais ou dans la langue locale du pays, avec l'année ajoutée au nom. Les dates existantes et les associations aux calendriers sont conservées."
   sla_holiday_import_selection_hint: "Les jours nationaux sont présélectionnés. Vérifiez les jours régionaux avant de les sélectionner. Les entrées d'une même date sont réunies."
   sla_holiday_import_scope: "Portée"
   sla_holiday_import_existing: "Jour férié existant"
   sla_holiday_import_national: "National"
-  sla_holiday_import_success: "%{created} jours créés, %{skipped} dates existantes ignorées."
+  sla_holiday_import_success: "%{created} jours fériés créés, %{skipped} dates existantes ignorées."
   sla_holiday_import_error_unavailable: "Le service de jours fériés est inaccessible. Réessayez ultérieurement."
   sla_holiday_import_error_invalid_response: "Le service a renvoyé des données invalides. Aucun jour férié n'a été importé."
   sla_holiday_import_error_invalid_selection: "Sélectionnez une année et un pays valides."

@@ -1,5 +1,39 @@
 # Changelog
 
+## 3.7.0 - 2026-11-25
+
+### Fixed
+
+- The plugin no longer redefines Redmine core labels. In French, the issue
+  start date was labelled "Date de début" on every Redmine page instead of the
+  core "Début"; the duplicated "Name" and "Status" labels are removed too.
+- Labels that were displayed as missing translations now exist: the bulk delete
+  confirmation of SLA project trackers, the flash messages after creating or
+  updating an SLA term, and the titles of the SLA cache Atom feeds.
+- French and English labels are corrected and use Redmine core wording
+  ("Modifier", "Sauvegarder", "Demande"; "Issue"). Object names are capitalized
+  the same way in every list, form and button, for example "SLA Calendar
+  Holidays" and "SLA Project Trackers" instead of "SLA Calendars' Holidays" and
+  "SLA projects' trackers". English plurals are fixed ("List SLAs", "SLA Cache
+  Spent Times" instead of "SLA Cache Spents"). The SLA schedule day field is
+  now named "Day" instead of "Dow", including in API validation errors ("Day
+  cannot be blank").
+- Invisible characters are removed from the English cache notice.
+- Redmine 6 and 7: SLA form fields and validation messages use translated
+  attribute names again, such as "Service Level Agreement" instead of "Sla" on
+  the project tracker form, or "Projet", "Statut" and "Heure de début" in
+  French. Redmine 6 moved this translation from ActiveRecord::Base to
+  ApplicationRecord; the SLA models now inherit from ApplicationRecord when it
+  exists.
+- The SLA project module, shown in project settings and as the permission group
+  of roles, is named "SLA" instead of "Sla".
+
+### Changed
+
+- The permissions are named "View SLAs" and "Manage SLAs" in English, and
+  "Voir les SLA" and "Gérer les SLA" in French, like the Redmine core
+  permissions. Their identifiers (`view_sla`, `manage_sla`) are unchanged.
+
 ## 3.6.4 - 2026-11-20
 
 ### Fixed

@@ -18,7 +18,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-class Sla < ActiveRecord::Base
+class Sla < SlaApplicationRecord
 
   has_many :sla_project_trackers
   has_many :sla_levels

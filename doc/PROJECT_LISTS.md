@@ -10,7 +10,7 @@ project trackers):
     project with SLAs.
 
 The detailed project / tracker / SLA assignments remain available in
-**Administration > SLA Global settings > SLA projects' trackers** (group
+**Administration > SLA Global settings > SLA Project Trackers** (group
 the list by project).
 
 ## Who sees what
@@ -18,7 +18,7 @@ the list by project).
 | Profile | Column and filter offered | SLAs shown for |
 | --- | --- | --- |
 | Administrator | yes | every project, even with the SLA module disabled |
-| *View SLA* or *Manage SLA* in at least one project | yes | projects where the user has one of these permissions and the SLA module is enabled |
+| *View SLAs* or *Manage SLAs* in at least one project | yes | projects where the user has one of these permissions and the SLA module is enabled |
 | No SLA permission (or anonymous) | no | none |
 
 A project whose SLAs the user may not see behaves as a project without
@@ -42,13 +42,13 @@ Filter **SLA: none**:
 
 ![Administrator: projects without SLA](screenshots/project-lists/01-02-admin-projects-without-sla.png)
 
-### Manager (View SLA and Manage SLA in every project)
+### Manager (View SLAs and Manage SLAs in every project)
 
 ![Manager: project list](screenshots/project-lists/02-01-manager-projects-list.png)
 
 ![Manager: project board](screenshots/project-lists/02-02-manager-projects-board.png)
 
-### Developer (View SLA in two projects)
+### Developer (View SLAs in two projects)
 
 ![Developer: project list](screenshots/project-lists/03-01-developer-projects-list.png)
 

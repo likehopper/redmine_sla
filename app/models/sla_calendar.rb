@@ -18,7 +18,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-class SlaCalendar < ActiveRecord::Base
+class SlaCalendar < SlaApplicationRecord
 
   has_many :sla_calendar_holidays, dependent: :delete_all
   has_many :sla_levels

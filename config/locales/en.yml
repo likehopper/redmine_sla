@@ -20,8 +20,9 @@ en:
   label_sla_gauge_style: SLA gauge style
   label_sla_icon_set: Icon set
   label_sla_icons_credit: Icons created by
-  permission_view_sla: View SLA
-  permission_manage_sla: Manage SLA
+  permission_view_sla: View SLAs
+  permission_manage_sla: Manage SLAs
+  project_module_sla: SLA
 
   msgerror: Error message
 
@@ -31,15 +32,15 @@ en:
 
   sla_dictionary:
     sla: &sla Service Level Agreement
-    slas: &slas Service Levels Agreement
+    slas: &slas Service Level Agreements
     name: &name Name
     start_date: &start_date Start date
     end_date: &end_date End date
-    dow: &dow Dow
+    dow: &dow Day
     start_time: &start_time Start time
     end_time: &end_time End time
     date: &date Date
-    updated_on: &updated_on Update
+    updated_on: &updated_on Updated
     sla_priority_id: &sla_priority_id SLA Priority
     match: &match Match
     term: &term Term
@@ -51,14 +52,14 @@ en:
     sla_type: &sla_type SLA Type
     sla_level: &sla_level SLA Level
     sla_cache: &sla_cache SLA Cache
-    sla_cache_spent: &sla_cache_spent SLA Cache spent
-    custom_field: &custom_field SLA Custom field
+    sla_cache_spent: &sla_cache_spent SLA Cache Spent Time
+    custom_field: &custom_field SLA Custom Field
 
+  # field_name, field_start_date and field_status come from Redmine core:
+  # redefining them here would override the core labels on every page.
   field_id: id
   field_sla: *sla
   field_slas: *slas
-  field_name: *name
-  field_start_date: *start_date
   field_end_date: *end_date
   field_dow: *dow
   field_start_time: *start_time
@@ -67,7 +68,6 @@ en:
   field_sla_priority_id: *sla_priority_id
   field_match: *match
   field_term: *term
-  field_status: *status
   field_spent: *spent
   field_sla_holiday: *sla_holiday
   field_sla_calendar: *sla_calendar
@@ -99,8 +99,8 @@ en:
         name: *name
         sla: *sla
         sla_id: *sla
-        sla_type: *sla_level
-        sla_type_id: *sla_level
+        sla_type: *sla_type
+        sla_type_id: *sla_type
         sla_calendar: *sla_calendar
         sla_calendar_id: *sla_calendar
       sla_status:
@@ -117,8 +117,8 @@ en:
       sla_schedules:
         sla_calendar_id: *sla_calendar
       sla_schedule:
-        sla_shedule: *sla_schedule
-        sla_shedule_id: *sla_schedule
+        sla_schedule: *sla_schedule
+        sla_schedule_id: *sla_schedule
         sla_calendar: *sla_calendar
         sla_calendar_id: *sla_calendar
         dow: *dow
@@ -137,6 +137,9 @@ en:
         sla_type: *sla_type
         sla_type_id: *sla_type
         sla_priority_id: *sla_priority_id
+        # Internal copy of sla_priority_id when the priority comes from a custom field
+        custom_field_enumeration: *sla_priority_id
+        custom_field_enumeration_id: *sla_priority_id
         term: *term
       sla_cache:
         sla_cache: *sla_cache
@@ -159,22 +162,22 @@ en:
   sla_label_project_settings: SLA Project settings
 
   sla_label:
-  
+
     # Sla
     sla:
       singular: *sla
       plural: Service Level Agreements
       count:
-        zero: None SLA
+        zero: No SLA
         one: One SLA
-        other: "%{count} SLA"
-      index: List SLA
+        other: "%{count} SLAs"
+      index: List SLAs
       new: New SLA
       show: Show SLA
       edit: Edit SLA
       save: Save SLA
       delete: Delete SLA
-      miss: Miss SLA
+      miss: Missing SLA
       notice_successful_create: "SLA %{id} created."
       notice_successful_update: "SLA %{id} updated."
 
@@ -183,8 +186,8 @@ en:
       singular: *sla_type
       plural: SLA Types
       count:
-        zero: None SLA Type
-        one: One SLA Types
+        zero: No SLA Type
+        one: One SLA Type
         other: "%{count} SLA Types"
       index: List SLA Types
       new: New SLA Type
@@ -192,7 +195,7 @@ en:
       edit: Edit SLA Type
       save: Save SLA Type
       delete: Delete SLA Type
-      miss: Miss SLA Type
+      miss: Missing SLA Type
       notice_successful_create: "SLA Type %{id} created."
       notice_successful_update: "SLA Type %{id} updated."
 
@@ -201,25 +204,25 @@ en:
       singular: SLA Status
       plural: SLA Statuses
       count:
-        zero: None SLA Status
+        zero: No SLA Status
         one: One SLA Status
         other: "%{count} SLA Statuses"
-      index: List SLA Status
+      index: List SLA Statuses
       show: Show SLA Status
       new: New SLA Status
       edit: Edit SLA Status
       save: Save SLA Status
-      delete: Delete SLA Statuses
-      miss: Miss SLA Statuses
-      notice_successful_create: "SLA Statuses %{id} created."
-      notice_successful_update: "SLA Statuses %{id} updated."
+      delete: Delete SLA Status
+      miss: Missing SLA Status
+      notice_successful_create: "SLA Status %{id} created."
+      notice_successful_update: "SLA Status %{id} updated."
 
-    # SlaHoliday
+    # SlaHoliday
     sla_holiday:
       singular: *sla_holiday
       plural: SLA Holidays
       count:
-        zero: None SLA Holiday
+        zero: No SLA Holiday
         one: One SLA Holiday
         other: "%{count} SLA Holidays"
       index: List SLA Holidays
@@ -228,7 +231,7 @@ en:
       edit: Edit SLA Holiday
       save: Save SLA Holiday
       delete: Delete SLA Holiday
-      miss: Miss SLA Holiday
+      miss: Missing SLA Holiday
       notice_successful_create: "SLA Holiday %{id} created."
       notice_successful_update: "SLA Holiday %{id} updated."
 
@@ -237,7 +240,7 @@ en:
       singular: *sla_calendar
       plural: SLA Calendars
       count:
-        zero: None SLA Calendar
+        zero: No SLA Calendar
         one: One SLA Calendar
         other: "%{count} SLA Calendars"
       index: List SLA Calendars
@@ -246,129 +249,135 @@ en:
       edit: Edit SLA Calendar
       save: Save SLA Calendar
       delete: Delete SLA Calendar
-      miss: Miss SLA Calendar
+      miss: Missing SLA Calendar
       notice_successful_create: "SLA Calendar %{id} created."
       notice_successful_update: "SLA Calendar %{id} updated."
 
     # SlaSchedule
     sla_schedule:
       singular: *sla_schedule
-      plural:  SLA Schedules
+      plural: SLA Schedules
       count:
-        zero: None SLA Schedule
+        zero: No SLA Schedule
         one: One SLA Schedule
         other: "%{count} SLA Schedules"
-      index: List SLA Schedule
+      index: List SLA Schedules
       new: New SLA Schedule
       show: Show SLA Schedule
       edit: Edit SLA Schedule
       save: Save SLA Schedule
-      delete: Del SLA Schedule
-      miss: Miss SLA Schedule
-      exists: This slot alredy exists
+      delete: Delete SLA Schedule
+      miss: Missing SLA Schedule
+      exists: This slot already exists
       overlaps: Schedules overlap
-      inconsistency: It inconsistency schedules
+      inconsistency: Schedules are inconsistent
 
     # SlaCalendarHoliday
     sla_calendar_holiday:
-      singular: SLA Calendar's Holidays
-      plural: SLA Calendars' Holidays
+      singular: SLA Calendar Holiday
+      plural: SLA Calendar Holidays
       count:
-        zero: None SLA Calendar's Holiday
-        one: One SLA Calendar's Holidays
-        other: "%{count} SLA Calendars' Holidays"
-      index: List SLA Calendar's Holidays
-      new: New SLA Calendar's Holidays
-      show: Show SLA Calendar's Holidays
-      edit: Edit SLA Calendar's Holidays
-      save: Save SLA Calendar's Holidays
-      delete: Delete SLA Calendar's Holidays
-      exists: This holiday is already present in this SLA Calendar's Holidays
+        zero: No SLA Calendar Holiday
+        one: One SLA Calendar Holiday
+        other: "%{count} SLA Calendar Holidays"
+      index: List SLA Calendar Holidays
+      new: New SLA Calendar Holiday
+      show: Show SLA Calendar Holiday
+      edit: Edit SLA Calendar Holiday
+      save: Save SLA Calendar Holiday
+      delete: Delete SLA Calendar Holiday
+      exists: This holiday is already present in this SLA Calendar
 
-    # SlaLevel
+    # SlaLevel
     sla_level:
       singular: SLA Level
       plural: SLA Levels
       count:
-        zero: None SLA Level
+        zero: No SLA Level
         one: One SLA Level
         other: "%{count} SLA Levels"
-      index: List SLA Level
-      new: Add SLA Level
+      index: List SLA Levels
+      new: New SLA Level
       show: Show SLA Level
       edit: Edit SLA Level
       save: Save SLA Level
       delete: Delete SLA Level
       purge: Purge all SLA Terms of the SLA Level
-      miss: Miss SLA Level
+      miss: Missing SLA Level
       notice_successful_create: "SLA Level %{id} created."
       notice_successful_update: "SLA Level %{id} updated."
 
-    # SlaLevelTerm
+    # SlaLevelTerm
     sla_level_term:
       singular: SLA Term
       plural: SLA Terms
       count:
-        zero: None SLA Term
+        zero: No SLA Term
         one: One SLA Term
         other: "%{count} SLA Terms"
-      index: List SLA Term
-      new: Add SLA Term
+      index: List SLA Terms
+      new: New SLA Term
       show: Show SLA Term
       edit: Edit SLA Term
       save: Save SLA Term
       delete: Delete SLA Term
-      miss: Miss SLA Term
-      exists: This term alredy exists
-      negative: Negative term is impossible
+      miss: Missing SLA Term
+      exists: This term already exists
+      negative: A term cannot be negative
+      notice_successful_create: "SLA Term %{id} created."
+      notice_successful_update: "SLA Term %{id} updated."
       show_hidden_types: Show hidden SLA types
 
     # SlaProjectTracker
     sla_project_tracker:
-      plural: SLA projects' trackers
-      singular: SLA project's trackers
-      index: List SLA project's trackers
-      new: New SLA project's trackers
-      edit: Edit SLA project's trackers
-      save: Save SLA project's trackers
-      delete: Delete SLA project's trackers
-      exists: This tracker alredy exists
+      singular: SLA Project Tracker
+      plural: SLA Project Trackers
+      count:
+        zero: No SLA Project Tracker
+        one: One SLA Project Tracker
+        other: "%{count} SLA Project Trackers"
+      index: List SLA Project Trackers
+      new: New SLA Project Tracker
+      edit: Edit SLA Project Tracker
+      save: Save SLA Project Tracker
+      delete: Delete SLA Project Tracker
+      exists: This tracker already exists
       miss_project: No projects available
 
-    # SlaCache
+    # SlaCache
     sla_cache:
       singular: SLA Cache
       plural: SLA Caches
       count:
-        zero: None SLA Cache
+        zero: No SLA Cache
         one: One SLA Cache
         other: "%{count} SLA Caches"
-      index: List SLA Cache
+      index: List SLA Caches
       show: Show SLA Cache
-      delete: Destroy SLA Cache
-      purge: Purge SLA Cache
-      miss: Miss SLA Cache
+      delete: Delete SLA Cache
+      purge: Purge SLA Caches
+      miss: Missing SLA Cache
 
-    # SlaCacheSpent
+    # SlaCacheSpent
     sla_cache_spent:
-      singular: SLA Cache spent
-      plural: SLA Cache spents
+      singular: SLA Cache Spent Time
+      plural: SLA Cache Spent Times
       count:
-        zero: None SLA Cache spent
-        one: One SLA Cache spent
-        other: "%{count} SLA Cache spents"
-      index: List SLA Cache spent
-      show: Show SLA Cache spent
-      delete: Delete SLA Cache spent
-      purge: Purge SLA Cache spent
-      miss: Miss SLA Cache spent
-      manage: SLA Cache spent management
-      
-  # Others  
+        zero: No SLA Cache Spent Time
+        one: One SLA Cache Spent Time
+        other: "%{count} SLA Cache Spent Times"
+      index: List SLA Cache Spent Times
+      show: Show SLA Cache Spent Time
+      delete: Delete SLA Cache Spent Time
+      purge: Purge SLA Cache Spent Times
+      miss: Missing SLA Cache Spent Time
+      manage: SLA Cache Spent Time management
+
+  # Others
   label_sla_title_horaire_am: Schedule AM
   label_sla_title_horaire_pm: Schedule PM
-  label_sla_notice: SLA are all stored in a <a href="%{url}">cache</a>. SLA are generated when values ​​are displayed in issues.
-  label_sla_warning: The changes (%{changes}) involved an update of the SLA!
+  label_sla_notice: SLAs are all stored in a <a href="%{url}">cache</a>. SLAs are generated when values are displayed in issues.
+  label_sla_warning: The changes (%{changes}) triggered an update of the SLAs!
   label_sla_term: Term
 
   button_sla_explain: Explain
@@ -377,7 +386,7 @@ en:
   label_sla_explain_no_level: No SLA is configured for this project/tracker, or no matching schedule was found within the search window.
   label_sla_explain_matched: Matched
   label_sla_explain_selected: Selected
-  label_sla_explain_issue_created_on: "Ticket created on:"
+  label_sla_explain_issue_created_on: "Issue created on:"
   label_sla_explain_spent: Time spent, by SLA type
   label_sla_explain_no_term: No SLA level applies to this issue, so no time spent can be computed.
   label_sla_explain_from_status: From status
@@ -394,7 +403,7 @@ en:
   label_sla_explain_minutes: Minutes counted
   label_sla_explain_total_minutes: Total minutes counted
   label_sla_spent: Spent
-  label_sla_remain: Remain
+  label_sla_remain: Remaining
   label_sla_respect: Respect
   label_sla_am_from: From
   label_sla_am_to: to
