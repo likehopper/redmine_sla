@@ -1,5 +1,53 @@
 # Testing
 
+## Version 3.7.0 release matrix
+
+Validated on **2026-11-25** in isolated local containers with disposable
+databases. Source snapshot: `release/3.7.0` at `16f95f7`; the following commit
+only records this matrix. Each cell checked that the loaded plugin files match
+the frozen snapshot.
+
+| Redmine | Ruby | Rails | PostgreSQL 17.12 | MariaDB 10.11.19 | MySQL 8.0.46 |
+| --- | --- | --- | --- | --- | --- |
+| 5.1.12 | 3.2.11 | 6.1.7.10 | 1532 / 16540 | 1532 / 16531 | 1532 / 16531 |
+| 6.1.4 | 3.4.11 | 7.2.3.2 | 1532 / 16516 | 1532 / 16507 | 1532 / 16507 |
+| 7.0.1 | 4.0.7 | 8.1.3.1 | 1532 / 17173 | 1532 / 17163 | 1532 / 17163 |
+
+Cells record **tests / assertions**. Total: **13,788 tests / 150,631
+assertions**, zero failures or errors in the recorded runs, and 18 expected
+PostgreSQL-only skips on MariaDB/MySQL. Each combination ran 1,383
+unit/functional/integration/API tests, 32 standalone icon/HTML tests, 39
+Chromium system tests and 78 documentation tests, in that order with seed 0,
+after migrating a fresh database (migrations 001-029). Rails session SQL modes:
+MySQL `ONLY_FULL_GROUP_BY, NO_AUTO_VALUE_ON_ZERO, STRICT_TRANS_TABLES,
+STRICT_ALL_TABLES, NO_ZERO_IN_DATE, NO_ZERO_DATE, ERROR_FOR_DIVISION_BY_ZERO,
+NO_ENGINE_SUBSTITUTION`; MariaDB `NO_AUTO_VALUE_ON_ZERO, STRICT_TRANS_TABLES,
+STRICT_ALL_TABLES, ERROR_FOR_DIVISION_BY_ZERO, NO_AUTO_CREATE_USER,
+NO_ENGINE_SUBSTITUTION`.
+
+The test images were rebuilt for this matrix from the official Redmine images
+(Chromium, Liberation fonts, test gem group, `pg` and `mysql2`), because the
+images of the previous matrices were no longer available. Redmine 5.1.13 is no
+longer published as an image, so the 5.1 cells use **5.1.12**; both lack
+`ApplicationRecord`, the case the new base model class handles.
+
+One retry: on Redmine 7.0.1/MySQL, the first system run failed once in the
+intermittent `SlaIconUrlPrefixTest` (`.title-sla-settings` not found after saving
+the settings under a URL mount), as in the 3.6.4 matrix. The cell was rerun on a
+fresh database: the system and documentation suites passed, and the core and
+standalone suites kept their first, passing run.
+
+New regression test: `SlaAttributeLabelTest` checks that the SLA models inherit
+`SlaApplicationRecord` and resolve attribute names from the Redmine core and
+plugin `field_*` translations in English and French. On Redmine 6.1.4, making two
+models inherit `ActiveRecord::Base` again makes its four tests fail (French
+validation message "Project doit être renseigné(e)"). The documentation
+screenshots of this release come from Redmine 6.1.4/PostgreSQL documentation
+runs of the branch before the version bump; only the captures whose text changed
+(checked by OCR and visually) were replaced. No upgrade test on a populated
+database (no new migration), no production deployment and no CI execution were
+performed.
+
 ## Version 3.6.4 release matrix
 
 Validated on **2026-11-20** in isolated local containers with disposable
